@@ -1,5 +1,15 @@
 const winston = require('winston')
-const settings = require('./settings').logger
+const isTesting = (() => {
+  if (process.argv[2] === 'test') return true
+  else return false
+})()
+
+const getSettings = () => {
+  if (isTesting) return require('./settings.inc.js')
+  else return require('./settings')
+}
+
+const settings = getSettings().logger
 require('winston-daily-rotate-file')
 require('date-utils')
 

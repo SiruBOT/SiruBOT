@@ -6,6 +6,7 @@ const utils = {
   safeEdit: require('./modules/safe_Edit'),
   randmizer: require('./modules/randmizer')
 }
+
 const isTesting = (() => {
   if (process.argv[2] === 'test') return true
   else return false
