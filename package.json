@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js test"
+    "test": "node index.js test",
+    "ci": "node index.js test"
   },
   "author": "Sangoon_Is_Noob",
   "license": "GPL-3.0",
