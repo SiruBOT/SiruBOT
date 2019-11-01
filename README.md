@@ -21,4 +21,4 @@
 > apt-get install nodejs -y
 > ```
 
-## Install MYSQL
+## Install MongoDB
