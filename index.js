@@ -6,6 +6,15 @@ const utils = {
   safeEdit: require('./modules/safe_Edit'),
   randmizer: require('./modules/randmizer')
 }
+const isTesting = (() => {
+  if (process.argv[2] === 'test') return true
+  else return false
+})()
+
+const getSettings = () => {
+  if (isTesting) return require('./settings.inc.js')
+  else return require('./settings')
+}
 
 class Bot extends Discord.Client {
   constructor (options) {
@@ -26,9 +35,10 @@ class Bot extends Discord.Client {
       this.logger.error('[BOT] Bot is Already Initialized!')
       return new Error('[BOT] Bot is Already Initialized!')
     }
-    this.logger.info('[BOT] Initializing Bot..')
+    if (!isTesting) { this.logger.info('[BOT] Initializing Bot..') }
     this.registerEvents()
-    this.login(this._options.bot.token)
+    this.LoadCommands()
+    if (!isTesting) this.login(this._options.bot.token)
   }
 
   async LoadCommands () {
@@ -96,7 +106,7 @@ function globAsync (path) {
   })
 }
 
-const client = new Bot(require('./settings'))
+const client = new Bot(getSettings())
 client.init()
 
 process.on('uncaughtException', (err) => {
