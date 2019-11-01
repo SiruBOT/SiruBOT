@@ -1,4 +1,15 @@
-const settings = require('./settings')
+const isTesting = (() => {
+  if (process.argv[2] === 'test') return true
+  else return false
+})()
+
+const getSettings = () => {
+  if (isTesting) return require('./settings.inc.js')
+  else return require('./settings')
+}
+
+const settings = getSettings()
+
 module.exports = [{
   name: 'BotOwner',
   filter: (user) => settings.bot.owners.includes(user.id)
