@@ -16,7 +16,7 @@
     "discord.js": "^11.5.1",
     "discord.js-lavalink": "^2.2.3",
     "glob": "^7.1.6",
-    "mongoose": "^5.7.3",
+    "mongoose": "^5.7.5",
     "node-fetch": "^2.6.0",
     "saslprep": "^1.0.3",
     "string-placeholder": "^1.0.2",
