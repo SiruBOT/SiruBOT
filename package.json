@@ -15,7 +15,7 @@
     "date-utils": "^1.2.21",
     "discord.js": "^11.5.1",
     "discord.js-lavalink": "^2.2.3",
-    "glob": "^7.1.5",
+    "glob": "^7.1.6",
     "mongoose": "^5.7.3",
     "node-fetch": "^2.6.0",
     "saslprep": "^1.0.3",
