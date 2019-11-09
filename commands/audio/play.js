@@ -42,9 +42,9 @@ class Command {
   }
 }
 
-async function ask (message) {
+// async function ask (message) {
 
-}
+// }
 
 function validURL (str) {
   const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol

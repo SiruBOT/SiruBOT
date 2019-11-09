@@ -15,8 +15,8 @@ class Command {
    * @param {Object} compressed - Compressed Object (In CBOT)
    */
   run (compressed) {
-    const { message, args } = compressed
-    message.channel.send('Dev')
+    const { message } = compressed
+    message.channel.send(carriers.join(', '))
   }
 }
 module.exports = Command
