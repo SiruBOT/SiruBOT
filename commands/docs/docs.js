@@ -7,7 +7,6 @@ class Command {
     this.command = {
       name: 'docs',
       aliases: ['앷ㄴ', 'djsdocs', 'djs'],
-      description: 'Discord.Js Documentation',
       permissions: ['Everyone']
     }
   }

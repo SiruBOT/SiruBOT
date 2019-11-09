@@ -3,7 +3,7 @@ const AudioPlayer = require('./AudioPlayer')
 const { Collection } = require('discord.js')
 const fetch = require('node-fetch')
 const { URLSearchParams } = require('url')
-const Discord = require('discord.js')
+// const Discord = require('discord.js')
 
 class AudioManager {
   /**

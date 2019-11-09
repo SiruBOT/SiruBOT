@@ -4,11 +4,14 @@ class Command {
     this.command = {
       name: 'play',
       aliases: ['ㅔㅣ묘'],
-      description: '재생',
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Boolean} isSoundCloud - is Search Platform SoundCloud?
+   */
   async run (compressed, isSoundCloud) {
     const { message, args } = compressed
     const Audio = this.client.audio
@@ -20,7 +23,7 @@ class Command {
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
     const searchResult = await Audio.getSongs(searchStr)
-    console.log(searchResult)
+
     const result = searchResult.tracks[0]
     switch (searchResult.loadType) {
       case 'LOAD_FAILED':
@@ -30,12 +33,17 @@ class Command {
         message.channel.send(`플레이리스트 **${searchResult.playlistInfo.name}** 에는 **${searchResult.tracks.length}** 개의 노래가 있어요! 추가하시겠어요?`)
         Audio.players.get(message.guild.id).addQueue(searchResult.tracks)
         break
+      case 'SEARCH_RESULT':
       case 'TRACK_LOADED':
         message.channel.send(`노래 ${result.info.title} (${result.info.length / 1000} 초)`)
         Audio.players.get(message.guild.id).addQueue(result)
         break
     }
   }
+}
+
+async function ask (message) {
+
 }
 
 function validURL (str) {

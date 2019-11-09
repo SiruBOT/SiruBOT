@@ -2,9 +2,11 @@ const Discord = require('discord.js')
 const Logger = require('./logger')
 const DataBase = require('./modules/database')
 const Audio = require('./modules/audio/Audio')
+const LocalePicker = require('./locales/localePicker')
 const utils = {
   safeEdit: require('./modules/safe_Edit'),
-  randmizer: require('./modules/randmizer')
+  randmizer: require('./modules/randmizer'),
+  getStackTraceMessage: require('./modules/getStackTraceMessage')
 }
 
 const isTesting = (() => {
@@ -21,9 +23,9 @@ class Bot extends Discord.Client {
   constructor (options) {
     super()
     this._options = options
-    this.randmizer = require('./modules/randmizer')
     this.logger = new Logger(this)
     this.database = new DataBase(this)
+    utils.localePicker = new LocalePicker(this)
     this.utils = utils
     this.activityNum = 0
     this.initialized = false
@@ -37,6 +39,7 @@ class Bot extends Discord.Client {
       return new Error('[BOT] Bot is Already Initialized!')
     }
     if (!isTesting) { this.logger.info('[BOT] Initializing Bot..') }
+    this.utils.localePicker.init()
     this.registerEvents()
     this.LoadCommands()
     if (!isTesting) this.login(this._options.bot.token)
@@ -89,6 +92,7 @@ class Bot extends Discord.Client {
     this.activityNum++
     if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
     if (!act) act = this.getActivityMessage(this._options.bot.games[this.activityNum])
+    this.logger.debug(`[Activity] Setting Bot's Activity to ${act}`)
     this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
   }
 

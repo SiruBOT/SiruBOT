@@ -4,7 +4,6 @@ class Command {
     this.command = {
       name: 'volume',
       aliases: ['볼륨', 'vol', 'qhffba', '패ㅣㅕㅡㄷ'],
-      description: '볼륨 설정',
       permissions: ['Everyone']
     }
   }

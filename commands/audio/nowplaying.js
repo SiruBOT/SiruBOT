@@ -4,7 +4,6 @@ class Command {
     this.command = {
       name: 'nowplaying',
       aliases: ['np', 'ㅞ'],
-      description: '현재 재생 중 보여주기',
       permissions: ['Everyone']
     }
   }

@@ -4,7 +4,6 @@ class Command {
     this.command = {
       name: 'stop',
       aliases: ['ㄴ새ㅔ', '정지'],
-      description: '노래 정지',
       permissions: ['Everyone']
     }
   }

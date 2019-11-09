@@ -4,7 +4,6 @@ class Command {
     this.command = {
       name: 'settc',
       aliases: ['ㄴㄷㅅㅅㅊ'],
-      description: '택스트 채널 설정',
       permissions: ['Administrator']
     }
   }

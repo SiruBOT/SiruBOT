@@ -5,7 +5,6 @@ class Command {
     this.command = {
       name: 'nodeinfo',
       aliases: ['ㅜㅐㅇ댜ㅜ래'],
-      description: '오디오 노드 상태 확인',
       permissions: ['Everyone']
     }
   }

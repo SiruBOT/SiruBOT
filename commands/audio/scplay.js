@@ -4,7 +4,6 @@ class Command {
     this.command = {
       name: 'scplay',
       aliases: ['ㄴㅊㅔㅣ묘'],
-      description: '사운드클라우드 재생',
       permissions: ['Everyone']
     }
   }

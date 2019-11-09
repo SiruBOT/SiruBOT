@@ -81,9 +81,12 @@ class AudioPlayer {
       this.player.emit('end', 'error')
     })
     this.player.once('end', async (data) => {
-      if (data === 'error') return this.client.logger.error(`[Audio] Error on play track: ${item.info.identifier}`)
-      if (data.reason === 'REPLACED') return this.client.logger.debug(`[Audio] Replaced Track! (Guild: ${this.guild})`)
       this.nowplaying = null
+      if (data === 'error') {
+        this.playNext(true)
+        return this.client.logger.error(`[Audio] Error on play track: ${item.info.identifier}`)
+      }
+      if (data.reason === 'REPLACED') return this.client.logger.debug(`[Audio] Replaced Track! (Guild: ${this.guild})`)
       const guildData = await this.client.database.getGuildData(this.guild)
       switch (guildData.repeat) {
         case 0:

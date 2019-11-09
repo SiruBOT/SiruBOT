@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: 'debug',
       aliases: [],
+      description: 'debug',
       permissions: ['Everyone']
     }
   }

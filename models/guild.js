@@ -8,6 +8,7 @@ const Schema = new mongo.Schema({
   welcomeMessage: { type: String, default: '환영합니다!' },
   filter: { type: Boolean, default: false },
   customFilter: { type: Array, default: [] },
+  locale: { type: String, default: 'ko_kr' },
 
   // Audio
   repeat: { type: Number, default: 0 },

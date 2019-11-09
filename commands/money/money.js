@@ -4,26 +4,34 @@ class Command {
     this.command = {
       name: '돈',
       aliases: ['money', 'ehs'],
-      description: '돈 정보',
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
+    const picker = this.client.utils.localePicker
+    const locale = compressed.GuildData.locale
     const { message, GlobalUserData, args } = compressed
     const user = getUserFromMention(this.client.users, args[0])
     if (user.bot === true) {
-      return message.reply(`${this.client._options.money.emoji}  이 유저는 봇인거 같아요!`)
+      return message.reply(picker.get(locale, 'COMMANDS_MONEY_BOT'))
     } else if (user) {
       const data = await this.client.database.getGlobalUserData(user)
-      if (!data) return message.reply(`${this.client._options.money.emoji}  이 유저는 등록되지 않은 (${this.client._options.bot.name}을 사용하지 않은) 유저에요!`)
-      message.reply(`${this.client._options.money.emoji}  ${user.tag} 의 잔고: \`\`${data.money}\`\` ${this.client._options.money.name}`)
+      if (!data) return message.reply()
+      message.reply(picker.get(locale, 'COMMANDS_MONEY_BALANCE_OTHER', { USER_TAG: user.tag, MONEY: data.money }))
     } else {
-      message.reply(`${this.client._options.money.emoji}  당신의 잔고: \`\`${GlobalUserData.money}\`\` ${this.client._options.money.name}`)
+      message.reply(picker.get(locale, 'COMMANDS_MONEY_BALANCE_ME', { USER_TAG: user.tag, MONEY: GlobalUserData.money }))
     }
   }
 }
 
+/**
+* @param {Map} users - Bot's Users (Collection)
+* @param {String} mention - Discord Mention String
+*/
 function getUserFromMention (users, mention) {
   if (!mention) return false
 

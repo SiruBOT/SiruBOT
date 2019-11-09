@@ -31,6 +31,7 @@ class Event {
       const compressed = {
         GlobalUserData: GlobalUserData,
         GuildMemberData: GuildMemberData,
+        GuildData: GuildData,
         message: message,
         args: args,
         userPermissions: userPermissions

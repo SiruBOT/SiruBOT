@@ -4,7 +4,6 @@ class Command {
     this.command = {
       name: 'setvc',
       aliases: ['ㄴㄷㅅㅍㅊ'],
-      description: '보이스 채널 설정',
       permissions: ['Administrator']
     }
   }

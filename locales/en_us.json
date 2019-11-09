@@ -1,0 +1,24 @@
+{
+    "COMMANDS_PING_PING": "%EMOJI_PINGPONG% Ping",
+    "COMMANDS_PING_PONG": "%EMOJI_PINGPONG% Pong!",
+    "COMMANDS_PING_PINGING": "Pinging..",
+    "COMMANDS_PING_RESULT": "Websocket Ping: %WEBSOCKET%\nMessage Responce Ping: %RESPONCE%",
+
+    "COMMANDS_MONEY_BOT": "%EMOJI_MONEY%  I think this user is a bot!",
+    "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY% This user is not a registered user (not using %BOT_NAME_EN%)!",
+    "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  %USER_TAG%'s Balance: ``%MONEY%`` %MONEY_NAME_EN%",
+    "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  Your balance: ``%MONEY%`` %MONEY_NAME_EN%",
+
+    "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY% Finish using other gambling commands!",
+
+    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX% Money`` command to get %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%getmoney`` command to receive %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_START": "%MEMBER% %EMOJI_MONEY% I'll start all-in! The odds are half! %EMOJI_MONEY% Press reaction in 15 seconds to start all-in!",
+    "COMMANDS_CASINO_ALLIN_RAND_LOAD": "Playing slots ... | Playing card games .. | Checking balance .. | Cheating..",
+    "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "Congratulations!:tada:|Congratulations!|:tada:|:smile:",
+    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_RAND_FAIL": "Attempt the following! | Maybe it might be .. | It's okay .. | Okay .. | T.T...",
+    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER% %EMOJI_MONEY% All-in failed. Your balance has been set to` `0 ''.% RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO% Timed out. Please try again with ``%PREFIX%allin``!"
+}

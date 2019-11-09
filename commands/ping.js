@@ -7,23 +7,26 @@ class Command {
     this.command = {
       name: 'ping',
       aliases: ['ㅔㅑㅜㅎ', '핑'],
-      description: '핑',
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   run (compressed) {
     const { message } = compressed
-    // message.channel.send(`${message.member}\n> 핑 측정 중...`).then(m => {
-    //   m.edit(`${message.member}\n> 웹소켓 핑: ${this.client.pings.join('ms **=>** ')}ms\n> 메세지 반응 핑: ${m.createdAt - message.createdTimestamp}ms`)
-    // })
+    const locale = compressed.GuildData.locale
+    const picker = this.client.utils.localePicker
     const embed = new Discord.RichEmbed()
-    embed.setTitle('🏓 핑!')
+
+    embed.setTitle(picker.get(locale, 'COMMANDS_PING_PING'))
     embed.setColor(getColor(message.member))
-    embed.setDescription('핑 측정 중...')
+    embed.setDescription(picker.get(locale, 'COMMANDS_PING_PINGING'))
+
     message.reply(embed).then((m) => {
-      embed.setTitle('🏓 퐁!')
-      embed.setDescription(`웹소켓 핑: ${this.client.pings.join('ms **=>** ')}ms\n메세지 반응 핑: ${m.createdAt - message.createdTimestamp}ms`)
+      embed.setTitle(picker.get(locale, 'COMMANDS_PING_PONG'))
+      embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.pings.join('ms **=>** ')}ms`, RESPONCE: `${m.createdAt - message.createdTimestamp}ms` }))
       embed.setFooter(`${message.member.displayName}`, message.author.displayAvatarURL)
       m.edit(message.author, embed)
     })
