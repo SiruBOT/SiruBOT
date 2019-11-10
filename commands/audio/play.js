@@ -1,3 +1,4 @@
+// TODO: Localization Play.js
 class Command {
   constructor (client) {
     this.client = client
@@ -18,7 +19,7 @@ class Command {
     let searchStr = args.join(' ')
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
 
-    if (!this.client.audio.players.get(message.guild.id)) return message.channel.send('먼저 Join 명령어로 봇을 보이스 채널에 추가해주세요!')
+    if (!this.client.audio.players.get(message.guild.id)) await this.client.commands.get('join').run(compressed, true)
     if (args.length === 0) return message.channel.send('검색어를 입력해주세요!')
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
 

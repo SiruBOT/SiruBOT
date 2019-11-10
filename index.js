@@ -45,6 +45,17 @@ class Bot extends Discord.Client {
     if (!isTesting) this.login(this._options.bot.token)
   }
 
+  getRightTextChannel (channel, id) {
+    if (id === channel.id) return true
+    if (id === '0') return true
+    if (this.channels.get(id)) {
+      if (this.channels.get(id).id === channel.id) return true
+      else return false
+    } else {
+      return true
+    }
+  }
+
   async LoadCommands () {
     this.commands = new Discord.Collection()
     this.aliases = new Discord.Collection()

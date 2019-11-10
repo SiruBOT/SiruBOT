@@ -11,12 +11,10 @@ class Command {
 
   run (compressed) {
     const { message, args } = compressed
-    let codeIn = `const server = message.guild;
-const fs = require('fs');
-const child = require('child_process');
-const os = require("os");
-const Audio = this.client.audio
-` + args.join(' ')
+    if (args.length === 0) return message.channel.send('❎  코드를 적어주세요')
+    let codeIn = `
+const child = require('child_process')
+const Discord = require('discord.js')\n` + args.join(' ')
     let type
     try {
       const result = new Promise((resolve) => resolve(eval(codeIn)))
@@ -43,17 +41,12 @@ const Audio = this.client.audio
         embed.addField(':outbox_tray: 출력', `\`\`\`js\n${code} \n\`\`\``)
         message.channel.send(embed)
       }).catch(e => {
-        const embed = new Discord.RichEmbed()
-          .setAuthor('오류!')
-          .setColor('#D6564E')
-        if (codeIn.length > 1000) {
-          codeIn = codeIn.substr(0, 1000) + ' (1000자 이상..'
-        }
-        embed.addField(':inbox_tray: 입력', `\`\`\`js\n${codeIn} \`\`\``)
-        embed.addField(':outbox_tray: 오류', `\`\`\`js\n${e} \n\`\`\``)
-        message.channel.send(embed)
+        sendError(e)
       })
     } catch (e) {
+      sendError(e)
+    }
+    function sendError (e) {
       const embed = new Discord.RichEmbed()
         .setAuthor('오류!')
         .setColor('#D6564E')

@@ -10,6 +10,7 @@ class AudioPlayer {
     this.client = options.client
     this.guild = options.guild
     this.channel = options.channel
+    this.textChannel = options.textChannel
     this.player = null
     this.node = null
     this.nowplaying = null
@@ -76,7 +77,12 @@ class AudioPlayer {
     this.client.database.updateGuildData(this.guild, { $set: { nowplaying: item } })
     this.player.play(item.track)
     this.player.volume(volumeData.volume)
-    this.client.channels.get('633004130259959818').send(`> Audio System: **Playing Now In <#${this.channel}>...**\n> **${item.info.title}**`)
+    let chId
+    if (this.textChannel.id === volumeData.tch) chId = volumeData.tch
+    else if (this.textChannel.id && volumeData.tch === '0') chId = this.textChannel.id
+    else if (this.textChannel.id && !this.client.channels.get(volumeData.tch)) chId = this.textChannel.id
+    else if (this.textChannel.id && this.client.channels.get(volumeData.tch)) chId = volumeData.tch
+    this.client.channels.get(chId).send(`> Audio System: **Playing Now In <#${this.channel}>...**\n> **${item.info.title}**`)
     this.player.once('error', () => {
       this.player.emit('end', 'error')
     })

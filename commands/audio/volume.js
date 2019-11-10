@@ -9,12 +9,19 @@ class Command {
   }
 
   async run (compressed) {
+    const locale = compressed.GuildData.locale
+    const picker = this.client.utils.localePicker
     const { message, args } = compressed
-    const guildData = await this.client.database.getGuildData(message.guild.id)
-    if (args.length === 0) return message.channel.send(`> 🔊  현재 볼륨 **${guildData.volume}%**`)
-    const Audio = this.client.audio
-    await Audio.setVolume(message.guild, Number(args[0]))
-    message.channel.send(`> 🔊  볼륨이 **${Number(args[0])}%** 로 변경되었어요!`)
+    if (compressed.userPermissions.includes('DJ') && args.length > 0) {
+      if (isNaN(args[0])) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_STRING'))
+      if (Number(args[0]) < 1) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_UNDER_ONE'))
+      if (Number(args[0]) > 150) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_HIGH_HDF'))
+      await this.client.audio.setVolume(message.guild, Number(args[0]))
+      message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_CHAGED', { VOLUME: Number(args[0]) }))
+    } else {
+      const guildData = await this.client.database.getGuildData(message.guild.id)
+      return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_CURRENT', { VOLUME: guildData.volume }))
+    }
   }
 }
 

@@ -48,9 +48,33 @@ class AudioManager {
    */
   join (options) {
     this.client.logger.debug(`[DEBUG] Joining Voice Channel (VoiceChannel: ${options.channel}, Guild: ${options.guild})`)
-    const player = new AudioPlayer({ AudioManager: this, client: this.client, guild: options.guild, channel: options.channel })
-    player.join()
-    this.players.set(options.guild, player)
+    if (options.channel.joinable === false) return false
+    else {
+      const player = new AudioPlayer({ AudioManager: this, client: this.client, guild: options.guild, channel: options.channel.id, textChannel: options.textChannel })
+      player.join()
+      this.players.set(options.guild, player)
+      return true
+    }
+  }
+
+  /**
+   * @description Checking is member speakable
+   * @param {Discord.Member} member - Member to checking
+   */
+  checkSpeakable (member) {
+    if (member.serverMute) return false
+    if (member.selfMute) return false
+    else return true
+  }
+
+  /**
+   * @description Checking is member listenable
+   * @param {Discord.Member} member - Member to checking
+   */
+  checkListenable (member) {
+    if (member.serverDeaf) return false
+    if (member.selfDeaf) return false
+    else return true
   }
 
   /**

@@ -1,8 +1,8 @@
-const Permissonchecker = require('../modules/perMissionChecker')
+const Permissionchecker = require('../modules/perMissionChecker')
 class Event {
   constructor (client) {
     this.client = client
-    this.permissonChecker = new Permissonchecker(client)
+    this.permissionChecker = new Permissionchecker(client)
   }
 
   async run (message) {
@@ -27,7 +27,7 @@ class Event {
         GuildMemberData: GuildMemberData,
         GuildData: GuildData
       }
-      const userPermissions = this.permissonChecker.getUserPermission(message.member, otherData)
+      const userPermissions = this.permissionChecker.getUserPermission(message.member, otherData)
       const compressed = {
         GlobalUserData: GlobalUserData,
         GuildMemberData: GuildMemberData,
@@ -37,24 +37,35 @@ class Event {
         userPermissions: userPermissions
       }
 
+      const locale = compressed.GuildData.locale
+      const picker = this.client.utils.localePicker
       const Command = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (Command) {
-        let ablePermissons = 0
+        let ablePermissions = 0
+        // if (this.client.getRightTextChannel(message.channel, GuildData.tch)) {
         for (const userPerm of userPermissions) {
           if (Command.command.permissions.includes(userPerm)) {
-            ablePermissons++
+            ablePermissions++
             return Command.run(compressed)
           }
         }
-        if (ablePermissons === 0) {
-          message.channel.send(`권한없자나, 필요한권한: ${Command.command.permissions.join(' + ')}`)
+        if (ablePermissions === 0) {
+          message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: Command.command.permissions.join(', ') }))
         }
+        // } else {
+        //   if (this.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
+        //     message.delete()
+        //   }
+        //   message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: GuildData.tch })).catch((e) => {
+        //     this.client.logger.debug(`[Message Handler] [Send Author] Send Fail.. ${message.author.tag}(${message.author.id})`)
+        //   })
+        // }
       }
     }
   }
 
   sendNotAbleDM (message) {
-    message.channel.send('❎  DM 에서는 명령어를 사용하실수 없어요..')
+    message.channel.send('❎  DM 에서는 명령어를 사용하실수 없어요..\n❎  You can\'t use commands on the DM.')
   }
 }
 module.exports = Event

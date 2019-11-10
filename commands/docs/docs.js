@@ -12,14 +12,15 @@ class Command {
   }
 
   async run (compressed) {
+    const locale = compressed.GuildData.locale
+    const picker = this.client.utils.localePicker
     const { message, args } = compressed
-    if (args.length === 0) return message.reply('❎  검색어를 입력해주세요!')
+    if (args.length === 0) return message.reply(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     const result = await requestAsync(`https://djsdocs.sorta.moe/v2/embed?src=https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json&q=${args.join()}`).then(res => res.json())
-    if (!result) return message.reply('❎  결과가 없어요!')
+    if (!result) return message.reply(picker.get(locale, 'GENERAL_NO_RESULT'))
     const embed = new Discord.RichEmbed(result)
     embed.setFooter(message.author.tag, message.author.displayAvatarURL)
     message.channel.send(embed)
-    // message.reply('✅  검색 결과를 찾았어요!', embed)
   }
 }
 

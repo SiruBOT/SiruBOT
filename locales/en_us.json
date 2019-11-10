@@ -9,16 +9,37 @@
     "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  %USER_TAG%'s Balance: ``%MONEY%`` %MONEY_NAME_EN%",
     "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  Your balance: ``%MONEY%`` %MONEY_NAME_EN%",
 
-    "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY% Finish using other gambling commands!",
+    "GENERAL_INPUT_QUERY": "%EMOJI_NO%  Enter item to search!",
+    "GENERAL_NO_RESULT": "%EMOJI_NO%  There's no search results!",
 
-    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX% Money`` command to get %MONEY_NAME_EN%!",
-    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%getmoney`` command to receive %MONEY_NAME_EN%!",
-    "COMMANDS_CASINO_ALLIN_START": "%MEMBER% %EMOJI_MONEY% I'll start all-in! The odds are half! %EMOJI_MONEY% Press reaction in 15 seconds to start all-in!",
-    "COMMANDS_CASINO_ALLIN_RAND_LOAD": "Playing slots ... | Playing card games .. | Checking balance .. | Cheating..",
-    "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
-    "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "Congratulations!:tada:|Congratulations!|:tada:|:smile:",
-    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%",
-    "COMMANDS_CASINO_ALLIN_RAND_FAIL": "Attempt the following! | Maybe it might be .. | It's okay .. | Okay .. | T.T...",
-    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER% %EMOJI_MONEY% All-in failed. Your balance has been set to` `0 ''.% RANDMESSAGE%",
-    "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO% Timed out. Please try again with ``%PREFIX%allin``!"
+    "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** server can only use my command on channel <#%CHANNEL%>!",
+    "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  This command requires this permissions. %REQUIRED%",
+
+    "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY% Please finish using other gambling commands!",
+
+    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX% Money`` command to get %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%getmoney`` command to receive %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_START": "%MEMBER% %EMOJI_MONEY% I'll start all-in! The odds are half! %EMOJI_MONEY% Press reaction in 15 seconds to start all-in!",
+    "COMMANDS_CASINO_ALLIN_RAND_LOAD": "Playing slots...|Playing card games..|Checking balance..|Cheating..",
+    "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "Congratulations! :tada:|Congratulations!|:tada:|:smile:",
+    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_RAND_FAIL": "Attempt the following!| Maybe it might be..|It's okay..|Okay..|T.T...",
+    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER% %EMOJI_MONEY% All-in failed. Your balance has been set to ``0``.. %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO% Timed out. Please try again with ``%PREFIX%allin``!",
+    
+    "COMMANDS_AUDIO_VOLUME_CHAGED": "> %EMOJI_SPEAKER%  Volume is changed **%VOLUME%%**",
+    "COMMANDS_AUDIO_VOLUME_CURRENT": "> %EMOJI_SPEAKER%  Current Volume **%VOLUME%%**",
+    "COMMANDS_AUDIO_VOLUME_STRING": "> %EMOJI_NO%  Volume is not string!",
+    "COMMANDS_AUDIO_VOLUME_UNDER_ONE": "> %EMOJI_NO%  Volume is not under **1%**!",
+    "COMMANDS_AUDIO_VOLUME_HIGH_HDF": "> %EMOJI_NO%  Volume is not excess **150%**!",
+
+    "AUDIO_NOPLAYER": "> %EMOJI_MUSIC%  Currently noting playing!",
+    "AUDIO_JOIN_VOICE_FIRST": "> %EMOJI_MUSIC%  Firstly, please join voice channel!",
+    "AUDIO_NOT_DEFAULT_CH": "> %EMOJI_MUSIC%  This command able in voicechannel **<#%VOICECHANNEL%>**!",
+
+    "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  The player has stopped and the queue has been cleared.",
+    
+    "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  Successfully joined **<#%VOICECHANNEL%>**!",
+    "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  Failed to join **<#%VOICECHANNEL%>**..."
 }
