@@ -19,7 +19,7 @@ class AudioPlayer {
   async join () {
     const BestNode = this.AudioManager.getBestNode(this.guild)
     this.node = BestNode
-    this.client.logger.debug('[AudioPlayer] Joining Voice Channel...')
+    this.client.logger.debug(`[AudioPlayer] Joining Voice Channel... (Player: (Guild: ${this.guild}) (Channel: ${this.channel}))`)
     this.player = await this.AudioManager.manager.join({
       guild: this.guild,
       channel: this.channel,
@@ -118,8 +118,10 @@ class AudioPlayer {
    */
   async stop (clearQueue) {
     if (clearQueue) {
-      this.client.logger.debug(`[Audio] [Stop] (Clear Queue, Guild: ${this.guild})`)
+      this.client.logger.debug(`[Audio] [Player] Stopped Audio Player & Clear Queue (Guild: ${this.guild})`)
       this.client.database.updateGuildData(this.guild, { $set: { queue: [] } })
+    } else {
+      this.client.logger.debug(`[Audio] [Player] Stopped Audio Player (Guild: ${this.guild})`)
     }
     await this.AudioManager.manager.leave(this.guild)
     this.AudioManager.players.delete(this.guild)

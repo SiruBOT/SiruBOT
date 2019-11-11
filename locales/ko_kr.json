@@ -9,8 +9,8 @@
     "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  %USER_TAG% 의 잔고: ``%MONEY%`` %MONEY_NAME_KR%",
     "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  당신의 잔고: ``%MONEY%`` %MONEY_NAME_KR%",
 
-    "GENERAL_INPUT_QUERY": "%EMOJI_NO%  검색어를 입력해주세요!",
-    "GENERAL_NO_RESULT": "%EMOJI_NO%  검색 결과가 없어요!",
+    "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  검색어를 입력해주세요!",
+    "GENERAL_NO_RESULT": "> %EMOJI_NO%  검색 결과가 없어요!",
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** 서버에서는 채널 <#%CHANNEL%> 에서만 저의 명령어를 사용하실수 있어요!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  이 명령어는 다음 권한이 필요해요. %REQUIRED%",
@@ -41,5 +41,9 @@
     "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  재생중인 음악을 정지하고 대기열을 초기화했어요!",
 
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  성공적으로 보이스 채널 **<#%VOICECHANNEL%>** 에 접속했어요!",
-    "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  보이스 채널 **<#%VOICECHANNEL%>** 에 접속을 실패했어요.. 채널의 권한을 확인해주세요!"
+    "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  보이스 채널 **<#%VOICECHANNEL%>** 에 접속을 실패했어요.. 채널의 권한을 확인해주세요!",
+
+    "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  노래 로드를 실패했어요.. \n> ```CSS\n> %ERROR%\n> ```",
+    "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 이 재생 목록 %POSITION% 번에 추가되었어요!",
+    "COMMANDS_AUDIO_PLAY_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 와 재생 목록 **%PLAYLISTNAME%** 의 곡 (%NUM% 개) 가 재생 목록에 추가되었어요!"
 }

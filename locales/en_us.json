@@ -9,8 +9,8 @@
     "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  %USER_TAG%'s Balance: ``%MONEY%`` %MONEY_NAME_EN%",
     "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  Your balance: ``%MONEY%`` %MONEY_NAME_EN%",
 
-    "GENERAL_INPUT_QUERY": "%EMOJI_NO%  Enter item to search!",
-    "GENERAL_NO_RESULT": "%EMOJI_NO%  There's no search results!",
+    "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  Enter item to search!",
+    "GENERAL_NO_RESULT": "> %EMOJI_NO%  There's no search results!",
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** server can only use my command on channel <#%CHANNEL%>!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  This command requires this permissions. %REQUIRED%",
@@ -41,5 +41,7 @@
     "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  The player has stopped and the queue has been cleared.",
     
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  Successfully joined **<#%VOICECHANNEL%>**!",
-    "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  Failed to join **<#%VOICECHANNEL%>**..."
+    "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  Failed to join **<#%VOICECHANNEL%>**...",
+
+    "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```"
 }

@@ -47,7 +47,7 @@ class AudioManager {
    * @param {String} options.channel - Voicechannel id for player
    */
   join (options) {
-    this.client.logger.debug(`[DEBUG] Joining Voice Channel (VoiceChannel: ${options.channel}, Guild: ${options.guild})`)
+    this.client.logger.info(`[DEBUG] Joining Voice Channel (VoiceChannel: ${options.channel}, Guild: ${options.guild})`)
     if (options.channel.joinable === false) return false
     else {
       const player = new AudioPlayer({ AudioManager: this, client: this.client, guild: options.guild, channel: options.channel.id, textChannel: options.textChannel })
