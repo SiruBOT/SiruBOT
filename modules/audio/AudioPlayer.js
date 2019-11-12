@@ -72,17 +72,18 @@ class AudioPlayer {
    * @param {Object} item - Playing Song Object
    */
   async play (item) {
-    const volumeData = await this.client.database.getGuildData(this.guild)
+    const picker = this.client.utils.localePicker
+    const guildData = await this.client.database.getGuildData(this.guild)
     this.nowplaying = item
     this.client.database.updateGuildData(this.guild, { $set: { nowplaying: item } })
     this.player.play(item.track)
-    this.player.volume(volumeData.volume)
+    this.player.volume(guildData.volume)
     let chId
-    if (this.textChannel.id === volumeData.tch) chId = volumeData.tch
-    else if (this.textChannel.id && volumeData.tch === '0') chId = this.textChannel.id
-    else if (this.textChannel.id && !this.client.channels.get(volumeData.tch)) chId = this.textChannel.id
-    else if (this.textChannel.id && this.client.channels.get(volumeData.tch)) chId = volumeData.tch
-    this.client.channels.get(chId).send(`> Audio System: **Playing Now In <#${this.channel}>...**\n> **${item.info.title}**`)
+    if (this.textChannel.id === guildData.tch) chId = guildData.tch
+    else if (this.textChannel.id && guildData.tch === '0') chId = this.textChannel.id
+    else if (this.textChannel.id && !this.client.channels.get(guildData.tch)) chId = this.textChannel.id
+    else if (this.textChannel.id && this.client.channels.get(guildData.tch)) chId = guildData.tch
+    this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000) }))
     this.player.once('error', () => {
       this.player.emit('end', 'error')
     })

@@ -20,7 +20,7 @@ class Command {
       return message.reply(picker.get(locale, 'COMMANDS_MONEY_BOT'))
     } else if (user) {
       const data = await this.client.database.getGlobalUserData(user)
-      if (!data) return message.reply()
+      if (!data) return message.reply(picker.get(locale, 'COMMANDS_MONEY_UNREGI'))
       message.reply(picker.get(locale, 'COMMANDS_MONEY_BALANCE_OTHER', { USER_TAG: user.tag, MONEY: data.money }))
     } else {
       message.reply(picker.get(locale, 'COMMANDS_MONEY_BALANCE_ME', { USER_TAG: user.tag, MONEY: GlobalUserData.money }))

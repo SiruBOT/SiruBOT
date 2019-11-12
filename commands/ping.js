@@ -1,5 +1,4 @@
 const Discord = require('discord.js')
-const { getColor } = require('../modules/findUtil')
 
 class Command {
   constructor (client) {
@@ -21,7 +20,7 @@ class Command {
     const embed = new Discord.RichEmbed()
 
     embed.setTitle(picker.get(locale, 'COMMANDS_PING_PING'))
-    embed.setColor(getColor(message.member))
+    embed.setColor(this.client.utils.findUtil.getColor(message.member))
     embed.setDescription(picker.get(locale, 'COMMANDS_PING_PINGING'))
 
     message.reply(embed).then((m) => {

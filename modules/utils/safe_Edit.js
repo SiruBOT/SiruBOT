@@ -1,4 +1,4 @@
-const Logger = require('../logger')
+const Logger = require('../../logger')
 const logger = new Logger()
 module.exports = function (message, data) {
   logger.debug(`[Utils] [Safe_Edit] Edit Message ${message.id} to ${escapeLineBreak(data)}...`)

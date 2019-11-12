@@ -1,8 +1,6 @@
-const Permissionchecker = require('../modules/perMissionChecker')
 class Event {
   constructor (client) {
     this.client = client
-    this.permissionChecker = new Permissionchecker(client)
   }
 
   async run (message) {
@@ -27,7 +25,7 @@ class Event {
         GuildMemberData: GuildMemberData,
         GuildData: GuildData
       }
-      const userPermissions = this.permissionChecker.getUserPermission(message.member, otherData)
+      const userPermissions = this.client.utils.permissionChecker.getUserPermission(message.member, otherData)
       const compressed = {
         GlobalUserData: GlobalUserData,
         GuildMemberData: GuildMemberData,
@@ -53,7 +51,7 @@ class Event {
           message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: Command.command.permissions.join(', ') }))
         }
         // } else {
-        //   if (this.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
+        //   if (this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
         //     message.delete()
         //   }
         //   message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: GuildData.tch })).catch((e) => {

@@ -37,11 +37,14 @@
     "AUDIO_NOPLAYER": "> %EMOJI_MUSIC%  Currently noting playing!",
     "AUDIO_JOIN_VOICE_FIRST": "> %EMOJI_MUSIC%  Firstly, please join voice channel!",
     "AUDIO_NOT_DEFAULT_CH": "> %EMOJI_MUSIC%  This command able in voicechannel **<#%VOICECHANNEL%>**!",
+    "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  Playing Now... **%TRACK% [%DURATION%]**",
 
     "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  The player has stopped and the queue has been cleared.",
     
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  Successfully joined **<#%VOICECHANNEL%>**!",
     "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  Failed to join **<#%VOICECHANNEL%>**...",
 
-    "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```"
+    "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```",
+    "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  Added **%TRACK% [%DURATION%]** to the queue at position **%POSITION%**",
+    "COMMANDS_AUDIO_PLAY_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 와 재생 목록 **%PLAYLISTNAME%** 의 곡 (%NUM% 개) 가 재생 목록에 추가되었어요!"
 }

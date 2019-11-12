@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const permissions = require('../permissions')
+const permissions = require('../../permissions')
 
 class PermissionChecker {
   /**

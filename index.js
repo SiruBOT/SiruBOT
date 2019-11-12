@@ -3,11 +3,7 @@ const Logger = require('./logger')
 const DataBase = require('./modules/database')
 const Audio = require('./modules/audio/Audio')
 const LocalePicker = require('./locales/localePicker')
-const utils = {
-  safeEdit: require('./modules/safe_Edit'),
-  randmizer: require('./modules/randmizer'),
-  getStackTraceMessage: require('./modules/getStackTraceMessage')
-}
+const PermissionChecker = require('./modules/utils/perMissionChecker')
 
 const isTesting = (() => {
   if (process.argv[2] === 'test') return true
@@ -25,8 +21,11 @@ class Bot extends Discord.Client {
     this._options = options
     this.logger = new Logger(this)
     this.database = new DataBase(this)
-    utils.localePicker = new LocalePicker(this)
-    this.utils = utils
+
+    this.utils = require('./modules/utils')
+    this.utils.localePicker = new LocalePicker(this)
+    this.utils.permissionChecker = new PermissionChecker(this)
+
     this.activityNum = 0
     this.initialized = false
     this.commands_loaded = false

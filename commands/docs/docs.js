@@ -1,4 +1,4 @@
-const { requestAsync } = require('../../modules/request')
+const fetch = require('node-fetch')
 const Discord = require('discord.js')
 
 class Command {
@@ -16,7 +16,7 @@ class Command {
     const picker = this.client.utils.localePicker
     const { message, args } = compressed
     if (args.length === 0) return message.reply(picker.get(locale, 'GENERAL_INPUT_QUERY'))
-    const result = await requestAsync(`https://djsdocs.sorta.moe/v2/embed?src=https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json&q=${args.join()}`).then(res => res.json())
+    const result = await fetch(`https://djsdocs.sorta.moe/v2/embed?src=https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json&q=${args.join()}`).then(res => res.json())
     if (!result) return message.reply(picker.get(locale, 'GENERAL_NO_RESULT'))
     const embed = new Discord.RichEmbed(result)
     embed.setFooter(message.author.tag, message.author.displayAvatarURL)
