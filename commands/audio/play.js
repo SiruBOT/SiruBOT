@@ -46,8 +46,10 @@ class Command {
 
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
       const info = searchResult.tracks[0].info
-      if (Audio.players.get(message.guild.id).nowplaying) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000), POSITION: compressed.GuildData.queue.length + 1 }))
-      Audio.players.get(message.guild.id).addQueue(searchResult.tracks[0])
+      if (Audio.players.get(message.guild.id).nowplaying) {
+        Audio.players.get(message.guild.id).addQueue(searchResult.tracks[0])
+        return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000), POSITION: compressed.GuildData.queue.length + 1 }))
+      }
     }
   }
 }
