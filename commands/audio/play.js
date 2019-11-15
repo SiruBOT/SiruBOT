@@ -45,10 +45,17 @@ class Command {
     }
 
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
+      const guildData = await this.client.database.getGuildData(message.guild.id)
       const info = searchResult.tracks[0].info
-      Audio.players.get(message.guild.id).addQueue(searchResult.tracks[0])
-      if (Audio.players.get(message.guild.id).nowplaying) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000), POSITION: compressed.GuildData.queue.length + 1 }))
+      this.addQueue(message, searchResult.tracks[0], picker, locale)
+      if (Audio.players.get(message.guild.id).nowplaying) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000), POSITION: guildData.queue.length + 1 }))
     }
+  }
+
+  addQueue (message, items, picker, locale) {
+    const Audio = this.client.audio
+    if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_PLAY_NO_VOICE_ME'))
+    Audio.players.get(message.guild.id).addQueue(items)
   }
 }
 

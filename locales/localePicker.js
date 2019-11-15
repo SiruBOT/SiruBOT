@@ -24,11 +24,19 @@ class LanguagePicker {
 
   get (lang, name, placeholder = {}) {
     this.client.logger.debug(`[LanguagePicker] [Get] Lang: ${lang}, PATH: ${name}, Placeholders: ${Object.keys(placeholder)}`)
-    const language = this.locales.get(lang)[name]
+    let language = this.locales.get(lang)[name]
+    if (!language) {
+      for (const locale of this.locales.array()) {
+        if (locale[name]) {
+          language = locale[name]
+        }
+      }
+    }
     const settings = { before: '%', after: '%' }
     const userPlaceholder = template(language, placeholder, settings)
     const result = template(userPlaceholder, this.client._options.constructors, settings)
     this.client.logger.debug(`[LanguagePicker] [Get] Result: ${result}`)
+
     return result
   }
 }

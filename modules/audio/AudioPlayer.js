@@ -14,8 +14,12 @@ class AudioPlayer {
     this.player = null
     this.node = null
     this.nowplaying = null
+    this.message = null
   }
 
+  /**
+   * @description - Join Player to voiceChannel
+   */
   async join () {
     const BestNode = this.AudioManager.getBestNode(this.guild)
     this.node = BestNode
@@ -83,12 +87,13 @@ class AudioPlayer {
     else if (this.textChannel.id && guildData.tch === '0') chId = this.textChannel.id
     else if (this.textChannel.id && !this.client.channels.get(guildData.tch)) chId = this.textChannel.id
     else if (this.textChannel.id && this.client.channels.get(guildData.tch)) chId = guildData.tch
-    this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000) }))
+    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000) }))
     this.player.once('error', () => {
       this.player.emit('end', 'error')
     })
     this.player.once('end', async (data) => {
       this.nowplaying = null
+      this.deleteMessage()
       if (data === 'error') {
         this.playNext(true)
         return this.client.logger.error(`[Audio] Error on play track: ${item.info.identifier}`)
@@ -124,8 +129,18 @@ class AudioPlayer {
     } else {
       this.client.logger.debug(`[Audio] [Player] Stopped Audio Player (Guild: ${this.guild})`)
     }
+    this.deleteMessage()
     await this.AudioManager.manager.leave(this.guild)
     this.AudioManager.players.delete(this.guild)
+  }
+
+  /**
+   * @description - Delete Now Playing Alert Message
+   */
+  deleteMessage () {
+    if (!this.message.deleted && this.message) {
+      this.message.delete()
+    }
   }
 }
 

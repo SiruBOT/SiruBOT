@@ -2,11 +2,11 @@
     "DHL": "de.dhl",
     "천일택배": "kr.chunilps",
     "CJ대한통운": "kr.cjlogistics",
-    "CU 편의점택배": "kr.cupost",
-    "GS Postbox 택배": "kr.cvsnet",
+    "CU택배": "kr.cupost",
+    "GS택배": "kr.cvsnet",
     "CWAY": "kr.cway",
     "대신택배": "kr.daesin",
-    "우체국 택배": "kr.epost",
+    "우체국택배": "kr.epost",
     "한의사랑택배": "kr.hanips",
     "한진택배": "kr.hanjin",
     "합동택배": "kr.hdexp",
@@ -20,7 +20,7 @@
     "SLX": "kr.slx",
     "TNT": "nl.tnt",
     "EMS": "un.upu.ems",
-    "Fedex": "us.fedex",
+    "FEDEX": "us.fedex",
     "UPS": "us.ups",
     "USPS": "us.usps"
 }

@@ -8,6 +8,7 @@ class Event {
   }
 
   async handleCommand (message) {
+    if (message.author.id === '351613953769603073') return
     if (message.author.bot) return
     if (message.channel.type === 'dm') return this.sendNotAbleDM(message)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
