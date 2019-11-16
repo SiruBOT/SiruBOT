@@ -3,5 +3,6 @@ module.exports = {
   randmizer: require('./randmizer'),
   getStackTraceMessage: require('./getStackTraceMessage'),
   findUtil: require('./findUtil'),
-  timeUtil: require('./time')
+  timeUtil: require('./time'),
+  arrayUtil: require('./arrayUtil')
 }

@@ -5,6 +5,7 @@ class Command {
     this.command = {
       name: 'play',
       aliases: ['ㅔㅣ묘'],
+      category: 'MUSIC_GENERAL',
       permissions: ['Everyone']
     }
   }
@@ -48,7 +49,7 @@ class Command {
       const guildData = await this.client.database.getGuildData(message.guild.id)
       const info = searchResult.tracks[0].info
       this.addQueue(message, searchResult.tracks[0], picker, locale)
-      if (Audio.players.get(message.guild.id).nowplaying) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000), POSITION: guildData.queue.length + 1 }))
+      if (Audio.players.get(message.guild.id).nowplaying) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
     }
   }
 

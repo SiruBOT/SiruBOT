@@ -11,6 +11,8 @@
 
     "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  검색어를 입력해주세요!",
     "GENERAL_NO_RESULT": "> %EMOJI_NO%  검색 결과가 없어요!",
+    "GENERAL_USER_STOP": "> %EMOJI_NO%  사용자가 선택을 취소했어요.",
+    "GENERAL_TIMED_OUT": "> %EMOJI_NO%  시간이 초과되었어요.",
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** 서버에서는 채널 <#%CHANNEL%> 에서만 저의 명령어를 사용하실수 있어요!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  이 명령어는 다음 권한이 필요해요. %REQUIRED%",

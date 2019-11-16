@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: 'nowplaying',
       aliases: ['np', 'ㅞ'],
+      category: 'MUSIC_GENERAL',
       permissions: ['Everyone']
     }
   }

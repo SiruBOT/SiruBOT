@@ -11,6 +11,8 @@
 
     "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  Enter item to search!",
     "GENERAL_NO_RESULT": "> %EMOJI_NO%  There's no search results!",
+    "GENERAL_USER_STOP": "> %EMOJI_NO%  The user has canceled it.",
+    "GENERAL_TIMED_OUT": "> %EMOJI_NO%  Timed out.",
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** server can only use my command on channel <#%CHANNEL%>!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  This command requires this permissions. %REQUIRED%",

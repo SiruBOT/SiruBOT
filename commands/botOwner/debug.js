@@ -10,7 +10,7 @@ class Command {
 
   async run (compressed) {
     const message = compressed.message
-    this.client.database.updateGlobalUserData(message.member, { $set: { money: 100000 } })
+    this.client.database.updateGlobalUserData(message.member, { $add: { money: 100000 } })
     message.channel.send('Updated')
   }
 }

@@ -20,7 +20,7 @@ class Command {
       }
       m.edit(`🛠️  종료 중...\n✅  오디오 플레이어 종료 완료! (${players} 개)`)
       message.channel.send('✅  Shutting Down...').then(() => {
-        this.client.logger.warn('[Shutdown] Shutting Down...')
+        this.client.logger.warn('[SHUTDOWN] Shutting Down...')
         process.exit(0)
       })
     })

@@ -87,7 +87,7 @@ class AudioPlayer {
     else if (this.textChannel.id && guildData.tch === '0') chId = this.textChannel.id
     else if (this.textChannel.id && !this.client.channels.get(guildData.tch)) chId = this.textChannel.id
     else if (this.textChannel.id && this.client.channels.get(guildData.tch)) chId = guildData.tch
-    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000) }))
+    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000, item.info.isStream) }))
     this.player.once('error', () => {
       this.player.emit('end', 'error')
     })
@@ -138,6 +138,7 @@ class AudioPlayer {
    * @description - Delete Now Playing Alert Message
    */
   deleteMessage () {
+    if (!this.message) return
     if (!this.message.deleted && this.message) {
       this.message.delete()
     }

@@ -1,4 +1,5 @@
-module.exports.toHHMMSS = (secs) => {
+module.exports.toHHMMSS = (secs, stream = false) => {
+  if (stream) return 'Live'
   const secNum = parseInt(secs, 10)
   const hours = Math.floor(secNum / 3600)
   const minutes = Math.floor(secNum / 60) % 60
