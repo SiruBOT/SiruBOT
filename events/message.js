@@ -41,24 +41,24 @@ class Event {
       const Command = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (Command) {
         let ablePermissions = 0
-        // if (this.client.getRightTextChannel(message.channel, GuildData.tch)) {
-        for (const userPerm of userPermissions) {
-          if (Command.command.permissions.includes(userPerm)) {
-            ablePermissions++
-            return Command.run(compressed)
+        if (this.client.getRightTextChannel(message.channel, GuildData.tch)) {
+          for (const userPerm of userPermissions) {
+            if (Command.command.permissions.includes(userPerm)) {
+              ablePermissions++
+              return Command.run(compressed)
+            }
           }
+          if (ablePermissions === 0) {
+            message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: Command.command.permissions.join(', ') }))
+          }
+        } else {
+          if (this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
+            message.delete()
+          }
+          message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: GuildData.tch })).catch((e) => {
+            this.client.logger.debug(`[Message Handler] [Send Author] Send Fail.. ${message.author.tag}(${message.author.id})`)
+          })
         }
-        if (ablePermissions === 0) {
-          message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: Command.command.permissions.join(', ') }))
-        }
-        // } else {
-        //   if (this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
-        //     message.delete()
-        //   }
-        //   message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: GuildData.tch })).catch((e) => {
-        //     this.client.logger.debug(`[Message Handler] [Send Author] Send Fail.. ${message.author.tag}(${message.author.id})`)
-        //   })
-        // }
       }
     }
   }
