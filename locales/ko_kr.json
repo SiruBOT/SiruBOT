@@ -51,5 +51,5 @@
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  노래 로드를 실패했어요.. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 이 재생 목록 **%POSITION%**번에 추가되었어요!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  이 재생 목록에 있는 노래 **%NUM%** 개를 재생 목록에 추가했어요!",
-    "COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST": "> %EMOJI_MUSIC%  이 노래에는 **%NUM%** 개의 노래가 포함되어있어요! 추가하실건가요?",
+    "COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST": "> %EMOJI_MUSIC%  이 노래에는 **%NUM%** 개의 노래가 포함되어있어요! 추가하실건가요?"
 }
