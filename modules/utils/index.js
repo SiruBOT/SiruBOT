@@ -1,5 +1,6 @@
 module.exports = {
-  safeEdit: require('./safe_Edit'),
+  safeEdit: require('./safeEdit'),
+  massReact: require('./safeEdit').massReact,
   randmizer: require('./randmizer'),
   getStackTraceMessage: require('./getStackTraceMessage'),
   findUtil: require('./findUtil'),

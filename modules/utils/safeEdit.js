@@ -17,7 +17,6 @@ function safeEdit (message, data) {
 
 module.exports.massReact = massReact
 /**
- *
  * @param {Discord.Message} message - to React (Message)
  * @param {Array} array - Array to react
  */

@@ -15,7 +15,7 @@ class Command {
     const picker = this.client.utils.localePicker
     const locale = compressed.GuildData.locale
     const { message, GlobalUserData, args } = compressed
-    if (!args[0]) return message.reply(picker.get(locale, 'COMMANDS_MONEY_BALANCE_ME', { MONEY: GlobalUserData.money }))
+    if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MONEY_BALANCE_ME', { MONEY: GlobalUserData.money }))
     const formatter = (a, number) => { return `[${number}] ${a.user.bot ? '[BOT]' : ''} ${a.displayName} (${a.user.tag}) [${a.id}]` }
     const filter = (a) => { return a.displayName.toLowerCase() === args[0].toLowerCase() || a.id === args[0] || a.id === this.client.utils.findUtil.getUserFromMention(this.client.users, args[0]).id || a.user.username.toLowerCase() === args[0].toLowerCase() }
     const options = {
@@ -27,14 +27,14 @@ class Command {
       picker: picker
     }
     this.client.utils.findUtil.findElement(options).then(async (res) => {
-      if (!res) return picker.get(locale, 'GENERAL_NO_RESULT')
+      if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
       const user = res.user
       if (user.bot === true) {
-        return message.reply(picker.get(locale, 'COMMANDS_MONEY_BOT'))
+        return message.channel.send(picker.get(locale, 'COMMANDS_MONEY_BOT'))
       } else if (user) {
         const data = await this.client.database.getGlobalUserData(user)
-        if (!data) return message.reply(picker.get(locale, 'COMMANDS_MONEY_UNREGI'))
-        message.reply(picker.get(locale, 'COMMANDS_MONEY_BALANCE_OTHER', { USER_TAG: user.tag, MONEY: data.money }))
+        if (!data) return message.channel.send(picker.get(locale, 'COMMANDS_MONEY_UNREGI'))
+        message.channel.send(picker.get(locale, 'COMMANDS_MONEY_BALANCE_OTHER', { USER_TAG: user.tag, MONEY: data.money }))
       }
     })
   }
