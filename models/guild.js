@@ -19,6 +19,6 @@ const Schema = new mongo.Schema({
   nowplaying: { type: Object, default: { track: null } },
   tch: { type: String, default: '0' },
   vch: { type: String, default: '0' }
-}, { collection: 'guild' })
+}, { collection: 'guild', versionKey: false })
 
 module.exports = mongo.model('guild', Schema)

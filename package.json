@@ -1,7 +1,7 @@
 {
   "name": "chinobot-rewrite",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![Build Status](https://travis-ci.org/cotwo0139/CHINOBOT_BETA.svg?branch=master)](https://travis-ci.org/cotwo0139/CHINOBOT_BETA)",
   "main": "index.js",
   "scripts": {
     "test": "node index.js test",
@@ -27,5 +27,14 @@
     "string-placeholder": "^1.0.2",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.2.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cotwo0139/CHINOBOT_BETA.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cotwo0139/CHINOBOT_BETA/issues"
+  },
+  "homepage": "https://github.com/cotwo0139/CHINOBOT_BETA#readme"
 }

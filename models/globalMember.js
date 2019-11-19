@@ -7,6 +7,6 @@ const Schema = new mongo.Schema({
   getMoneyTimeStamp: { type: Number },
   profile_bg_url: { type: String, default: '0' },
   blacklisted: { type: Boolean, default: false }
-}, { collection: 'globalMember' })
+}, { collection: 'globalMember', versionKey: false })
 
 module.exports = mongo.model('globalMember', Schema)
