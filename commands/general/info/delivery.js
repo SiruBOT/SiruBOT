@@ -12,6 +12,7 @@ class Command {
     this.command = {
       name: 'delivery',
       aliases: ['택배', '택배조회'],
+      category: 'COMMANDS_GENERAL_INFO',
       permissions: ['Everyone']
     }
   }

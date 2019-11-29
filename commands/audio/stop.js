@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: 'stop',
       aliases: ['ㄴ새ㅔ', '정지'],
+      category: 'MUSIC_DJ',
       permissions: ['DJ', 'Administrator']
     }
   }

@@ -98,7 +98,7 @@ class Command {
   addQueue (message, items, picker, locale) {
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_PLAY_NO_VOICE_ME'))
-    Audio.players.get(message.guild.id).addQueue(items)
+    Audio.players.get(message.guild.id).addQueue(items, message)
   }
 }
 

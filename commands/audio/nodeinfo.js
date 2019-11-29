@@ -4,8 +4,8 @@ class Command {
     this.client = client
     this.command = {
       name: 'nodeinfo',
-      category: 'MUSIC_GENERAL',
       aliases: ['ㅜㅐㅇ댜ㅜ래'],
+      category: 'MUSIC_GENERAL',
       permissions: ['Everyone']
     }
   }

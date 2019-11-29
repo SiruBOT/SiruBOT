@@ -1,9 +1,7 @@
 const Discord = require('discord.js')
 const Logger = require('./logger')
-const DataBase = require('./modules/database')
-const Audio = require('./modules/audio/Audio')
 const LocalePicker = require('./locales/localePicker')
-const PermissionChecker = require('./modules/utils/perMissionChecker')
+const { PermissionChecker, DataBase, Audio } = require('./modules')
 
 const isTesting = (() => {
   if (process.argv[2] === 'test') return true

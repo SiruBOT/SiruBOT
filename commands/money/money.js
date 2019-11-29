@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: '돈',
       aliases: ['money', 'ehs'],
+      category: 'COMMANDS_MONEY_GENERAL',
       permissions: ['Everyone']
     }
   }

@@ -35,12 +35,38 @@ module.exports = {
     EMOJI_PINGPONG: '🏓',
     EMOJI_MONEY: '💸',
 
+    EMOJI_SPEAKER: '🔊',
+    EMOJI_AUDIO_NOTHING: '⏹️',
+    EMOJI_AUDIO_PAUSED: '⏸️',
+    EMOJI_AUDIO_PLAYING: '▶️',
+    EMOJI_REPEAT_NOTHING: '➡️',
+    EMOJI_REPEAT_ALL: '🔁',
+    EMOJI_REPEAT_SINGLE: '🔂',
+
+    EMOJI_SWITCH_ON: '<:emoji_on:649622462765596683>',
+    EMOJI_SWITCH_OFF: '<:emoji_off:649622462685773884>',
+
     BOT_NAME_KR: '치노봇',
     BOT_NAME_EN: 'ChinoBot',
 
     MONEY_NAME_KR: '치머니',
     MONEY_NAME_EN: 'ChiMoney',
 
-    PREFIX: prefix
+    PREFIX: prefix,
+
+    EMOJI_REGIONS_BRAZIL: '🇧🇷',
+    EMOJI_REGIONS_EUROPE: '🇪🇺',
+    EMOJI_REGIONS_HONGKONG: '🇭🇰',
+    EMOJI_REGIONS_INDIA: '🇮🇳',
+    EMOJI_REGIONS_JAPAN: '🇯🇵',
+    EMOJI_REGIONS_RUSSIA: '🇷🇺',
+    EMOJI_REGIONS_SINGAPORE: '🇸🇬',
+    EMOJI_REGIONS_SOUTHAFRICA: '🇿🇦',
+    'EMOJI_REGIONS_SOUTH-KOREA': '🇰🇷',
+    EMOJI_REGIONS_SYDNEY: '🇦🇺',
+    'EMOJI_REGIONS_US-CENTRAL': '🇺🇸',
+    'EMOJI_REGIONS_US-EAST': '🇺🇸',
+    'EMOJI_REGIONS_US-WEST': '🇺🇸',
+    'EMOJI_REGIONS_US-SOUTH': '🇺🇸'
   }
 }

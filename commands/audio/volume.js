@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: 'volume',
       aliases: ['볼륨', 'vol', 'qhffba', '패ㅣㅕㅡㄷ'],
+      category: 'MUSIC_GENERAL',
       permissions: ['Everyone']
     }
   }

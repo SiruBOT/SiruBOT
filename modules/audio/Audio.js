@@ -3,7 +3,7 @@ const AudioPlayer = require('./AudioPlayer')
 const { Collection } = require('discord.js')
 const fetch = require('node-fetch')
 const { URLSearchParams } = require('url')
-// const Discord = require('discord.js')
+const Discord = require('discord.js')
 
 class AudioManager {
   /**
@@ -14,6 +14,7 @@ class AudioManager {
    */
   constructor (options) {
     this.client = options.client
+    this.nowplayingMessages = new Collection()
     this.players = new Collection()
     this.manager = null
     this._options = options
@@ -28,6 +29,137 @@ class AudioManager {
       user: this.client.user.id,
       shards: this._options.shards
     })
+    for (const node of this.manager.nodes) {
+      node[1].ws.on('message', (data) => {
+        const parsed = JSON.parse(data)
+        if (parsed.op === 'playerUpdate') {
+          this.updateNpMessage(parsed.guildId)
+        }
+      })
+    }
+  }
+
+  updateNpMessage (guildId, stop = false) {
+    const npMessage = this.nowplayingMessages.get(guildId)
+    if (npMessage && npMessage.deleted === false && npMessage.editable) {
+      this.getNowplayingEmbed(guildId).then(embed => {
+        npMessage.edit(embed)
+      })
+    } else {
+      this.nowplayingMessages.delete(guildId)
+    }
+    if (stop) {
+      this.nowplayingMessages.delete(guildId)
+    }
+  }
+
+  /**
+   * @param {String} guild - Guild Id to get nowplaying Embed
+   */
+  async getNowplayingEmbed (guild) {
+    const guildData = await this.client.database.getGuildData(guild)
+    if (!this.players.get(guild) || !this.players.get(guild).nowplaying) {
+      return new Discord.RichEmbed()
+        .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
+        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))
+    }
+    const request = this.client.users.get(this.players.get(guild).nowplaying.request)
+    return new Discord.RichEmbed()
+      .setAuthor(request.tag, request.displayAvatarURL)
+      .setTitle(this.players.get(guild).nowplaying.info.title)
+      .setURL(this.players.get(guild).nowplaying.info.uri)
+      .setDescription(this.getNowplayingText(guild, guildData))
+      .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))
+      .setThumbnail(this.validateYouTubeUrl(this.players.get(guild).nowplaying.info.uri) ? `https://img.youtube.com/vi/${this.players.get(guild).nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
+  }
+
+  /**
+   * Get Formatted(Nowplaying) Text with informations
+   * @param {String} guild - guildId to formatting
+   * @param {Object} guildData - Database Object
+   */
+  getNowplayingText (guild, guildData) {
+    if (!this.players.get(guild) || !this.players.get(guild).nowplaying) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
+    const nowPlayingObject = this.getNowplayingObject(guild, guildData)
+    return `${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
+  }
+
+  /**
+   * @param {String} guild - guildId to formatting
+   * @param {Object} guildData - Database Object
+   */
+  getNowplayingObject (guild, guildData) {
+    return {
+      playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
+      repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
+      progressBar: this.getProgressBar(this.players.get(guild).player.state.position / this.players.get(guild).nowplaying.info.length),
+      time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).nowplaying.info.length / 1000, this.players.get(guild).nowplaying.info.isStream)}]`,
+      volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
+    }
+  }
+
+  /**
+   *
+   * @param {String} url - Url to check validate
+   */
+  validateYouTubeUrl (url) {
+    const regExp = new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/)
+    const match = url.match(regExp)
+    if (match && match[2].length === 11) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  /**
+   * @param {Number} volume- Volume of get emoji
+   */
+  getVolumeEmoji (volume) {
+    if (volume === 0) { return '🔇' }
+    if (volume < 30) { return '🔉' }
+    if (volume < 70) { return '🔊' }
+    return '🔊'
+  }
+
+  /**
+   * @param {String} - Guild Id to get playing state (pause,playing,no)
+   * @returns {String} - 'pause', 'playing', 'nothing'
+   */
+  getPlayingState (guild) {
+    if (!this.client.audio.players.get(guild)) return 'nothing'
+    if (this.client.audio.players.get(guild).player.paused) return 'paused'
+    if (this.client.audio.players.get(guild).player.paused === false) return 'playing'
+  }
+
+  /**
+   * @param {Number} number - 0, 1, 2 (Repeat Stats)
+   * @returns {String} - 'repeat_nothing', 'repeat_all', 'repeat_single'
+   */
+  getRepeatState (number) {
+    switch (number) {
+      case 0:
+        return 'repeat_nothing'
+      case 1:
+        return 'repeat_all'
+      case 2:
+        return 'repeat_single'
+    }
+  }
+
+  /**
+   * @param {Number} percent - Player's Position / Track Duration
+   */
+  getProgressBar (percent) {
+    let str = ''
+    for (let i = 0; i < 12; i++) {
+      if (i === parseInt(percent * 12)) {
+        str += '🔘'
+      } else {
+        str += '▬'
+      }
+    }
+    return str
   }
 
   /**

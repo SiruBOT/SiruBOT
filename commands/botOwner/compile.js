@@ -5,6 +5,7 @@ class Command {
     this.command = {
       name: 'compile',
       aliases: ['eval'],
+      category: 'BOT_OWNER',
       permissions: ['BotOwner']
     }
   }

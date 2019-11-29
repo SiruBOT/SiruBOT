@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: 'shutdown',
       aliases: ['셧다운'],
+      category: 'BOT_OWNER',
       permissions: ['BotOwner']
     }
   }

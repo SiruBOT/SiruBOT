@@ -7,6 +7,7 @@ class Command {
     this.command = {
       name: 'docs',
       aliases: ['앷ㄴ', 'djsdocs', 'djs'],
+      category: 'COMMANDS_GENERAL',
       permissions: ['Everyone']
     }
   }
