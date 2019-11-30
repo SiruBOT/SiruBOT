@@ -1,9 +1,9 @@
 # CHINOBOT BETA
 # MusicBOT (Lavalink)
-[![Build Status](https://travis-ci.org/cotwo0139/CHINOBOT_BETA.svg?branch=master)](https://travis-ci.org/cotwo0139/CHINOBOT_BETA)
+[![Build Status](https://travis-ci.com/cotwo0139/CHINOBOT_BETA.svg?branch=master)](https://travis-ci.com/cotwo0139/CHINOBOT_BETA)
 
 # Creator: Sangoon_Is_Noob
-![Sangoon_Profile_SRC](https://cdn.discordapp.com/avatars/260303569591205888/6cd9167d526be581e0d96dad38421016.png?size=256)
+![Sangoon_Profile_SRC](https://cdn.discordapp.com/avatars/260303569591205888/83811d211c198632dc279079436fc614.png?size=256)
 
 # Installation
 
