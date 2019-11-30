@@ -67,9 +67,11 @@
     "AUDIO_JOIN_VOICE_FIRST": "> %EMOJI_MUSIC%  Firstly, please join voice channel!",
     "AUDIO_NOT_DEFAULT_CH": "> %EMOJI_MUSIC%  This command able in voicechannel **<#%VOICECHANNEL%>**!",
     "AUDIO_NO_VOICE_ME": "> %EMOJI_NO%  Im not in voice channel.. please use ``%prefix%join`` command!",
+    "AUDIO_LISTEN_PLEASE": "> %EMOJI_NO%  Please turn on your listening status!",
     "AUDIO_ALL_SONGS_FINISHED": "> %EMOJI_MUSIC%  Finished playback.",
-    
     "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  Playing Now... **%TRACK% [%DURATION%]**",
+
+    "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | %NUM% Items | ``[%TOTALTIME%]``",
 
     "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  The player has stopped and the queue has been cleared.",
     

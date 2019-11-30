@@ -5,10 +5,14 @@ class Command {
       name: 'shutdown',
       aliases: ['셧다운'],
       category: 'BOT_OWNER',
+      require_voice: false,
       permissions: ['BotOwner']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     const { message } = compressed
     const players = this.client.audio.players.array().length

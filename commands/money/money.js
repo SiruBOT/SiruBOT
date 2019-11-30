@@ -5,6 +5,7 @@ class Command {
       name: '돈',
       aliases: ['money', 'ehs'],
       category: 'COMMANDS_MONEY_GENERAL',
+      require_voice: false,
       permissions: ['Everyone']
     }
   }

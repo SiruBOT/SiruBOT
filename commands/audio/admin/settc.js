@@ -5,10 +5,14 @@ class Command {
       name: 'settc',
       aliases: ['ㄴㄷㅅㅅㅊ'],
       category: 'MUSIC_DJ',
+      require_voice: false,
       permissions: ['Administrator', 'DJ']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
   }
 }

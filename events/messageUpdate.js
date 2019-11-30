@@ -5,6 +5,9 @@ class Event {
     this.client = client
   }
 
+  /**
+   * Run Event
+   */
   run (...args) {
     // const message = args[1]
     // const messageEvent = new MessageHandler(this.client)

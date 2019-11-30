@@ -6,6 +6,7 @@ class Command {
       name: 'play',
       aliases: ['ㅔㅣ묘'],
       category: 'MUSIC_GENERAL',
+      require_voice: true,
       permissions: ['Everyone']
     }
   }
@@ -17,13 +18,8 @@ class Command {
   async run (compressed, isSoundCloud) {
     // Default Variables
     const { message, args } = compressed
-    const vch = compressed.GuildData.vch
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
-
-    // Conditions
-    if (!message.member.voiceChannel) return message.channel.send(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
-    if (!this.client.getRightTextChannel(message.member.voiceChannel, vch)) return message.channel.send(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { CHANNEL: vch }))
 
     // If Conditions True
     const Audio = this.client.audio

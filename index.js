@@ -42,7 +42,7 @@ class Bot extends Discord.Client {
     if (!isTesting) this.login(this._options.bot.token)
   }
 
-  getRightTextChannel (channel, id) {
+  getRightChannel (channel, id) {
     if (id === channel.id) return true
     if (id === '0') return true
     if (this.channels.get(id)) {

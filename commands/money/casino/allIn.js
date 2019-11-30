@@ -5,10 +5,14 @@ class Command {
       name: '올인',
       aliases: ['dhfdls'],
       category: 'COMMANDS_MONEY_CASINO',
+      require_voice: false,
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     const picker = this.client.utils.localePicker
     const locale = compressed.GuildData.locale

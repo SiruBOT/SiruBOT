@@ -5,10 +5,15 @@ class Command {
       name: 'join',
       aliases: ['ㅓㅐㅑㅜ'],
       category: 'MUSIC_DJ',
+      require_voice: false,
       permissions: ['DJ', 'Administrator']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Boolean} silent - if Send Message
+   */
   async run (compressed, silent = false) {
     const { message } = compressed
     const Audio = this.client.audio
@@ -17,7 +22,7 @@ class Command {
     const picker = this.client.utils.localePicker
 
     if (!message.member.voiceChannel) return sendSilent(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
-    if (!this.client.getRightTextChannel(message.member.voiceChannel, vch)) return sendSilent(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
+    if (!this.client.getRightChannel(message.member.voiceChannel, vch)) return sendSilent(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
 
     const voiceChannel = message.member.voiceChannel
     if (Audio.players.get(message.guild.id) && !message.guild.me.voiceChannel) {

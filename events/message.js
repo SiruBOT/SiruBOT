@@ -3,6 +3,10 @@ class Event {
     this.client = client
   }
 
+  /**
+   * Run Event
+   * @param {Discord.Message} - Message
+   */
   async run (message) {
     this.handleCommand(message)
   }
@@ -41,7 +45,13 @@ class Event {
       const Command = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (Command) {
         let ablePermissions = 0
-        if (this.client.getRightTextChannel(message.channel, GuildData.tch)) {
+        if (this.client.getRightChannel(message.channel, GuildData.tch)) {
+          if (Command.command.require_voice) {
+            const vch = GuildData.vch
+            if (!message.member.voiceChannel) return message.channel.send(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
+            if (!this.client.getRightChannel(message.member.voiceChannel, vch)) return message.channel.send(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
+            if (this.client.audio.getVoiceStatus(message.member).listen === false) return message.channel.send(picker.get(locale, 'AUDIO_LISTEN_PLEASE'))
+          }
           for (const userPerm of userPermissions) {
             if (Command.command.permissions.includes(userPerm)) {
               ablePermissions++

@@ -3,6 +3,10 @@ class Event {
     this.client = client
   }
 
+  /**
+   * Run Event
+   * @param {String} - Debug Message of Client
+   */
   run (message) {
     this.client.logger.debug(message)
   }

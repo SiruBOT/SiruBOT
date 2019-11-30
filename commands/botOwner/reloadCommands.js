@@ -5,10 +5,14 @@ class Command {
       name: 'reload',
       aliases: ['리로드', 'loadcommands', 'flfhem', '리로드'],
       category: 'BOT_OWNER',
+      require_voice: false,
       permissions: ['BotOwner']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     const { message } = compressed
     message.channel.send('❎  리로드 중...').then(async m => {

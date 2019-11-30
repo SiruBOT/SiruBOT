@@ -5,10 +5,14 @@ class Command {
       name: 'volume',
       aliases: ['볼륨', 'vol', 'qhffba', '패ㅣㅕㅡㄷ'],
       category: 'MUSIC_GENERAL',
+      require_voice: false,
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker

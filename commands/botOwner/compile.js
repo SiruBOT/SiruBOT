@@ -6,10 +6,14 @@ class Command {
       name: 'compile',
       aliases: ['eval'],
       category: 'BOT_OWNER',
+      require_voice: false,
       permissions: ['BotOwner']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   run (compressed) {
     const { message, args } = compressed
     if (args.length === 0) return message.channel.send('❎  코드를 적어주세요')

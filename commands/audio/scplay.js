@@ -4,11 +4,15 @@ class Command {
     this.command = {
       name: 'scplay',
       category: 'MUSIC_GENERAL',
+      require_voice: true,
       aliases: ['ㄴㅊㅔㅣ묘'],
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     this.client.commands.get('play').run(compressed, true)
   }

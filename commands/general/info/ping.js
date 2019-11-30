@@ -7,6 +7,7 @@ class Command {
       name: 'ping',
       aliases: ['ㅔㅑㅜㅎ', '핑'],
       category: 'COMMANDS_GENERAL',
+      require_voice: false,
       permissions: ['Everyone']
     }
   }

@@ -8,10 +8,14 @@ class Command {
       name: 'docs',
       aliases: ['앷ㄴ', 'djsdocs', 'djs'],
       category: 'COMMANDS_GENERAL',
+      require_voice: false,
       permissions: ['Everyone']
     }
   }
 
+  /**
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker

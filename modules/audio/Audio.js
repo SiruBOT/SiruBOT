@@ -21,8 +21,8 @@ class AudioManager {
   }
 
   /**
-   * Init AudioManager
-   */
+  * @description Init AudioManager
+  */
   init () {
     this.client.logger.info('[Audio] Init Audio...')
     this.manager = new PlayerManager(this.client, this._options.nodes, {
@@ -39,6 +39,11 @@ class AudioManager {
     }
   }
 
+  /**
+   * @description Update Nowplaying Message
+   * @param {String} guildId - guildId of to update nowplaying message
+   * @param {Boolean} stop - If True, delete guildId of nowplayingMessage from nowplayingMessagesCollection
+   */
   updateNpMessage (guildId, stop = false) {
     const npMessage = this.nowplayingMessages.get(guildId)
     if (npMessage && npMessage.deleted === false && npMessage.editable) {
@@ -74,7 +79,7 @@ class AudioManager {
   }
 
   /**
-   * Get Formatted(Nowplaying) Text with informations
+   * @description Get Formatted(Nowplaying) Text with informations
    * @param {String} guild - guildId to formatting
    * @param {Object} guildData - Database Object
    */
@@ -89,18 +94,28 @@ class AudioManager {
    * @param {Object} guildData - Database Object
    */
   getNowplayingObject (guild, guildData) {
-    return {
-      playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
-      repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
-      progressBar: this.getProgressBar(this.players.get(guild).player.state.position / this.players.get(guild).nowplaying.info.length),
-      time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).nowplaying.info.length / 1000, this.players.get(guild).nowplaying.info.isStream)}]`,
-      volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
+    if (this.players.get(guild).nowplaying.info) {
+      return {
+        playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
+        repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
+        progressBar: this.getProgressBar(this.players.get(guild).player.state.position / this.players.get(guild).nowplaying.info.length),
+        time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).nowplaying.info.length / 1000, this.players.get(guild).nowplaying.info.isStream)}]`,
+        volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
+      }
+    } else {
+      return {
+        playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
+        repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
+        progressBar: this.getProgressBar(this.players.get(guild).player.state.position / 0),
+        time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(0, false)}]`,
+        volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
+      }
     }
   }
 
   /**
-   *
    * @param {String} url - Url to check validate
+   * @return {Boolean} - If url is youtube url, returns true, else returns false
    */
   validateYouTubeUrl (url) {
     const regExp = new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/)
@@ -114,6 +129,7 @@ class AudioManager {
 
   /**
    * @param {Number} volume- Volume of get emoji
+   * @returns {String} - Emojis (🔇, 🔉, 🔊)
    */
   getVolumeEmoji (volume) {
     if (volume === 0) { return '🔇' }
@@ -148,7 +164,8 @@ class AudioManager {
   }
 
   /**
-   * @param {Number} percent - Player's Position / Track Duration
+   * @param {Number} percent - Player's Position / Track Duration (miliseconds)
+   * @returns {String} - 🔘▬▬▬▬▬▬▬▬▬▬▬
    */
   getProgressBar (percent) {
     let str = ''
@@ -163,7 +180,7 @@ class AudioManager {
   }
 
   /**
-   * Gets best node - Sort by playing players
+   * @description Gets best node - Sort by playing players
    * @returns {Node} - Returns Audio Node
    */
   getBestNode () {
@@ -190,20 +207,33 @@ class AudioManager {
   }
 
   /**
-   * @description Checking is member speakable
+   * @description Checking is member listenable
    * @param {Discord.Member} member - Member to checking
    */
-  checkSpeakable (member) {
-    if (member.serverMute) return false
+  getVoiceStatus (member) {
+    return {
+      listen: this.getListenStatus(member),
+      speak: this.getVoiceMuteStatus(member)
+    }
+  }
+
+  /**
+   * @description Get VoiceMute Status
+   * @param {Discord.Member} member - Member to check
+   * @returns {Boolean} - false, true
+   */
+  getVoiceMuteStatus (member) {
     if (member.selfMute) return false
+    if (member.serverMute) return false
     else return true
   }
 
   /**
-   * @description Checking is member listenable
-   * @param {Discord.Member} member - Member to checking
+   * @description Get Listen Status
+   * @param {Discord.Member} member - Member to check
+   * @returns {Boolean} - false, true
    */
-  checkListenable (member) {
+  getListenStatus (member) {
     if (member.serverDeaf) return false
     if (member.selfDeaf) return false
     else return true
