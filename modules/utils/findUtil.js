@@ -10,8 +10,8 @@ const isTesting = (() => {
 })()
 
 const getSettings = () => {
-  if (isTesting) return require('./settings.inc.js')
-  else return require('./settings')
+  if (isTesting) return require('../../settings.inc.js')
+  else return require('../../settings')
 }
 
 /**
