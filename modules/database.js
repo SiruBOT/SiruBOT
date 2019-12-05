@@ -11,7 +11,7 @@ class DataManager {
     const options = this.client._options
     const logger = this.client.logger
     logger.info(`[DataBase] [INIT] Connecting URL (${options.db.mongoURL})`)
-    Mongo.connect(options.db.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: options.db.user, pass: options.db.password })
+    Mongo.connect(options.db.mongo.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: options.db.mongo.user, pass: options.db.mongo.password })
   }
 
   async checkGuildMember (guildMember) {

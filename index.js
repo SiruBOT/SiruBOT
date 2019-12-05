@@ -13,7 +13,7 @@ const getSettings = () => {
   else return require('./settings')
 }
 
-class Bot extends Discord.Client {
+class Client extends Discord.Client {
   constructor (options) {
     super()
     this._options = options
@@ -119,7 +119,7 @@ function globAsync (path) {
   })
 }
 
-const client = new Bot(getSettings())
+const client = new Client(getSettings())
 client.init()
 
 process.on('uncaughtException', (err) => {

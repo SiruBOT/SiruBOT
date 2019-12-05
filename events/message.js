@@ -1,3 +1,5 @@
+const redis = require('redis')
+
 class Event {
   constructor (client) {
     this.client = client
@@ -8,6 +10,8 @@ class Event {
    * @param {Discord.Message} - Message
    */
   async run (message) {
+    const redisClient = redis.createClient({ host: 'localhost' })
+    redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     this.handleCommand(message)
   }
 

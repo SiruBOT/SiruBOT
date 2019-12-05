@@ -114,17 +114,17 @@ class AudioPlayer {
       switch (guildData.repeat) {
         case 0:
           this.client.logger.debug(`[Audio] [Repeat] Repeat Status (No_Repeat: 0) (Guild: ${this.guild})`)
-          await this.playNext(false, chId)
+          await this.playNext(true, chId)
           break
         case 1:
           this.client.logger.debug(`[Audio] [Repeat] Repeat Status (All: 1) (Guild: ${this.guild})`)
           await this.client.database.updateGuildData(this.guild, { $push: { queue: item } })
-          await this.playNext(false)
+          await this.playNext(true)
           break
         case 2:
           this.client.logger.debug(`[Audio] [Repeat] Repeat Status (Single: 2) (Guild: ${this.guild})`)
           await this.client.database.updateGuildData(this.guild, { $push: { queue: { $each: [item], $position: 0 } } })
-          await this.playNext(false)
+          await this.playNext(true)
           break
       }
     })
@@ -152,7 +152,7 @@ class AudioPlayer {
    */
   deleteMessage () {
     if (!this.message) return
-    if (this.message.deletable && this.message) {
+    if (this.message.deletable && this.message && this.message.deleted === false) {
       this.message.delete()
     }
   }

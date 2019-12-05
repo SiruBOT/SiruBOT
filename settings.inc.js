@@ -18,9 +18,15 @@ module.exports = {
     level: 'debug'
   },
   db: {
-    mongoURL: 'mongodb://mongodbIP:27017/DBNAME?authSource=admin',
-    user: 'yourmongodbuser',
-    password: 'yourmongodbpassword'
+    mongo: {
+      mongoURL: 'mongodb://mongodbIP:27017/DBNAME?authSource=admin',
+      user: 'yourmongodbuser',
+      password: 'yourmongodbpassword'
+    },
+    redis: {
+      host: '127.0.0.1',
+      port: 6379
+    }
   },
   others: {
     embed_warn: '#FFDADA',
