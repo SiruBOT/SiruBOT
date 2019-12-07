@@ -1,6 +1,8 @@
 /**
  * Others
  */
+const path = require('path')
+const routes = require('./routes')
 const Logger = require('./modules/logger')
 const logger = new Logger()
 const morgan = require('morgan')
@@ -15,13 +17,13 @@ const RedisStore = require('connect-redis')(session)
 // Redis
 const redis = require('redis')
 const redisClient = redis.createClient({ host: globalOptions.db.redis.host })
-const pubsubClient = redis.createClient({ host: globalOptions.db.redis.host })
+// const pubsubClient = redis.createClient({ host: globalOptions.db.redis.host })
 
-pubsubClient.on('message', (channel, message) => {
-  console.log(message)
-})
+// pubsubClient.on('message', (channel, message) => {
+//   console.log(message)
+// })
 
-pubsubClient.subscribe('asdf')
+// pubsubClient.subscribe('asdf')
 
 /**
  * Passport
@@ -36,6 +38,17 @@ const express = require('express')
 const https = require('https')
 const http = require('http')
 const app = express()
+
+/**
+ * Page
+ */
+const Routes = require('./routes')
+
+app.set('view engine', 'ejs')
+app.set('views', path.join(__dirname, './views'))
+app.engine('html', require('ejs').renderFile)
+
+app.use('/static', express.static(path.join(__dirname, './static')))
 
 const scopes = ['identify', 'email', 'guilds']
 
@@ -74,15 +87,17 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.get('/', passport.authenticate('discord', { scope: scopes }), (req, res) => {
-})
-app.get('/callback',
-  passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => { res.redirect('/info') } // auth success
-)
+app.use('/', Routes.main.index(app))
+
+app.get('/login', passport.authenticate('discord', { scope: scopes }))
+
+app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => { res.redirect('/') })
+
 app.get('/logout', (req, res) => {
   req.logout()
   res.redirect('/')
 })
+
 app.get('/info', checkAuth, (req, res) => {
   res.json(req.user)
 })
@@ -99,4 +114,8 @@ http.createServer(app).listen(options.host.httpPort, () => {
 })
 https.createServer(options.cert, app).listen(options.host.httpsPort, () => {
   logger.info(`[WEB] HTTPS Server listening on port ${options.host.httpsPort}`)
+})
+
+process.on('uncaughtException', (err) => {
+  logger.error(err.stack)
 })

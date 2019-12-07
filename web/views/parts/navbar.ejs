@@ -1,0 +1,54 @@
+<nav class="uk-navbar-container uk-margin" uk-navbar>
+    <div class="uk-navbar-left">
+    
+        <a class="uk-navbar-item uk-logo" href="#">시루봇</a>
+    
+        <ul class="uk-navbar-nav">
+            <li>
+                <a href="#">
+                    <span class="uk-icon uk-margin-small-right" uk-icon="icon: star"></span>
+                    Features
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="uk-navbar-right">
+        <ul class="uk-navbar-nav">
+            <li>
+                <% if (req.isAuthenticated()) { %>
+                <a href="#">
+                    <div>
+                        <div class="uk-navbar-title uk-margin-small-right"><img style="border-radius: 50%" data-src="<%= `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=4096` %>" width="32" height="32" alt="profile" uk-img></div>
+                        <!-- <div class="uk-navbar-title uk-margin-small-right"><span uk-icon="user"></span></div> -->
+                    </div>
+                    <div>
+                        <div class="uk-navbar-title uk-margin-small-right"><%= req.user.username + '#' + req.user.discriminator %></div>
+                    </div>
+                </a>
+                <div class="uk-navbar-dropdown">
+                    <ul class="uk-nav uk-navbar-dropdown-nav">
+                        <li><a type="button" uk-toggle="target: #modal-logout"><span uk-icon="sign-out"></span> 로그아웃</a></li>
+                    </ul>
+                </div>
+                <!-- This is the modal -->
+                <div id="modal-logout" uk-modal>
+                    <div class="uk-modal-dialog uk-modal-body">
+                        <h2 class="uk-modal-title">로그아웃 하시겠습니까?</h2>
+                        <button class="uk-button uk-button-primary" type="button" onclick="location.href = '/logout'">네</a></button>
+                        <button class="uk-button uk-button-default uk-modal-close" type="button">아니요</button>
+                    </div>
+                </div>
+                <% } else { %>
+                <a href="login">
+                    <div>
+                        <div class="uk-navbar-title uk-margin-small-right"><span uk-icon="sign-in"></span></div>
+                    </div>
+                    <div>
+                        <div class="uk-navbar-title uk-margin-small-right">DISCORD 를 통해 로그인</div>
+                    </div>
+                </a>
+                <% } %>
+            </li>
+        </ul>
+    </div>
+</nav>

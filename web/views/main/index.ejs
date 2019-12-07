@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../parts/head.ejs'); -%>
+  </head>
+  <body>
+    <%- include('../parts/navbar.ejs', { req: req }) -%>
+    <% if (req.isAuthenticated()) { %>
+      <%- include('./logged_in.ejs'); -%>
+    <% } else { %>
+      <%- include('./guest.ejs'); -%>
+    <% } %>
+
+    <style>
+      #page-footer, body::after {
+        width:100%
+      }
+    </style>
+    <div class="uk-position-bottom-center" id="page-footer">
+      <footer style="background-color: #f5f5f5;">
+        <%- include('../parts/footer.ejs'); -%>
+      </footer>
+    </div>
+  </body>
+</html>
