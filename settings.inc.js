@@ -32,7 +32,8 @@ module.exports = {
   others: {
     embed_warn: '#FFDADA',
     embed_good: '#DAFFDA',
-    embed_general: '#7289DA'
+    embed_general: '#7289DA',
+    changelog_url: 'https://*****/.github.io/' // https://*****/.github.io/[COMMITID.txt]
   },
   constructors: {
     EMOJI_MUSIC: '🎵',
