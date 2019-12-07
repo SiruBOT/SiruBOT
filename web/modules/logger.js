@@ -1,21 +1,11 @@
+
 const winston = require('winston')
-const isTesting = (() => {
-  if (process.argv[2] === 'test') return true
-  else return false
-})()
-
-const getSettings = () => {
-  if (isTesting) return require('./settings.inc.js')
-  else return require('./settings')
-}
-
-const settings = getSettings().logger
 require('winston-daily-rotate-file')
 require('date-utils')
 
 const DailyRotateFile = new winston.transports.DailyRotateFile({
   level: 'debug',
-  filename: 'logs/siru-%DATE%.log',
+  filename: 'logs/%DATE%.log',
   zippedArchive: true,
   format: winston.format.printf(info => `[${new Date()}] [${info.level.toUpperCase()}] ${info.message}`)
 })
@@ -40,7 +30,7 @@ const logLevels = {
 }
 winston.addColors(logLevels)
 const logger = winston.createLogger({
-  level: settings.level,
+  level: 'debug',
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.simple(),
@@ -58,11 +48,7 @@ class Logger {
   }
 
   getMessage (message = undefined) {
-    if (this.client.shard) {
-      return `[Shard ${this.client.shard.id}] ${message}`
-    } else {
-      return message
-    }
+    return message
   }
 
   info (...args) {

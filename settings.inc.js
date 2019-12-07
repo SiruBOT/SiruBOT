@@ -5,7 +5,8 @@ module.exports = {
     prefix: prefix,
     games: ['%users% 명의 유저와 함께하고 있어요!', '봇 리라이트중!', '%guilds% 개의 길드에서 사용 중!', '>>도움 | %ping%', 'https://github.com/cotwo0139/CHINOBOT_BETA.git'],
     gamesInterval: 30000, // 1000ms = 1sec (ms)
-    owners: ['260303569591205888']
+    owners: [],
+    shards: 0
   },
   audio: {
     nodes: [

@@ -1,5 +1,12 @@
+/**
+ * Others
+ */
+const Logger = require('./modules/logger')
+const logger = new Logger()
+const morgan = require('morgan')
 const options = require('./options')
 const globalOptions = require('../settings')
+
 /**
  * Sessions
  */
@@ -8,12 +15,13 @@ const RedisStore = require('connect-redis')(session)
 // Redis
 const redis = require('redis')
 const redisClient = redis.createClient({ host: globalOptions.db.redis.host })
+const pubsubClient = redis.createClient({ host: globalOptions.db.redis.host })
 
-redisClient.on('message', (channel, message) => {
+pubsubClient.on('message', (channel, message) => {
   console.log(message)
 })
 
-redisClient.subscribe('asdf')
+pubsubClient.subscribe('asdf')
 
 /**
  * Passport
@@ -35,6 +43,8 @@ const checkAuth = (req, res, next) => {
   if (req.isAuthenticated()) return next()
   res.send('not logged in :(')
 }
+
+app.use(morgan('dev'))
 
 passport.serializeUser((user, done) => {
   done(null, user)
@@ -64,7 +74,8 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.get('/', passport.authenticate('discord', { scope: scopes }), (req, res) => {})
+app.get('/', passport.authenticate('discord', { scope: scopes }), (req, res) => {
+})
 app.get('/callback',
   passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => { res.redirect('/info') } // auth success
 )
@@ -73,7 +84,6 @@ app.get('/logout', (req, res) => {
   res.redirect('/')
 })
 app.get('/info', checkAuth, (req, res) => {
-  console.log(req.user)
   res.json(req.user)
 })
 
@@ -84,5 +94,9 @@ app.use((req, res) => {
 /**
  * Https, Http - Server Settings
  */
-http.createServer(app).listen(80)
-https.createServer(options.cert, app).listen(443)
+http.createServer(app).listen(options.host.httpPort, () => {
+  logger.info(`[WEB] HTTP Server listening on port ${options.host.httpPort}`)
+})
+https.createServer(options.cert, app).listen(options.host.httpsPort, () => {
+  logger.info(`[WEB] HTTPS Server listening on port ${options.host.httpsPort}`)
+})

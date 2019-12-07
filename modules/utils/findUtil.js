@@ -3,16 +3,7 @@ const arrayUtil = require('./arrayUtil')
 const findElementRequiredOptions = ['filter', 'collection', 'message', 'formatter', 'locale', 'picker']
 const { massReact } = require('./safeEdit')
 const Numbers = ['0️⃣', '1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
-
-const isTesting = (() => {
-  if (process.argv[2] === 'test') return true
-  else return false
-})()
-
-const getSettings = () => {
-  if (isTesting) return require('../../settings.inc.js')
-  else return require('../../settings')
-}
+const settings = require('../checker/getSettings')()
 
 /**
  * Options For FindElement Function
@@ -92,7 +83,7 @@ function getEmbed (pages, currentPage, picker, locale) {
  */
 module.exports.getColor = (member) => {
   if (member.highestRole && member.highestRole.color !== 0) return member.highestRole.color
-  else return getSettings().others.embed_general
+  else return settings.others.embed_general
 }
 
 module.exports.getUserFromMention = getUserFromMention

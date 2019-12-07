@@ -1,14 +1,4 @@
-const isTesting = (() => {
-  if (process.argv[2] === 'test') return true
-  else return false
-})()
-
-const getSettings = () => {
-  if (isTesting) return require('./settings.inc.js')
-  else return require('./settings')
-}
-
-const settings = getSettings()
+const settings = require('./modules/checker/getSettings')()
 
 module.exports = [{
   name: 'BotOwner',

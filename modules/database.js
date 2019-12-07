@@ -10,7 +10,7 @@ class DataManager {
   init () {
     const options = this.client._options
     const logger = this.client.logger
-    logger.info(`[DataBase] [INIT] Connecting URL (${options.db.mongoURL})`)
+    logger.info(`[DataBase] [INIT] Connecting URL (${options.db.mongo.mongoURL})`)
     Mongo.connect(options.db.mongo.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: options.db.mongo.user, pass: options.db.mongo.password })
   }
 

@@ -1,21 +1,14 @@
 const Discord = require('discord.js')
-const Logger = require('./logger')
 const LocalePicker = require('./locales/localePicker')
-const { PermissionChecker, DataBase, Audio } = require('./modules')
+const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
 
-const isTesting = (() => {
-  if (process.argv[2] === 'test') return true
-  else return false
-})()
-
-const getSettings = () => {
-  if (isTesting) return require('./settings.inc.js')
-  else return require('./settings')
-}
+const settings = require('./modules/checker/getSettings')()
+const isTesting = require('./modules/checker/isTesting')()
 
 class Client extends Discord.Client {
   constructor (options) {
     super()
+    this._isTesting = isTesting
     this._options = options
     this.logger = new Logger(this)
     this.database = new DataBase(this)
@@ -119,7 +112,7 @@ function globAsync (path) {
   })
 }
 
-const client = new Client(getSettings())
+const client = new Client(settings)
 client.init()
 
 process.on('uncaughtException', (err) => {
