@@ -25,18 +25,18 @@ function getCookie (cookieName) {
 }
 
 function hideWithAnimation (id, name = '') {
-  document.getElementById(id).className = name + ' hide'
-  setTimeout(() => {
-    document.getElementById(id).style = 'display:none'
-  }, 600)
+  // document.getElementById(id).className = name + ' hide'
+  // setTimeout(() => {
+  document.getElementById(id).style = 'display:none'
+  document.getElementById('show').style = 'display:none'
+  // }, 1000)
 }
 function displayWithAnimation (id, name = '') {
-  document.getElementById(id).className = name + ' show'
-  document.getElementById(id).style = 'display:show'
+  document.getElementById(id).className = 'show'
 }
 setTimeout(() => {
   hideWithAnimation('spinner', 'uk-position-center')
   setTimeout(() => {
     displayWithAnimation('show', 'content')
-  }, 500)
-}, 1000)
+  }, 600)
+}, 2000)

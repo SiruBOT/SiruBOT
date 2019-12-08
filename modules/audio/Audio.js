@@ -32,6 +32,7 @@ class AudioManager {
     for (const node of this.manager.nodes) {
       node[1].ws.on('message', (data) => {
         const parsed = JSON.parse(data)
+        // if (Object.keys(parsed).includes('filters') && parsed.op === 'event') return this.players.get(parsed.guildId).emit('error', parsed.error)
         if (parsed.op === 'playerUpdate') {
           this.updateNpMessage(parsed.guildId)
         }

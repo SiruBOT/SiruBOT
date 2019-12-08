@@ -100,14 +100,18 @@ class AudioPlayer {
     await this.player.play(item.track)
     await this.player.volume(guildData.volume)
     this.player.once('error', (data) => {
-      if (data !== 'remove') return this.player.emit('end', 'error')
+      if (data !== 'remove') {
+        return this.player.emit('end', 'error')
+      }
     })
     this.player.once('end', async (data) => {
       this.nowplaying = null
-      this.player.emit('error', 'remove')
       if (data === 'error') {
-        await this.playNext(false)
+        await this.playNext(true)
+        this.deleteMessage()
         return this.client.logger.error(`[Audio] Error on play track: ${item.info.identifier}`)
+      } else {
+        this.player.emit('error', 'remove')
       }
       if (data.reason === 'REPLACED') return this.client.logger.debug(`[Audio] Replaced Track! (Guild: ${this.guild})`)
       const guildData = await this.client.database.getGuildData(this.guild)
