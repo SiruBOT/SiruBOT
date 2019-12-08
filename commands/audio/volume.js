@@ -17,7 +17,7 @@ class Command {
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
     const { message, args } = compressed
-    if (compressed.userPermissions.includes('DJ') && args.length > 0) {
+    if ((compressed.userPermissions.includes('Administrator') || compressed.userPermissions.includes('DJ')) && args.length > 0) {
       if (isNaN(args[0])) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_STRING'))
       if (Number(args[0]) < 1) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_UNDER_ONE'))
       if (Number(args[0]) > 150) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_HIGH_HDF'))
