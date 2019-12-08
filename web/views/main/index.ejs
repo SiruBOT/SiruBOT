@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <%- include('../parts/head.ejs'); -%>
+    <%- include('../parts/head.ejs', { req: req, options: options, locale: locale, picker }); -%>
   </head>
   <body>
-    <%- include('../parts/navbar.ejs', { req: req }) -%>
-    <% if (req.isAuthenticated()) { %>
-      <%- include('./logged_in.ejs'); -%>
-    <% } else { %>
-      <%- include('./guest.ejs'); -%>
-    <% } %>
-
     <style>
-      #page-footer, body::after {
-        width:100%
-      }
+    .show {
+      opacity: 1;
+      transition: opacity 0.6s linear;
+    }
+
+    .hide {
+      opacity: 0;
+      transition: opacity 0.6s linear;
+    }
     </style>
-    <div class="uk-position-bottom-center" id="page-footer">
-      <footer style="background-color: #f5f5f5;">
-        <%- include('../parts/footer.ejs'); -%>
-      </footer>
+    <div uk-spinner="ratio: 3" class="uk-position-center" id="spinner"></div>
+    <div style="display:none" id="show" class="hide content">
+      <%- include('../parts/navbar.ejs', { req: req, options: options, locale: locale, picker }) -%>
+      <%- include('./main.ejs', { req: req, options: options, locale: locale, picker }) -%>
+      <%- include('../parts/footer.ejs'); -%>
     </div>
   </body>
 </html>

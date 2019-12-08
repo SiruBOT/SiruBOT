@@ -8,6 +8,14 @@ module.exports = {
     key: fs.readFileSync('./cert/key.pem'),
     cert: fs.readFileSync('./cert/cert.pem')
   },
+  web: {
+    supportedLocales: ['en', 'ko'],
+    locales: {
+      en: 'English (US)',
+      ko: '한국어'
+    },
+    support_server: 'https://discord.gg/wy6KsRf'
+  },
   oauth: {
     discord: {
       callback: 'https://siru.xyz/callback',

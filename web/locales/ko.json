@@ -1,0 +1,14 @@
+{
+    "NAVBAR_LOGO": "시루봇",
+    "TITLE": "시루봇",
+    "DESCRIPTION": "웹 대시보드 기능이 있는 다기능 봇",
+    "SUPPORT": "서포트 서버",
+    "DASHBOARD": "대시보드",
+    "LANGUAGE": "언어",
+    "LOGOUT": "로그아웃",
+    "LOGOUT_Q": "로그아웃 하실건가요?",
+    "THROUGH_DISCORD": "DISCORD 를 통해 로그인",
+    "CANCEL": "취소",
+    "NO": "ㄴㄴ",
+    "YES": "ㅇㅇ ㄳㄳ"
+}

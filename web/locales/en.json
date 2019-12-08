@@ -1,0 +1,14 @@
+{
+    "NAVBAR_LOGO": "SIRUBOT",
+    "TITLE": "SIRUBOT",
+    "DESCRIPTION": "A Multi-purpose discord bot with web dashboard",
+    "SUPPORT": "Support Server",
+    "DASHBOARD": "Dashboard",
+    "LANGUAGE": "Language",
+    "LOGOUT": "Logout",
+    "LOGOUT_Q": "Are you sure you want to log out?",
+    "THROUGH_DISCORD": "Login through discord",
+    "CANCEL": "Cancel",
+    "NO": "No",
+    "YES": "Yes"
+}

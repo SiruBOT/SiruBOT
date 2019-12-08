@@ -2,12 +2,14 @@
  * Others
  */
 const path = require('path')
-const routes = require('./routes')
-const Logger = require('./modules/logger')
-const logger = new Logger()
-const morgan = require('morgan')
-const options = require('./options')
 const globalOptions = require('../settings')
+const LocalePicker = require('./locales/picker')
+const Logger = require('./modules/logger')
+const options = require('./options')
+const morgan = require('morgan')
+const logger = new Logger()
+const picker = new LocalePicker(logger, globalOptions)
+picker.init()
 
 /**
  * Sessions
@@ -39,23 +41,29 @@ const https = require('https')
 const http = require('http')
 const app = express()
 
+const cookieParser = require('cookie-parser')
+const locale = require('locale')
+
+const defaultLocale = 'en'
+
 /**
  * Page
  */
 const Routes = require('./routes')
 
+const scopes = ['identify', 'email', 'guilds']
+
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, './views'))
 app.engine('html', require('ejs').renderFile)
 
+app.use(require('serve-favicon')(path.join(__dirname, 'static', 'images', 'favicon.ico'))) // Favicon
+
 app.use('/static', express.static(path.join(__dirname, './static')))
 
-const scopes = ['identify', 'email', 'guilds']
+app.use(locale(options.web.supportedLocales, defaultLocale))
 
-const checkAuth = (req, res, next) => {
-  if (req.isAuthenticated()) return next()
-  res.send('not logged in :(')
-}
+app.use(cookieParser())
 
 app.use(morgan('dev'))
 
@@ -87,23 +95,13 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use('/', Routes.main.index(app))
+app.use('/', Routes.main.index({ app, passport, options, picker }))
 
-app.get('/login', passport.authenticate('discord', { scope: scopes }))
-
-app.get('/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => { res.redirect('/') })
-
-app.get('/logout', (req, res) => {
-  req.logout()
-  res.redirect('/')
-})
-
-app.get('/info', checkAuth, (req, res) => {
-  res.json(req.user)
-})
-
+/**
+ * 404 Handle
+ */
 app.use((req, res) => {
-  res.status(404).send('not found')
+  res.status(404).render('errors/404')
 })
 
 /**

@@ -1,13 +1,35 @@
 <nav class="uk-navbar-container uk-margin" uk-navbar>
     <div class="uk-navbar-left">
     
-        <a class="uk-navbar-item uk-logo" href="#">시루봇</a>
+        <a class="uk-navbar-item uk-logo" href="/"><%= picker.get(locale, 'NAVBAR_LOGO') %></a>
     
         <ul class="uk-navbar-nav">
             <li>
+                <a href="<%= options.web.support_server %>">
+                    <div>
+                        <span uk-icon="comments" class="uk-margin-small-right"></span><%= picker.get(locale, 'SUPPORT') %>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard">
+                    <div>
+                        <span uk-icon="settings" class="uk-margin-small-right"></span><%= picker.get(locale, 'DASHBOARD') %>
+                    </div>
+                </a>
+            </li>
+            <li>
                 <a href="#">
-                    <span class="uk-icon uk-margin-small-right" uk-icon="icon: star"></span>
-                    Features
+                    <div>
+                        <span uk-icon="world" class="uk-margin-small-right"></span><%= picker.get(locale, 'LANGUAGE') %>
+                    </div>
+                    <div class="uk-navbar-dropdown">
+                        <ul class="uk-nav uk-navbar-dropdown-nav">
+                            <% for (const language of options.web.supportedLocales) { %>
+                                <li><a type="button" onclick="setLocale('<%= language %>')"><span uk-icon=></span><%= options.web.locales[language] %></a></li>
+                            <% } %>
+                        </ul>
+                    </div>
                 </a>
             </li>
         </ul>
@@ -18,7 +40,7 @@
                 <% if (req.isAuthenticated()) { %>
                 <a href="#">
                     <div>
-                        <div class="uk-navbar-title uk-margin-small-right"><img style="border-radius: 50%" data-src="<%= `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=4096` %>" width="32" height="32" alt="profile" uk-img></div>
+                        <div class="uk-navbar-title uk-margin-small-right"><img style="border-radius: 50%" data-src="<%= req.user.avatar ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=4096` : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png` %>" width="32" height="32" alt="profile" uk-img></div>
                         <!-- <div class="uk-navbar-title uk-margin-small-right"><span uk-icon="user"></span></div> -->
                     </div>
                     <div>
@@ -27,15 +49,15 @@
                 </a>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li><a type="button" uk-toggle="target: #modal-logout"><span uk-icon="sign-out"></span> 로그아웃</a></li>
+                        <li><a type="button" uk-toggle="target: #modal-logout"><span uk-icon="sign-out"></span> <%= picker.get(locale, 'LOGOUT') %></a></li>
                     </ul>
                 </div>
                 <!-- This is the modal -->
                 <div id="modal-logout" uk-modal>
                     <div class="uk-modal-dialog uk-modal-body">
-                        <h2 class="uk-modal-title">로그아웃 하시겠습니까?</h2>
-                        <button class="uk-button uk-button-primary" type="button" onclick="location.href = '/logout'">네</a></button>
-                        <button class="uk-button uk-button-default uk-modal-close" type="button">아니요</button>
+                        <h2 class="uk-modal-title"><%= picker.get(locale, 'LOGOUT_Q') %></h2>
+                        <button class="uk-button uk-button-primary" type="button" onclick="location.href = '/logout'"><%= picker.get(locale, 'YES') %></a></button>
+                        <button class="uk-button uk-button-default uk-modal-close" type="button"><%= picker.get(locale, 'CANCEL') %></button>
                     </div>
                 </div>
                 <% } else { %>
@@ -44,7 +66,7 @@
                         <div class="uk-navbar-title uk-margin-small-right"><span uk-icon="sign-in"></span></div>
                     </div>
                     <div>
-                        <div class="uk-navbar-title uk-margin-small-right">DISCORD 를 통해 로그인</div>
+                        <div class="uk-navbar-title uk-margin-small-right"><%= picker.get(locale, 'THROUGH_DISCORD') %></div>
                     </div>
                 </a>
                 <% } %>
