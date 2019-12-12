@@ -2,12 +2,21 @@
     "NAVBAR_LOGO": "시루봇",
     "TITLE": "시루봇",
     "DESCRIPTION": "웹 대시보드 기능이 있는 다기능 봇",
+
+    "TITLE_404": "404: 길을 잃었어요..",
+    "404": "이런... 길을 잘못 드셨군요!",
+    "BACK_TO_HOME": "홈으로 가기",
+    "WHOOPSE": "이런! :(",
+    "DESCRIPTION_404": "없는 파일이거나, 경로가 존재하지 않아요...",
+
     "SUPPORT": "서포트 서버",
     "DASHBOARD": "대시보드",
     "LANGUAGE": "언어",
     "LOGOUT": "로그아웃",
     "LOGOUT_Q": "로그아웃 하실건가요?",
     "THROUGH_DISCORD": "DISCORD 를 통해 로그인",
+
+    "GO_BACK": "이전 페이지",
     "CANCEL": "취소",
     "NO": "ㄴㄴ",
     "YES": "ㅇㅇ ㄳㄳ"

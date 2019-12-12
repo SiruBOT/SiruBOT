@@ -54,19 +54,22 @@ class AudioPlayer {
   /**
    * @param {Boolean} [songend] - Song End Status
    */
-  async playNext (stopStatus, chId = 0) {
+  async playNext (stopStatus, leave = false) {
     this.AudioManager.updateNpMessage(this.guild)
     const picker = this.client.utils.localePicker
     const first = await this.client.database.getGuildData(this.guild)
     const result = await this.client.database.updateGuildData(this.guild, { $pop: { queue: -1 } })
+    const chId = await this.getTextChannel()
+    this.deleteMessage()
     if (result.result.nModified !== 0) {
       this.client.logger.debug(`[Audio] Play Next Song.... (Guild: ${this.guild}) (Song: ${first.queue[0].track})`)
-      this.deleteMessage()
       await this.play(first.queue[0])
     } else {
       this.client.logger.debug(`[Audio] Empty Queue!... (Guild: ${this.guild})`)
       if (stopStatus) {
-        this.client.channels.get(chId).send(picker.get(first.locale, 'AUDIO_ALL_SONGS_FINISHED'))
+        return this.client.channels.get(chId).send(picker.get(first.locale, 'AUDIO_ALL_SONGS_FINISHED'))
+      }
+      if (leave) {
         return this.stop()
       }
     }
@@ -84,16 +87,25 @@ class AudioPlayer {
   }
 
   /**
-   * @param {Object} item - Playing Song Object
-   */
-  async play (item) {
-    const picker = this.client.utils.localePicker
+  * @param {*} item
+  */
+  async getTextChannel () {
     const guildData = await this.client.database.getGuildData(this.guild)
     let chId
     if (this.textChannel.id === guildData.tch) chId = guildData.tch
     else if (this.textChannel.id && guildData.tch === '0') chId = this.textChannel.id
     else if (this.textChannel.id && !this.client.channels.get(guildData.tch)) chId = this.textChannel.id
     else if (this.textChannel.id && this.client.channels.get(guildData.tch)) chId = guildData.tch
+    return chId
+  }
+
+  /**
+   * @param {Object} item - Playing Song Object
+   */
+  async play (item) {
+    const picker = this.client.utils.localePicker
+    const guildData = await this.client.database.getGuildData(this.guild)
+    const chId = await this.getTextChannel()
     this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000, item.info.isStream) }))
     this.nowplaying = item
     await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: item } })
@@ -107,7 +119,7 @@ class AudioPlayer {
     this.player.once('end', async (data) => {
       this.nowplaying = null
       if (data === 'error') {
-        await this.playNext(true)
+        await this.playNext(true, false)
         this.deleteMessage()
         return this.client.logger.error(`[Audio] Error on play track: ${item.info.identifier}`)
       } else {
@@ -118,17 +130,17 @@ class AudioPlayer {
       switch (guildData.repeat) {
         case 0:
           this.client.logger.debug(`[Audio] [Repeat] Repeat Status (No_Repeat: 0) (Guild: ${this.guild})`)
-          await this.playNext(true, chId)
+          await this.playNext(true, false)
           break
         case 1:
           this.client.logger.debug(`[Audio] [Repeat] Repeat Status (All: 1) (Guild: ${this.guild})`)
           await this.client.database.updateGuildData(this.guild, { $push: { queue: item } })
-          await this.playNext(true)
+          await this.playNext(true, false)
           break
         case 2:
           this.client.logger.debug(`[Audio] [Repeat] Repeat Status (Single: 2) (Guild: ${this.guild})`)
           await this.client.database.updateGuildData(this.guild, { $push: { queue: { $each: [item], $position: 0 } } })
-          await this.playNext(true)
+          await this.playNext(true, false)
           break
       }
     })

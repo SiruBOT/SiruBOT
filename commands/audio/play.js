@@ -33,13 +33,17 @@ class Command {
 
     if (args.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
+    // searchStr = 'ytsearch:' + searchStr
 
+    console.log(searchStr)
     const searchResult = await Audio.getSongs(searchStr)
+    console.log(searchResult)
+
     // SearchResult
-    if (searchResult.loadType === 'NO_MATCHES') return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
-    if (searchResult.loadType === 'LOAD_FAILED') return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
     const keys = Object.keys(searchResult)
     if (!keys.includes('loadType')) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.cause.message })) // andesite-node Handling
+    if (searchResult.loadType === 'NO_MATCHES' || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
+    if (searchResult.loadType === 'LOAD_FAILED') return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
 
     if (searchResult.loadType === 'PLAYLIST_LOADED') {
       const guildData = await this.client.database.getGuildData(message.guild.id)

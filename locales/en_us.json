@@ -83,5 +83,9 @@
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  Found playlist with **%NUM%** entries, added to the queue!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST": "> %EMOJI_MUSIC%  This track has a playlist of **%NUM%** tracks attached. Will you load playlist?",
 
+    "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NOTHING%  Repeat mode changed to **NONE**",
+    "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **All**",
+    "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  Repeat mode chaged to **Single**",
+
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  Developers have changed the log do not exist to commit! **(%COMMITSHA%)**"
 }

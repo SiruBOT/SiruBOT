@@ -5,6 +5,7 @@ const path = require('path')
 const globalOptions = require('../settings')
 const LocalePicker = require('./locales/picker')
 const Logger = require('./modules/logger')
+const getLocale = require('./modules/getLocale')
 const options = require('./options')
 const morgan = require('morgan')
 const logger = new Logger()
@@ -95,23 +96,35 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use('/', Routes.main.index({ app, passport, options, picker }))
+/**
+ * Routing
+ */
+app.use('/', Routes.main.index({ app, passport, options, picker, getLocale }))
 
 /**
  * 404 Handle
  */
 app.use((req, res) => {
-  res.status(404).render('errors/404')
+  res.status(404).render('errors/404', { picker, locale: getLocale(req, res, options), desc: '_404', req, options })
 })
+
+/**
+ * 500 Handle
+ */
+app.use((err, req, res) => {
+  res.status(500).render('errors/500', { picker, locale: getLocale(req, res, options), desc: '_500', req, options })
+})
+
 
 /**
  * Https, Http - Server Settings
  */
-http.createServer(app).listen(options.host.httpPort, () => {
-  logger.info(`[WEB] HTTP Server listening on port ${options.host.httpPort}`)
-})
 https.createServer(options.cert, app).listen(options.host.httpsPort, () => {
   logger.info(`[WEB] HTTPS Server listening on port ${options.host.httpsPort}`)
+})
+
+http.createServer(app).listen(options.host.httpPort, () => {
+  logger.info(`[WEB] HTTP Server listening on port ${options.host.httpPort}`)
 })
 
 process.on('uncaughtException', (err) => {

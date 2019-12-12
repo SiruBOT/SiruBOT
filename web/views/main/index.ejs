@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <%- include('../parts/head.ejs', { req: req, options: options, locale: locale, picker }); -%>
+    <%- include('../parts/head.ejs', { req: req, options: options, locale: locale, picker, desc: '' }); -%>
   </head>
   <body>
     <style>
@@ -13,11 +13,10 @@
     .hide {
       opacity: 0;
       transition: opacity 0.6s linear;
-      display: unset
     }
     </style>
-    <div uk-spinner="ratio: 3" class="uk-position-center" id="spinner"></div>
-    <div style="display:none" id="show" class="hide content">
+    <div uk-spinner="ratio: 3" class="uk-position-center" id="loadSpinner"></div>
+    <div style="display:none" id="divDisplay" class="hide content">
       <%- include('../parts/navbar.ejs', { req: req, options: options, locale: locale, picker }) -%>
       <%- include('./main.ejs', { req: req, options: options, locale: locale, picker }) -%>
       <%- include('../parts/footer.ejs'); -%>

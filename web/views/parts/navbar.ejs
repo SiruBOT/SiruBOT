@@ -1,8 +1,13 @@
 <nav class="uk-navbar-container uk-margin" uk-navbar>
     <div class="uk-navbar-left">
     
-        <a class="uk-navbar-item uk-logo" href="/"><%= picker.get(locale, 'NAVBAR_LOGO') %></a>
-    
+        <a class="uk-navbar-item uk-logo" href="/">
+            <div>
+                <div class="uk-navbar-title uk-margin-small-right"><img style="border-radius: 50%" data-src="https://cdn.discordapp.com/avatars/577055261785718793/ad6437d83f8d6fa1e7f1f6e688dd6452.png?size=2048" width="42" height="42" alt="logo" uk-img></div>
+            </div>
+            <%= picker.get(locale, 'NAVBAR_LOGO') %>
+        </a>
+
         <ul class="uk-navbar-nav">
             <li>
                 <a href="<%= options.web.support_server %>">

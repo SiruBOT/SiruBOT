@@ -25,7 +25,7 @@ class Command {
     embed.setColor(this.client.utils.findUtil.getColor(message.member))
     embed.setDescription(picker.get(locale, 'COMMANDS_PING_PINGING'))
 
-    message.reply(embed).then((m) => {
+    message.channel.send(message.author, embed).then((m) => {
       embed.setTitle(picker.get(locale, 'COMMANDS_PING_PONG'))
       embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.pings.join('ms **=>** ')}ms`, RESPONCE: `${m.createdAt - message.createdTimestamp}ms` }))
       embed.setFooter(`${message.member.displayName}`, message.author.displayAvatarURL)

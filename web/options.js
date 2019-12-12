@@ -1,8 +1,8 @@
 const fs = require('fs')
 module.exports = {
   host: {
-    httpPort: 80,
-    httpsPort: 443
+    httpPort: 8081,
+    httpsPort: 8082
   },
   cert: {
     key: fs.readFileSync('./cert/key.pem'),

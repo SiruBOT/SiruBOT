@@ -25,18 +25,20 @@ function getCookie (cookieName) {
 }
 
 function hideWithAnimation (id, name = '') {
-  // document.getElementById(id).className = name + ' hide'
-  // setTimeout(() => {
-  document.getElementById(id).style = 'display:none'
-  document.getElementById('show').style = 'display:none'
-  // }, 1000)
+  setTimeout(function () {
+    document.getElementById(id).className = name + ' hide'
+    document.getElementById(id).style = 'display: none'
+  }, 400)
+  document.getElementById('divDisplay').style = 'display: show;'
+  setTimeout(function () {
+    displayWithAnimation('divDisplay')
+  }, 100)
 }
 function displayWithAnimation (id, name = '') {
-  document.getElementById(id).className = 'show'
+  document.getElementById(id).className = name + ' show'
 }
-setTimeout(() => {
-  hideWithAnimation('spinner', 'uk-position-center')
-  setTimeout(() => {
-    displayWithAnimation('show', 'content')
-  }, 600)
-}, 2000)
+window.onload = function () {
+  setTimeout(function () {
+    hideWithAnimation('loadSpinner', 'uk-position-center')
+  }, 400)
+}
