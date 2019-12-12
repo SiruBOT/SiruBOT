@@ -35,3 +35,5 @@
 > ```
 
 ## Install MongoDB
+
+> [Click Here (Redirect To MongoDB Web)](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials)
