@@ -1,79 +1,54 @@
-<nav class="uk-navbar-container uk-margin" uk-navbar>
-    <div class="uk-navbar-left">
-    
-        <a class="uk-navbar-item uk-logo" href="/">
-            <div>
-                <div class="uk-navbar-title uk-margin-small-right"><img style="border-radius: 50%" data-src="https://cdn.discordapp.com/avatars/577055261785718793/ad6437d83f8d6fa1e7f1f6e688dd6452.png?size=2048" width="42" height="42" alt="logo" uk-img></div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-darkest">
+    <a class="navbar-brand" href="/">
+        <div class="row">
+            <div class="col-md-5">
+                <img class="rounded-circle ml-1 mr-2" src="https://cdn.discordapp.com/avatars/577055261785718793/ad6437d83f8d6fa1e7f1f6e688dd6452.png?size=64" width="41" height="41">
+                <span class="align-middle font-weight-bold text-white"><%= picker.get(locale, 'TITLE') %></span>
             </div>
-            <%= picker.get(locale, 'NAVBAR_LOGO') %>
-        </a>
+        </div>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
+        <a class="text-white"><span class="navbar-toggler-icon text-white"></span></a>
+    </button>
 
-        <ul class="uk-navbar-nav">
-            <li>
-                <a href="<%= options.web.support_server %>">
-                    <div>
-                        <span uk-icon="comments" class="uk-margin-small-right"></span><%= picker.get(locale, 'SUPPORT') %>
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="/dashboard">
-                    <div>
-                        <span uk-icon="settings" class="uk-margin-small-right"></span><%= picker.get(locale, 'DASHBOARD') %>
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <div>
-                        <span uk-icon="world" class="uk-margin-small-right"></span><%= picker.get(locale, 'LANGUAGE') %>
-                    </div>
-                    <div class="uk-navbar-dropdown">
-                        <ul class="uk-nav uk-navbar-dropdown-nav">
-                            <% for (const language of options.web.supportedLocales) { %>
-                                <li><a type="button" onclick="setLocale('<%= language %>')"><span uk-icon=></span><%= options.web.locales[language] %></a></li>
-                            <% } %>
-                        </ul>
-                    </div>
-                </a>
-            </li>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link text-uppercase font-weight" href="<%= options.web.support_server %>"><span uk-icon="comments" class="uk-margin-small-right"></span><%= picker.get(locale, 'SUPPORT') %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-uppercase" href="#"><span uk-icon="settings" class="uk-margin-small-right"></span><%= picker.get(locale, 'DASHBOARD') %></a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-uppercase align-middle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span uk-icon="location" class="uk-margin-small-right"></span><%= picker.get(locale, 'LANGUAGE') %>
+            </a>
+            <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+                <% for (const language of options.web.supportedLocales) { %>
+                    <a class="dropdown-item bg-dark text-white-50" onclick="setLocale('<%= language %>')"><%= options.web.locales[language] %></a>
+                <% } %>
+            </div>
+          </li>
         </ul>
-    </div>
-    <div class="uk-navbar-right">
-        <ul class="uk-navbar-nav">
-            <li>
+        <ul class="navbar-nav my-2 my-lg-0">
+            <li class="nav-item">
                 <% if (req.isAuthenticated()) { %>
-                <a href="#">
-                    <div>
-                        <div class="uk-navbar-title uk-margin-small-right"><img style="border-radius: 50%" data-src="<%= req.user.avatar ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=4096` : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png` %>" width="32" height="32" alt="profile" uk-img></div>
-                        <!-- <div class="uk-navbar-title uk-margin-small-right"><span uk-icon="user"></span></div> -->
+                    <div class="d-flex">
+                        <div class="dropdown mr-1">
+                            <a class="align-middle rounded-pill container bg-secondary nounderline" class="btn btn-secondary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="10,20" href="#">
+                                <img class="rounded-circle ml-1 mr-2" src="<%= req.user.avatar ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=64` : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png` %>" width="41" height="41" alt="profile">
+                                <span class="font-weight-bold text-white text-uppercase nav-link"><%= req.user.username + '#' + req.user.discriminator %></span>
+                            </a>
+                            <div class="dropdown-menu bg-secondary" aria-labelledby="userDropdown">
+                                <a class="dropdown-item bg-secondary text-white" href="#"><span uk-icon="credit-card"></span>  결제 정보</a>
+                                <a class="dropdown-item bg-secondary text-white" href="/logout"><span uk-icon="sign-out"></span> <%= picker.get(locale, 'LOGOUT') %></a>
+                            </div>
+
+                        </div>
                     </div>
-                    <div>
-                        <div class="uk-navbar-title uk-margin-small-right"><%= req.user.username + '#' + req.user.discriminator %></div>
-                    </div>
-                </a>
-                <div class="uk-navbar-dropdown">
-                    <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li><a type="button" uk-toggle="target: #modal-logout"><span uk-icon="sign-out"></span> <%= picker.get(locale, 'LOGOUT') %></a></li>
-                    </ul>
-                </div>
-                <!-- This is the modal -->
-                <div id="modal-logout" uk-modal>
-                    <div class="uk-modal-dialog uk-modal-body">
-                        <h2 class="uk-modal-title"><%= picker.get(locale, 'LOGOUT_Q') %></h2>
-                        <button class="uk-button uk-button-primary" type="button" onclick="location.href = '/logout'"><%= picker.get(locale, 'YES') %></a></button>
-                        <button class="uk-button uk-button-default uk-modal-close" type="button"><%= picker.get(locale, 'CANCEL') %></button>
-                    </div>
-                </div>
                 <% } else { %>
-                <a href="login">
-                    <div>
-                        <div class="uk-navbar-title uk-margin-small-right"><span uk-icon="sign-in"></span></div>
-                    </div>
-                    <div>
-                        <div class="uk-navbar-title uk-margin-small-right"><%= picker.get(locale, 'THROUGH_DISCORD') %></div>
-                    </div>
-                </a>
+                    <a class="nav-link text-uppercase align-middle rounded-pill bg-white text-secondary" href="/login"><span uk-icon="sign-in" class="uk-margin-small-right"></span><%= picker.get(locale, 'THROUGH_DISCORD') %></a>
                 <% } %>
             </li>
         </ul>

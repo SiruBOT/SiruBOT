@@ -20,13 +20,13 @@ const RedisStore = require('connect-redis')(session)
 // Redis
 const redis = require('redis')
 const redisClient = redis.createClient({ host: globalOptions.db.redis.host })
-// const pubsubClient = redis.createClient({ host: globalOptions.db.redis.host })
+const pubsubClient = redis.createClient({ host: globalOptions.db.redis.host })
 
-// pubsubClient.on('message', (channel, message) => {
-//   console.log(message)
-// })
+pubsubClient.on('message', (channel, message) => {
+  console.log(message)
+})
 
-// pubsubClient.subscribe('asdf')
+pubsubClient.subscribe('asdf')
 
 /**
  * Passport
@@ -100,6 +100,7 @@ app.use(passport.session())
  * Routing
  */
 app.use('/', Routes.main.index({ app, passport, options, picker, getLocale }))
+app.use('/dashboard', Routes.dashboard.index({ app, passport, options, picker, getLocale }))
 
 /**
  * 404 Handle
@@ -108,13 +109,13 @@ app.use((req, res) => {
   res.status(404).render('errors/404', { picker, locale: getLocale(req, res, options), desc: '_404', req, options })
 })
 
-/**
- * 500 Handle
- */
+// /**
+//  * 500 Handle
+//  */
 app.use((err, req, res) => {
+  logger.error(err.stack)
   res.status(500).render('errors/500', { picker, locale: getLocale(req, res, options), desc: '_500', req, options })
 })
-
 
 /**
  * Https, Http - Server Settings

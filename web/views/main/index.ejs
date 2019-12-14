@@ -4,22 +4,11 @@
     <%- include('../parts/head.ejs', { req: req, options: options, locale: locale, picker, desc: '' }); -%>
   </head>
   <body>
-    <style>
-    .show {
-      opacity: 1;
-      transition: opacity 0.6s linear;
-    }
-
-    .hide {
-      opacity: 0;
-      transition: opacity 0.6s linear;
-    }
-    </style>
-    <div uk-spinner="ratio: 3" class="uk-position-center" id="loadSpinner"></div>
-    <div style="display:none" id="divDisplay" class="hide content">
-      <%- include('../parts/navbar.ejs', { req: req, options: options, locale: locale, picker }) -%>
+    <%- include('../parts/navbar.ejs', { req: req, options: options, locale: locale, picker }) -%>
+    <div class="container-fluid">
       <%- include('./main.ejs', { req: req, options: options, locale: locale, picker }) -%>
-      <%- include('../parts/footer.ejs'); -%>
     </div>
+    <%- include('../parts/footer.ejs'); -%>
   </body>
+  <script type="text/javascript" id="cookieinfo" src="//cookieinfoscript.com/js/cookieinfo.min.js"></script>
 </html>

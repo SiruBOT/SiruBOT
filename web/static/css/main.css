@@ -1,0 +1,54 @@
+.show {
+    opacity: 1;
+    transition: opacity 0.6s linear;
+}
+
+.hide {
+    opacity: 0;
+    transition: opacity 0.6s linear;
+}
+
+body {
+    background-color: #23272A;
+}
+
+.bg-darkest {
+    background-color: #2C2F33;
+}
+
+.bg-light-dark {
+    background-color: #303136;
+}
+
+.custom-toggler .navbar-toggler-icon {
+    color: #FFFFFF;
+}
+
+/* 
+ * no underline <a> tag
+ */
+.nounderline {
+    text-decoration: none !important
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: #23272A;
+    border-radius: 20px;
+}
+   
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 20px;
+}
+  
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}

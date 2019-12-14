@@ -1,3 +1,15 @@
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<!-- Bootstrap jquery -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+<!-- CSS -->
+<link href="/static/css/open-iconic-bootstrap.min.css" rel="stylesheet">
+<link rel="preload" href="/static/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+
 <!-- UIkit CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.2.4/dist/css/uikit.min.css" />
 
@@ -6,7 +18,7 @@
 <script src="https://cdn.jsdelivr.net/npm/uikit@3.2.4/dist/js/uikit-icons.min.js"></script>
 
 <!-- JS -->
-<script src="/static/js/main.js"></script>
+<script async src="/static/js/main.js"></script>
 
 <!-- Metadata -->
 <title><%= picker.get(locale, 'TITLE'+desc) %></title>
@@ -15,3 +27,5 @@
 <meta property="og:type" content="website">
 <meta property="og:description" content="<%= picker.get(locale, 'DESCRIPTION'+desc) %>">
 <meta name="theme-color" content="#FFDADA">
+<!--Let browser know website is optimized for mobile-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>

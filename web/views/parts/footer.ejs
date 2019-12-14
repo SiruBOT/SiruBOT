@@ -1,13 +1,22 @@
 <style>
-    #page-footer {
-        width:100%;
-        position:fixed;
-        bottom: 0px;
-        background-color: #f5f5f5;
+    .footer {
+        max-width: 100%;
     }
 </style>
-<div id="page-footer" class="uk-flex-bottom">
-    <div class="uk-container uk-padding-small">
-        <p class="uk-text-center uk-text-small">Copyright(c) 2019 Sangoon_Is_Noob#1683 All rights reserved.</p>
+<% let fix = false; %>
+<% try { %>
+<% fix = fixed %>
+<% } catch (e) { %>
+<% fix = false %>
+<% } %>
+<% if (fix) { %>
+    <footer class="footer bg-darkest fixed-bottom">
+<% } else { %>
+    <footer class="footer bg-darkest">
+<% } %>
+    <div class="container text-center text-white">
+        <span uk-icon="code"></span> with <span uk-icon="heart"></span> by Sangoon_Is_Noob#1683<br>
+        Copyright(c) 2019 Sangoon_Is_Noob#1683 All rights reserved.
     </div>
-</div>
+
+</footer>

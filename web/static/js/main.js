@@ -24,21 +24,21 @@ function getCookie (cookieName) {
   }
 }
 
-function hideWithAnimation (id, name = '') {
-  setTimeout(function () {
-    document.getElementById(id).className = name + ' hide'
-    document.getElementById(id).style = 'display: none'
-  }, 400)
-  document.getElementById('divDisplay').style = 'display: show;'
-  setTimeout(function () {
-    displayWithAnimation('divDisplay')
-  }, 100)
-}
-function displayWithAnimation (id, name = '') {
-  document.getElementById(id).className = name + ' show'
-}
-window.onload = function () {
-  setTimeout(function () {
-    hideWithAnimation('loadSpinner', 'uk-position-center')
-  }, 400)
-}
+// function hideWithAnimation (id, name = '') {
+//   setTimeout(function () {
+//     document.getElementById(id).className = 'hide'
+//     document.getElementById(id).style = 'display: none'
+//   }, 400)
+//   document.getElementById('divDisplay').style = 'display: show;'
+//   setTimeout(function () {
+//     displayWithAnimation('divDisplay')
+//   }, 100)
+// }
+// function displayWithAnimation (id, name = '') {
+//   document.getElementById(id).className = 'show'
+// }
+// window.onload = function () {
+//   setTimeout(function () {
+//     hideWithAnimation('loadSpinner', 'uk-position-center')
+//   }, 400)
+// }
