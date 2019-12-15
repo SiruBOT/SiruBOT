@@ -24,6 +24,10 @@ body {
     color: #FFFFFF;
 }
 
+body {
+    font-family: "Nanum Gothic", sans-serif; !important
+}
+
 /* 
  * no underline <a> tag
  */

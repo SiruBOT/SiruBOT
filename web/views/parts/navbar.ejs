@@ -35,9 +35,9 @@
             <li class="nav-item">
                 <% if (req.isAuthenticated()) { %>
                     <div class="d-flex">
-                        <div class="dropdown mr-1">
+                        <div class="dropdown">
                             <a class="align-middle rounded-pill container bg-secondary nounderline" class="btn btn-secondary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="10,20" href="#">
-                                <img class="rounded-circle ml-1 mr-2" src="<%= req.user.avatar ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=64` : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png` %>" width="41" height="41" alt="profile">
+                                <img class="rounded-circle mr-1" src="<%= req.user.avatar ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=64` : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png` %>" width="41" height="41" alt="profile">
                                 <span class="font-weight-bold text-white text-uppercase nav-link"><%= req.user.username + '#' + req.user.discriminator %></span>
                             </a>
                             <div class="dropdown-menu bg-secondary" aria-labelledby="userDropdown">
@@ -48,7 +48,7 @@
                         </div>
                     </div>
                 <% } else { %>
-                    <a class="nav-link text-uppercase align-middle rounded-pill bg-white text-secondary" href="/login"><span uk-icon="sign-in" class="uk-margin-small-right"></span><%= picker.get(locale, 'THROUGH_DISCORD') %></a>
+                    <a class="nav-link text-uppercase align-middle rounded-pill bg-secondary text-white" href="/login">    <span uk-icon="sign-in" class="uk-margin-small-right"></span><%= picker.get(locale, 'THROUGH_DISCORD') %></a>
                 <% } %>
             </li>
         </ul>
