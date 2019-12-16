@@ -5,7 +5,7 @@ class Event {
 
   /**
    * Run Event
-   * @param {Discord.GuildMember} - GuildMemeber
+   * @param member {Object} - GuildMember
    */
   run (member) {
     this.client.logger.debug(`[GuildMemberAdd] Check Guild Member, Check Guild ${member.guild.id}`)

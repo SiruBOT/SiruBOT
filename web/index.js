@@ -93,8 +93,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }))
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.initialize({}))
+app.use(passport.session({}))
 
 /**
  * Routing
@@ -103,18 +103,18 @@ app.use('/', Routes.main.index({ app, passport, options, picker, getLocale }))
 app.use('/dashboard', Routes.dashboard.index({ app, passport, options, picker, getLocale }))
 
 /**
+ * 500 Handle
+ */
+app.use((err, req, res) => {
+  logger.error(err.stack)
+  res.status(500).render('errors/500', { picker, locale: getLocale(req, res, options), desc: '_500', req, options })
+})
+
+/**
  * 404 Handle
  */
 app.use((req, res) => {
   res.status(404).render('errors/404', { picker, locale: getLocale(req, res, options), desc: '_404', req, options })
-})
-
-// /**
-//  * 500 Handle
-//  */
-app.use((err, req, res) => {
-  logger.error(err.stack)
-  res.status(500).render('errors/500', { picker, locale: getLocale(req, res, options), desc: '_500', req, options })
 })
 
 /**

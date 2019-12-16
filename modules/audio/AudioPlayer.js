@@ -34,6 +34,7 @@ class AudioPlayer {
 
   /**
    * @param {(Object|Array)} item - Item(s) add Queue
+   * @param {Object} message = Message
    */
   async addQueue (item, message) {
     if (Array.isArray(item)) {
@@ -52,7 +53,8 @@ class AudioPlayer {
   }
 
   /**
-   * @param {Boolean} [songend] - Song End Status
+   * @param {Boolean} stopStatus - [Song End]
+   * @param {Boolean} leave - if songs end, leaves voice channel? (Default false)
    */
   async playNext (stopStatus, leave = false) {
     this.AudioManager.updateNpMessage(this.guild)
@@ -76,7 +78,7 @@ class AudioPlayer {
   }
 
   /**
-   * If nowplaying is none, play Automatically Next Queue
+   * If NowPlaying is none, play Automatically Next Queue
    */
   async autoPlay () {
     const QueueData = await this.client.database.getGuildData(this.guild)
@@ -87,7 +89,7 @@ class AudioPlayer {
   }
 
   /**
-  * @param {*} item
+  * Get player's textChannel
   */
   async getTextChannel () {
     const guildData = await this.client.database.getGuildData(this.guild)
@@ -152,7 +154,7 @@ class AudioPlayer {
   async stop (clearQueue) {
     if (clearQueue) {
       this.client.logger.debug(`[Audio] [Player] Stopped Audio Player & Clear Queue (Guild: ${this.guild})`)
-      this.client.database.updateGuildData(this.guild, { $set: { queue: [] } })
+      await this.client.database.updateGuildData(this.guild, { $set: { queue: [] } })
     } else {
       this.client.logger.debug(`[Audio] [Player] Stopped Audio Player (Guild: ${this.guild})`)
     }

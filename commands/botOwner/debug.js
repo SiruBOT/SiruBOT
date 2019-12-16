@@ -15,7 +15,7 @@ class Command {
    */
   async run (compressed) {
     const message = compressed.message
-    this.client.database.updateGlobalUserData(message.member, { $inc: { money: 100000 } })
+    await this.client.database.updateGlobalUserData(message.member, { $inc: { money: 100000 } })
     message.channel.send('Updated')
   }
 }

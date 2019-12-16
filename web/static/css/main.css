@@ -24,15 +24,11 @@ body {
     color: #FFFFFF;
 }
 
-body {
-    font-family: "Nanum Gothic", sans-serif; !important
-}
-
 /* 
- * no underline <a> tag
+ * All Text Fonts
  */
-.nounderline {
-    text-decoration: none !important
+* {
+    font-family: "Nanum Gothic", sans-serif !important;
 }
 
 /* width */

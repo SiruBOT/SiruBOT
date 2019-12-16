@@ -7,7 +7,7 @@ class Event {
 
   /**
    * Run Event
-   * @param {Discord.Message} - Message
+   * @param message {Object} - Message
    */
   async run (message) {
     const redisClient = redis.createClient({ host: 'localhost' })

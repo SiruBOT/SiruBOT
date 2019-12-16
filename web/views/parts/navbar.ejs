@@ -36,19 +36,23 @@
                 <% if (req.isAuthenticated()) { %>
                     <div class="d-flex">
                         <div class="dropdown">
-                            <a class="align-middle rounded-pill container bg-secondary nounderline" class="btn btn-secondary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="10,20" href="#">
+                            <a class="align-middle rounded-pill container bg-secondary text-decoration-none" class="btn btn-secondary dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="10,20" href="#">
                                 <img class="rounded-circle mr-1" src="<%= req.user.avatar ? `https://cdn.discordapp.com/avatars/${req.user.id}/${req.user.avatar}.png?size=64` : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png` %>" width="41" height="41" alt="profile">
-                                <span class="font-weight-bold text-white text-uppercase nav-link"><%= req.user.username + '#' + req.user.discriminator %></span>
+                                <span class="font-weight-bold text-white text-uppercase mr-1"><%= req.user.username + '#' + req.user.discriminator %></span>
+                                <span class="badge badge-success mr-1">Developer</span>
                             </a>
                             <div class="dropdown-menu bg-secondary" aria-labelledby="userDropdown">
                                 <a class="dropdown-item bg-secondary text-white" href="#"><span uk-icon="credit-card"></span>  결제 정보</a>
                                 <a class="dropdown-item bg-secondary text-white" href="/logout"><span uk-icon="sign-out"></span> <%= picker.get(locale, 'LOGOUT') %></a>
                             </div>
-
                         </div>
                     </div>
                 <% } else { %>
-                    <a class="nav-link text-uppercase align-middle rounded-pill bg-secondary text-white" href="/login">    <span uk-icon="sign-in" class="uk-margin-small-right"></span><%= picker.get(locale, 'THROUGH_DISCORD') %></a>
+                    <div class="d-flex">
+                        <div class="bg-secondary rounded-pill align-middle text-center">
+                            <a class="nav-link font-weight-bold text-uppercase align-middle text-white ml-3 mr-3" href="/login"><span uk-icon="sign-in" class="mr-1"></span><%= picker.get(locale, 'THROUGH_DISCORD') %> </a>
+                        </div>
+                    </div>
                 <% } %>
             </li>
         </ul>

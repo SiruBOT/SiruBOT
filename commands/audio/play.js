@@ -33,11 +33,8 @@ class Command {
 
     if (args.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
-    // searchStr = 'ytsearch:' + searchStr
 
-    console.log(searchStr)
     const searchResult = await Audio.getSongs(searchStr)
-    console.log(searchResult)
 
     // SearchResult
     const keys = Object.keys(searchResult)

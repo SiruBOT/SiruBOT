@@ -5,7 +5,7 @@ class Event {
 
   /**
    * Run Event
-   * @param {String} - Debug Message of Client
+   * @param message {String} - Debug Message of Client
    */
   run (message) {
     this.client.logger.debug(message)

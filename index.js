@@ -98,8 +98,7 @@ class Client extends Discord.Client {
   }
 
   getActivityMessage (message) {
-    const msg = message.replace('%ping%', `${this.pings[0]}ms`).replace('%guilds%', this.guilds.size).replace('%users%', this.users.size)
-    return msg
+    return message.replace('%ping%', `${this.pings[0]}ms`).replace('%guilds%', this.guilds.size).replace('%users%', this.users.size)
   }
 }
 

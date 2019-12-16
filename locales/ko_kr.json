@@ -67,7 +67,7 @@
 
     "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | 재생 목록: %NUM% 개 | ``[%TOTALTIME%]``",
 
-    "COMMANDS_AUDIO_VOLUME_CHAGED": "> %EMOJI_SPEAKER%  볼륨이 **%VOLUME%%** 로 변경되었어요!",
+    "COMMANDS_AUDIO_VOLUME_CHANGED": "> %EMOJI_SPEAKER%  볼륨이 **%VOLUME%%** 로 변경되었어요!",
     "COMMANDS_AUDIO_VOLUME_CURRENT": "> %EMOJI_SPEAKER%  현재 볼륨 **%VOLUME%%**",
     "COMMANDS_AUDIO_VOLUME_STRING": "> %EMOJI_NO%  볼륨은 문자열일수 없어요!",
     "COMMANDS_AUDIO_VOLUME_UNDER_ONE": "> %EMOJI_NO%  볼륨은 **1%** 미만일수 없어요!",
