@@ -101,6 +101,7 @@ app.use(passport.session({}))
  */
 app.use('/', Routes.main.index({ app, passport, options, picker, getLocale }))
 app.use('/dashboard', Routes.dashboard.index({ app, passport, options, picker, getLocale }))
+app.use('/invite', Routes.main.invite({ options, picker, getLocale }))
 
 /**
  * 500 Handle

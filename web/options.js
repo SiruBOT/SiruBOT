@@ -14,7 +14,8 @@ module.exports = {
       en: 'English (US)',
       ko: '한국어'
     },
-    support_server: 'https://discord.gg/wy6KsRf'
+    support_server: 'https://discord.gg/wy6KsRf',
+    invite_link: 'https://discordapp.com/oauth2/authorize?client_id=577055261785718793&scope=bot&permissions=8'
   },
   oauth: {
     discord: {

@@ -9,6 +9,9 @@
     "WHOOPSE": "이런! :(",
     "DESCRIPTION_404": "없는 파일이거나, 경로가 존재하지 않아요...",
 
+    "TITLE_INVITE": "시루봇 초대하기",
+    "DESCRIPTION_INVITE": "당신의 서버에 시루봇을 추가해보세요!",
+
     "SUPPORT": "서포트 서버",
     "DASHBOARD": "대시보드",
     "LANGUAGE": "언어",

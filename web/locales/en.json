@@ -9,6 +9,9 @@
     "BACK_TO_HOME": "Back to home",
     "DESCRIPTION_404": "If file is does not exists, or unknown path.",
 
+    "TITLE_INVITE": "Invite SIRUBOT",
+    "DESCRIPTION_INVITE": "Invite sirubot to your server!",
+
     "SUPPORT": "Support Server",
     "DASHBOARD": "Dashboard",
     "LANGUAGE": "Language",
