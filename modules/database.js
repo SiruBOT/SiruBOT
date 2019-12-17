@@ -60,32 +60,27 @@ class DataManager {
   }
 
   async getGuildData (id) {
-    let guildData
-    guildData = this.connection.collection('guild').findOne({ _id: id })
+    const guildData = this.connection.collection('guild').findOne({ _id: id })
     return guildData
   }
 
   async getGlobalUserData (user) {
-    let userData
-    userData = await this.connection.collection('globalMember').findOne({ _id: user.id })
+    const userData = await this.connection.collection('globalMember').findOne({ _id: user.id })
     return userData
   }
 
   async getGuildMemberData (user) {
-    let guildMemberData
-    guildMemberData =  this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(user, user.guild.id) })
+    const guildMemberData = this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(user, user.guild.id) })
     return guildMemberData
   }
 
   async updateGuildData (guild, query) {
-    let updated
-    updated = await this.connection.collection('guild').updateOne({ _id: guild }, query)
+    const updated = await this.connection.collection('guild').updateOne({ _id: guild }, query)
     return updated
   }
 
   async updateGlobalUserData (member, query) {
-    let updated
-    updated = await this.connection.collection('globalMember').updateOne({ _id: member.id }, query)
+    const updated = await this.connection.collection('globalMember').updateOne({ _id: member.id }, query)
     return updated
   }
 

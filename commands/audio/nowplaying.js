@@ -6,6 +6,7 @@ class Command {
       aliases: ['np', 'ㅞ'],
       category: 'MUSIC_GENERAL',
       require_voice: false,
+      hide: false,
       permissions: ['Everyone']
     }
   }

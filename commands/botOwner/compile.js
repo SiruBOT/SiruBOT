@@ -7,6 +7,7 @@ class Command {
       aliases: ['eval'],
       category: 'BOT_OWNER',
       require_voice: false,
+      hide: false,
       permissions: ['BotOwner']
     }
   }

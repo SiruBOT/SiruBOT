@@ -6,8 +6,9 @@ class Command {
     this.command = {
       name: 'ping',
       aliases: ['ㅔㅑㅜㅎ', '핑'],
-      category: 'COMMANDS_GENERAL',
+      category: 'COMMANDS_GENERAL_INFO',
       require_voice: false,
+      hide: false,
       permissions: ['Everyone']
     }
   }
@@ -28,7 +29,6 @@ class Command {
     message.channel.send(message.author, embed).then((m) => {
       embed.setTitle(picker.get(locale, 'COMMANDS_PING_PONG'))
       embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.pings.join('ms **=>** ')}ms`, RESPONCE: `${m.createdAt - message.createdTimestamp}ms` }))
-      embed.setFooter(`${message.member.displayName}`, message.author.displayAvatarURL)
       m.edit(message.author, embed)
     })
   }

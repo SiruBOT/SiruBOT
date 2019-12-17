@@ -2,10 +2,11 @@ class Command {
   constructor (client) {
     this.client = client
     this.command = {
-      name: '올인',
-      aliases: ['dhfdls'],
+      name: 'allin',
+      aliases: ['dhfdls', '올인'],
       category: 'COMMANDS_MONEY_CASINO',
       require_voice: false,
+      hide: false,
       permissions: ['Everyone']
     }
   }

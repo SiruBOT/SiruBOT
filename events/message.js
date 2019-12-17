@@ -23,11 +23,12 @@ class Event {
     await this.client.database.checkGuild(message.guild)
     await this.client.database.checkGuildMember(message.member)
     await this.client.database.checkGlobalMember(message.author)
-    if (message.content.startsWith(this.client._options.bot.prefix)) {
+    const prefix = this.client._options.bot.prefix
+    if (message.content.startsWith(prefix)) {
       const GlobalUserData = await this.client.database.getGlobalUserData(message.author)
       const GuildMemberData = await this.client.database.getGuildMemberData(message.member)
       const GuildData = await this.client.database.getGuildData(message.guild.id)
-      const args = message.content.slice(this.client._options.bot.prefix.length).trim().split(/ +/g)
+      const args = message.content.slice(prefix.length).trim().split(/ +/g)
       const command = args.shift().toLowerCase()
       const otherData = {
         GlobalUserData: GlobalUserData,
@@ -41,6 +42,7 @@ class Event {
         GuildData: GuildData,
         message: message,
         args: args,
+        prefix: prefix,
         userPermissions: userPermissions
       }
 

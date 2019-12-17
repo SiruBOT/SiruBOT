@@ -8,8 +8,9 @@ class Command {
     this.command = {
       name: 'qrcode',
       aliases: ['qr', 'ㅂㄱ', 'ㅂㄱ코드', 'qrzhem'],
-      category: 'COMMANDS_GENERAL',
+      category: 'COMMANDS_GENERAL_UTILS',
       require_voice: false,
+      hide: false,
       permissions: ['Everyone']
     }
   }

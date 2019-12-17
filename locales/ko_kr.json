@@ -3,15 +3,25 @@
 
     "COMMANDS_HELP_DESC_PING": "봇의 응답 속도를 보여드려요!",
     "COMMANDS_HELP_DESC_DOCS": "Discord.js 의 공식 문서를 검색해요!",
+    "COMMANDS_HELP_DESC_CHANGELOG": "Discord.js 의 공식 문서를 검색해요!",
+    "COMMANDS_HELP_DESC_HELP": "도움말 메세지를 보여드려요!",
+    "COMMANDS_HELP_DESC_QRCODE": "QR 코드를 읽어요!",
+    "COMMANDS_HELP_DESC_DELIVERY": "송장 번호와 택배사를 입력하면, 택배의 추적정보를 보여드려요!",
 
     "COMMANDS_HELP_DESC_MONEY": "유저의 잔고를 보여드려요!",
     "COMMANDS_HELP_DESC_ALLIN": "가진 돈을 모두 잃거나, 2배가 되는 도박이에요!",
+    "COMMANDS_HELP_DESC_PAYDAY": "1시간마다 10000 치머니를 받는 명령어에요!",
 
     "COMMANDS_HELP_DESC_SETDJ": "음악 명령어를 사용할수 있는 역할을 설정해요!",
     "COMMANDS_HELP_DESC_SETVC": "음악 명령어를 사용할수 있는 음성 채널을 설정해요!",
     "COMMANDS_HELP_DESC_SETTC": "저의 명령어를 사용할수 있는 텍스트 채널을 설정해요!",
 
+    "COMMANDS_HELP_DESC_COMPILE": "명령어를 실행해요! (봇 제작자 전용)",
+    "COMMANDS_HELP_DESC_SHUTDOWN": "봇을 꺼요.",
+    "COMMANDS_HELP_DESC_DEBUG": "미공개",
+
     "COMMANDS_HELP_DESC_JOIN": "음성 채널에 접속해요!",
+    "COMMANDS_HELP_DESC_REPEAT": "노래를 연속으로 재생할지 설정해요!",
     "COMMANDS_HELP_DESC_NODEINFO": "재생중인 노드의 정보를 확인해요!",
     "COMMANDS_HELP_DESC_NOWPLAYING": "현재 재생중인 노래의 정보를 알려드려요!",
     "COMMANDS_HELP_DESC_PLAY": "노래를 재생해요!",
@@ -19,6 +29,14 @@
     "COMMANDS_HELP_DESC_SCPLAY": "사운드클라우드에서 노래를 재생해요!",
     "COMMANDS_HELP_DESC_STOP": "현재 재생중인 노래를 정지하고, 대기열을 초기화해요!",
     "COMMANDS_HELP_DESC_VOLUME": "플래이어의 볼륨을 설정해요!",
+
+    "CATEGORY_MUSIC_DJ": "DJ 명령어들",
+    "CATEGORY_MUSIC_GENERAL": "음악 명령어들",
+    "CATEGORY_BOT_OWNER": "봇 제작자 전용 명령어들",
+    "CATEGORY_COMMANDS_GENERAL_INFO": "정보 명령어들",
+    "CATEGORY_COMMANDS_MONEY_CASINO": "도박 명령어들",
+    "CATEGORY_COMMANDS_MONEY_GENERAL": "돈 명령어들",
+    "CATEGORY_COMMANDS_GENERAL_UTILS": "도구들",
 
     "REMARK_2": "(주석) 커맨드에 사용되는 멘트들",
 
@@ -42,6 +60,9 @@
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** 서버에서는 채널 <#%CHANNEL%> 에서만 저의 명령어를 사용하실수 있어요!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  이 명령어는 다음 권한이 필요해요. %REQUIRED%",
+
+    "COMMANDS_MONEY_PAYDAY_OK": "%EMOJI_MONEY%  당신의 잔고에 ``10000`` %MONEY_NAME_KR%를 추가했어요!",
+    "COMMANDS_MONEY_PAYDAY_LATER": "%EMOJI_MONEY%  당신은 이미 돈을 받았어요, **%TIME%** 분 후에 다시 이용해주세요!",
 
     "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY%  다른 도박 명령어의 사용을 마쳐주세요!",
 
@@ -87,5 +108,9 @@
     "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  반복 모드가 **전체** 로 변경되었어요!",
     "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  반복 모드가 **한곡** 으로 변경되었어요!",
 
-    "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  개발자가 커밋한 변경 로그가 존재하지 않아요! **(%COMMITSHA%)**"
+    "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  개발자가 커밋한 변경 로그가 존재하지 않아요! **(%COMMITSHA%)**",
+
+    "COMMANDS_HELP_TITLE": "> 모든 명령어들",
+    "COMMANDS_HELP_FOOTER": "%PREFIX%도움 [명령어] | 버그, 에러 - Sangoon_Is_Noob#1683",
+    "COMMANDS_HELP_INFO": "> 명령어 정보 - %COMMAND%"
 }

@@ -6,6 +6,7 @@ class Command {
       aliases: [],
       category: 'BOT_OWNER',
       require_voice: false,
+      hide: true,
       permissions: ['Everyone']
     }
   }

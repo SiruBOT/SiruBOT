@@ -14,6 +14,7 @@ class Command {
       aliases: ['택배', '택배조회'],
       category: 'COMMANDS_GENERAL_INFO',
       require_voice: false,
+      hide: false,
       permissions: ['Everyone']
     }
   }

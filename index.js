@@ -19,7 +19,12 @@ class Client extends Discord.Client {
 
     this.activityNum = 0
     this.initialized = false
+
     this.commands_loaded = false
+    this.commands = new Discord.Collection()
+    this.aliases = new Discord.Collection()
+    this.categories = new Discord.Collection()
+
     this.audio = new Audio({ client: this, shards: this._options.audio.shards, nodes: this._options.audio.nodes })
   }
 
@@ -47,8 +52,6 @@ class Client extends Discord.Client {
   }
 
   async LoadCommands () {
-    this.commands = new Discord.Collection()
-    this.aliases = new Discord.Collection()
     const CommandsFile = await globAsync('./commands/**/*.js')
     const reLoadOrLoad = `${this.commands_loaded ? '(re)' : ''}Load`
     const load = `[Commands] [${reLoadOrLoad}]`
@@ -66,6 +69,16 @@ class Client extends Discord.Client {
       delete require.cache[require.resolve(cmd)]
     }
     this.commands_loaded = true
+    this.categories = new Discord.Collection()
+    for (const item of this.commands.array().map(el => el.command).filter(el => el.hide === false)) {
+      if (!this.categories.keyArray().includes(item.category)) this.categories.set(item.category, [])
+      if (this.categories.keyArray().includes(item.category) && this.categories.get(item.category).includes(item.name) === false) {
+        const array = this.categories.get(item.category)
+        array.push(item.name)
+        this.categories.set(item.category, array)
+      }
+    }
+    console.log(this.categories)
     this.logger.info(`[Commands] Successfully ${reLoadOrLoad}ed Commands!`)
     return this.commands
   }

@@ -5,6 +5,7 @@ class Command {
       name: 'scplay',
       category: 'MUSIC_GENERAL',
       require_voice: true,
+      hide: false,
       aliases: ['ㄴㅊㅔㅣ묘'],
       permissions: ['Everyone']
     }

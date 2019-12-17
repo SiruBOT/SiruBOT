@@ -7,6 +7,7 @@ class Command {
       aliases: ['ㅔㅣ묘'],
       category: 'MUSIC_GENERAL',
       require_voice: true,
+      hide: false,
       permissions: ['Everyone']
     }
   }

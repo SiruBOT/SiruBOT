@@ -6,6 +6,7 @@ class Command {
       aliases: ['ㄱ덷ㅁㅅ', '반복'],
       category: 'MUSIC_DJ',
       require_voice: false,
+      hide: false,
       permissions: ['DJ', 'Administrator']
     }
   }
