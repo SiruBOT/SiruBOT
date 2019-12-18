@@ -57,6 +57,7 @@ class Event {
             if (!message.member.voiceChannel) return message.channel.send(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
             if (!this.client.getRightChannel(message.member.voiceChannel, vch)) return message.channel.send(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
             if (this.client.audio.getVoiceStatus(message.member).listen === false) return message.channel.send(picker.get(locale, 'AUDIO_LISTEN_PLEASE'))
+            if (message.guild.me.voiceChannel.id !== message.member.voiceChannel.id) return message.channel.send(picker.get(locale, 'AUDIO_SAME_VOICE', { VOICECHANNEL: message.guild.me.voiceChannel.id }))
           }
           for (const userPerm of userPermissions) {
             if (Command.command.permissions.includes(userPerm)) {

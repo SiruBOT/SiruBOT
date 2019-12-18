@@ -11,6 +11,7 @@ const Schema = new mongo.Schema({
   locale: { type: String, default: 'ko_kr' },
 
   // Audio
+  audioMessage: { type: Boolean, default: true },
   repeat: { type: Number, default: 0 },
   shuffle: { type: Boolean, default: false },
   dj_role: { type: String, default: '0' },
