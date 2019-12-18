@@ -1,4 +1,4 @@
-// TODO: Localization Play.js
+// TODO: Attachments
 class Command {
   constructor (client) {
     this.client = client
@@ -101,10 +101,6 @@ class Command {
     Audio.players.get(message.guild.id).addQueue(items, message)
   }
 }
-
-// async function ask (message) {
-
-// }
 
 function validURL (str) {
   const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol

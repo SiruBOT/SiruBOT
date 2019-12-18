@@ -1,10 +1,10 @@
 const Mongo = require('mongoose')
-const Models = require('../models')
 
 class DataManager {
   constructor (client) {
     this.client = client
     this.connection = Mongo.connection
+    this.Models = require('../models')
   }
 
   init () {
@@ -19,7 +19,7 @@ class DataManager {
     const mongoResult = await this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(guildMember, guildMember.guild.id) })
     if (!mongoResult) {
       this.client.logger.info(`[DataBase] [Guild] [Member] GuildMember does not exist, create one. (${this.getGuildMemberID(guildMember, guildMember.guild.id)})`)
-      const Model = new Models.GuildMember({
+      const Model = new this.Models.GuildMember({
         _id: this.getGuildMemberID(guildMember, guildMember.guild.id)
       })
       await Model.save()
@@ -32,7 +32,7 @@ class DataManager {
     const mongoResult = await this.connection.collection('globalMember').findOne({ _id: guildMember.id })
     if (!mongoResult) {
       this.client.logger.info(`[DataBase] [Global] [Member] Global Member is not exist, create one. (Member: ${guildMember.id})`)
-      const Model = new Models.GlobalMember({
+      const Model = new this.Models.GlobalMember({
         _id: guildMember.id
       })
       await Model.save()
@@ -45,7 +45,7 @@ class DataManager {
     const mongoGuild = await this.connection.collection('guild').findOne({ _id: guild.id })
     if (!mongoGuild) {
       this.client.logger.info(`[DataBase] [Guild] Guild is not exist, create one. (Guild: ${guild.id})`)
-      const Model = new Models.Guild({
+      const Model = new this.Models.Guild({
         _id: guild.id
       })
       await Model.save()

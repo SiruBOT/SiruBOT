@@ -18,7 +18,6 @@
 
     "COMMANDS_HELP_DESC_COMPILE": "명령어를 실행해요! (봇 제작자 전용)",
     "COMMANDS_HELP_DESC_SHUTDOWN": "봇을 꺼요.",
-    "COMMANDS_HELP_DESC_DEBUG": "미공개",
 
     "COMMANDS_HELP_DESC_JOIN": "음성 채널에 접속해요!",
     "COMMANDS_HELP_DESC_REPEAT": "노래를 연속으로 재생할지 설정해요!",
@@ -65,9 +64,10 @@
     "COMMANDS_MONEY_PAYDAY_LATER": "%EMOJI_MONEY%  You are already used this command, Try again **%TIME%** minutes later",
 
     "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY% Please finish using other gambling commands!",
+    "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  You can't bet less ``10000`` %MONEY_NAME_EN%, please type ``%PREFIX%payday`` command to get %MONEY_NAME_EN%!",
 
-    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX% Money`` command to get %MONEY_NAME_EN%!",
-    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%getmoney`` command to receive %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX%money`` command to get %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%payday`` command to receive %MONEY_NAME_EN%!",
     "COMMANDS_CASINO_ALLIN_START": "%MEMBER% %EMOJI_MONEY% I'll start all-in! The odds are half! %EMOJI_MONEY% Press reaction in 15 seconds to start all-in!",
     "COMMANDS_CASINO_ALLIN_RAND_LOAD": "Playing slots...|Playing card games..|Checking balance..|Cheating..",
     "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
@@ -76,6 +76,15 @@
     "COMMANDS_CASINO_ALLIN_RAND_FAIL": "Attempt the following!| Maybe it might be..|It's okay..|Okay..|T.T...",
     "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER% %EMOJI_MONEY% All-in failed. Your balance has been set to ``0``.. %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO% Timed out. Please try again with ``%PREFIX%allin``!",
+
+    "COMMANDS_CASINO_PLEASE_BET": "%EMOJI_MONEY%  Please type your bet!",
+    "COMMANDS_CASINO_BET_INT": "%EMOJI_MONEY%  Your bet is must be intger",
+
+    "COMMANDS_CASINO_ODD_TYPE": "%EMOJI_MONEY%  Please choose **ODD** or **EVEN**!",
+    "COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS": "%MEMBER%\n%EMOJI_MONEY%  %RESULT%\nBot selected number: %SELNUM%(%SELTYPE%) Your choice: %TYPE%",
+    "COMMANDS_CASINO_RESULT_MESSAGE_FAIL": "%MEMBER%\n%EMOJI_MONEY%  %RESULT%\nBot selected number: %SELNUM%(%SELTYPE%) Your choice: %TYPE%",
+    "COMMANDS_CASINO_ODD": "odd",
+    "COMMANDS_CASINO_EVEN": "even",
     
     "COMMANDS_AUDIO_VOLUME_CHANGED": "> %EMOJI_SPEAKER%  Volume is changed **%VOLUME%%**",
     "COMMANDS_AUDIO_VOLUME_CURRENT": "> %EMOJI_SPEAKER%  Current Volume **%VOLUME%%**",

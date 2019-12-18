@@ -65,6 +65,7 @@
     "COMMANDS_MONEY_PAYDAY_LATER": "%EMOJI_MONEY%  당신은 이미 돈을 받았어요, **%TIME%** 분 후에 다시 이용해주세요!",
 
     "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY%  다른 도박 명령어의 사용을 마쳐주세요!",
+    "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  최소 베팅 %MONEY_NAME_KR%는 ``10000`` %MONEY_NAME_KR% 이상이여야 해요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME_KR%를 받아주세요!",
 
     "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO%  당신은 %MONEY_NAME_KR% 가 ``10000`` %MONEY_NAME_KR% 미만이네요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME_KR%를 받아주세요!",
     "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO%  당신은 %MONEY_NAME_KR% 가 ``0`` %MONEY_NAME_KR% 이네요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME_KR%를 받아주세요!",
@@ -73,9 +74,18 @@
     "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "축하합니다! :tada:|축하해요!|:tada:|:smile:",
     "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 성공! 잔고가 2배로 설정되었어요! %RANDMESSAGE%",
-    "COMMANDS_CASINO_ALLIN_RAND_FAIL": "다음을 노려보세요!|그럴수도 있지 뭐..|아깝네요..|괜찮아요..|ㄲㅂㄱㅂ...",
-    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 실패.. 잔고가 ``0`` 으로 설정되었어요.. %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_RAND_FAIL": "다음을 노려보세요..|그럴수도 있지 뭐..|아깝네요..|괜찮아요..|ㄲㅂㄱㅂ...",
+    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 실패.. 잔고가 ``0`` %MONEY_NAME_KR% 이 되었어요.. %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO%  시간이 초과되었어요.. ``%PREFIX%올인`` 으로 다시 시도해 주세요!",
+
+    "COMMANDS_CASINO_PLEASE_BET": "%EMOJI_MONEY%  베팅 금액을 입력해주세요!",
+    "COMMANDS_CASINO_BET_INT": "%EMOJI_MONEY%  베팅 금액은 정수여야 해요!",
+
+    "COMMANDS_CASINO_ODD_TYPE": "%EMOJI_MONEY%  **홀**, **짝** 둘중 하나를 선택해주세요!",
+    "COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS": "%MEMBER%\n%EMOJI_MONEY%  당신의 잔고에 당신이 베팅한 %MONEY_NAME_KR%를 추가했어요!  %RESULT%\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%) 당신이 선택한 값: %TYPE%",
+    "COMMANDS_CASINO_RESULT_MESSAGE_FAIL": "%MEMBER%\n%EMOJI_MONEY%  %RESULT% 당신이 베팅한 ``%BET%`` %MONEY_NAME_KR%를 잃었어요..\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%) 당신이 선택한 값: %TYPE%",
+    "COMMANDS_CASINO_ODD": "홀수",
+    "COMMANDS_CASINO_EVEN": "짝수",
 
     "NOWPLAYING_NOTRACK": "아무 노래도 재생중이지 않아요!",
     "AUDIO_NOPLAYER": "> %EMOJI_MUSIC%  현재 노래를 재생중이지 않아요!",

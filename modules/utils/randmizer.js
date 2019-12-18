@@ -6,6 +6,10 @@ module.exports.chooseWeighted = function (items, chances) {
   return items[chances.filter(el => el <= rand).length]
 }
 
+module.exports.randRange = (min, max) => {
+  return Math.floor(Math.random() * (max - min)) + min
+}
+
 module.exports.shuffle = (array) => {
   let currentIndex = array.length
   let temporaryValue

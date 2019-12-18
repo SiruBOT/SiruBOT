@@ -24,13 +24,13 @@ class Command {
       .setThumbnail(message.guild.me.user.displayAvatarURL)
       .setColor(this.client.utils.findUtil.getColor(message.member))
       .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }))
-    if (!(this.client.commands.get(args[0]) || this.client.commands.get(this.client.aliases.get(args[0])))) {
+    const command = this.client.commands.get(args[0]) || this.client.commands.get(this.client.aliases.get(args[0]))
+    if (!command || command.command.hide === true) {
       embed.setTitle(picker.get(locale, 'COMMANDS_HELP_TITLE'))
       for (const item of this.client.categories.keyArray()) {
         embed.addField(picker.get(locale, `CATEGORY_${item}`), this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '))
       }
     } else {
-      const command = this.client.commands.get(args[0]) || this.client.commands.get(this.client.aliases.get(args[0]))
       embed.setTitle(picker.get(locale, 'COMMANDS_HELP_INFO', { COMMAND: command.command.name.toUpperCase() }))
       embed.addField(picker.get(locale, `COMMANDS_HELP_DESC_${command.command.name.toUpperCase()}`))
     }
