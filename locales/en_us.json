@@ -1,33 +1,39 @@
 {
+    "FLAG": "%EMOJI_REGIONS_US-CENTRAL%",
+    "NAME": "English",
+
     "REMARK_1": "(주석) 명령어 정보들",
 
-    "COMMANDS_HELP_DESC_PING": "Displays bot's ping!",
-    "COMMANDS_HELP_DESC_DOCS": "Search discord.js docs!",
-    "COMMANDS_HELP_DESC_CHANGELOG": "Shows bot's last changelog!",
-    "COMMANDS_HELP_DESC_HELP": "Shows help message!",
-    "COMMANDS_HELP_DESC_QRCODE": "Reads QR code!",
-    "COMMANDS_HELP_DESC_DELIVERY": "송장 번호와 택배사를 입력하면, 택배의 추적정보를 보여드려요!",
-
-    "COMMANDS_HELP_DESC_MONEY": "Shows user's balance!",
-    "COMMANDS_HELP_DESC_ALLIN": "가진 돈을 모두 잃거나, 2배가 되는 도박이에요!",
-    "COMMANDS_HELP_DESC_PAYDAY": "1시간마다 10000 치머니를 받는 명령어에요!",
-
-    "COMMANDS_HELP_DESC_SETDJ": "음악 명령어를 사용할수 있는 역할을 설정해요!",
-    "COMMANDS_HELP_DESC_SETVC": "음악 명령어를 사용할수 있는 음성 채널을 설정해요!",
-    "COMMANDS_HELP_DESC_SETTC": "저의 명령어를 사용할수 있는 텍스트 채널을 설정해요!",
-
-    "COMMANDS_HELP_DESC_COMPILE": "명령어를 실행해요! (봇 제작자 전용)",
-    "COMMANDS_HELP_DESC_SHUTDOWN": "봇을 꺼요.",
-
+    "COMMANDS_HELP_DESC_SETDJ": "DJ 명령어를 실행할 수 있는 역할을 설정해요!",
+    "COMMANDS_HELP_DESC_SETTC": "명령어를 실행할 수 있는 채팅 채널을 설정해요!",
+    "COMMANDS_HELP_DESC_SETVC": "음악을 들을 수 있는 음성 채널을 설정해요!",
     "COMMANDS_HELP_DESC_JOIN": "음성 채널에 접속해요!",
-    "COMMANDS_HELP_DESC_REPEAT": "노래를 연속으로 재생할지 설정해요!",
-    "COMMANDS_HELP_DESC_NODEINFO": "재생중인 노드의 정보를 확인해요!",
-    "COMMANDS_HELP_DESC_NOWPLAYING": "현재 재생중인 노래의 정보를 알려드려요!",
-    "COMMANDS_HELP_DESC_PLAY": "노래를 재생해요!",
-    "COMMANDS_HELP_DESC_QUEUE": "재생 목록을 알려드려요!",
-    "COMMANDS_HELP_DESC_SCPLAY": "사운드클라우드에서 노래를 재생해요!",
-    "COMMANDS_HELP_DESC_STOP": "현재 재생중인 노래를 정지하고, 대기열을 초기화해요!",
-    "COMMANDS_HELP_DESC_VOLUME": "플래이어의 볼륨을 설정해요!",
+    "COMMANDS_HELP_DESC_NODEINFO": "음악을 재생하고 있는 노드들의 정보를 확인해요!",
+    "COMMANDS_HELP_DESC_NOWPLAYING": "현재 재생중인 노래의 정보를 보여드려요!",
+    "COMMANDS_HELP_DESC_PLAY": "음악을 재생해요!",
+    "COMMANDS_HELP_DESC_QUEUE": "음악 대기열을 보여드려요!",
+    "COMMANDS_HELP_DESC_RELATED": "만약 다음 노래가 없으면 자동으로 추천 영상을 재생할지에 대한 설정을 하실 수 있어요!",
+    "COMMANDS_HELP_DESC_REPEAT": "전채 반복, 한곡 반복 등을 설정하실수 있어요!",
+    "COMMANDS_HELP_DESC_SCPLAY": "사운드클라우드에서 음악을 재생해요!",
+    "COMMANDS_HELP_DESC_SKIP": "현재 재생 중인 음악을 건너뛰어요!",
+    "COMMANDS_HELP_DESC_STOP": "현재 재생 중인 플레이어를 종료하고, 대기열을 초기화해요!",
+    "COMMANDS_HELP_DESC_VOLUME": "현재 재생 중인 노래의 볼륨을 조절해요!",
+
+    "COMMANDS_HELP_DESC_COMPILE": "자바스크립트를 실행해요! (제작자 Only)",
+    "COMMANDS_HELP_DESC_DEBUG": "null",
+    "COMMANDS_HELP_DESC_RELOAD": "명령어, 설정, 언어 등을 다시 로드해요! (제작자 Only)",
+    "COMMANDS_HELP_DESC_SHUTDOWN": "봇을 안전하게 종료해요! (제작자 Only)",
+
+    "COMMANDS_HELP_DESC_DOCS": "DISCORD.JS 의 문서를 검색해요!",
+    "COMMANDS_HELP_DESC_CHANGELOG": "봇의 변경 사항을 보여드려요!",
+    "COMMANDS_HELP_DESC_DELIVERY": "국내에 한해서 택배를 조회할 수 있어요!",
+    "COMMANDS_HELP_DESC_HELP": "명령어들에 대한 도움말을 보여드려요!",
+    "COMMANDS_HELP_DESC_PING": "봇의 응답 속도를 보여드려요!",
+
+    "COMMANDS_HELP_DESC_ALLIN": "현재 잔고를 모두 사용해 1/2 의 확률로 전 재산을 잃거나, 2배가 되어요!",
+    "COMMANDS_HELP_DESC_홀짝": "홀짝게임에 베팅하여 실패 시 베팅금을 잃고, 성공 시 베팅금액을 드려요!",
+    "COMMANDS_HELP_DESC_MONEY": "유저들이나 자신의 잔고를 확인해요!",
+    "COMMANDS_HELP_DESC_PAYDAY": "각종 확률형 도박을 즐길 수 있는 가상 재화를 받으실수 있어요!",
 
     "CATEGORY_MUSIC_DJ": "DJ Commands",
     "CATEGORY_MUSIC_GENERAL": "Music Commands",
@@ -54,7 +60,7 @@
     "GENERAL_USER_STOP": "> %EMOJI_NO%  The user has canceled it.",
     "GENERAL_TIMED_OUT": "> %EMOJI_NO%  Timed out.",
 
-    "PAGER_MULTIPLE_ITMES": "Multiple Items Found!",
+    "PAGER_MULTIPLE_ITEMS": "Multiple Items Found!",
     "PAGER_PAGE": "Page %CURRENT% / %PAGES%",
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** server can only use my command on channel <#%CHANNEL%>!",
@@ -112,6 +118,10 @@
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  Added **%TRACK% [%DURATION%]** to the queue at position **%POSITION%**",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  Found playlist with **%NUM%** entries, added to the queue!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST": "> %EMOJI_MUSIC%  This track has a playlist of **%NUM%** tracks attached. Will you load playlist?",
+    "COMMANDS_AUDIO_PLAY_NO_VOICE_ME": "> %EMOJI_MUSIC%  First, please add me your voice channel!",
+
+    "COMMANDS_AUDIO_RELATED_ON": "> %EMOJI_STAR%  Related videos future turned **on** %EMOJI_SWITCH_ON%",
+    "COMMANDS_AUDIO_RELATED_OFF": "> %EMOJI_STAR%  Related videos future turned **off** %EMOJI_SWITCH_OFF%",
 
     "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NOTHING%  Repeat mode changed to **NONE**",
     "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **All**",

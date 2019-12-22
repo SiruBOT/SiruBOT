@@ -58,15 +58,19 @@ class Client extends Discord.Client {
     this.logger.info(`${load} Loading Commands (${CommandsFile.length} Files)`)
     this.logger.debug(`${load} (Commands: ${CommandsFile.join(', ')})`)
     for (const cmd of CommandsFile) {
-      const Command = require(cmd)
-      const command = new Command(this)
-      this.logger.debug(`${load} Loading Command (${command.command.name})`)
-      for (const aliases of command.command.aliases) {
-        this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.command.name}`)
-        this.aliases.set(aliases, command.command.name)
+      if (!cmd.split('/').slice(-1)[0].startsWith('!')) {
+        const Command = require(cmd)
+        const command = new Command(this)
+        this.logger.debug(`${load} Loading Command (${command.command.name})`)
+        for (const aliases of command.command.aliases) {
+          this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.command.name}`)
+          this.aliases.set(aliases, command.command.name)
+        }
+        this.commands.set(command.command.name, command)
+        delete require.cache[require.resolve(cmd)]
+      } else {
+        this.logger.info(`${load} Ignore file ${cmd} (Starts !)`)
       }
-      this.commands.set(command.command.name, command)
-      delete require.cache[require.resolve(cmd)]
     }
     this.commands_loaded = true
     this.categories = new Discord.Collection()
@@ -78,7 +82,6 @@ class Client extends Discord.Client {
         this.categories.set(item.category, array)
       }
     }
-    console.log(this.categories)
     this.logger.info(`[Commands] Successfully ${reLoadOrLoad}ed Commands!`)
     return this.commands
   }
@@ -95,7 +98,7 @@ class Client extends Discord.Client {
     this.logger.info('[Events] Events Successfully Loaded!')
   }
 
-  ActivityInterVal () {
+  activityInterVal () {
     this.setActivity()
     setInterval(() => {
       this.setActivity()
@@ -110,8 +113,34 @@ class Client extends Discord.Client {
     this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
   }
 
-  getActivityMessage (message) {
-    return message.replace('%ping%', `${this.pings[0]}ms`).replace('%guilds%', this.guilds.size).replace('%users%', this.users.size)
+  async getActivityMessage (message) {
+    const ping = await this.getvalue('ping')
+    const guilds = await this.getvalue('guilds')
+    const users = await this.getvalue('users')
+    const channels = await this.getvalue('channels')
+    return message.replace('%PING%', `${ping}ms`).replace('%GUILDS%', guilds).replace('%USERS%', users).replace('%CHANNELS%', channels)
+  }
+
+  async getvalue (type) {
+    let value
+    switch (type) {
+      case 'ping':
+        value = await this.shard.fetchClientValues('ping').then(res => res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards)
+        if (!value) value = this.ping
+        return value
+      case 'channels':
+        value = await this.shard.fetchClientValues('channels.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        if (!value) value = this.channels.size
+        return value
+      case 'guilds':
+        value = await this.shard.fetchClientValues('guilds.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        if (!value) value = this.guilds.size
+        return value
+      case 'users':
+        value = await this.shard.fetchClientValues('users.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        if (!value) value = this.users.size
+        return value
+    }
   }
 }
 

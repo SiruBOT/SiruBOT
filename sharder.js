@@ -11,4 +11,6 @@ manager.on('launch', shard => {
     logger.warn(`[Sharding] Successfully Launched all shards! (${settings.bot.shards} shards)`)
   }
 })
-manager.spawn()
+manager.spawn().then(() => {
+  manager.broadcast('spawned-all-shards')
+})

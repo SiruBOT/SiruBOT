@@ -22,6 +22,7 @@ class Command {
     const formatter = (a, number) => { return `[${number}] ${a.user.bot ? '[BOT]' : ''} ${a.displayName} (${a.user.tag}) [${a.id}]` }
     const filter = (a) => { return a.displayName.toLowerCase() === args[0].toLowerCase() || a.id === args[0] || a.id === this.client.utils.findUtil.getUserFromMention(this.client.users, args[0]).id || a.user.username.toLowerCase() === args[0].toLowerCase() }
     const options = {
+      title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
       formatter: formatter,
       collection: message.guild.members,
       filter: filter,

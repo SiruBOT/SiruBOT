@@ -54,14 +54,14 @@ class Command {
         const info = searchResult.tracks[0].info
         this.addQueue(message, searchResult.tracks[0], picker, locale)
         searchResult.tracks.shift()
-        if (Audio.players.get(message.guild.id).nowplaying) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+        if (guildData.nowplaying.track) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
         if (searchResult.tracks.length === 0) return
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length })).then((m) => {
           const emojiList = ['📥', '🚫']
           this.client.utils.massReact(m, emojiList)
 
           const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
-          const collector = m.createReactionCollector(filter, { time: 600000 })
+          const collector = m.createReactionCollector(filter, { time: 15000 })
           const functionList = [() => {
             collector.stop()
             this.addQueue(message, searchResult.tracks, picker, locale)
@@ -91,13 +91,13 @@ class Command {
       const guildData = await this.client.database.getGuildData(message.guild.id)
       const info = searchResult.tracks[0].info
       this.addQueue(message, searchResult.tracks[0], picker, locale)
-      if (Audio.players.get(message.guild.id).nowplaying) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+      if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
     }
   }
 
   addQueue (message, items, picker, locale) {
     const Audio = this.client.audio
-    if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_PLAY_NO_VOICE_ME'))
+    if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_NO_VOICE_ME'))
     Audio.players.get(message.guild.id).addQueue(items, message)
   }
 }

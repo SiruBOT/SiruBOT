@@ -40,7 +40,7 @@ class Command {
         embed: new Discord.RichEmbed()
           .setDescription(chunkedDescriptionArray[page].map(el => el))
           .setFooter(picker.get(locale, 'PAGER_PAGE', { CURRENT: page + 1, PAGES: chunkedDescriptionArray.length })).setColor(client.utils.findUtil.getColor(message.guild.me)),
-        nowplaying: picker.get(locale, 'COMMANDS_AUDIO_QUEUE_SONGS', { PLAYINGSTATUS: nowplayingObject.playingStatus, NPTITLE: client.audio.players.get(message.guild.id).nowplaying.info.title, NOWPOSITION: nowplayingObject.time, REPEATSTATUS: nowplayingObject.repeatStatus, NUM: guildData.queue.length, TOTALTIME: client.utils.timeUtil.toHHMMSS(allDuration / 1000) }),
+        nowplaying: picker.get(locale, 'COMMANDS_AUDIO_QUEUE_SONGS', { PLAYINGSTATUS: nowplayingObject.playingStatus, NPTITLE: guildData.nowplaying.info.title, NOWPOSITION: nowplayingObject.time, REPEATSTATUS: nowplayingObject.repeatStatus, NUM: guildData.queue.length, TOTALTIME: client.utils.timeUtil.toHHMMSS(allDuration / 1000) }),
         chunkedDescriptionArray: chunkedDescriptionArray
       }
     }
@@ -49,7 +49,7 @@ class Command {
       const emojiList = ['◀️', '⏹️', '▶️']
       this.client.utils.massReact(m, emojiList).then(() => {
         const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
-        const collector = m.createReactionCollector(filter, { time: 600000 })
+        const collector = m.createReactionCollector(filter, { time: 60000 })
         const functionList = [(r) => {
           r.remove(message.author)
           if (page === 0) page = data.chunkedDescriptionArray.length - 1

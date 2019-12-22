@@ -6,12 +6,14 @@ const Schema = new mongo.Schema({
   // Others
   welcomeChannel: { type: String, default: '0' },
   welcomeMessage: { type: String, default: '환영합니다!' },
+  locale: { type: String, default: 'ko_kr' },
   filter: { type: Boolean, default: false },
   customFilter: { type: Array, default: [] },
-  locale: { type: String, default: 'ko_kr' },
+  warningMax: { type: Number, default: 10 },
 
   // Audio
   audioMessage: { type: Boolean, default: true },
+  audioPlayrelated: { type: Boolean, default: false },
   repeat: { type: Number, default: 0 },
   shuffle: { type: Boolean, default: false },
   dj_role: { type: String, default: '0' },

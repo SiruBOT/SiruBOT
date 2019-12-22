@@ -6,15 +6,21 @@ class AudioPlayer {
    * @param {String} options.guild - Guild id for this player
    */
   constructor (options) {
-    this.AudioManager = options.AudioManager
     this.client = options.client
+    this.AudioManager = options.AudioManager
+
     this.guild = options.guild
+    this.loggerPrefix = `[AudioPlayer] (${this.guild})`
     this.channel = options.channel
     this.textChannel = options.textChannel
-    this.player = null
+
     this.node = null
-    this.nowplaying = null
+    this.player = null
     this.message = null
+
+    this.skippers = []
+
+    this.playedSongs = []
   }
 
   /**
@@ -23,7 +29,7 @@ class AudioPlayer {
   async join () {
     const BestNode = this.AudioManager.getBestNode(this.guild)
     this.node = BestNode
-    this.client.logger.debug(`[AudioPlayer] Joining Voice Channel... (Player: (Guild: ${this.guild}) (Channel: ${this.channel}))`)
+    this.client.logger.debug(`${this.loggerPrefix} [Join] (${this.channel}) Joining Voice Channel...`)
     this.player = await this.AudioManager.manager.join({
       guild: this.guild,
       channel: this.channel,
@@ -42,10 +48,10 @@ class AudioPlayer {
         el.request = message.author.id
         return el
       })
-      this.client.logger.debug(`[Audio] [Queue] Added Track(s) (${item.length} Items) (Guild: ${this.guild})`)
+      this.client.logger.debug(`${this.loggerPrefix} [Queue] Added Track(s) (${item.length} Items)`)
       await this.client.database.updateGuildData(this.guild, { $push: { queue: { $each: result } } })
     } else {
-      this.client.logger.debug(`[Audio] [Queue] Added Track (${item.track}) (Guild: ${this.guild})`)
+      this.client.logger.debug(`${this.loggerPrefix} [Queue] Added Track (${item.track})`)
       item.request = message.author.id
       await this.client.database.updateGuildData(this.guild, { $push: { queue: item } })
     }
@@ -64,10 +70,10 @@ class AudioPlayer {
     const chId = await this.getTextChannel()
     this.deleteMessage()
     if (result.result.nModified !== 0) {
-      this.client.logger.debug(`[Audio] Play Next Song.... (Guild: ${this.guild}) (Song: ${first.queue[0].track})`)
+      this.client.logger.debug(`${this.loggerPrefix} Play Next Song.... (Song: ${first.queue[0].track})`)
       await this.play(first.queue[0])
     } else {
-      this.client.logger.debug(`[Audio] Empty Queue!... (Guild: ${this.guild})`)
+      this.client.logger.debug(`${this.loggerPrefix} Empty Queue!...`)
       if (stopStatus) {
         return this.client.channels.get(chId).send(picker.get(first.locale, 'AUDIO_ALL_SONGS_FINISHED'))
       }
@@ -78,18 +84,18 @@ class AudioPlayer {
   }
 
   /**
-   * If NowPlaying is none, play Automatically Next Queue
+   * @description - If NowPlaying is none, play Automatically Next Queue
    */
   async autoPlay () {
     const QueueData = await this.client.database.getGuildData(this.guild)
-    if (!this.nowplaying) {
-      if (QueueData.queue.length > 0) this.client.logger.debug(`[Audio] Resume Last Queue... (Guild: ${this.guild})`)
+    if (!this.player.track) {
+      if (QueueData.queue.length > 0) this.client.logger.debug(`${this.loggerPrefix} Resume Last Queue...`)
       await this.playNext(false)
     }
   }
 
   /**
-  * Get player's textChannel
+  * @description - Get player's textChannel
   */
   async getTextChannel () {
     const guildData = await this.client.database.getGuildData(this.guild)
@@ -105,11 +111,12 @@ class AudioPlayer {
    * @param {Object} item - Playing Song Object
    */
   async play (item) {
+    this.playedSongs.push(item.info.identifier)
     const picker = this.client.utils.localePicker
     const guildData = await this.client.database.getGuildData(this.guild)
     const chId = await this.getTextChannel()
-    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_NOWPLAYING', { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000, item.info.isStream) }))
-    this.nowplaying = item
+    const localeMessage = item.request === this.client.user.id ? 'AUDIO_NOWPLAYING_RELATED' : 'AUDIO_NOWPLAYING'
+    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, localeMessage, { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000, item.info.isStream) }))
     await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: item } })
     await this.player.play(item.track)
     await this.player.volume(guildData.volume)
@@ -119,32 +126,45 @@ class AudioPlayer {
       }
     })
     this.player.once('end', async (data) => {
-      this.nowplaying = null
+      await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
       if (data === 'error') {
         await this.playNext(true, false)
         this.deleteMessage()
-        return this.client.logger.error(`[Audio] Error on play track: ${item.info.identifier}`)
+        this.client.logger.error(`${this.loggerPrefix} Error on play track: ${item.info.identifier}`)
       } else {
-        this.player.emit('error', 'remove')
+        if (this.player) { this.player.emit('error', 'remove') }
       }
-      if (data.reason === 'REPLACED') return this.client.logger.debug(`[Audio] Replaced Track! (Guild: ${this.guild})`)
+      if (data.reason === 'REPLACED') return this.client.logger.debug(`${this.loggerPrefix}  Replaced Track!`)
       const guildData = await this.client.database.getGuildData(this.guild)
       switch (guildData.repeat) {
         case 0:
-          this.client.logger.debug(`[Audio] [Repeat] Repeat Status (No_Repeat: 0) (Guild: ${this.guild})`)
-          await this.playNext(true, false)
+          this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (No_Repeat: 0)`)
+          if (guildData.queue.length === 0 && this.AudioManager.getvIdfromUrl(item.info.uri) !== undefined && guildData.audioPlayrelated === true) {
+            await this.playRelated(this.AudioManager.getvIdfromUrl(item.info.uri))
+          } else {
+            await this.playNext(true, false)
+          }
           break
         case 1:
-          this.client.logger.debug(`[Audio] [Repeat] Repeat Status (All: 1) (Guild: ${this.guild})`)
-          await this.client.database.updateGuildData(this.guild, { $push: { queue: item } })
+          this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (All: 1)`)
+          if (this.skip) {
+            this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Enabled but, skipped (ignore push)`)
+          } else {
+            await this.client.database.updateGuildData(this.guild, { $push: { queue: item } })
+          }
           await this.playNext(true, false)
           break
         case 2:
-          this.client.logger.debug(`[Audio] [Repeat] Repeat Status (Single: 2) (Guild: ${this.guild})`)
-          await this.client.database.updateGuildData(this.guild, { $push: { queue: { $each: [item], $position: 0 } } })
+          this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (Single: 2)`)
+          if (this.skip) {
+            this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Enabled but, skipped (ignore unshift)`)
+          } else {
+            await this.client.database.updateGuildData(this.guild, { $push: { queue: { $each: [item], $position: 0 } } })
+          }
           await this.playNext(true, false)
           break
       }
+      this.skip = false
     })
   }
 
@@ -153,11 +173,13 @@ class AudioPlayer {
    */
   async stop (clearQueue) {
     if (clearQueue) {
-      this.client.logger.debug(`[Audio] [Player] Stopped Audio Player & Clear Queue (Guild: ${this.guild})`)
+      this.client.logger.debug(`${this.loggerPrefix} [Player] Stopped Audio Player & Clear Queue`)
       await this.client.database.updateGuildData(this.guild, { $set: { queue: [] } })
+      await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
     } else {
-      this.client.logger.debug(`[Audio] [Player] Stopped Audio Player (Guild: ${this.guild})`)
+      this.client.logger.debug(`${this.loggerPrefix} [Player] Stopped Audio Player`)
     }
+    this.playedSongs = []
     this.deleteMessage()
     this.AudioManager.updateNpMessage(this.guild, true)
     await this.player.stop()
@@ -166,7 +188,35 @@ class AudioPlayer {
   }
 
   /**
-   * @description - Delete Now Playing Alert Message
+   * @description - playRelated
+   */
+  async playRelated (vId) {
+    const result = await this.AudioManager.getRelated(vId)
+    let number = 0
+    for (const item of result.items) {
+      if ((this.playedSongs.includes(vId) && item.identifier === vId) || this.playedSongs.includes(item.identifier)) {
+        number += 1
+        continue
+      }
+    }
+    if (this.playedSongs.length > 100) this.playedSongs = [] // Decreses track duplication
+    const track = await this.AudioManager.getSongs(`https://youtu.be/${result.items[number].identifier}`)
+    this.client.logger.debug(`${this.loggerPrefix} Playing related video ${track.tracks[0].info.title} (${track.tracks[0].info.identifier})`)
+    this.addQueue(track.tracks[0], this.message)
+  }
+
+  /**
+   * @description - Skips current track
+   */
+  skipTrack () {
+    this.skip = true
+    this.skippers = []
+    this.client.logger.debug(`${this.loggerPrefix} Skipped 1 Tracks.`)
+    this.player.stop()
+  }
+
+  /**
+   * @description - Delete NowPlaying Alert Message
    */
   deleteMessage () {
     if (!this.message) return

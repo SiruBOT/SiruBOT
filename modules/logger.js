@@ -40,6 +40,8 @@ const logger = winston.createLogger({
   ),
   transports: transports
 })
+const Discord = require('discord.js')
+const hook = new Discord.WebhookClient('658307549182951432', 'dumhRcZi6m2w76RIajIEO5FpdBZLqVSXy-jLekjgRfYisvOw9Md_O-XV9nk8QTUafKtK')
 
 class Logger {
   constructor (client = {}) {
@@ -58,18 +60,22 @@ class Logger {
   }
 
   info (...args) {
+    hook.send(this.getMessage(...args), { code: 'js' })
     this._logger.info(this.getMessage(...args))
   }
 
   error (...args) {
+    hook.send(this.getMessage(...args), { code: 'js' })
     this._logger.error(this.getMessage(...args))
   }
 
   debug (...args) {
+    hook.send(this.getMessage(...args), { code: 'js' })
     this._logger.debug(this.getMessage(...args))
   }
 
   warn (...args) {
+    hook.send(this.getMessage(...args), { code: 'js' })
     this._logger.warn(this.getMessage(...args))
   }
 }

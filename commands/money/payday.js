@@ -25,14 +25,14 @@ class Command {
       this.client.database.updateGlobalUserData(message.member, { $inc: { money: 10000 } })
       this.client.database.updateGlobalUserData(message.member, { $set: { paydayDate: new Date() } })
     } else {
-      message.channel.send(picker.get(locale, 'COMMANDS_MONEY_PAYDAY_LATER', { TIME: (60 - able.diff.asMinutes()).toFixed(1) }))
+      message.channel.send(picker.get(locale, 'COMMANDS_MONEY_PAYDAY_LATER', { TIME: (10 - able.diff.asMinutes()).toFixed(1) }))
     }
   }
 
   checkAble (date) {
     const paydayTimeStamp = moment(date)
     const duration = moment.duration(moment(new Date()).diff(paydayTimeStamp))
-    if (duration.asHours() < 1) return { bool: false, diff: duration }
+    if (duration.asMinutes() < 10) return { bool: false, diff: duration }
     else return { bool: true, diff: duration }
   }
 }

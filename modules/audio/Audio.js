@@ -2,6 +2,7 @@ const { PlayerManager } = require('discord.js-lavalink')
 const AudioPlayer = require('./AudioPlayer')
 const { Collection } = require('discord.js')
 const fetch = require('node-fetch')
+const cheerio = require('cheerio')
 const { URLSearchParams } = require('url')
 const Discord = require('discord.js')
 
@@ -60,23 +61,55 @@ class AudioManager {
   }
 
   /**
+   * @description - get video id from youtube url's
+   * @param {String} url - youtube url
+   */
+  getvIdfromUrl (url) {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+    const match = url.match(regExp)
+    return (match && match[7].length === 11) ? match[7] : undefined
+  }
+
+  /**
+   *
+   * @param {String} vId - Youtube Video Id
+   */
+  async getRelated (vId) {
+    const result = await fetch(`https://www.youtube.com/watch?v=${vId}`)
+      .then(body => body.text()).catch(err => {
+        console.error(err)
+        return null
+      })
+    const $ = cheerio.load(result)
+    const relatedSongs = []
+    const upnext = $('#watch7-sidebar-modules > div:nth-child(1) > div > div.watch-sidebar-body > ul > li > div.content-wrapper > a')
+    relatedSongs.push({ uri: `https://youtube.com${upnext.attr('href')}`, identifier: this.getvIdfromUrl(upnext.attr('href')), title: upnext.attr('title') })
+    $('#watch-related').children().each((index, item) => {
+      const url = $(item).children('.content-wrapper').children('a').attr('href')
+      const title = $(item).children('.content-wrapper').children('a').attr('title')
+      if (url) relatedSongs.push({ uri: `https://youtube.com${url}`, identifier: this.getvIdfromUrl(url), title: title })
+    })
+    return { items: relatedSongs.splice(0, relatedSongs.length - (relatedSongs.length - 15)) }
+  }
+
+  /**
    * @param {String} guild - Guild Id to get nowplaying Embed
    */
   async getNowplayingEmbed (guild) {
     const guildData = await this.client.database.getGuildData(guild)
-    if (!this.players.get(guild) || !this.players.get(guild).nowplaying) {
+    if (!this.players.get(guild) || !guildData.nowplaying.track) {
       return new Discord.RichEmbed()
         .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
         .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))
     }
-    const request = this.client.users.get(this.players.get(guild).nowplaying.request)
+    const request = this.client.users.get(guildData.nowplaying.request)
     return new Discord.RichEmbed()
       .setAuthor(request.tag, request.displayAvatarURL)
-      .setTitle(this.players.get(guild).nowplaying.info.title)
-      .setURL(this.players.get(guild).nowplaying.info.uri)
+      .setTitle(guildData.nowplaying.info.title)
+      .setURL(guildData.nowplaying.info.uri)
       .setDescription(this.getNowplayingText(guild, guildData))
       .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))
-      .setThumbnail(this.validateYouTubeUrl(this.players.get(guild).nowplaying.info.uri) ? `https://img.youtube.com/vi/${this.players.get(guild).nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
+      .setThumbnail(this.validateYouTubeUrl(guildData.nowplaying.info.uri) ? `https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
   }
 
   /**
@@ -85,7 +118,7 @@ class AudioManager {
    * @param {Object} guildData - Database Object
    */
   getNowplayingText (guild, guildData) {
-    if (!this.players.get(guild) || !this.players.get(guild).nowplaying) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
+    if (!this.players.get(guild) || !guildData.nowplaying.track) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
     const nowPlayingObject = this.getNowplayingObject(guild, guildData)
     return `${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
   }
@@ -95,12 +128,12 @@ class AudioManager {
    * @param {Object} guildData - Database Object
    */
   getNowplayingObject (guild, guildData) {
-    if (this.players.get(guild).nowplaying.info) {
+    if (guildData.nowplaying.info) {
       return {
         playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
         repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
-        progressBar: this.getProgressBar(this.players.get(guild).player.state.position / this.players.get(guild).nowplaying.info.length),
-        time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).nowplaying.info.length / 1000, this.players.get(guild).nowplaying.info.isStream)}]`,
+        progressBar: this.getProgressBar(this.players.get(guild).player.state.position / guildData.nowplaying.info.length),
+        time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]`,
         volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
       }
     } else {
@@ -197,7 +230,7 @@ class AudioManager {
    * @param {String} options.channel - Voicechannel id for player
    */
   join (options) {
-    this.client.logger.info(`[DEBUG] Joining Voice Channel (VoiceChannel: ${options.channel}, Guild: ${options.guild})`)
+    this.client.logger.info(`[AudioManager] ${options.guild.id} [DEBUG] [Join] (${options.channel.id}) Joining Voice Channel`)
     if (options.channel.joinable === false) return false
     else {
       const player = new AudioPlayer({ AudioManager: this, client: this.client, guild: options.guild, channel: options.channel.id, textChannel: options.textChannel })
