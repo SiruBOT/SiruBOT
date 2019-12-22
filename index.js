@@ -83,6 +83,7 @@ class Client extends Discord.Client {
       }
     }
     this.logger.info(`[Commands] Successfully ${reLoadOrLoad}ed Commands!`)
+    if (isTesting) process.exit(0)
     return this.commands
   }
 
