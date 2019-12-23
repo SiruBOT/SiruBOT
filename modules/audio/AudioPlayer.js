@@ -29,12 +29,17 @@ class AudioPlayer {
   async join () {
     const BestNode = this.AudioManager.getBestNode(this.guild)
     this.node = BestNode
+    const guildData = await this.client.database.getGuildData(this.guild)
     this.client.logger.debug(`${this.loggerPrefix} [Join] (${this.channel}) Joining Voice Channel...`)
     this.player = await this.AudioManager.manager.join({
       guild: this.guild,
       channel: this.channel,
       host: BestNode.host
     }, { selfdeaf: true })
+    if (!this.player.track && guildData.nowplaying.track) {
+      this.client.logger.debug(`${this.loggerPrefix} [Join] [Queue] Player's track is null but db's nowplaying is exists, setting up ${this.guild}.nowplaying = { track: null }`)
+      this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
+    }
     this.autoPlay()
   }
 
@@ -120,12 +125,7 @@ class AudioPlayer {
     await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: item } })
     await this.player.play(item.track)
     await this.player.volume(guildData.volume)
-    this.player.once('error', (data) => {
-      if (data !== 'remove') {
-        return this.player.emit('end', 'error')
-      }
-    })
-    this.player.once('end', async (data) => {
+    const endHandler = async (data) => {
       await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
       if (data === 'error') {
         await this.playNext(true, false)
@@ -165,7 +165,16 @@ class AudioPlayer {
           break
       }
       this.skip = false
-    })
+    }
+    const errorHandler = (data) => {
+      if (data !== 'remove') {
+        this.player.removeListener('error', errorHandler)
+      } else {
+        this.player.emit('end', 'error')
+      }
+    }
+    this.player.once('error', errorHandler)
+    this.player.once('end', endHandler)
   }
 
   /**
@@ -196,7 +205,6 @@ class AudioPlayer {
     for (const item of result.items) {
       if ((this.playedSongs.includes(vId) && item.identifier === vId) || this.playedSongs.includes(item.identifier)) {
         number += 1
-        continue
       }
     }
     if (this.playedSongs.length > 100) this.playedSongs = [] // Decreses track duplication

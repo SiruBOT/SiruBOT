@@ -106,10 +106,10 @@ class Client extends Discord.Client {
     }, 15000)
   }
 
-  setActivity (act = undefined) {
+  async setActivity (act = undefined) {
     this.activityNum++
     if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
-    if (!act) act = this.getActivityMessage(this._options.bot.games[this.activityNum])
+    if (!act) act = await this.getActivityMessage(this._options.bot.games[this.activityNum])
     this.logger.debug(`[Activity] Setting Bot's Activity to ${act}`)
     this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
   }
@@ -119,14 +119,14 @@ class Client extends Discord.Client {
     const guilds = await this.getvalue('guilds')
     const users = await this.getvalue('users')
     const channels = await this.getvalue('channels')
-    return message.replace('%PING%', `${ping}ms`).replace('%GUILDS%', guilds).replace('%USERS%', users).replace('%CHANNELS%', channels)
+    return message.replace('%PING%', ping).replace('%GUILDS%', guilds).replace('%USERS%', users).replace('%CHANNELS%', channels)
   }
 
   async getvalue (type) {
     let value
     switch (type) {
       case 'ping':
-        value = await this.shard.fetchClientValues('ping').then(res => res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards)
+        value = await this.shard.fetchClientValues('ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1))
         if (!value) value = this.ping
         return value
       case 'channels':

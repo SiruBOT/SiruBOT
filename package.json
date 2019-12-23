@@ -26,6 +26,7 @@
     "opusscript": "0.0.7",
     "qrcode-reader": "^1.0.4",
     "redis": "^2.8.0",
+    "req-fast": "^0.2.19",
     "saslprep": "^1.0.3",
     "string-placeholder": "^1.0.2",
     "winston": "^3.2.1",
