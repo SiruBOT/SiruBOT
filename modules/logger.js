@@ -7,7 +7,7 @@ const DailyRotateFile = new winston.transports.DailyRotateFile({
   level: 'debug',
   filename: 'logs/siru-%DATE%.log',
   zippedArchive: true,
-  format: winston.format.printf(info => `[${new Date()}] [${info.level.toUpperCase()}] ${info.message}`)
+  format: winston.format.printf(info => `[${new Date().getTime()}] [${info.level.toUpperCase()}] ${info.message}`)
 })
 
 const Console = new winston.transports.Console()

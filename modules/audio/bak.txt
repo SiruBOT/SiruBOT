@@ -1,0 +1,7 @@
+$('body > div.container.main-page > div > div > div > table > tbody > tr').children('.visitedlyr').each(function (index, element) {
+  console.log($(element).children('a').text())
+  console.log($(element).children('a').attr('href'))
+})
+
+
+

@@ -33,6 +33,9 @@ class Client extends Discord.Client {
       this.logger.error('[BOT] Bot is Already Initialized!')
       return new Error('[BOT] Bot is Already Initialized!')
     }
+    process.on('message', (data) => {
+      if (data === 'spawned-all-shards') this.client.activityInterVal()
+    })
     if (!isTesting) { this.logger.info('[BOT] Initializing Bot..') }
     this.utils.localePicker.init()
     this.registerEvents()
@@ -107,11 +110,13 @@ class Client extends Discord.Client {
   }
 
   async setActivity (act = undefined) {
-    this.activityNum++
-    if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
-    if (!act) act = await this.getActivityMessage(this._options.bot.games[this.activityNum])
-    this.logger.debug(`[Activity] Setting Bot's Activity to ${act}`)
-    this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
+    if (this.user) {
+      this.activityNum++
+      if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
+      if (!act) act = await this.getActivityMessage(this._options.bot.games[this.activityNum])
+      this.logger.debug(`[Activity] Setting Bot's Activity to ${act}`)
+      this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
+    }
   }
 
   async getActivityMessage (message) {

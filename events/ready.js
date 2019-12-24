@@ -9,9 +9,6 @@ class Event {
   run () {
     this.client.logger.info(`[BOT] Bot Is Ready. (${this.client.user.tag})`)
     this.client.database.init()
-    process.on('message', (data) => {
-      if (data === 'spawned-all-shards') this.client.activityInterVal()
-    })
     this.client.audio.init()
     this.client.initialized = true
   }

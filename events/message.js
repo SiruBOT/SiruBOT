@@ -62,6 +62,7 @@ class Event {
           for (const userPerm of userPermissions) {
             if (Command.command.permissions.includes(userPerm)) {
               ablePermissions++
+              this.client.logger.debug(`[Command] [Run] (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${Command.command.name} at ${new Date().getTime()}`)
               return Command.run(compressed)
             }
           }
