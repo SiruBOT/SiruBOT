@@ -3,6 +3,7 @@ const redis = require('redis')
 class Event {
   constructor (client) {
     this.client = client
+    this.redisClient = redis.createClient({ host: 'localhost' })
   }
 
   /**
@@ -10,13 +11,11 @@ class Event {
    * @param message {Object} - Message
    */
   async run (message) {
-    const redisClient = redis.createClient({ host: 'localhost' })
-    redisClient.publish('asdf', JSON.stringify({ message: message.content }))
+    this.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     this.handleCommand(message)
   }
 
   async handleCommand (message) {
-    // if (message.author.id === '351613953769603073' || message.author.id === '422745309144154115') return
     if (message.author.bot) return
     if (message.channel.type === 'dm') return this.sendNotAbleDM(message)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)

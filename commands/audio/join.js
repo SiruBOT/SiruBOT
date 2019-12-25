@@ -31,7 +31,7 @@ class Command {
       Audio.players.get(message.guild.id).player.switchChannel(voiceChannel.id, true)
       return sendSilent(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannel.id }))
     }
-    const result = await Audio.join({ guild: message.guild.id, channel: voiceChannel, textChannel: message.channel })
+    const result = Audio.join({ guild: message.guild.id, channel: voiceChannel, textChannel: message.channel })
     if (result === true) return sendSilent(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannel.id }))
     else {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_JOIN_FAIL', { VOICECHANNEL: voiceChannel.id }))

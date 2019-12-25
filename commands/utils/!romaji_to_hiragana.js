@@ -1,5 +1,5 @@
 module.exports.hiraganaToromaji = (data) => {
-  data.replace(/ん/g, 'n')
+  return data.replace(/ん/g, 'n')
     .replace(/きゃ/g, 'kya')
     .replace(/きゅ/g, 'kyu')
     .replace(/きょ/g, 'kyo')

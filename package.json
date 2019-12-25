@@ -10,6 +10,7 @@
   "author": "Sangoon_Is_Noob",
   "license": "GPL-3.0",
   "dependencies": {
+    "@thesharks/jagtag-js": "^1.0.4",
     "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
     "cyclic": "^0.2.1",
@@ -28,6 +29,7 @@
     "redis": "^2.8.0",
     "req-fast": "^0.2.19",
     "saslprep": "^1.0.3",
+    "slyrics": "^0.1.32",
     "string-placeholder": "^1.0.2",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.0"

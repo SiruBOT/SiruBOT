@@ -1,0 +1,82 @@
+const Lyrics = require('slyrics')
+const lyrics = new Lyrics()
+const providers = ['melon', 'atoz']
+const Discord = require('discord.js')
+
+class Command {
+  constructor (client) {
+    this.client = client
+    this.command = {
+      name: 'lyrics',
+      aliases: ['가사', 'lyric'],
+      category: 'COMMANDS_GENERAL_UTILS',
+      require_voice: false,
+      hide: false,
+      permissions: ['Everyone']
+    }
+  }
+
+  /**
+     * @param {Object} compressed - Compressed Object (In CBOT)
+     */
+  async run (compressed) {
+    // const locale = compressed.GuildData.locale
+    // const picker = this.client.utils.localePicker
+    const { message, args } = compressed
+    const embed = new Discord.RichEmbed()
+      .setColor(this.client.utils.findUtil.getColor(message.guild.me))
+    message.channel.startTyping(1)
+    let index = 0
+    for (const provider of providers) {
+      index++
+      const result = await get(provider, args.join(' '))
+      if (result === true) {
+        message.channel.stopTyping(true)
+        return
+      }
+      if (index === providers.length) {
+        message.channel.stopTyping(true)
+        message.channel.send('Lyrics not found')
+      }
+    }
+    async function get (provider, title) {
+      const lyricsData = await lyrics.get(provider, title)
+      if (lyricsData.result === null) return false
+      else {
+        embed.setTitle(lyricsData.title)
+        embed.setFooter(lyricsData.artist)
+        embed.setURL(lyricsData.url)
+      }
+      /**
+       * John Grosh (john.a.grosh@gmail.com) 의 https://github.com/jagrosh/MusicBot/blob/master/src/main/java/com/jagrosh/jmusicbot/commands/music/LyricsCmd.java 를 참고하였습니다.
+       */
+      if (lyricsData.result.length > 7000) {
+        message.channel.send(lyricsData.url)
+        return true
+      } else if (lyricsData.result.length > 2000) {
+        let content = lyricsData.result
+        while (content.length > 2000) {
+          let index = content.lastIndexOf('\n\n', 2000)
+          if (index === -1) { index = content.lastIndexOf('\n', 2000) }
+          if (index === -1) { index = content.lastIndexOf(' ', 2000) }
+          if (index === -1) { index = 2000 }
+          embed.setDescription(content.substring(0, index))
+          delete embed.footer
+          message.channel.send(embed)
+          content = content.substring(index).trim()
+          delete embed.title
+        }
+        embed.setDescription(content)
+        embed.setFooter(lyricsData.artist)
+        message.channel.send(embed)
+        return true
+      } else {
+        embed.setDescription(lyricsData.result)
+        message.channel.send(embed)
+        return true
+      }
+    }
+  }
+}
+
+module.exports = Command
