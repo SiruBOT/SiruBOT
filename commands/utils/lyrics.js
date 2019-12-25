@@ -20,8 +20,8 @@ class Command {
      * @param {Object} compressed - Compressed Object (In CBOT)
      */
   async run (compressed) {
-    // const locale = compressed.GuildData.locale
-    // const picker = this.client.utils.localePicker
+    const locale = compressed.GuildData.locale
+    const picker = this.client.utils.localePicker
     const { message, args } = compressed
     const embed = new Discord.RichEmbed()
       .setColor(this.client.utils.findUtil.getColor(message.guild.me))
@@ -36,11 +36,12 @@ class Command {
       }
       if (index === providers.length) {
         message.channel.stopTyping(true)
-        message.channel.send('Lyrics not found')
+        message.channel.send(picker.get(locale, 'COMMANDS_UTILS_LYRICS_NOTFOUND'))
       }
     }
     async function get (provider, title) {
       const lyricsData = await lyrics.get(provider, title)
+      lyricsData.result = lyricsData.result === null ? null : lyricsData.result.replace(/\n\n\n/g, '\n\n')
       if (lyricsData.result === null) return false
       else {
         embed.setTitle(lyricsData.title)
@@ -50,8 +51,9 @@ class Command {
       /**
        * John Grosh (john.a.grosh@gmail.com) 의 https://github.com/jagrosh/MusicBot/blob/master/src/main/java/com/jagrosh/jmusicbot/commands/music/LyricsCmd.java 를 참고하였습니다.
        */
-      if (lyricsData.result.length > 7000) {
-        message.channel.send(lyricsData.url)
+      message.channel.send(picker.get(locale, 'COMMANDS_UTILS_LYRICS_NOTCORRECT'))
+      if (lyricsData.result.length > 10000) {
+        message.channel.send(`> **${lyricsData.title} - ${lyricsData.artist}**\n> ${lyricsData.url}`)
         return true
       } else if (lyricsData.result.length > 2000) {
         let content = lyricsData.result

@@ -17,7 +17,7 @@
     "COMMANDS_HELP_DESC_SCPLAY": "사운드클라우드에서 음악을 재생해요!",
     "COMMANDS_HELP_DESC_SKIP": "현재 재생 중인 음악을 건너뛰어요!",
     "COMMANDS_HELP_DESC_STOP": "현재 재생 중인 플레이어를 종료하고, 대기열을 초기화해요!",
-    "COMMANDS_HELP_DESC_VOLUME": "현재 재생 중인 노래의 볼륨을 조절해요!",
+    "COMMANDS_HELP_DESC_LYRICS": "가사를 검색해드려요!",
 
     "COMMANDS_HELP_DESC_COMPILE": "자바스크립트를 실행해요! (제작자 Only)",
     "COMMANDS_HELP_DESC_DEBUG": "null",
@@ -29,6 +29,7 @@
     "COMMANDS_HELP_DESC_DELIVERY": "국내에 한해서 택배를 조회할 수 있어요!",
     "COMMANDS_HELP_DESC_HELP": "명령어들에 대한 도움말을 보여드려요!",
     "COMMANDS_HELP_DESC_PING": "봇의 응답 속도를 보여드려요!",
+    "COMMANDS_HELP_DESC_GOOKBAP": "국밥을 계산해줘요!",
 
     "COMMANDS_HELP_DESC_ALLIN": "현재 잔고를 모두 사용해 1/2 의 확률로 전 재산을 잃거나, 2배가 되어요!",
     "COMMANDS_HELP_DESC_홀짝": "홀짝게임에 베팅하여 실패 시 베팅금을 잃고, 성공 시 베팅금액을 드려요!",
@@ -49,6 +50,9 @@
     "COMMANDS_PING_PONG": "%EMOJI_PINGPONG% 퐁!",
     "COMMANDS_PING_PINGING": "핑 측정 중..",
     "COMMANDS_PING_RESULT": "웹소켓 핑: %WEBSOCKET%\n메세지 반응 핑: %RESPONCE%",
+
+    "COMMANDS_UTILS_LYRICS_NOTFOUND": "%EMOJI_NO%  가사를 찾을수 없어요..",
+    "COMMANDS_UTILS_LYRICS_NOTCORRECT": "%EMOJI_BULB%  검색 결과는 정확하지 않을 수 있어요! 만약 검색 결과가 정확하지 않다면, 아티스트의 이름을 더해서 검색해보세요!",
 
     "COMMANDS_MONEY_BOT": "%EMOJI_MONEY%  이 유저는 봇인거 같아요!",
     "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY%  이 유저는 등록되지 않은 (%BOT_NAME_KR% 을 사용하지 않은) 유저에요!",

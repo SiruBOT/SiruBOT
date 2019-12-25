@@ -42,6 +42,8 @@ module.exports = {
     EMOJI_FAIL: '⚠',
     EMOJI_PINGPONG: '🏓',
     EMOJI_MONEY: '💸',
+    EMOJI_STAR: '⭐',
+    EMOJI_BULB: '💡',
 
     EMOJI_SPEAKER: '🔊',
     EMOJI_AUDIO_NOTHING: '⏹️',

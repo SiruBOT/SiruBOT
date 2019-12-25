@@ -12,7 +12,7 @@ class Command {
   }
 
   run (compressed) {
-    const { message } = compressed
+    // const { message } = compressed
   }
 }
 module.exports = Command
