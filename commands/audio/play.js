@@ -1,4 +1,5 @@
 // TODO: Attachments
+const Discord = require('discord.js')
 class Command {
   constructor (client) {
     this.client = client
@@ -54,7 +55,7 @@ class Command {
         const info = searchResult.tracks[0].info
         this.addQueue(message, searchResult.tracks[0], picker, locale)
         searchResult.tracks.shift()
-        if (guildData.nowplaying.track) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+        if (guildData.nowplaying.track) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
         if (searchResult.tracks.length === 0) return
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length })).then((m) => {
           const emojiList = ['📥', '🚫']
@@ -91,7 +92,7 @@ class Command {
       const guildData = await this.client.database.getGuildData(message.guild.id)
       const info = searchResult.tracks[0].info
       this.addQueue(message, searchResult.tracks[0], picker, locale)
-      if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+      if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
     }
   }
 

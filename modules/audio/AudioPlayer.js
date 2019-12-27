@@ -1,3 +1,4 @@
+const Discord = require('discord.js')
 class AudioPlayer {
   /**
    * @param {Object} options - Options For AudioPlayer
@@ -121,7 +122,7 @@ class AudioPlayer {
     const guildData = await this.client.database.getGuildData(this.guild)
     const chId = await this.getTextChannel()
     const localeMessage = item.request === this.client.user.id ? 'AUDIO_NOWPLAYING_RELATED' : 'AUDIO_NOWPLAYING'
-    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, localeMessage, { TRACK: item.info.title, DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000, item.info.isStream) }))
+    this.message = await this.client.channels.get(chId).send(picker.get(guildData.locale, localeMessage, { TRACK: Discord.Util.escapeMarkdown(item.info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(item.info.length / 1000, item.info.isStream) }))
     await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: item } })
     await this.player.play(item.track)
     await this.player.volume(guildData.volume)
@@ -206,8 +207,12 @@ class AudioPlayer {
       if ((this.playedSongs.includes(vId) && item.identifier === vId) || this.playedSongs.includes(item.identifier)) {
         number += 1
       }
+      if (number === result.items.length && this.playedSongs.includes(item.identifier)) {
+        number = 0
+        this.playedSongs = []
+        continue
+      }
     }
-    if (this.playedSongs.length > 100) this.playedSongs = [] // Decreses track duplication
     const track = await this.AudioManager.getSongs(`https://youtu.be/${result.items[number].identifier}`)
     this.client.logger.debug(`${this.loggerPrefix} Playing related video ${track.tracks[0].info.title} (${track.tracks[0].info.identifier})`)
     this.addQueue(track.tracks[0], this.message)

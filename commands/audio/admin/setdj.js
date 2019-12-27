@@ -7,7 +7,7 @@ class Command {
       category: 'MUSIC_DJ',
       require_voice: false,
       hide: false,
-      permissions: ['Administrator', 'DJ']
+      permissions: ['Administrator']
     }
   }
 
@@ -15,7 +15,31 @@ class Command {
    * @param {Object} compressed - Compressed Object (In CBOT)
    */
   async run (compressed) {
+    const picker = this.client.utils.localePicker
+    const locale = compressed.GuildData.locale
+    const { message, args } = compressed
+    if (!args[0]) return message.channel.send('No')
+    if (['none', '없음', 'null', 'remove', '지우기'].includes(args[0].toLowerCase())) {
+      message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_NONE'))
+      this.client.database.updateGuildData(message.guild.id, { $set: { dj_role: '0' } })
+    } else {
+      const formatter = (role, number) => { return `[${number}] ${role.name} [${role.id}]` }
+      const filter = (role) => { return role.name.toLowerCase() === args[0].toLowerCase() || role.id === args[0] || role.name.replace('@everyone', 'everyone') === args[0].toLowerCase().replace('@', '') || role.id === (message.mentions.roles.array()[0] === undefined ? false : message.mentions.roles.array()[0].id) }
+      const options = {
+        title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
+        formatter: formatter,
+        collection: message.guild.roles,
+        filter: filter,
+        message: message,
+        locale: locale,
+        picker: picker
+      }
+      this.client.utils.findUtil.findElement(options).then(async (res) => {
+        if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
+        message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_SET', { DJNAME: res.name }))
+        this.client.database.updateGuildData(message.guild.id, { $set: { dj_role: res.id } })
+      })
+    }
   }
 }
-
 module.exports = Command

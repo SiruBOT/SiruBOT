@@ -89,7 +89,7 @@ class AudioManager {
       const title = $(item).children('.content-wrapper').children('a').attr('title')
       if (url) relatedSongs.push({ uri: `https://youtube.com${url}`, identifier: this.getvIdfromUrl(url), title: title })
     })
-    return { items: relatedSongs.splice(0, relatedSongs.length - (relatedSongs.length - 15)) }
+    return { items: relatedSongs.splice(0, relatedSongs.length - (relatedSongs.length - 5)) }
   }
 
   /**
@@ -105,7 +105,7 @@ class AudioManager {
     const request = this.client.users.get(guildData.nowplaying.request)
     return new Discord.RichEmbed()
       .setAuthor(request.tag, request.displayAvatarURL)
-      .setTitle(guildData.nowplaying.info.title)
+      .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
       .setURL(guildData.nowplaying.info.uri)
       .setDescription(this.getNowplayingText(guild, guildData))
       .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))

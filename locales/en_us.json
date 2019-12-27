@@ -117,6 +117,12 @@
     
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  Successfully joined **<#%VOICECHANNEL%>**!",
     "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  Failed to join **<#%VOICECHANNEL%>**...",
+    "COMMANDS_AUDIO_SETDJ_SET": "> %EMOJI_MUSIC%  I set up a role as a DJ ``%DJNAME%``",
+    "COMMANDS_AUDIO_SETDJ_NONE": "> %EMOJI_MUSIC%  I set up a role as a DJ **NONE**",
+    "COMMANDS_AUDIO_SETTC_SET": "> %EMOJI_MUSIC%  I set up a command channel %CHANNEL%!",
+    "COMMANDS_AUDIO_SETTC_NONE": "> %EMOJI_MUSIC%  I set up a command channel **NONE**!",
+    "COMMANDS_AUDIO_SETVC_SET": "> %EMOJI_MUSIC%  I set up a voice channel %CHANNEL%!",
+    "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  I set up a voice channel **NONE**!",
 
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  Added **%TRACK% [%DURATION%]** to the queue at position **%POSITION%**",

@@ -31,7 +31,7 @@ class Command {
       })
       const descriptionArray = []
       for (const position in guildData.queue) {
-        descriptionArray.push(`\`\`${parseInt(position) + 1}.\`\` \`\`[${client.utils.timeUtil.toHHMMSS(guildData.queue[position].info.length / 1000, guildData.queue[position].info.isStream)}]\`\` **${guildData.queue[position].info.title}** - <@${guildData.queue[position].request}>`)
+        descriptionArray.push(`\`\`${parseInt(position) + 1}.\`\` \`\`[${client.utils.timeUtil.toHHMMSS(guildData.queue[position].info.length / 1000, guildData.queue[position].info.isStream)}]\`\` **${Discord.Util.escapeMarkdown(guildData.queue[position].info.title)}** - <@${guildData.queue[position].request}>`)
       }
       const chunkedDescriptionArray = client.utils.arrayUtil.chunkArray(descriptionArray, 10)
       const nowplayingObject = client.audio.getNowplayingObject(message.guild.id, guildData)
