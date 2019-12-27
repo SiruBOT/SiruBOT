@@ -16,7 +16,11 @@ module.exports = {
     shards: 1
   },
   logger: {
-    level: 'debug'
+    level: 'debug',
+    bootWebhook: {
+      id: 'WebhookID',
+      token: 'WebhookToken'
+    }
   },
   db: {
     mongo: {
