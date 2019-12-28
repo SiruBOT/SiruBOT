@@ -68,20 +68,25 @@ class AudioPlayer {
    * @param {Boolean} stopStatus - [Song End]
    * @param {Boolean} leave - if songs end, leaves voice channel? (Default false)
    */
-  async playNext (stopStatus, leave = false) {
+  async playNext (stopStatus, leave = false, skip = false) {
     this.AudioManager.updateNpMessage(this.guild)
     const picker = this.client.utils.localePicker
-    const first = await this.client.database.getGuildData(this.guild)
-    const result = await this.client.database.updateGuildData(this.guild, { $pop: { queue: -1 } })
+    const guildData = await this.client.database.getGuildData(this.guild)
     const chId = await this.getTextChannel()
     this.deleteMessage()
-    if (result.result.nModified !== 0) {
-      this.client.logger.debug(`${this.loggerPrefix} Play Next Song.... (Song: ${first.queue[0].track})`)
-      await this.play(first.queue[0])
+    if (guildData.queue.length !== 0 || guildData.repeat === 2) {
+      if (guildData.nowplaying.track !== null && skip === false && guildData.repeat === 2) {
+        await this.play(guildData.nowplaying)
+        this.client.logger.debug(`${this.loggerPrefix} Play Next Song... (Song: ${guildData.nowplaying.track}) (Single Repeat)`)
+      } else if (guildData.queue.length !== 0) {
+        await this.client.database.updateGuildData(this.guild, { $pop: { queue: -1 } })
+        this.client.logger.debug(`${this.loggerPrefix} Play Next Song... (Song: ${guildData.queue[0].track})`)
+        await this.play(guildData.queue[0])
+      }
     } else {
       this.client.logger.debug(`${this.loggerPrefix} Empty Queue!...`)
       if (stopStatus) {
-        return this.client.channels.get(chId).send(picker.get(first.locale, 'AUDIO_ALL_SONGS_FINISHED'))
+        return this.client.channels.get(chId).send(picker.get(guildData.locale, 'AUDIO_ALL_SONGS_FINISHED'))
       }
       if (leave) {
         return this.stop()
@@ -127,16 +132,18 @@ class AudioPlayer {
     await this.player.play(item.track)
     await this.player.volume(guildData.volume)
     const endHandler = async (data) => {
-      await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
+      const guildData = await this.client.database.getGuildData(this.guild)
+      if (guildData.repeat !== 2) {
+        await this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
+      }
       if (data === 'error') {
         await this.playNext(true, false)
         this.deleteMessage()
         this.client.logger.error(`${this.loggerPrefix} Error on play track: ${item.info.identifier}`)
       } else {
-        if (this.player) { this.player.emit('error', 'remove') }
+        this.player.removeListener('error', errorHandler)
       }
       if (data.reason === 'REPLACED') return this.client.logger.debug(`${this.loggerPrefix}  Replaced Track!`)
-      const guildData = await this.client.database.getGuildData(this.guild)
       switch (guildData.repeat) {
         case 0:
           this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (No_Repeat: 0)`)
@@ -158,19 +165,15 @@ class AudioPlayer {
         case 2:
           this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (Single: 2)`)
           if (this.skip) {
-            this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Enabled but, skipped (ignore unshift)`)
-          } else {
-            await this.client.database.updateGuildData(this.guild, { $push: { queue: { $each: [item], $position: 0 } } })
+            this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Enabled but, skipped (ignore)`)
           }
-          await this.playNext(true, false)
+          await this.playNext(true, false, this.skip)
           break
       }
       this.skip = false
     }
     const errorHandler = (data) => {
-      if (data !== 'remove') {
-        this.player.removeListener('error', errorHandler)
-      } else {
+      if (data === 'remove') {
         this.player.emit('end', 'error')
       }
     }
@@ -206,6 +209,7 @@ class AudioPlayer {
     for (const item of result.items) {
       if ((this.playedSongs.includes(vId) && item.identifier === vId) || this.playedSongs.includes(item.identifier)) {
         number += 1
+        continue
       }
       if (number === result.items.length && this.playedSongs.includes(item.identifier)) {
         number = 0
@@ -213,6 +217,7 @@ class AudioPlayer {
         continue
       }
     }
+    if (number > 5) this.playedSongs = []
     const track = await this.AudioManager.getSongs(`https://youtu.be/${result.items[number].identifier}`)
     this.client.logger.debug(`${this.loggerPrefix} Playing related video ${track.tracks[0].info.title} (${track.tracks[0].info.identifier})`)
     this.addQueue(track.tracks[0], this.message)

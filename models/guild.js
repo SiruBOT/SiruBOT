@@ -10,6 +10,7 @@ const Schema = new mongo.Schema({
   filter: { type: Boolean, default: false },
   customFilter: { type: Array, default: [] },
   warningMax: { type: Number, default: 10 },
+  announceChannel: { type: String, default: '0' },
 
   // Audio
   audioMessage: { type: Boolean, default: true },

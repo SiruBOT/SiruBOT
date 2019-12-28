@@ -25,7 +25,7 @@ class Command {
 
     // If Conditions True
     const Audio = this.client.audio
-    let searchStr = args.join(' ')
+    let searchStr = message.attachments.map(el => el.url)[0] ? message.attachments.map(el => el.url)[0] : args.join(' ')
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
 
     if (!Audio.players.get(message.guild.id) || (Audio.players.get(message.guild.id) && !message.guild.me.voiceChannel)) {
@@ -33,7 +33,7 @@ class Command {
       if (joinresult === false) return
     }
 
-    if (args.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
+    if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
     const searchResult = await Audio.getSongs(searchStr)
@@ -91,7 +91,9 @@ class Command {
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
       const guildData = await this.client.database.getGuildData(message.guild.id)
       const info = searchResult.tracks[0].info
-      this.addQueue(message, searchResult.tracks[0], picker, locale)
+      const track = searchResult.tracks[0]
+      if (info.title.length === 0) track.info.title = searchStr.split('/').slice(-1)[0]
+      this.addQueue(message, track, picker, locale)
       if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
     }
   }

@@ -109,7 +109,12 @@
     "AUDIO_SAME_VOICE": "> %EMOJI_NO%  This command able only voicechannel **<#%VOICECHANNEL%>**",
     "AUDIO_LISTEN_PLEASE": "> %EMOJI_NO%  Please turn on your listening status!",
     "AUDIO_ALL_SONGS_FINISHED": "> %EMOJI_MUSIC%  Finished playback.",
-    "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  Playing Now... **%TRACK% [%DURATION%]**",
+    "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  Playing now... **%TRACK% [%DURATION%]**",
+    "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_MUSIC%  Playing related video now... **%TRACK% [%DURATION%]**",
+
+    "ALL": "전체",
+    "REPEAT_SINGLE": "한곡",
+    "NONE": "없음",
 
     "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | %NUM% Items | ``[%TOTALTIME%]``",
 
@@ -118,11 +123,11 @@
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  Successfully joined **<#%VOICECHANNEL%>**!",
     "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  Failed to join **<#%VOICECHANNEL%>**...",
     "COMMANDS_AUDIO_SETDJ_SET": "> %EMOJI_MUSIC%  I set up a role as a DJ ``%DJNAME%``",
-    "COMMANDS_AUDIO_SETDJ_NONE": "> %EMOJI_MUSIC%  I set up a role as a DJ **NONE**",
+    "COMMANDS_AUDIO_SETDJ_NONE": "> %EMOJI_MUSIC%  I set up a role as a DJ **%NONE%**",
     "COMMANDS_AUDIO_SETTC_SET": "> %EMOJI_MUSIC%  I set up a command channel %CHANNEL%!",
-    "COMMANDS_AUDIO_SETTC_NONE": "> %EMOJI_MUSIC%  I set up a command channel **NONE**!",
+    "COMMANDS_AUDIO_SETTC_NONE": "> %EMOJI_MUSIC%  I set up a command channel **%NONE%**!",
     "COMMANDS_AUDIO_SETVC_SET": "> %EMOJI_MUSIC%  I set up a voice channel %CHANNEL%!",
-    "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  I set up a voice channel **NONE**!",
+    "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  I set up a voice channel **%NONE%**!",
 
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  Added **%TRACK% [%DURATION%]** to the queue at position **%POSITION%**",
@@ -133,13 +138,20 @@
     "COMMANDS_AUDIO_RELATED_ON": "> %EMOJI_STAR%  Related videos future turned **on** %EMOJI_SWITCH_ON%",
     "COMMANDS_AUDIO_RELATED_OFF": "> %EMOJI_STAR%  Related videos future turned **off** %EMOJI_SWITCH_OFF%",
 
-    "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NOTHING%  Repeat mode changed to **NONE**",
-    "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **All**",
-    "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  Repeat mode chaged to **Single**",
+    "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NONE%  Repeat mode changed to **NONE**",
+    "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **%ALL%**",
+    "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  Repeat mode chaged to **%REPEAT_SINGLE%**",
 
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  Developers have changed the log do not exist to commit! **(%COMMITSHA%)**",
 
     "COMMANDS_HELP_TITLE": "> All Commands of me!",
     "COMMANDS_HELP_FOOTER": "%PREFIX%help [Command] | Bugs, Error - Contact Sangoon_Is_Noob#1683",
-    "COMMANDS_HELP_INFO": "> Command information - %COMMAND%"
+    "COMMANDS_HELP_INFO": "> Command information - %COMMAND%",
+
+    "COMMANDS_MODSETTINGS_DESC": "%EMOJI_LOCALES%  Language: **%LOCALE%**\n%EMOJI_BIN%  Swear Filter: **%FILTER%**\n%EMOJI_WARN%  Max warning count: **%WARNMAX%**\n%EMOJI_MUSIC%  Audio Playing Notification: **%AUDIOPLAY%**\n%EMOJI_STAR%  Playing Related Videos: **%RELATED%**",
+    "COMMANDS_MODSETTINGS_EMBED_TITLE": "🔧  Settings of **%SERVER%**",
+    "ENABLE": "Enable",
+    "DISABLE": "Disable",
+    "YES": "Yes",
+    "NO": "No"
 }

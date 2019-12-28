@@ -65,6 +65,7 @@ class AudioManager {
    * @param {String} url - youtube url
    */
   getvIdfromUrl (url) {
+    if (!url) return undefined
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
     const match = url.match(regExp)
     return (match && match[7].length === 11) ? match[7] : undefined
@@ -89,7 +90,7 @@ class AudioManager {
       const title = $(item).children('.content-wrapper').children('a').attr('title')
       if (url) relatedSongs.push({ uri: `https://youtube.com${url}`, identifier: this.getvIdfromUrl(url), title: title })
     })
-    return { items: relatedSongs.splice(0, relatedSongs.length - (relatedSongs.length - 5)) }
+    return { items: relatedSongs }
   }
 
   /**
@@ -174,22 +175,22 @@ class AudioManager {
 
   /**
    * @param {String} - Guild Id to get playing state (pause,playing,no)
-   * @returns {String} - 'pause', 'playing', 'nothing'
+   * @returns {String} - 'pause', 'playing', 'none'
    */
   getPlayingState (guild) {
-    if (!this.client.audio.players.get(guild)) return 'nothing'
+    if (!this.client.audio.players.get(guild)) return 'none'
     if (this.client.audio.players.get(guild).player.paused) return 'paused'
     if (this.client.audio.players.get(guild).player.paused === false) return 'playing'
   }
 
   /**
    * @param {Number} number - 0, 1, 2 (Repeat Stats)
-   * @returns {String} - 'repeat_nothing', 'repeat_all', 'repeat_single'
+   * @returns {String} - 'repeat_none', 'repeat_all', 'repeat_single'
    */
   getRepeatState (number) {
     switch (number) {
       case 0:
-        return 'repeat_nothing'
+        return 'repeat_none'
       case 1:
         return 'repeat_all'
       case 2:

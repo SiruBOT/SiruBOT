@@ -32,9 +32,14 @@ class LanguagePicker {
         }
       }
     }
+    if (!language) {
+      this.client.logger.error(`[LanguagePicker] [Error] Language key is not exists! ${lang}.${name}`)
+      return `${lang}.${name}`
+    }
     const settings = { before: '%', after: '%' }
     const userPlaceholder = template(language, placeholder, settings)
-    const result = template(userPlaceholder, this.client._options.constructors, settings)
+    const constructors = template(userPlaceholder, this.client._options.constructors, settings)
+    const result = template(constructors, this.locales.get(lang), settings)
     this.client.logger.debug(`[LanguagePicker] [Get] Result: ${result}`)
 
     return result

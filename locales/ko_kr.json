@@ -13,7 +13,7 @@
     "COMMANDS_HELP_DESC_PLAY": "음악을 재생해요!",
     "COMMANDS_HELP_DESC_QUEUE": "음악 대기열을 보여드려요!",
     "COMMANDS_HELP_DESC_RELATED": "만약 다음 노래가 없으면 자동으로 추천 영상을 재생할지에 대한 설정을 하실 수 있어요!",
-    "COMMANDS_HELP_DESC_REPEAT": "전채 반복, 한곡 반복 등을 설정하실수 있어요!",
+    "COMMANDS_HELP_DESC_REPEAT": "%ALL% 반복, %REPEAT_SINGLE% 반복 등을 설정하실수 있어요!",
     "COMMANDS_HELP_DESC_SCPLAY": "사운드클라우드에서 음악을 재생해요!",
     "COMMANDS_HELP_DESC_SKIP": "현재 재생 중인 음악을 건너뛰어요!",
     "COMMANDS_HELP_DESC_STOP": "현재 재생 중인 플레이어를 종료하고, 대기열을 초기화해요!",
@@ -43,6 +43,7 @@
     "CATEGORY_COMMANDS_MONEY_CASINO": "도박 명령어들",
     "CATEGORY_COMMANDS_MONEY_GENERAL": "돈 명령어들",
     "CATEGORY_COMMANDS_GENERAL_UTILS": "도구들",
+    "CATEGORY_COMMANDS_MODERATION": "관리 명령어들",
 
     "REMARK_2": "(주석) 커맨드에 사용되는 멘트들",
 
@@ -106,6 +107,12 @@
     "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  현재 재생 중: **%TRACK% [%DURATION%]**",
     "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_MUSIC%  추천 영상 재생 중: **%TRACK% [%DURATION%]**",
 
+    "ALL": "전체",
+    "REPEAT_ALL": "%ALL%",
+    "REPEAT_SINGLE": "한곡",
+    "NONE": "없음",
+    "REPEAT_NONE": "%NONE%",
+
     "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | 재생 목록: %NUM% 개 | ``[%TOTALTIME%]``",
 
     "COMMANDS_AUDIO_VOLUME_CHANGED": "> %EMOJI_SPEAKER%  볼륨이 **%VOLUME%%** 로 변경되었어요!",
@@ -119,11 +126,11 @@
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  성공적으로 음성 채널 **<#%VOICECHANNEL%>** 에 접속했어요!",
     "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  음성 채널 **<#%VOICECHANNEL%>** 에 접속을 실패했어요.. 채널의 권한을 확인해주세요!",
     "COMMANDS_AUDIO_SETDJ_SET": "> %EMOJI_MUSIC%  DJ 역할을 ``%DJNAME%`` 로 설정했어요!\n> %EMOJI_MUSIC%  DJ 명령어는 이 역할을 가지고 있거나, 관리자만 사용 가능해요!",
-    "COMMANDS_AUDIO_SETDJ_NONE": "> %EMOJI_MUSIC%  DJ 역할을 **없음** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 DJ 명령어는 관리자만 사용 가능해요!",
+    "COMMANDS_AUDIO_SETDJ_NONE": "> %EMOJI_MUSIC%  DJ 역할을 **%NONE%** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 DJ 명령어는 관리자만 사용 가능해요!",
     "COMMANDS_AUDIO_SETTC_SET": "> %EMOJI_MUSIC%  명령어 채널을 %CHANNEL% 로 설정했어요!\n> %EMOJI_MUSIC%  앞으로 이 채널에서만 명령어를 사용하실 수 있어요!",
-    "COMMANDS_AUDIO_SETTC_NONE": "> %EMOJI_MUSIC%  명령어 채널을 **없음** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 모든 텍스트 채널에서 명령어를 사용하실 수 있어요!",
+    "COMMANDS_AUDIO_SETTC_NONE": "> %EMOJI_MUSIC%  명령어 채널을 **%NONE%** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 모든 텍스트 채널에서 명령어를 사용하실 수 있어요!",
     "COMMANDS_AUDIO_SETVC_SET": "> %EMOJI_MUSIC%  음성 채널을 %CHANNEL% 로 설정했어요!\n> %EMOJI_MUSIC%  앞으로 이 음성 채널에서만 음성 기능을 사용하실수 있어요!",
-    "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  음성 채널을 **없음** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 모든 음성 채널에서 음성 기능을 사용하실수 있어요!",
+    "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  음성 채널을 **%NONE%** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 모든 음성 채널에서 음성 기능을 사용하실수 있어요!",
 
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  노래 로드를 실패했어요.. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 이 재생 목록 **%POSITION%**번에 추가되었어요!",
@@ -134,13 +141,20 @@
     "COMMANDS_AUDIO_RELATED_ON": "> %EMOJI_STAR%  추천곡 기능이 **켜짐** %EMOJI_SWITCH_ON% 으로 설정되었어요!",
     "COMMANDS_AUDIO_RELATED_OFF": "> %EMOJI_STAR%  추천곡 기능이 **꺼짐** %EMOJI_SWITCH_OFF% 으로 설정되었어요!",
 
-    "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NOTHING%  반복 모드가 **없음** 으로 변경되었어요!",
-    "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  반복 모드가 **전체** 로 변경되었어요!",
-    "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  반복 모드가 **한곡** 으로 변경되었어요!",
+    "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NONE%  반복 모드가 **%NONE%** 으로 변경되었어요!",
+    "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  반복 모드가 **%ALL%** 반복으로 변경되었어요!",
+    "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  반복 모드가 **%REPEAT_SINGLE%** 반복으로 변경되었어요!",
 
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  개발자가 커밋한 변경 로그가 존재하지 않아요! **(%COMMITSHA%)**",
 
     "COMMANDS_HELP_TITLE": "> 모든 명령어들",
     "COMMANDS_HELP_FOOTER": "%PREFIX%도움 [명령어] | 버그, 에러 - Sangoon_Is_Noob#1683",
-    "COMMANDS_HELP_INFO": "> 명령어 정보 - %COMMAND%"
+    "COMMANDS_HELP_INFO": "> 명령어 정보 - %COMMAND%",
+
+    "COMMANDS_MODSETTINGS_DESC": "%EMOJI_LOCALES%  언어: **%LOCALE%**\n%EMOJI_BIN%  욕설 필터링: **%FILTER%**\n%EMOJI_WARN%  최대 경고 수: **%WARNMAX%** 개\n%EMOJI_MUSIC%  음악 재생 메세지: **%AUDIOPLAY%**\n%EMOJI_STAR%  관련 영상 재생: **%RELATED%**\n%REPEAT_EMOJI%  반복 모드: **%REPEAT%**\n%SHUFFLE_EMOJI%  셔플 모드: **%SHUFFLE%**\n%EMOJI_HEADPHONES%  DJ 역할: **%DJROLE%**",
+    "COMMANDS_MODSETTINGS_EMBED_TITLE": "🔧  **%SERVER%** 의 설정들",
+    "ENABLE": "활성화",
+    "DISABLE": "비활성화",
+    "YES": "네",
+    "NO": "아니요"
 }
