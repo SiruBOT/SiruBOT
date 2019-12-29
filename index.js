@@ -3,6 +3,16 @@ const LocalePicker = require('./locales/localePicker')
 const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
 const settings = require('./modules/checker/getSettings')()
 const isTesting = require('./modules/checker/isTesting')()
+const glob = require('glob')
+
+const globAsync = (path) => {
+  return new Promise((resolve, reject) => {
+    glob(path, (err, res) => {
+      if (err) return reject(err)
+      resolve(res)
+    })
+  })
+}
 
 class Client extends Discord.Client {
   constructor (options) {
