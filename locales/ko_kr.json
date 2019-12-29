@@ -151,7 +151,15 @@
     "COMMANDS_HELP_FOOTER": "%PREFIX%도움 [명령어] | 버그, 에러 - Sangoon_Is_Noob#1683",
     "COMMANDS_HELP_INFO": "> 명령어 정보 - %COMMAND%",
 
-    "COMMANDS_MODSETTINGS_DESC": "%EMOJI_LOCALES%  언어: **%LOCALE%**\n%EMOJI_BIN%  욕설 필터링: **%FILTER%**\n%EMOJI_WARN%  최대 경고 수: **%WARNMAX%** 개\n%EMOJI_MUSIC%  음악 재생 메세지: **%AUDIOPLAY%**\n%EMOJI_STAR%  관련 영상 재생: **%RELATED%**\n%REPEAT_EMOJI%  반복 모드: **%REPEAT%**\n%SHUFFLE_EMOJI%  셔플 모드: **%SHUFFLE%**\n%EMOJI_HEADPHONES%  DJ 역할: **%DJROLE%**",
+    "COMMANDS_MODSETTINGS_DESC": "%EMOJI_LOCALES%  언어: **%LOCALE%**\n%EMOJI_BIN%  욕설 필터링: **%FILTER%**\n%EMOJI_WARN%  최대 경고 수: **%WARNMAX%** 개\n\n%EMOJI_MUSIC%  음악 재생 메세지: **%AUDIOPLAY%**\n%EMOJI_STAR%  관련 영상 재생: **%RELATED%**\n%REPEAT_EMOJI%  반복 모드: **%REPEAT%**\n%SHUFFLE_EMOJI%  셔플 모드: **%SHUFFLE%**\n\n%EMOJI_HEADPHONES%  DJ 역할: **%DJROLE%**\n%EMOJI_SPEAKER%  기본 음성 채널: **%VCH%**\n%EMOJI_HASH%  기본 텍스트 채널: **%TCH%**",
+
+    "COMMANDS_MODSETTINGS_FIELD_MOD": "관리 설정들",
+    "COMMANDS_MODSETTINGS_FIELD_AUDIO": "음악 설정들",
+    "COMMANDS_MODSETTINGS_FIELD_DEFAULT": "기본 설정값들",
+    
+    "COMMANDS_MODSETTINGS_DESC_TEST_MOD": "%EMOJI_LOCALES%  언어: **%LOCALE%**\n%EMOJI_BIN%  욕설 필터링: **%FILTER%**\n%EMOJI_WARN%  최대 경고 수: **%WARNMAX%** 개",
+    "COMMANDS_MODSETTINGS_DESC_TEST_AUDIO": "%EMOJI_MUSIC%  음악 재생 메세지: **%AUDIOPLAY%**\n%EMOJI_STAR%  관련 영상 재생: **%RELATED%**\n%REPEAT_EMOJI%  반복 모드: **%REPEAT%**\n%SHUFFLE_EMOJI%  셔플 모드: **%SHUFFLE%**",
+    "COMMANDS_MODSETTINGS_DESC_TEST_DEFAULT": "%EMOJI_HEADPHONES%  DJ 역할: **%DJROLE%**\n%EMOJI_SPEAKER%  기본 음성 채널: **%VCH%**\n%EMOJI_HASH%  기본 텍스트 채널: **%TCH%**",
     "COMMANDS_MODSETTINGS_EMBED_TITLE": "🔧  **%SERVER%** 의 설정들",
     "ENABLE": "활성화",
     "DISABLE": "비활성화",

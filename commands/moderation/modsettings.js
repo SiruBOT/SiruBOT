@@ -21,25 +21,53 @@ class Command {
     const { locale, filter, warningMax, audioMessage, audioPlayrelated, repeat, shuffle, tch, vch } = GuildData
     const djRole = GuildData.dj_role
     const embed = new Discord.RichEmbed()
-    embed.setDescription(picker.get(locale, 'COMMANDS_MODSETTINGS_DESC',
-      {
+    const obj = {
+      MOD: {
         LOCALE: picker.get(locale, 'NAME'),
         FILTER: filter === true ? picker.get(locale, 'ENABLE') : picker.get(locale, 'DISABLE'),
-        WARNMAX: warningMax,
+        WARNMAX: warningMax
+      },
+      AUDIO: {
         AUDIOPLAY: audioMessage === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         RELATED: audioPlayrelated === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         REPEAT_EMOJI: this.client._options.constructors['EMOJI_' + this.client.audio.getRepeatState(repeat).toUpperCase()],
         REPEAT: picker.get(locale, this.client.audio.getRepeatState(GuildData.repeat).toUpperCase()),
         SHUFFLE: shuffle === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         SHUFFLE_EMOJI: shuffle === true ? this.client._options.constructors.EMOJI_SHUFFLE : this.client._options.constructors.EMOJI_REPEAT_NONE
-      }))
+      },
+      DEFAULT: {
+        DJROLE: this.getName(djRole, message.guild.roles, locale, picker),
+        TCH: this.getName(tch, message.guild.channels, locale, picker),
+        VCH: this.getName(vch, message.guild.channels, locale, picker)
+      }
+    }
+    for (const item of ['MOD', 'AUDIO', 'DEFAULT']) {
+      embed.addField(picker.get(locale, 'COMMANDS_MODSETTINGS_FIELD_' + item), picker.get(locale, 'COMMANDS_MODSETTINGS_DESC_TEST_' + item, obj[item]), true)
+    }
+    // embed.setDescription(picker.get(locale, 'COMMANDS_MODSETTINGS_DESC',
+    //   {
+    //     LOCALE: picker.get(locale, 'NAME'),
+    //     FILTER: filter === true ? picker.get(locale, 'ENABLE') : picker.get(locale, 'DISABLE'),
+    //     WARNMAX: warningMax,
+    //     AUDIOPLAY: audioMessage === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
+    //     RELATED: audioPlayrelated === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
+    //     REPEAT_EMOJI: this.client._options.constructors['EMOJI_' + this.client.audio.getRepeatState(repeat).toUpperCase()],
+    //     REPEAT: picker.get(locale, this.client.audio.getRepeatState(GuildData.repeat).toUpperCase()),
+    //     SHUFFLE: shuffle === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
+    //     SHUFFLE_EMOJI: shuffle === true ? this.client._options.constructors.EMOJI_SHUFFLE : this.client._options.constructors.EMOJI_REPEAT_NONE,
+    //     DJROLE: this.getName(djRole, message.guild.roles, locale, picker),
+    //     TCH: this.getName(tch, message.guild.channels, locale, picker),
+    //     VCH: this.getName(vch, message.guild.channels, locale, picker)
+    //   }))
     embed.setTimestamp(new Date())
     embed.setColor(this.client.utils.findUtil.getColor(message.guild.me))
     message.channel.send(picker.get(locale, 'COMMANDS_MODSETTINGS_EMBED_TITLE', { SERVER: message.guild.name }), embed)
   }
 
-  getName () {
-
+  getName (id, items, locale, picker) {
+    if (items.get(id)) return items.get(id).name
+    if (!items.get(id)) return picker.get(locale, 'NONE')
+    if (id === '0') return picker.get(locale, 'NONE')
   }
 }
 

@@ -51,6 +51,7 @@ module.exports = {
     EMOJI_LOCALES: '🌏',
     EMOJI_WARN: '⚠️',
     EMOJI_BIN: '🗑️',
+    EMOJI_HASH: '#️⃣',
 
     EMOJI_SPEAKER: '🔊',
     EMOJI_AUDIO_NONE: '⏹️',

@@ -18,7 +18,7 @@ class LanguagePicker {
       }
       return this.locales
     } catch (e) {
-      this.client.logger.error(this.client.utils.getStackTraceMessage(e))
+      this.client.logger.error(e.stack)
     }
   }
 

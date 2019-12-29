@@ -1,7 +1,6 @@
 const Discord = require('discord.js')
 const LocalePicker = require('./locales/localePicker')
 const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
-
 const settings = require('./modules/checker/getSettings')()
 const isTesting = require('./modules/checker/isTesting')()
 
@@ -148,15 +147,6 @@ class Client extends Discord.Client {
         return value
     }
   }
-}
-
-function globAsync (path) {
-  return new Promise((resolve, reject) => {
-    require('glob')(path, (er, res) => {
-      if (er) reject(er)
-      else resolve(res)
-    })
-  })
 }
 
 const client = new Client(settings)

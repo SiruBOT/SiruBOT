@@ -24,7 +24,7 @@ class Command {
       this.client.database.updateGuildData(message.guild.id, { $set: { dj_role: '0' } })
     } else {
       const formatter = (role, number) => { return `[${number}] ${role.name} [${role.id}]` }
-      const filter = (role) => { return role.name.toLowerCase() === args[0].toLowerCase() || role.id === args[0] || role.name.replace('@everyone', 'everyone') === args[0].toLowerCase().replace('@', '') || role.id === (message.mentions.roles.array()[0] === undefined ? false : message.mentions.roles.array()[0].id) }
+      const filter = (role) => { return role.name.toLowerCase() === args.join(' ').toLowerCase() || role.id === args.join(' ') || role.name.replace('@everyone', 'everyone') === args.join(' ').toLowerCase().replace('@', '') || role.id === (message.mentions.roles.array()[0] === undefined ? false : message.mentions.roles.array()[0].id) }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
         formatter: formatter,
