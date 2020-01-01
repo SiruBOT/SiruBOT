@@ -19,7 +19,7 @@ class ServerLogger {
   }
 
   LoadEvents () {
-    
+
   }
 }
 

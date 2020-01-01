@@ -4,7 +4,7 @@ class Command {
     this.command = {
       name: 'setvc',
       aliases: ['ㄴㄷㅅㅍㅊ'],
-      category: 'MUSIC_DJ',
+      category: 'COMMANDS_MODERATION',
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

@@ -39,7 +39,8 @@ class Command {
             const randSuccessMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_SUCCESS').split('|'), [60, 25, 14, 1])
             const data = await this.client.database.getGlobalUserData(message.member)
             this.client.database.updateGlobalUserData(message.member, { $set: { money: data.money * 2 } })
-            safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_SUCCESS_EDIT', { RANDMESSAGE: randSuccessMessage, MEMBER: message.member }))
+            const dataThenEdited = await this.client.database.getGlobalUserData(message.member)
+            safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_SUCCESS_EDIT', { RANDMESSAGE: randSuccessMessage, MEMBER: message.member, LAST: Number(dataThenEdited.money).toLocaleString('fullwide') }))
           } else {
             const randFailMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_FAIL').split('|'), [60, 15, 10, 14, 1])
             safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_FAIL_EDIT', { RANDMESSAGE: randFailMessage, MEMBER: message.member }))

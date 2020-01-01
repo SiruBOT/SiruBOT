@@ -4,7 +4,7 @@ class Command {
     this.command = {
       name: 'setdj',
       aliases: ['ㄴㄷㅅ어'],
-      category: 'MUSIC_DJ',
+      category: 'COMMANDS_MODERATION',
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

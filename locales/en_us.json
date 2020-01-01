@@ -75,6 +75,7 @@
 
     "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY% Please finish using other gambling commands!",
     "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  You can't bet less ``10000`` %MONEY_NAME_EN%, please type ``%PREFIX%payday`` command to get %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_BET_HIGH_BALANCE": "%EMOJI_MONEY% You cannot bet more than your balance!",
 
     "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX%money`` command to get %MONEY_NAME_EN%!",
     "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%payday`` command to receive %MONEY_NAME_EN%!",
@@ -82,7 +83,7 @@
     "COMMANDS_CASINO_ALLIN_RAND_LOAD": "Playing slots...|Playing card games..|Checking balance..|Cheating..",
     "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "Congratulations! :tada:|Congratulations!|:tada:|:smile:",
-    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%\n%EMOJI_MONEY%  Your balance: ``%LAST%`` %MONEY_NAME_EN%",
     "COMMANDS_CASINO_ALLIN_RAND_FAIL": "Attempt the following!| Maybe it might be..|It's okay..|Okay..|T.T...",
     "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER% %EMOJI_MONEY% All-in failed. Your balance has been set to ``0``.. %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO% Timed out. Please try again with ``%PREFIX%allin``!",
@@ -112,9 +113,9 @@
     "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  Playing now... **%TRACK% [%DURATION%]**",
     "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_MUSIC%  Playing related video now... **%TRACK% [%DURATION%]**",
 
-    "ALL": "전체",
-    "REPEAT_SINGLE": "한곡",
-    "NONE": "없음",
+    "ALL": "All",
+    "REPEAT_SINGLE": "Single",
+    "NONE": "None",
 
     "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | %NUM% Items | ``[%TOTALTIME%]``",
 
@@ -148,10 +149,21 @@
     "COMMANDS_HELP_FOOTER": "%PREFIX%help [Command] | Bugs, Error - Contact Sangoon_Is_Noob#1683",
     "COMMANDS_HELP_INFO": "> Command information - %COMMAND%",
 
+    "COMMANDS_MODSETTINGS_FIELD_MOD": "Moaderation Settings",
+    "COMMANDS_MODSETTINGS_FIELD_AUDIO": "Music Settings",
+    "COMMANDS_MODSETTINGS_FIELD_DEFAULT": "Default Settings",
+    
+    "COMMANDS_MODSETTINGS_DESC_TEST_MOD": "%EMOJI_LOCALES%  Locale: **%LOCALE%**\n%EMOJI_BIN%  Banwords: **%FILTER%**\n%EMOJI_WARN%  Max warning counts: **%WARNMAX%**",
+    "COMMANDS_MODSETTINGS_DESC_TEST_AUDIO": "%EMOJI_MUSIC%  Playback message: **%AUDIOPLAY%**\n%EMOJI_STAR%  Playing related songs: **%RELATED%**\n%REPEAT_EMOJI%  Repeat: **%REPEAT%**\n%SHUFFLE_EMOJI%  Shuffle: **%SHUFFLE%**",
+    "COMMANDS_MODSETTINGS_DESC_TEST_DEFAULT": "%EMOJI_HEADPHONES%  DJ Role: **%DJROLE%**\n%EMOJI_SPEAKER%  Default voice channel: **%VCH%**\n%EMOJI_HASH%  Default Text Channel: **%TCH%**",
     "COMMANDS_MODSETTINGS_DESC": "%EMOJI_LOCALES%  Language: **%LOCALE%**\n%EMOJI_BIN%  Swear Filter: **%FILTER%**\n%EMOJI_WARN%  Max warning count: **%WARNMAX%**\n%EMOJI_MUSIC%  Audio Playing Notification: **%AUDIOPLAY%**\n%EMOJI_STAR%  Playing Related Videos: **%RELATED%**",
     "COMMANDS_MODSETTINGS_EMBED_TITLE": "🔧  Settings of **%SERVER%**",
     "ENABLE": "Enable",
     "DISABLE": "Disable",
     "YES": "Yes",
-    "NO": "No"
+    "NO": "No",
+
+    "COMMANDS_LANGUAGE_EMBED_TITLE": "%EMOJI_LOCALES%  Language list",
+    "COMMANDS_LANGUAGE_EMBED_CHANGED": "%EMOJI_YES% Language changed to %NAME%!",
+    "COMMANDS_LANGUAGE_SET_DESC": "Please use ``%PREFIX%lang en_us`` command to change language %NAME%"
 }

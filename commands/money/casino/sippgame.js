@@ -49,6 +49,7 @@ class Command {
     if (!args[1]) return message.reply(picker.get(locale, 'COMMANDS_CASINO_PLEASE_BET'))
     if (isNaN(getbetMoney(args[1], GlobalUserData.money))) return message.reply(picker.get(locale, 'COMMANDS_CASINO_BET_INT'))
     if (getbetMoney(args[1], GlobalUserData.money) < 10000) return message.reply(picker.get(locale, 'COMMANDS_CASINO_BET_HIGH'))
+    if (GlobalUserData.money < getbetMoney(args[1], GlobalUserData.money)) return message.reply(picker.get(locale, 'COMMANDS_CASINO_BET_HIGH_BALANCE'))
 
     message.author.isCasino = true
 
@@ -58,14 +59,16 @@ class Command {
     const randSelected = this.client.utils.randmizer.randRange(1, 10)
     const seltype = (randSelected % 2) === 0 ? 'EVEN' : 'ODD'
 
-    if (seltype === seleted.toUpperCase()) { // 짝수
+    if (seltype === seleted.toUpperCase()) {
       message.author.isCasino = false
       this.client.database.updateGlobalUserData(message.member, { $inc: { money: +getbetMoney(args[1], GlobalUserData.money) } })
-      return message.channel.send(picker.get(locale, 'COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS', { MEMBER: message.author, RESULT: randSuccessMessage, SELNUM: randSelected, TYPE: picker.get(locale, 'COMMANDS_CASINO_' + seleted.toUpperCase()), SELTYPE: picker.get(locale, 'COMMANDS_CASINO_' + seltype) }))
+      const dataThenEdited = await this.client.database.getGlobalUserData(message.member)
+      return message.channel.send(picker.get(locale, 'COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS', { MEMBER: message.author, RESULT: randSuccessMessage, SELNUM: randSelected, TYPE: picker.get(locale, 'COMMANDS_CASINO_' + seleted.toUpperCase()), SELTYPE: picker.get(locale, 'COMMANDS_CASINO_' + seltype), LAST: Number(dataThenEdited.money).toLocaleString('fullwide') }))
     } else {
       message.author.isCasino = false
       this.client.database.updateGlobalUserData(message.member, { $inc: { money: -getbetMoney(args[1], GlobalUserData.money) } })
-      return message.channel.send(picker.get(locale, 'COMMANDS_CASINO_RESULT_MESSAGE_FAIL', { MEMBER: message.author, RESULT: randFailMessage, SELNUM: randSelected, TYPE: picker.get(locale, 'COMMANDS_CASINO_' + seleted.toUpperCase()), SELTYPE: picker.get(locale, 'COMMANDS_CASINO_' + seltype), BET: getbetMoney(args[1], GlobalUserData.money) }))
+      const dataThenEdited = await this.client.database.getGlobalUserData(message.member)
+      return message.channel.send(picker.get(locale, 'COMMANDS_CASINO_RESULT_MESSAGE_FAIL', { MEMBER: message.author, RESULT: randFailMessage, SELNUM: randSelected, TYPE: picker.get(locale, 'COMMANDS_CASINO_' + seleted.toUpperCase()), SELTYPE: picker.get(locale, 'COMMANDS_CASINO_' + seltype), BET: getbetMoney(args[1], GlobalUserData.money), LAST: Number(dataThenEdited.money).toLocaleString('fullwide') }))
     }
   }
 }

@@ -1,5 +1,4 @@
 const Discord = require('discord.js')
-const permissions = require('../../permissions')
 
 class PermissionChecker {
   /**
@@ -7,6 +6,7 @@ class PermissionChecker {
    */
   constructor (client = {}) {
     this.client = client
+    this.permissions = require('../../permissions')
   }
 
   /**
@@ -30,7 +30,7 @@ class PermissionChecker {
    */
   getUserPermission (member, otherData) {
     const resultArray = []
-    for (const perm of permissions) {
+    for (const perm of this.permissions) {
       if (perm.filter(member, otherData)) resultArray.push(perm.name)
     }
     return resultArray
