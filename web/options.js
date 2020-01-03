@@ -19,7 +19,7 @@ module.exports = {
   },
   oauth: {
     discord: {
-      callback: 'https://siru.xyz/callback',
+      callback: 'https://siru.ga/callback',
       clientID: '577055261785718793',
       clientSecret: 'F-TJMSJpp7Ck2CKuJwsOOXpL2dS3Ucpm'
     }

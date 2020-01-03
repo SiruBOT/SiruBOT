@@ -1,5 +1,5 @@
 {
-    "FLAG": "%EMOJI_REGIONS_US-CENTRAL%",
+    "FLAG": "%EMOJI_REGIONS_US_CENTRAL%",
     "NAME": "English",
 
     "REMARK_1": "(주석) 명령어 정보들",
@@ -164,6 +164,6 @@
     "NO": "No",
 
     "COMMANDS_LANGUAGE_EMBED_TITLE": "%EMOJI_LOCALES%  Language list",
-    "COMMANDS_LANGUAGE_EMBED_CHANGED": "%EMOJI_YES% Language changed to %NAME%!",
+    "COMMANDS_LANGUAGE_CHANGED": "%EMOJI_YES%  Language changed to  %FLAG% ``%NAME%``!",
     "COMMANDS_LANGUAGE_SET_DESC": "Please use ``%PREFIX%lang en_us`` command to change language %NAME%"
 }

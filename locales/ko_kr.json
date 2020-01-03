@@ -1,5 +1,5 @@
 {
-    "FLAG": "%EMOJI_REGIONS_SOUTH-KOREA%",
+    "FLAG": "%EMOJI_REGIONS_SOUTH_KOREA%",
     "NAME": "한국어",
 
     "REMARK_1": "(주석) 명령어 정보들",
@@ -168,6 +168,6 @@
     "NO": "아니요",
 
     "COMMANDS_LANGUAGE_EMBED_TITLE": "%EMOJI_LOCALES%  언어 목록",
-    "COMMANDS_LANGUAGE_EMBED_CHANGED": "%EMOJI_YES% 언어가 %NAME% 으로 변경되었어요!",
+    "COMMANDS_LANGUAGE_CHANGED": "%EMOJI_YES%  언어가  %FLAG% ``%NAME%`` 로 변경되었어요!",
     "COMMANDS_LANGUAGE_SET_DESC": "``%PREFIX%lang ko_kr`` 명령어를 사용해 봇의 언어를 한국어로 바꾸실 수 있어요!"
 }

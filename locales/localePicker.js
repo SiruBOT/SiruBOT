@@ -38,8 +38,8 @@ class LanguagePicker {
     }
     const settings = { before: '%', after: '%' }
     const userPlaceholder = template(language, placeholder, settings)
-    const constructors = template(userPlaceholder, this.client._options.constructors, settings)
-    const result = template(constructors, this.locales.get(lang), settings)
+    const localesKeys = template(userPlaceholder, this.locales.get(lang), settings)
+    const result = template(localesKeys, this.client._options.constructors, settings)
     this.client.logger.debug(`[LanguagePicker] [Get] Result: ${result}`)
 
     return result
