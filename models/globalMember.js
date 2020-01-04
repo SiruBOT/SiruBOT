@@ -7,8 +7,7 @@ const Schema = new mongo.Schema({
   paydayDate: { type: Date, default: new Date(0) },
   casinoMultiplier: { type: Number, default: 0 },
   profile: { type: String, default: 'default' },
-  blacklisted: { type: Boolean, default: false },
-  christmas2019: { type: Object, default: { christmascoin: 0 } }
+  blacklisted: { type: Boolean, default: false }
 }, { collection: 'globalMember', versionKey: false })
 
 module.exports = mongo.model('globalMember', Schema)

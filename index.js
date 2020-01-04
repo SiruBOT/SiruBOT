@@ -3,16 +3,7 @@ const LocalePicker = require('./locales/localePicker')
 const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
 const settings = require('./modules/checker/getSettings')()
 const isTesting = require('./modules/checker/isTesting')()
-const glob = require('glob')
-
-const globAsync = (path) => {
-  return new Promise((resolve, reject) => {
-    glob(path, (err, res) => {
-      if (err) return reject(err)
-      resolve(res)
-    })
-  })
-}
+const ServerLoggingManager = require('./modules/logging/serverLoggerManager')
 
 class Client extends Discord.Client {
   constructor (options) {
@@ -25,6 +16,8 @@ class Client extends Discord.Client {
     this.utils = require('./modules/utils')
     this.utils.localePicker = new LocalePicker(this)
     this.utils.permissionChecker = new PermissionChecker(this)
+
+    this.loggerManager = new ServerLoggingManager(this)
 
     this.activityNum = 0
     this.initialized = false
@@ -43,10 +36,11 @@ class Client extends Discord.Client {
       return new Error('[BOT] Bot is Already Initialized!')
     }
     process.on('message', (data) => {
-      if (data === 'spawned-all-shards') this.client.activityInterVal()
+      if (data === 'spawned-all-shards') this.client.activityInterval()
     })
     if (!isTesting) { this.logger.info('[BOT] Initializing Bot..') }
     this.utils.localePicker.init()
+    this.loggerManager.init()
     this.registerEvents()
     this.LoadCommands()
     if (!isTesting) this.login(this._options.bot.token)
@@ -64,7 +58,7 @@ class Client extends Discord.Client {
   }
 
   async LoadCommands () {
-    const CommandsFile = await globAsync('./commands/**/*.js')
+    const CommandsFile = await this.utils.asyncFunc.globAsync('./commands/**/*.js')
     const reLoadOrLoad = `${this.commands_loaded ? '(re)' : ''}Load`
     const load = `[Commands] [${reLoadOrLoad}]`
     this.logger.info(`${load} Loading Commands (${CommandsFile.length} Files)`)
@@ -81,7 +75,7 @@ class Client extends Discord.Client {
         this.commands.set(command.command.name, command)
         delete require.cache[require.resolve(cmd)]
       } else {
-        this.logger.info(`${load} Ignore file ${cmd} (Starts !)`)
+        this.logger.warn(`${load} Ignore file ${cmd} (Starts !)`)
       }
     }
     this.commands_loaded = true
@@ -101,7 +95,7 @@ class Client extends Discord.Client {
 
   async registerEvents () {
     this.logger.info('[Events] Registering Events...')
-    const eventsFile = await globAsync('./events/*.js')
+    const eventsFile = await this.utils.asyncFunc.globAsync('./events/**/*.js')
     this.logger.debug(`[Events] Event Files: ${eventsFile.join(' | ')}`)
     for (const file of eventsFile) {
       const EventClass = require(file)
@@ -111,7 +105,7 @@ class Client extends Discord.Client {
     this.logger.info('[Events] Events Successfully Loaded!')
   }
 
-  activityInterVal () {
+  activityInterval () {
     this.setActivity()
     setInterval(() => {
       this.setActivity()

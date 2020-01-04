@@ -84,7 +84,7 @@
     "COMMANDS_CASINO_ALLIN_RAND_LOAD": "슬롯 돌리는 중...|카드게임 하는 중..|잔고 확인 중..|밑장 빼는 중..",
     "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "축하합니다! :tada:|축하해요!|:tada:|:smile:",
-    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 성공! 잔고가 2배로 설정되었어요! %RANDMESSAGE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
+    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 성공! 잔고가 %MULTIPLIER_RESULT%배로 설정되었어요! ``+%MULTIPLIER% 배 [연속 성공 보너스]`` %RANDMESSAGE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
     "COMMANDS_CASINO_ALLIN_RAND_FAIL": "다음을 노려보세요..|그럴수도 있지 뭐..|아깝네요..|괜찮아요..|ㄲㅂㄱㅂ...",
     "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 실패.. 당신의 잔고가 ``0`` %MONEY_NAME_KR%가 되었어요.. %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO%  시간이 초과되었어요.. ``%PREFIX%올인`` 으로 다시 시도해 주세요!",
@@ -92,9 +92,9 @@
     "COMMANDS_CASINO_PLEASE_BET": "%EMOJI_MONEY%  베팅 금액을 입력해주세요!",
     "COMMANDS_CASINO_BET_INT": "%EMOJI_MONEY%  베팅 금액은 정수여야 해요!",
 
-    "COMMANDS_CASINO_ODD_TYPE": "%EMOJI_MONEY%  **홀**, **짝** 둘중 하나를 선택해주세요!",
-    "COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS": "%MEMBER%\n%EMOJI_MONEY%  당신의 잔고에 당신이 베팅한 %MONEY_NAME_KR%를 추가했어요!  %RESULT%\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
-    "COMMANDS_CASINO_RESULT_MESSAGE_FAIL": "%MEMBER%\n%EMOJI_MONEY%  %RESULT% 당신이 베팅한 ``%BET%`` %MONEY_NAME_KR%를 잃었어요..\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
+    "COMMANDS_CASINO_ODD_TYPE": "\n%EMOJI_MONEY%  올바르지 않은 사용법이에요..\n%EMOJI_MONEY%  ``%PREFIX%홀짝 [홀|짝] [베팅 금액 (올인: 올)]``",
+    "COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS": "\n%MEMBER%\n%EMOJI_MONEY%  당신의 잔고에 당신이 베팅한 %MONEY_NAME_KR%를 추가했어요!  %RESULT%\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
+    "COMMANDS_CASINO_RESULT_MESSAGE_FAIL": "\n%MEMBER%\n%EMOJI_MONEY%  %RESULT% 당신이 베팅한 ``%BET%`` %MONEY_NAME_KR%를 잃었어요..\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
     "COMMANDS_CASINO_ODD": "홀수",
     "COMMANDS_CASINO_EVEN": "짝수",
 

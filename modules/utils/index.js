@@ -4,5 +4,6 @@ module.exports = {
   randmizer: require('./randmizer'),
   findUtil: require('./findUtil'),
   timeUtil: require('./time'),
-  arrayUtil: require('./arrayUtil')
+  arrayUtil: require('./arrayUtil'),
+  asyncFunc: require('./asyncFunc')
 }

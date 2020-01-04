@@ -43,6 +43,7 @@
     "CATEGORY_COMMANDS_MONEY_CASINO": "Gambling Commands",
     "CATEGORY_COMMANDS_MONEY_GENERAL": "Money Commands",
     "CATEGORY_COMMANDS_GENERAL_UTILS": "Utils Commands",
+    "CATEGORY_COMMANDS_MODERATION": "Moderation Commands",
 
     "REMARK_2": "(주석) 커맨드에 사용되는 멘트들",
     

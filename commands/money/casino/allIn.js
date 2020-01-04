@@ -34,17 +34,18 @@ class Command {
         const loadMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_LOAD').split('|'), [55, 20, 22, 1])
         safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_LOAD_EDIT', { RANDMESSAGE: loadMessage, MEMBER: message.member }))
         setTimeout(async () => {
-          const result = this.client.utils.randmizer.chooseWeighted([true, false], [50, 50])
+          const result = this.client.utils.randmizer.chooseWeighted([true, false], [90, 10])
           if (result === true) {
             const randSuccessMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_SUCCESS').split('|'), [60, 25, 14, 1])
             const data = await this.client.database.getGlobalUserData(message.member)
-            this.client.database.updateGlobalUserData(message.member, { $set: { money: data.money * 2 } })
+            const multiplier = this.client.utils.randmizer.chooseWeighted([0.3, 0.4, 0.7, 0.9, 1, 2, 3], [16, 12, 25, 30, 10, 5, 2])
+            this.client.database.updateGlobalUserData(message.member, { $set: { money: data.money * (2 + GlobalUserData.casinoMultiplier) }, $inc: { casinoMultiplier: multiplier } })
             const dataThenEdited = await this.client.database.getGlobalUserData(message.member)
-            safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_SUCCESS_EDIT', { RANDMESSAGE: randSuccessMessage, MEMBER: message.member, LAST: Number(dataThenEdited.money).toLocaleString('fullwide') }))
+            safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_SUCCESS_EDIT', { RANDMESSAGE: randSuccessMessage, MEMBER: message.member, LAST: Number(dataThenEdited.money).toLocaleString('fullwide'), MULTIPLIER: GlobalUserData.casinoMultiplier.toFixed(2), MULTIPLIER_RESULT: (2 + GlobalUserData.casinoMultiplier).toFixed(2) }))
           } else {
             const randFailMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_FAIL').split('|'), [60, 15, 10, 14, 1])
             safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_FAIL_EDIT', { RANDMESSAGE: randFailMessage, MEMBER: message.member }))
-            this.client.database.updateGlobalUserData(message.member, { $set: { money: 0 } })
+            this.client.database.updateGlobalUserData(message.member, { $set: { money: 0, casinoMultiplier: 0 } })
           }
           message.author.isCasino = false
         }, 2500)

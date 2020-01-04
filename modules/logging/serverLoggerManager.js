@@ -1,25 +1,48 @@
-
+const Discord = require('discord.js')
+const path = require('path')
 class ServerLogger {
   constructor (client) {
     this.client = client
+    this.events = new Discord.Collection()
   }
 
   /**
    * @description - Emits Event, args to server (ID)
    * @param {String} name - event name
-   * @param {String} guildId - emits guild id
+   * @param {Discord.Guild} guildId - guild object
    * @param {Array} args - event's args
    */
-  send (name, guild, args = []) {
-
+  send (name, guild, ...args) {
+    this.client.logger.info(`[GuildLoggerManager] Executing Event ${name}, In guild ${guild.id}, args ${args}`)
+    if (this.events.keyArray().includes(name)) {
+      const compressed = {
+        guild,
+        args
+      }
+      this.events.get(name).run(compressed)
+    }
   }
 
-  init () {
-
+  async init () {
+    this.client.logger.info('[GuildLoggerManager] Init GuildLoggerManager...')
+    const events = await this.client.utils.asyncFunc.globAsync('./modules/logging/loggerEvents/**/*.js')
+    this.client.logger.debug(`[GuildLoggerManager] Loading Events ${events}`)
+    for (const item of events) {
+      this.client.logger.debug(`[GuildLoggerManager] Loading Event ${item}`)
+      this.LoadEvent(item)
+    }
   }
 
-  LoadEvents () {
-
+  LoadEvent (eventPath) {
+    if (!eventPath.split('/').slice(-1)[0].startsWith('!')) {
+      const Event = require(path.join(process.cwd(), eventPath))
+      const event = new Event(this)
+      this.client.logger.debug(`[GuildLoggerManager] Loading Event (${event.event.name})`)
+      this.events.set(event.event.name, event)
+      delete require.cache[require.resolve(path.join(process.cwd(), eventPath))]
+    } else {
+      this.client.logger.warn(`[GuildLoggerManager] Ignore file ${eventPath} (Starts !)`)
+    }
   }
 }
 
