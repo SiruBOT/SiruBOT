@@ -21,7 +21,7 @@
     "glob": "^7.1.6",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
-    "mongoose": "^5.8.3",
+    "mongoose": "^5.8.4",
     "node-cache": "^5.1.0",
     "node-fetch": "^2.6.0",
     "node-opus": "^0.3.3",
