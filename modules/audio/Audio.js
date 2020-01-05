@@ -295,15 +295,28 @@ class AudioManager {
   async getSongs (search) {
     const node = this.getBestNode()
 
-    const params = new URLSearchParams()
-    params.append('identifier', search)
-
-    return fetch(`http://${node.host}:${node.port}/loadtracks?${params.toString()}`, { headers: { Authorization: node.password } })
-      .then(res => res.json())
-      .catch(err => {
-        console.error(err)
-        return null
-      })
+    if (this.client.audioCache.get(search)) {
+      this.client.logger.debug(`[AudioManager] Search Keyword: ${search} Cache Available (${this.client.audioCache.get(search)}) returns Data`)
+      return this.client.audioCache.get(search)
+    } else {
+      const params = new URLSearchParams()
+      params.append('identifier', search)
+      const result = await fetch(`http://${node.host}:${node.port}/loadtracks?${params.toString()}`, { headers: { Authorization: node.password } })
+        .then(res => res.json())
+        .catch(err => {
+          console.error(err)
+          return undefined
+        })
+      if (!['LOAD_FAILED', 'NO_MATCHES'].includes(result.loadType)) {
+        this.client.logger.debug(`[AudioManager] Cache not found. registring cache... (${search})`)
+        this.client.audioCache.set(search, result)
+        result.tracks.map(el => {
+          this.client.logger.debug(`[AudioManager] Registring Identifier: ${el.info.identifier}`)
+          this.client.audioCache.set(el.info.identifier, el)
+        })
+        return result
+      }
+    }
   }
 }
 

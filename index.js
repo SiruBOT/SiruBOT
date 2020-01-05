@@ -4,6 +4,7 @@ const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
 const settings = require('./modules/checker/getSettings')()
 const isTesting = require('./modules/checker/isTesting')()
 const ServerLoggingManager = require('./modules/logging/serverLoggerManager')
+const NodeCache = require('node-cache')
 
 class Client extends Discord.Client {
   constructor (options) {
@@ -28,6 +29,7 @@ class Client extends Discord.Client {
     this.categories = new Discord.Collection()
 
     this.audio = new Audio({ client: this, shards: this._options.audio.shards, nodes: this._options.audio.nodes })
+    this.audioCache = new NodeCache({ stdTTL: 1000 })
   }
 
   init () {
@@ -35,9 +37,6 @@ class Client extends Discord.Client {
       this.logger.error('[BOT] Bot is Already Initialized!')
       return new Error('[BOT] Bot is Already Initialized!')
     }
-    process.on('message', (data) => {
-      if (data === 'spawned-all-shards') this.client.activityInterval()
-    })
     if (!isTesting) { this.logger.info('[BOT] Initializing Bot..') }
     this.utils.localePicker.init()
     this.loggerManager.init()
@@ -165,4 +164,8 @@ process.on('unhandledRejection', (reason, promise) => {
   promise.catch((e) => {
     client.logger.error(e.stack)
   })
+})
+
+process.on('message', (data) => {
+  if (data === 'spawned-all-shards') client.activityInterval()
 })
