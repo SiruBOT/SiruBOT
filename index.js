@@ -18,8 +18,6 @@ class Client extends Discord.Client {
     this.utils.localePicker = new LocalePicker(this)
     this.utils.permissionChecker = new PermissionChecker(this)
 
-    this.loggerManager = new ServerLoggingManager(this)
-
     this.activityNum = 0
     this.initialized = false
 
@@ -29,7 +27,9 @@ class Client extends Discord.Client {
     this.categories = new Discord.Collection()
 
     this.audio = new Audio({ client: this, shards: this._options.audio.shards, nodes: this._options.audio.nodes })
-    this.audioCache = new NodeCache({ stdTTL: 1000 })
+    this.audioCache = new NodeCache()
+
+    this.loggerManager = new ServerLoggingManager(this)
   }
 
   init () {

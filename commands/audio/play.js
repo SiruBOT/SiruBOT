@@ -29,7 +29,7 @@ class Command {
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
 
     if (!Audio.players.get(message.guild.id) || (Audio.players.get(message.guild.id) && !message.guild.me.voiceChannel)) {
-      const joinresult = await this.client.commands.get('join').run(compressed, true)
+      const joinresult = await this.client.commands.get('join').run(compressed, true, !(searchStr.length === 0 && args.length === 0))
       if (joinresult === false) return
     }
 
@@ -94,7 +94,8 @@ class Command {
       const track = searchResult.tracks[0]
       if (info.title.length === 0) track.info.title = searchStr.split('/').slice(-1)[0]
       this.addQueue(message, track, picker, locale)
-      if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+      const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track)
+      if (status || (guildData.nowplaying.track || guildData.queue.length > 0)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
     }
   }
 

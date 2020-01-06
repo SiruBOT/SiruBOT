@@ -37,6 +37,7 @@ class Command {
       this.client.utils.localePicker = new LocalePicker(this.client)
       this.client.utils.permissionChecker = new PermissionChecker(this.client)
       this.client.utils.localePicker.init()
+      this.client.loggerManager.init()
       await m.edit(`✅  명령어 리로드 완료! (${Data.keyArray().length} 개)\n✅  언어 리로드 완료! (${Locale.keyArray().length} 개)\n✅  설정파일 리로드 완료!\n✅  DB 모델파일 리로드 완료!\n✅  유틸 리로드 완료!\n✅  모든 구성 요소들이 리로드 되었어요!`)
     })
   }

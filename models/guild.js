@@ -3,7 +3,7 @@ const mongo = require('mongoose')
 const Schema = new mongo.Schema({
   _id: String,
 
-  // Others
+  // Mod
   welcomeChannel: { type: String, default: '0' },
   welcomeMessage: { type: String, default: '환영합니다!' },
   locale: { type: String, default: 'ko_kr' },
@@ -11,6 +11,8 @@ const Schema = new mongo.Schema({
   customFilter: { type: Array, default: [] },
   warningMax: { type: Number, default: 10 },
   announceChannel: { type: String, default: '0' },
+
+  enabledEvents: { type: Array, default: [] },
 
   // Audio
   audioMessage: { type: Boolean, default: true },

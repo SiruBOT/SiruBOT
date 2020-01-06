@@ -17,7 +17,8 @@ class Command {
   async run (compressed) {
     const picker = this.client.utils.localePicker
     const { message, GuildData } = compressed
-    this.client.loggerManager.send('warn', message.guild, 'Hello', 'World')
+    message.channel.send('경고를 지급했어요!')
+    this.client.loggerManager.send('warn', message.guild, message.member)
   }
 }
 

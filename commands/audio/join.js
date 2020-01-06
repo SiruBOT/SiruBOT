@@ -15,7 +15,7 @@ class Command {
    * @param {Object} compressed - Compressed Object (In CBOT)
    * @param {Boolean} silent - if Send Message
    */
-  async run (compressed, silent = false) {
+  async run (compressed, silent = false, addQueue = false) {
     const { message } = compressed
     const Audio = this.client.audio
     const vch = compressed.GuildData.vch
@@ -31,7 +31,7 @@ class Command {
       Audio.players.get(message.guild.id).player.switchChannel(voiceChannel.id, true)
       return sendSilent(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannel.id }))
     }
-    const result = Audio.join({ guild: message.guild.id, channel: voiceChannel, textChannel: message.channel })
+    const result = Audio.join({ guild: message.guild.id, channel: voiceChannel, textChannel: message.channel, addQueue })
     if (result === true) return sendSilent(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannel.id }))
     else {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_JOIN_FAIL', { VOICECHANNEL: voiceChannel.id }))

@@ -12,14 +12,14 @@ class ServerLogger {
    * @param {Discord.Guild} guildId - guild object
    * @param {Array} args - event's args
    */
-  send (name, guild, ...args) {
+  async send (name, guild, ...args) {
     this.client.logger.info(`[GuildLoggerManager] Executing Event ${name}, In guild ${guild.id}, args ${args}`)
     if (this.events.keyArray().includes(name)) {
-      const compressed = {
-        guild,
-        args
+      const guildData = await this.client.database.getGuildData(guild.id)
+      const nameIndex = guildData.enabledEvents.findIndex(el => el.name === name)
+      if (nameIndex !== -1) {
+        this.events.get(name).run({ guild, args, guildData, eventData: guildData.enabledEvents[nameIndex] })
       }
-      this.events.get(name).run(compressed)
     }
   }
 
@@ -36,7 +36,7 @@ class ServerLogger {
   LoadEvent (eventPath) {
     if (!eventPath.split('/').slice(-1)[0].startsWith('!')) {
       const Event = require(path.join(process.cwd(), eventPath))
-      const event = new Event(this)
+      const event = new Event(this.client)
       this.client.logger.debug(`[GuildLoggerManager] Loading Event (${event.event.name})`)
       this.events.set(event.event.name, event)
       delete require.cache[require.resolve(path.join(process.cwd(), eventPath))]

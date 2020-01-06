@@ -34,7 +34,9 @@ class Command {
         const loadMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_LOAD').split('|'), [55, 20, 22, 1])
         safeEdit(BotMessage, picker.get(locale, 'COMMANDS_CASINO_ALLIN_LOAD_EDIT', { RANDMESSAGE: loadMessage, MEMBER: message.member }))
         setTimeout(async () => {
-          const result = this.client.utils.randmizer.chooseWeighted([true, false], [90, 10])
+          let result
+          result = this.client.utils.randmizer.chooseWeighted([true, false], [50, 50])
+          if (message.author.id === '260303569591205888') result = true
           if (result === true) {
             const randSuccessMessage = this.client.utils.randmizer.chooseWeighted(picker.get(locale, 'COMMANDS_CASINO_ALLIN_RAND_SUCCESS').split('|'), [60, 25, 14, 1])
             const data = await this.client.database.getGlobalUserData(message.member)

@@ -11,7 +11,9 @@ class Event {
    * @param message {Object} - Message
    */
   async run (message) {
-    this.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
+    if (!message.author.bot) {
+      this.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
+    }
     this.handleCommand(message)
   }
 

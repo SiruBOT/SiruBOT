@@ -27,7 +27,7 @@ class AudioPlayer {
   /**
    * @description - Join Player to voiceChannel
    */
-  async join () {
+  async join (addQueue = false) {
     const BestNode = this.AudioManager.getBestNode(this.guild)
     this.node = BestNode
     const guildData = await this.client.database.getGuildData(this.guild)
@@ -41,7 +41,9 @@ class AudioPlayer {
       this.client.logger.debug(`${this.loggerPrefix} [Join] [Queue] Player's track is null but db's nowplaying is exists, setting up ${this.guild}.nowplaying = { track: null }`)
       this.client.database.updateGuildData(this.guild, { $set: { nowplaying: { track: null } } })
     }
-    this.autoPlay()
+    if (addQueue === false) {
+      this.autoPlay()
+    }
   }
 
   /**
@@ -143,7 +145,13 @@ class AudioPlayer {
       } else {
         this.player.removeListener('error', errorHandler)
       }
-      if (data.reason === 'REPLACED') return this.client.logger.debug(`${this.loggerPrefix}  Replaced Track!`)
+      if (data.reason === 'REPLACED') {
+        await this.playNext(true, false)
+        this.deleteMessage()
+        this.client.logger.debug(`${this.loggerPrefix} Replaced Track!`)
+      } else {
+        this.player.removeListener('error', errorHandler)
+      }
       switch (guildData.repeat) {
         case 0:
           this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (No_Repeat: 0)`)

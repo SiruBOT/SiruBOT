@@ -10,8 +10,8 @@ class CustomEvent {
      * @param compressed - compressed Object
      */
   async run (compressed) {
-    const { guild, args } = compressed
-    guild.channels.get('657938825745530880').send(args)
+    const { guild, args, eventData } = compressed
+    guild.channels.get(eventData.value).send(`> **경고**\n> 경고를 받은 유저: ${args[0]}\n> 경고 횟수: 0/0`)
   }
 }
 module.exports = CustomEvent
