@@ -16,9 +16,34 @@ class Command {
    */
   async run (compressed) {
     const picker = this.client.utils.localePicker
-    const { message, GuildData } = compressed
-    message.channel.send('경고를 지급했어요!')
-    this.client.loggerManager.send('warn', message.guild, message.member)
+    const locale = compressed.GuildData.locale
+    const { message, args } = compressed
+    if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_TYPE_USER'))
+    const formatter = (a, number) => { return `[${number}] ${a.user.bot ? '[BOT]' : ''} ${a.displayName} (${a.user.tag}) [${a.id}]` }
+    const search = args.shift()
+    const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === this.client.utils.findUtil.getUserFromMention(this.client.users, search).id || a.user.username.toLowerCase() === search.toLowerCase() }
+    const options = {
+      title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
+      formatter: formatter,
+      collection: message.guild.members,
+      filter: filter,
+      message: message,
+      locale: locale,
+      picker: picker
+    }
+    this.client.utils.findUtil.findElement(options).then(async (res) => {
+      if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
+      const user = res.user
+      if (user.bot === true) {
+        return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_NO_BOT'))
+      } else if (user) {
+        let why
+        why = args.join(' ')
+        if (why.length === 0) why = null
+        // this.client.database.updateGuildMemberData(message.member)
+        this.client.loggerManager.send('warn', message.guild, message.member, why.toString())
+      }
+    })
   }
 }
 

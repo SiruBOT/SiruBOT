@@ -2,6 +2,10 @@
     "FLAG": "%EMOJI_REGIONS_SOUTH_KOREA%",
     "NAME": "한국어",
 
+    "BOT_NAME": "치노봇",
+
+    "MONEY_NAME": "치머니",
+
     "REMARK_1": "(주석) 명령어 정보들",
 
     "COMMANDS_HELP_DESC_SETDJ": "DJ 명령어를 실행할 수 있는 역할을 설정해요!",
@@ -56,9 +60,9 @@
     "COMMANDS_UTILS_LYRICS_NOTCORRECT": "%EMOJI_BULB%  검색 결과는 정확하지 않을 수 있어요! 만약 검색 결과가 정확하지 않다면, 아티스트의 이름을 더해서 검색해보세요!",
 
     "COMMANDS_MONEY_BOT": "%EMOJI_MONEY%  이 유저는 봇인거 같아요!",
-    "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY%  이 유저는 등록되지 않은 (%BOT_NAME_KR% 을 사용하지 않은) 유저에요!",
-    "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  **%USER_TAG%** 의 잔고: ``%MONEY%`` %MONEY_NAME_KR%",
-    "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  당신의 잔고: ``%MONEY%`` %MONEY_NAME_KR%",
+    "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY%  이 유저는 등록되지 않은 (%BOT_NAME% 을 사용하지 않은) 유저에요!",
+    "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  **%USER_TAG%** 의 잔고: ``%MONEY%`` %MONEY_NAME%",
+    "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  당신의 잔고: ``%MONEY%`` %MONEY_NAME%",
 
     "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  검색어를 입력해주세요!",
     "GENERAL_NO_RESULT": "> %EMOJI_NO%  검색 결과가 없어요!",
@@ -71,30 +75,30 @@
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** 서버에서는 채널 <#%CHANNEL%> 에서만 저의 명령어를 사용하실수 있어요!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  이 명령어는 다음 권한이 필요해요. ``%REQUIRED%``",
 
-    "COMMANDS_MONEY_PAYDAY_OK": "%EMOJI_MONEY%  당신의 잔고에 ``10000`` %MONEY_NAME_KR%를 추가했어요!",
+    "COMMANDS_MONEY_PAYDAY_OK": "%EMOJI_MONEY%  당신의 잔고에 ``10000`` %MONEY_NAME%를 추가했어요!",
     "COMMANDS_MONEY_PAYDAY_LATER": "%EMOJI_MONEY%  당신은 이미 돈을 받았어요, **%TIME%** 분 후에 다시 이용해주세요!",
 
     "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY%  다른 도박 명령어의 사용을 마쳐주세요!",
-    "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  최소 베팅 %MONEY_NAME_KR%는 ``10000`` %MONEY_NAME_KR% 이상이여야 해요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME_KR%를 받아주세요!",
+    "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  최소 베팅 %MONEY_NAME%는 ``10000`` %MONEY_NAME% 이상이여야 해요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME%를 받아주세요!",
     "COMMANDS_CASINO_BET_HIGH_BALANCE": "%EMOJI_MONEY%  당신의 잔고보다 더 많은 금액을 베팅 하실수 없어요!",
 
-    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO%  당신은 %MONEY_NAME_KR% 가 ``10000`` %MONEY_NAME_KR% 미만이네요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME_KR%를 받아주세요!",
-    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO%  당신은 %MONEY_NAME_KR% 가 ``0`` %MONEY_NAME_KR% 이네요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME_KR%를 받아주세요!",
+    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO%  당신은 %MONEY_NAME% 가 ``10000`` %MONEY_NAME% 미만이네요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME%를 받아주세요!",
+    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO%  당신은 %MONEY_NAME% 가 ``0`` %MONEY_NAME% 이네요.. ``%PREFIX%돈받기`` 명령어를 이용하여 %MONEY_NAME%를 받아주세요!",
     "COMMANDS_CASINO_ALLIN_START": "%MEMBER%\n%EMOJI_MONEY%  올인을 시작할게요! 확률은 절반!\n\n%EMOJI_MONEY%  올인을 시작하시려면 15초 안에 반응을 눌러주세요!",
     "COMMANDS_CASINO_ALLIN_RAND_LOAD": "슬롯 돌리는 중...|카드게임 하는 중..|잔고 확인 중..|밑장 빼는 중..",
     "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "축하합니다! :tada:|축하해요!|:tada:|:smile:",
-    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 성공! 잔고가 %MULTIPLIER_RESULT%배로 설정되었어요! ``+%MULTIPLIER% 배 [연속 성공 보너스]`` %RANDMESSAGE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
+    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 성공! 잔고가 %MULTIPLIER_RESULT%배로 설정되었어요! ``+%MULTIPLIER% 배 [연속 성공 보너스]`` %RANDMESSAGE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME%",
     "COMMANDS_CASINO_ALLIN_RAND_FAIL": "다음을 노려보세요..|그럴수도 있지 뭐..|아깝네요..|괜찮아요..|ㄲㅂㄱㅂ...",
-    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 실패.. 당신의 잔고가 ``0`` %MONEY_NAME_KR%가 되었어요.. %RANDMESSAGE%",
+    "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER%\n%EMOJI_MONEY%  올인 실패.. 당신의 잔고가 ``0`` %MONEY_NAME%가 되었어요.. %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO%  시간이 초과되었어요.. ``%PREFIX%올인`` 으로 다시 시도해 주세요!",
 
     "COMMANDS_CASINO_PLEASE_BET": "%EMOJI_MONEY%  베팅 금액을 입력해주세요!",
     "COMMANDS_CASINO_BET_INT": "%EMOJI_MONEY%  베팅 금액은 정수여야 해요!",
 
     "COMMANDS_CASINO_ODD_TYPE": "\n%EMOJI_MONEY%  올바르지 않은 사용법이에요..\n%EMOJI_MONEY%  ``%PREFIX%홀짝 [홀|짝] [베팅 금액 (올인: 올)]``",
-    "COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS": "\n%MEMBER%\n%EMOJI_MONEY%  당신의 잔고에 당신이 베팅한 %MONEY_NAME_KR%를 추가했어요!  %RESULT%\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
-    "COMMANDS_CASINO_RESULT_MESSAGE_FAIL": "\n%MEMBER%\n%EMOJI_MONEY%  %RESULT% 당신이 베팅한 ``%BET%`` %MONEY_NAME_KR%를 잃었어요..\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME_KR%",
+    "COMMANDS_CASINO_RESULT_MESSAGE_SUCCESS": "\n%MEMBER%\n%EMOJI_MONEY%  당신의 잔고에 당신이 베팅한 %MONEY_NAME%를 추가했어요!  %RESULT%\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME%",
+    "COMMANDS_CASINO_RESULT_MESSAGE_FAIL": "\n%MEMBER%\n%EMOJI_MONEY%  %RESULT% 당신이 베팅한 ``%BET%`` %MONEY_NAME%를 잃었어요..\n%EMOJI_MONEY%  봇이 선택한 숫자: %SELNUM%(%SELTYPE%), 당신이 선택한 값: %TYPE%\n%EMOJI_MONEY%  당신의 잔고: ``%LAST%`` %MONEY_NAME%",
     "COMMANDS_CASINO_ODD": "홀수",
     "COMMANDS_CASINO_EVEN": "짝수",
 
@@ -148,7 +152,7 @@
 
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  개발자가 커밋한 변경 로그가 존재하지 않아요! **(%COMMITSHA%)**",
 
-    "COMMANDS_HELP_TITLE": "%EMOJI_BULB%  %BOT_NAME_KR%의 명령어들",
+    "COMMANDS_HELP_TITLE": "%EMOJI_BULB%  %BOT_NAME%의 명령어들",
     "COMMANDS_HELP_FOOTER": "%PREFIX%도움 [명령어] | 버그, 에러 - Sangoon_Is_Noob#1683",
     "COMMANDS_HELP_INFO": "명령어 정보 - %COMMAND%",
 
@@ -166,6 +170,10 @@
     "DISABLE": "비활성화",
     "YES": "네",
     "NO": "아니요",
+
+    "COMMANDS_MOD_WARN_USER": "> %EMOJI_WARN%  경고 기능",
+    "COMMANDS_MOD_WARN_TYPE_USER": "> %EMOJI_WARN%  경고할 유저를 입력해주세요!\n> %EMOJI_WARN%  ``%PREFIX%warn <유저> [사유]``",
+    "COMMANDS_MOD_WARN_NO_BOT": "> %EMOJI_NO%  봇은 경고할 수 없어요!",
 
     "COMMANDS_LANGUAGE_EMBED_TITLE": "%EMOJI_LOCALES%  언어 목록",
     "COMMANDS_LANGUAGE_CHANGED": "%EMOJI_YES%  언어가  %FLAG% ``%NAME%`` 로 변경되었어요!",

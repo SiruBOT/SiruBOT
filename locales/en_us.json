@@ -2,6 +2,11 @@
     "FLAG": "%EMOJI_REGIONS_US_CENTRAL%",
     "NAME": "English",
 
+    "BOT_NAME": "ChinoBot",
+
+    "MONEY_NAME": "ChiMoney",
+
+
     "REMARK_1": "(주석) 명령어 정보들",
 
     "COMMANDS_HELP_DESC_SETDJ": "DJ 명령어를 실행할 수 있는 역할을 설정해요!",
@@ -56,9 +61,9 @@
     "COMMANDS_UTILS_LYRICS_NOTCORRECT": "%EMOJI_BULB%  Search results are not correct! If result is not correct, try re-search with artist name!",
 
     "COMMANDS_MONEY_BOT": "%EMOJI_MONEY%  I think this user is a bot!",
-    "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY% This user is not a registered user (not using %BOT_NAME_EN%)!",
-    "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  **%USER_TAG%**'s Balance: ``%MONEY%`` %MONEY_NAME_EN%",
-    "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  Your balance: ``%MONEY%`` %MONEY_NAME_EN%",
+    "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY% This user is not a registered user (not using %BOT_NAME%)!",
+    "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  **%USER_TAG%**'s Balance: ``%MONEY%`` %MONET_NAME%",
+    "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  Your balance: ``%MONEY%`` %MONET_NAME%",
 
     "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  Enter item to search!",
     "GENERAL_NO_RESULT": "> %EMOJI_NO%  There's no search results!",
@@ -71,20 +76,20 @@
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** server can only use my command on channel <#%CHANNEL%>!",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  This command requires this permissions. %REQUIRED%",
 
-    "COMMANDS_MONEY_PAYDAY_OK": "%EMOJI_MONEY%  Added ``10000`` %MONEY_NAME_EN% to your balance!",
+    "COMMANDS_MONEY_PAYDAY_OK": "%EMOJI_MONEY%  Added ``10000`` %MONET_NAME% to your balance!",
     "COMMANDS_MONEY_PAYDAY_LATER": "%EMOJI_MONEY%  You are already used this command, Try again **%TIME%** minutes later",
 
     "COMMANDS_CASINO_OTHER": "%EMOJI_MONEY% Please finish using other gambling commands!",
-    "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  You can't bet less ``10000`` %MONEY_NAME_EN%, please type ``%PREFIX%payday`` command to get %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_BET_HIGH": "%EMOJI_MONEY%  You can't bet less ``10000`` %MONET_NAME%, please type ``%PREFIX%payday`` command to get %MONET_NAME%!",
     "COMMANDS_CASINO_BET_HIGH_BALANCE": "%EMOJI_MONEY% You cannot bet more than your balance!",
 
-    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONEY_NAME_EN% less than ``10000`` %MONEY_NAME_EN%. Please use the ``%PREFIX%money`` command to get %MONEY_NAME_EN%!",
-    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONEY_NAME_EN% equal to ``0`` %MONEY_NAME_EN%. Please use the ``%PREFIX%payday`` command to receive %MONEY_NAME_EN%!",
+    "COMMANDS_CASINO_ALLIN_UNDER": "%EMOJI_NO% You have %MONET_NAME% less than ``10000`` %MONET_NAME%. Please use the ``%PREFIX%money`` command to get %MONET_NAME%!",
+    "COMMANDS_CASINO_ALLIN_MONEY_ZERO": "%EMOJI_NO% You have %MONET_NAME% equal to ``0`` %MONET_NAME%. Please use the ``%PREFIX%payday`` command to receive %MONET_NAME%!",
     "COMMANDS_CASINO_ALLIN_START": "%MEMBER% %EMOJI_MONEY% I'll start all-in! The odds are half! %EMOJI_MONEY% Press reaction in 15 seconds to start all-in!",
     "COMMANDS_CASINO_ALLIN_RAND_LOAD": "Playing slots...|Playing card games..|Checking balance..|Cheating..",
     "COMMANDS_CASINO_ALLIN_LOAD_EDIT": "%MEMBER% %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_RAND_SUCCESS": "Congratulations! :tada:|Congratulations!|:tada:|:smile:",
-    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%\n%EMOJI_MONEY%  Your balance: ``%LAST%`` %MONEY_NAME_EN%",
+    "COMMANDS_CASINO_ALLIN_SUCCESS_EDIT": "%MEMBER% %EMOJI_MONEY% All-in success! Your balance has been doubled! %RANDMESSAGE%\n%EMOJI_MONEY%  Your balance: ``%LAST%`` %MONET_NAME%",
     "COMMANDS_CASINO_ALLIN_RAND_FAIL": "Attempt the following!| Maybe it might be..|It's okay..|Okay..|T.T...",
     "COMMANDS_CASINO_ALLIN_FAIL_EDIT": "%MEMBER% %EMOJI_MONEY% All-in failed. Your balance has been set to ``0``.. %RANDMESSAGE%",
     "COMMANDS_CASINO_ALLIN_TIMEOUT": "%EMOJI_NO% Timed out. Please try again with ``%PREFIX%allin``!",
