@@ -8,7 +8,7 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/27e6dd6d058644c990b3d103757f99ea)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cotwo0139/CHINOBOT_BETA&amp;utm_campaign=Badge_Grade)
 # Creator: Sangoon_Is_Noob
-![Sangoon_Profile_SRC](https://cdn.discordapp.com/avatars/260303569591205888/83811d211c198632dc279079436fc614.png?size=256)
+![Sangoon_Profile_SRC](https://chinobot.ga/author_profile.png)
 
 ## Discord (Click Image)
 [![Discord](https://img.shields.io/discord/546882924759220234?style=for-the-badge)](https://discord.gg/ucDCPAY)
