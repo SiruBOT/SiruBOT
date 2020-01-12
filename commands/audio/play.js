@@ -38,11 +38,7 @@ class Command {
 
     const searchResult = await Audio.getSongs(searchStr)
 
-    // SearchResult
-    const keys = Object.keys(searchResult)
-    if (!keys.includes('loadType')) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.cause.message })) // andesite-node Handling
-    if (searchResult.loadType === 'NO_MATCHES' || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
-    if (searchResult.loadType === 'LOAD_FAILED') return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
+    if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return false
 
     if (searchResult.loadType === 'PLAYLIST_LOADED') {
       const guildData = await this.client.database.getGuildData(message.guild.id)
@@ -89,20 +85,32 @@ class Command {
     }
 
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
-      const guildData = await this.client.database.getGuildData(message.guild.id)
       const info = searchResult.tracks[0].info
       const track = searchResult.tracks[0]
       if (info.title.length === 0) track.info.title = searchStr.split('/').slice(-1)[0]
-      this.addQueue(message, track, picker, locale)
-      const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track)
-      if (status || (guildData.nowplaying.track || guildData.queue.length > 0)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+      this.addQueue(message, track, picker, locale, true)
     }
   }
 
-  addQueue (message, items, picker, locale) {
+  addQueue (message, items, picker, locale, single = false) {
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_NO_VOICE_ME'))
+    if (single) {
+      this.client.database.getGuildData(message.guild.id).then(guildData => {
+        const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track)
+        const info = items.info
+        if (status || (guildData.nowplaying.track || guildData.queue.length > 0)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
+      })
+    }
     Audio.players.get(message.guild.id).addQueue(items, message)
+  }
+
+  chkSearchResult (searchResult, picker, locale, message) {
+    const keys = Object.keys(searchResult)
+    if (!keys.includes('loadType')) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.cause.message })) // andesite-node Handling
+    if (searchResult.loadType === 'NO_MATCHES' || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
+    if (searchResult.loadType === 'LOAD_FAILED') return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
+    return true
   }
 }
 

@@ -231,7 +231,7 @@ class AudioManager {
    * @param {String} options.channel - Voicechannel id for player
    */
   join (options) {
-    this.client.logger.info(`[AudioManager] ${options.guild.id} [DEBUG] [Join] (${options.channel.id}) Joining Voice Channel`)
+    this.client.logger.info(`[AudioManager] ${options.guild} [DEBUG] [Join] (${options.channel.id}) Joining Voice Channel`)
     console.log(options.channel.joinable)
     if (options.channel.joinable === false) return false
     else {
@@ -292,7 +292,7 @@ class AudioManager {
    * @param {String} search - Search String ('ytsearch: asdfmovie')
    * @returns {Promise} - Search Result (Promise)
    */
-  async getSongs (search) {
+  async getSongs (search, cache = true) {
     const node = this.getBestNode()
 
     // const params = new URLSearchParams()
@@ -303,7 +303,7 @@ class AudioManager {
     //     console.error(err)
     //     return undefined
     //   })
-    if (this.client.audioCache.get(search)) {
+    if (this.client.audioCache.get(search) && cache) {
       this.client.logger.debug(`[AudioManager] Search Keyword: ${search} Cache Available (${this.client.audioCache.get(search)}) returns Data`)
       return this.client.audioCache.get(search)
     } else {

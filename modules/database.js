@@ -91,7 +91,7 @@ class DataManager {
   }
 
   async updateGuildMemberData (member, query) {
-    const updated = await this.connection.collection('globalMember').updateOne({ _id: this.getGuildMemberID(member, member.guild) }, query)
+    const updated = await this.connection.collection('guildMember').updateOne({ _id: this.getGuildMemberID(member, member.guild) }, query)
     return updated
   }
 

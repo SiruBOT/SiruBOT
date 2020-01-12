@@ -40,8 +40,13 @@ class Command {
         let why
         why = args.join(' ')
         if (why.length === 0) why = null
-        // this.client.database.updateGuildMemberData(message.member)
-        this.client.loggerManager.send('warn', message.guild, message.member, why.toString())
+        const obj = {
+          why: why,
+          date: new Date(),
+          admin: message.author.id
+        }
+        this.client.database.updateGuildMemberData(message.guild.members.get(user.id), { $inc: { warningCount: 1 }, $push: { warningArray: obj }})
+        this.client.loggerManager.send('warn', message.guild, user, obj)
       }
     })
   }

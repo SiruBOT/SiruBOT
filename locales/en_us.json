@@ -24,6 +24,8 @@
     "COMMANDS_HELP_DESC_STOP": "현재 재생 중인 플레이어를 종료하고, 대기열을 초기화해요!",
     "COMMANDS_HELP_DESC_VOLUME": "현재 재생 중인 노래의 볼륨을 조절해요!",
     "COMMANDS_HELP_DESC_LYRICS": "가사를 검색해드려요!",
+    "COMMANDS_HELP_DESC_SCSEARCH": "사운드클라우드에서 노래를 검색하고 재생해요!",
+    "COMMANDS_HELP_DESC_SEARCH": "유튜브에서 노래를 검색하고 재생해요!",
 
     "COMMANDS_HELP_DESC_COMPILE": "자바스크립트를 실행해요! (제작자 Only)",
     "COMMANDS_HELP_DESC_RELOAD": "명령어, 설정, 언어 등을 다시 로드해요! (제작자 Only)",

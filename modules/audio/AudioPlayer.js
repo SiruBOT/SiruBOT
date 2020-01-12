@@ -156,7 +156,7 @@ class AudioPlayer {
         case 0:
           this.client.logger.debug(`${this.loggerPrefix} [Repeat] Repeat Status (No_Repeat: 0)`)
           if (guildData.queue.length === 0 && this.AudioManager.getvIdfromUrl(item.info.uri) !== undefined && guildData.audioPlayrelated === true) {
-            await this.playRelated(this.AudioManager.getvIdfromUrl(item.info.uri))
+            await this.playRelated(item)
           } else {
             await this.playNext(true, false)
           }
@@ -201,9 +201,10 @@ class AudioPlayer {
       this.client.logger.debug(`${this.loggerPrefix} [Player] Stopped Audio Player`)
     }
     this.playedSongs = []
+    await this.player.stop()
+    this.player = null
     this.deleteMessage()
     this.AudioManager.updateNpMessage(this.guild, true)
-    await this.player.stop()
     await this.AudioManager.manager.leave(this.guild)
     this.AudioManager.players.delete(this.guild)
   }
@@ -211,7 +212,9 @@ class AudioPlayer {
   /**
    * @description - playRelated
    */
-  async playRelated (vId) {
+  async playRelated (item) {
+    if (!Buffer.from(item.track, 'base64').toString().split('').slice(-1)[0].startsWith('youtube')) return await this.playNext(true, false)
+    const vId = this.AudioManager.getvIdfromUrl(item.info.uri)
     const result = await this.AudioManager.getRelated(vId)
     let number = 0
     for (const item of result.items) {
@@ -225,10 +228,13 @@ class AudioPlayer {
         continue
       }
     }
-    if (number > 5) this.playedSongs = []
-    const track = await this.AudioManager.getSongs(`https://youtu.be/${result.items[number].identifier}`)
+    const track = await this.AudioManager.getSongs(`https://youtu.be/${result.items[number].identifier}`, false)
     this.client.logger.debug(`${this.loggerPrefix} Playing related video ${track.tracks[0].info.title} (${track.tracks[0].info.identifier})`)
-    this.addQueue(track.tracks[0], this.message)
+    if (!this.player) {
+      return this.client.logger.debug(`${this.loggerPrefix} [Related] Abort addqueue. Player is not exists!`)
+    } else {
+      this.addQueue(track.tracks[0], this.message)
+    }
   }
 
   /**
