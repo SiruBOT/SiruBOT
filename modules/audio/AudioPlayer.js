@@ -213,7 +213,7 @@ class AudioPlayer {
    * @description - playRelated
    */
   async playRelated (item) {
-    if (!Buffer.from(item.track, 'base64').toString().split('').slice(-1)[0].startsWith('youtube')) return await this.playNext(true, false)
+    if (!Buffer.from(item.track, 'base64').toString().split('').slice(-1)[0].startsWith('youtube')) return this.playNext(true, false)
     const vId = this.AudioManager.getvIdfromUrl(item.info.uri)
     const result = await this.AudioManager.getRelated(vId)
     let number = 0
