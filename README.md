@@ -1,4 +1,4 @@
-# Discord Siru (Chinobot Beta)
+# CHINOBOT Development Version
 ![Language](https://img.shields.io/badge/language-Javascript,%20Node.js-brightgreen) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 ## This Project Use Standard JS Style
 [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
@@ -11,7 +11,7 @@
 ![Sangoon_Profile_SRC](https://chinobot.ga/author_profile.png)
 
 ## Discord (Click Image)
-[![Discord](https://img.shields.io/discord/546882924759220234?style=for-the-badge)](https://discord.gg/ucDCPAY)
+[![Discord](https://img.shields.io/discord/562920560955228176?style=for-the-badge)](https://discord.gg/ucDCPAY)
 
 ## Invite (Click Image)
 [![Invite Me](https://img.shields.io/badge/Discord-Invite-brightgreen)](https://discordapp.com/oauth2/authorize?client_id=577055261785718793&scope=bot)
