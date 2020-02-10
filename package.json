@@ -20,7 +20,7 @@
     "glob": "^7.1.6",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
-    "mongoose": "^5.8.4",
+    "mongoose": "^5.8.11",
     "node-cache": "^5.1.0",
     "node-fetch": "^2.6.0",
     "node-opus": "^0.3.3",
@@ -35,7 +35,7 @@
     "string-placeholder": "^1.0.2",
     "table": "^5.4.6",
     "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^4.4.0"
+    "winston-daily-rotate-file": "^4.4.1"
   },
   "devDependencies": {},
   "repository": {
