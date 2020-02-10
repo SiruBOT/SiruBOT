@@ -23,7 +23,7 @@ class Command {
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
     const { message, args } = compressed
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
       .setColor(this.client.utils.findUtil.getColor(message.guild.me))
     message.channel.startTyping(1)
     let index = 0

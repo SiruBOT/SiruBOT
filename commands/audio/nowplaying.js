@@ -16,7 +16,7 @@ class Command {
    */
   async run (compressed) {
     const { message } = compressed
-    const embed = await this.client.audio.getNowplayingEmbed(message.guild.id)
+    const embed = await this.client.audio.utils.getNowplayingEmbed(message.guild.id)
     const nowPlayingMessage = await message.channel.send(embed)
     this.client.audio.nowplayingMessages.set(message.guild.id, nowPlayingMessage)
   }

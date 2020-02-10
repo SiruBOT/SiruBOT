@@ -8,8 +8,6 @@ class Event {
    */
   run () {
     this.client.logger.info(`[BOT] Bot Is Ready. (${this.client.user.tag})`)
-    this.client.database.init()
-    this.client.audio.init()
     this.client.initialized = true
   }
 }

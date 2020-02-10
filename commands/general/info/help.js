@@ -16,11 +16,11 @@ class Command {
   /**
    * @param {Object} compressed - Compressed Object (In CBOT)
    */
-  run (compressed) {
+  async run (compressed) {
     const { message, args, prefix, userPermissions } = compressed
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
       .setThumbnail(message.guild.me.user.displayAvatarURL)
       .setColor(this.client.utils.findUtil.getColor(message.guild.me))
       .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }))

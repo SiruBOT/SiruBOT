@@ -34,10 +34,10 @@ class Command {
         descriptionArray.push(`\`\`${parseInt(position) + 1}.\`\` \`\`[${client.utils.timeUtil.toHHMMSS(guildData.queue[position].info.length / 1000, guildData.queue[position].info.isStream)}]\`\` **${Discord.Util.escapeMarkdown(guildData.queue[position].info.title)}** - <@${guildData.queue[position].request}>`)
       }
       const chunkedDescriptionArray = client.utils.arrayUtil.chunkArray(descriptionArray, 10)
-      const nowplayingObject = client.audio.getNowplayingObject(message.guild.id, guildData)
+      const nowplayingObject = client.audio.utils.getNowplayingObject(message.guild.id, guildData)
 
       return {
-        embed: new Discord.RichEmbed()
+        embed: new Discord.MessageEmbed()
           .setDescription(chunkedDescriptionArray[page].map(el => el))
           .setFooter(picker.get(locale, 'PAGER_PAGE', { CURRENT: page + 1, PAGES: chunkedDescriptionArray.length })).setColor(client.utils.findUtil.getColor(message.guild.me)),
         nowplaying: picker.get(locale, 'COMMANDS_AUDIO_QUEUE_SONGS', { PLAYINGSTATUS: nowplayingObject.playingStatus, NPTITLE: guildData.nowplaying.info.title, NOWPOSITION: nowplayingObject.time, REPEATSTATUS: nowplayingObject.repeatStatus, NUM: guildData.queue.length, TOTALTIME: client.utils.timeUtil.toHHMMSS(allDuration / 1000) }),

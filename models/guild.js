@@ -23,6 +23,7 @@ const Schema = new mongo.Schema({
   volume: { type: Number, default: 40 },
   queue: { type: Array, default: [] },
   nowplaying: { type: Object, default: { track: null } },
+  nowplayingPosition: { type: Number, default: 0 },
   tch: { type: String, default: '0' },
   vch: { type: String, default: '0' }
 }, { collection: 'guild', versionKey: false })

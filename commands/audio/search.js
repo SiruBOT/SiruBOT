@@ -27,9 +27,9 @@ class Command {
 
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
 
-    if (!Audio.players.get(message.guild.id) || (Audio.players.get(message.guild.id) && !message.guild.me.voiceChannel)) {
-      const joinresult = await this.client.commands.get('join').run(compressed, true, !(searchStr.length === 0 && args.length === 0))
-      if (joinresult === false) return
+    if (!Audio.players.get(message.guild.id) || (this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
+      const voiceJoinSuccess = await this.client.commands.get('join').run(compressed, true)
+      if (voiceJoinSuccess !== true) return
     }
 
     if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
@@ -38,9 +38,9 @@ class Command {
     }
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
-    const searchResult = await Audio.getSongs(searchStr)
+    const searchResult = await Audio.getTrack(searchStr)
     if (this.client.commands.get('play').chkSearchResult(searchResult, picker, locale, message) !== true) return
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
     let string = ''
     const maxres = 5
     const slicedNumberArray = Numbers.slice(0, searchResult.tracks.slice(0, maxres).length)

@@ -1,333 +1,228 @@
-const { PlayerManager } = require('discord.js-lavalink')
-const AudioPlayer = require('./AudioPlayer')
+const Shoukaku = require('shoukaku')
+const NodeCache = require('node-cache')
+const Queue = require('./Queue')
+const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
+const AudioUtils = require('./AudioUtils')
+const QueueEvents = require('./QueueEvents')
 const { Collection } = require('discord.js')
-const fetch = require('node-fetch')
-const cheerio = require('cheerio')
-const { URLSearchParams } = require('url')
-const Discord = require('discord.js')
 
-class AudioManager {
-  /**
-   * @param {Object} options - Options for AudioManager
-   * @param {Client} options.client - AudioManager Client
-   * @param {Array} options.nodes - Audio Nodes
-   * @param {Number} options.shards - Shards Count
-   */
-  constructor (options) {
-    this.client = options.client
+class Audio extends Shoukaku.Shoukaku {
+  constructor (...args) {
+    super(...args)
+
+    this.client = args[0]
+
+    this.utils = new AudioUtils(this.client)
+
+    this.classPrefix = '[Audio:Defalut'
+    this.lavalinkPrefix = '[Audio:Lavalink]'
+    this.defaultPrefix = {
+      getTrack: `${this.classPrefix}:getTrack]`,
+      join: `${this.classPrefix}:join]`,
+      moveChannel: `${this.classPrefix}:moveChannel]`,
+      leave: `${this.classPrefix}:leave]`,
+      stop: `${this.classPrefix}:stop]`,
+      handleDisconnect: `${this.classPrefix}:handleDisconnect]`,
+      setPlayerDefaultSetting: `${this.classPrefix}:setPlayerDefaultSetting]`,
+      setVolume: `${this.classPrefix}:setVolume]`
+    }
+
+    this.queue = new Queue(this)
+    const queueEvents = new QueueEvents(args[0])
+    this.queue.on('queueEvent', (data) => {
+      queueEvents.HandleEvents(data)
+    })
+    this.textChannels = new Collection()
+    this.textMessages = new Collection()
     this.nowplayingMessages = new Collection()
-    this.players = new Collection()
-    this.manager = null
-    this._options = options
+
+    this.audioRouter = new AudioPlayerEventRouter(this)
+
+    this.client.logger.info(`${this.classPrefix}] Init Audio..`)
+    this.trackCache = new NodeCache({ ttl: 500 })
+
+    this.on('ready', (name, resumed) => this.client.logger.info(`${this.lavalinkPrefix} Lavalink Node: ${name} is now connected. This connection is ${resumed ? 'resumed' : 'a new connection'}`))
+    this.on('error', (name, error) => this.client.logger.error(`${this.lavalinkPrefix} Lavalink Node: ${name} emitted an error. ${error.stack}`))
+    this.on('close', (name, code, reason) => this.client.logger.warn(`${this.lavalinkPrefix} Lavalink Node: ${name} closed with code ${code}. Reason: ${reason || 'No reason'}`))
+    this.on('disconnected', (name, reason) => this.client.logger.warn(`${this.lavalinkPrefix} Lavalink Node: ${name} disconnected. Reason: ${reason || 'No reason'}`))
+    this.on('debug', (name, data) => {
+      this.client.logger.debug(`${this.lavalinkPrefix} Lavalink Node: ${name} - Data: ${JSON.stringify(data)}`)
+    })
   }
 
   /**
-  * @description Init AudioManager
+   * @param {String} voiceChannelID - voiceChannelId join for
+   * @param {String} guildID - guildID of voiceChannel
+   */
+  join (voiceChannelID, guildID, moveChannel = false) {
+    return new Promise((resolve, reject) => {
+      this.getNode().joinVoiceChannel({
+        guildID: guildID,
+        voiceChannelID: voiceChannelID
+      }).then((player) => {
+        this.audioRouter.registerEvents(player)
+        this.setPlayersDefaultSetting(guildID)
+        this.client.logger.debug(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Successfully joined voiceChannel.`)
+        if (!moveChannel) this.queue.autoPlay(guildID)
+        resolve(true)
+      }).catch(e => {
+        this.client.guilds.get(guildID)
+        this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)
+        reject(e)
+      })
+    })
+  }
+
+  /**
+  * @param {String} guildID - guildID
+  * @example - <Audio>.setPlayerDefaultSetting('672586746587774976')
+  * @returns {Promise<Boolean>}
   */
-  init () {
-    this.client.logger.info('[Audio] Init Audio...')
-    this.manager = new PlayerManager(this.client, this._options.nodes, {
-      user: this.client.user.id,
-      shards: this._options.shards
-    })
-    for (const node of this.manager.nodes) {
-      node[1].ws.on('message', (data) => {
-        const parsed = JSON.parse(data)
-        // if (Object.keys(parsed).includes('filters') && parsed.op === 'event') return this.players.get(parsed.guildId).emit('error', parsed.error)
-        if (parsed.op === 'playerUpdate') {
-          this.updateNpMessage(parsed.guildId)
-        }
-      })
-    }
+  async setPlayersDefaultSetting (guildID) {
+    if (!guildID) return new Error('no guildID Provied')
+    const { volume } = await this.client.database.getGuildData(guildID)
+    this.client.logger.debug(`${this.defaultPrefix.setPlayerDefaultSetting} Set player volume for guild ${guildID} (${volume})`)
+    return this.players.get(guildID).setVolume(volume)
   }
 
   /**
-   * @description Update Nowplaying Message
-   * @param {String} guildId - guildId of to update nowplaying message
-   * @param {Boolean} stop - If True, delete guildId of nowplayingMessage from nowplayingMessagesCollection
+   * @param {String} guildID - guildID for player leave
    */
-  updateNpMessage (guildId, stop = false) {
-    const npMessage = this.nowplayingMessages.get(guildId)
-    if (npMessage && npMessage.deleted === false && npMessage.editable) {
-      this.getNowplayingEmbed(guildId).then(embed => {
-        npMessage.edit(embed)
-      })
-    } else {
-      this.nowplayingMessages.delete(guildId)
-    }
-    if (stop) {
-      this.nowplayingMessages.delete(guildId)
-    }
-  }
-
-  /**
-   * @description - get video id from youtube url's
-   * @param {String} url - youtube url
-   */
-  getvIdfromUrl (url) {
-    if (!url) return undefined
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-    const match = url.match(regExp)
-    return (match && match[7].length === 11) ? match[7] : undefined
-  }
-
-  /**
-   *
-   * @param {String} vId - Youtube Video Id
-   */
-  async getRelated (vId) {
-    const result = await fetch(`https://www.youtube.com/watch?v=${vId}`)
-      .then(body => body.text()).catch(err => {
-        console.error(err)
-        return null
-      })
-    const $ = cheerio.load(result)
-    const relatedSongs = []
-    const upnext = $('#watch7-sidebar-modules > div:nth-child(1) > div > div.watch-sidebar-body > ul > li > div.content-wrapper > a')
-    relatedSongs.push({ uri: `https://youtube.com${upnext.attr('href')}`, identifier: this.getvIdfromUrl(upnext.attr('href')), title: upnext.attr('title') })
-    $('#watch-related').children().each((index, item) => {
-      const url = $(item).children('.content-wrapper').children('a').attr('href')
-      const title = $(item).children('.content-wrapper').children('a').attr('title')
-      if (url) relatedSongs.push({ uri: `https://youtube.com${url}`, identifier: this.getvIdfromUrl(url), title: title })
-    })
-    return { items: relatedSongs }
-  }
-
-  /**
-   * @param {String} guild - Guild Id to get nowplaying Embed
-   */
-  async getNowplayingEmbed (guild) {
-    const guildData = await this.client.database.getGuildData(guild)
-    if (!this.players.get(guild) || !guildData.nowplaying.track) {
-      return new Discord.RichEmbed()
-        .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
-        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))
-    }
-    const request = this.client.users.get(guildData.nowplaying.request)
-    return new Discord.RichEmbed()
-      .setAuthor(request.tag, request.displayAvatarURL)
-      .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
-      .setURL(guildData.nowplaying.info.uri)
-      .setDescription(this.getNowplayingText(guild, guildData))
-      .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guild).me))
-      .setThumbnail(this.validateYouTubeUrl(guildData.nowplaying.info.uri) ? `https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
-  }
-
-  /**
-   * @description Get Formatted(Nowplaying) Text with informations
-   * @param {String} guild - guildId to formatting
-   * @param {Object} guildData - Database Object
-   */
-  getNowplayingText (guild, guildData) {
-    if (!this.players.get(guild) || !guildData.nowplaying.track) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
-    const nowPlayingObject = this.getNowplayingObject(guild, guildData)
-    return `${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
-  }
-
-  /**
-   * @param {String} guild - guildId to formatting
-   * @param {Object} guildData - Database Object
-   */
-  getNowplayingObject (guild, guildData) {
-    if (guildData.nowplaying.info) {
-      return {
-        playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
-        repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
-        progressBar: this.getProgressBar(this.players.get(guild).player.state.position / guildData.nowplaying.info.length),
-        time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]`,
-        volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
-      }
-    } else {
-      return {
-        playingStatus: this.client._options.constructors['EMOJI_AUDIO_' + this.getPlayingState(guild).toUpperCase()],
-        repeatStatus: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat).toUpperCase()],
-        progressBar: this.getProgressBar(this.players.get(guild).player.state.position / 0),
-        time: `[${this.client.utils.timeUtil.toHHMMSS(this.players.get(guild).player.state.position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(0, false)}]`,
-        volume: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**`
-      }
-    }
-  }
-
-  /**
-   * @param {String} url - Url to check validate
-   * @return {Boolean} - If url is youtube url, returns true, else returns false
-   */
-  validateYouTubeUrl (url) {
-    const regExp = new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/)
-    const match = url.match(regExp)
-    if (match && match[2].length === 11) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  /**
-   * @param {Number} volume- Volume of get emoji
-   * @returns {String} - Emojis (🔇, 🔉, 🔊)
-   */
-  getVolumeEmoji (volume) {
-    if (volume === 0) { return '🔇' }
-    if (volume < 30) { return '🔉' }
-    if (volume < 70) { return '🔊' }
-    return '🔊'
-  }
-
-  /**
-   * @param {String} - Guild Id to get playing state (pause,playing,no)
-   * @returns {String} - 'pause', 'playing', 'none'
-   */
-  getPlayingState (guild) {
-    if (!this.client.audio.players.get(guild)) return 'none'
-    if (this.client.audio.players.get(guild).player.paused) return 'paused'
-    if (this.client.audio.players.get(guild).player.paused === false) return 'playing'
-  }
-
-  /**
-   * @param {Number} number - 0, 1, 2 (Repeat Stats)
-   * @returns {String} - 'repeat_none', 'repeat_all', 'repeat_single'
-   */
-  getRepeatState (number) {
-    switch (number) {
-      case 0:
-        return 'repeat_none'
-      case 1:
-        return 'repeat_all'
-      case 2:
-        return 'repeat_single'
-    }
-  }
-
-  /**
-   * @param {Number} percent - Player's Position / Track Duration (miliseconds)
-   * @returns {String} - 🔘▬▬▬▬▬▬▬▬▬▬▬
-   */
-  getProgressBar (percent) {
-    let str = ''
-    for (let i = 0; i < 12; i++) {
-      if (i === parseInt(percent * 12)) {
-        str += '🔘'
-      } else {
-        str += '▬'
-      }
-    }
-    return str
-  }
-
-  /**
-   * @description Gets best node - Sort by playing players
-   * @returns {Node} - Returns Audio Node
-   */
-  getBestNode () {
-    const node = this.manager.nodes.filter(el => el.ready === true).sort((a, b) => {
-      return a.stats.playingPlayers - b.stats.playingPlayers
-    }).first()
-    return node
-  }
-
-  /**
-   * @param {Object} options - Options for audio player
-   * @param {String} options.guild - Guild id for player
-   * @param {String} options.channel - Voicechannel id for player
-   */
-  join (options) {
-    this.client.logger.info(`[AudioManager] ${options.guild} [DEBUG] [Join] (${options.channel.id}) Joining Voice Channel`)
-    console.log(options.channel.joinable)
-    if (options.channel.joinable === false) return false
+  leave (guildID) {
+    this.client.logger.debug(`${this.defaultPrefix.leave} [${guildID}] Player leave`)
+    if (this.players.get(guildID)) this.players.get(guildID).disconnect()
     else {
-      const player = new AudioPlayer({ AudioManager: this, client: this.client, guild: options.guild, channel: options.channel.id, textChannel: options.textChannel })
-      player.join(options.addQueue)
-      this.players.set(options.guild, player)
-      return true
-    }
-  }
-
-  /**
-   * @description Checking is member listenable
-   * @param {Discord.Member} member - Member to checking
-   */
-  getVoiceStatus (member) {
-    return {
-      listen: this.getListenStatus(member),
-      speak: this.getVoiceMuteStatus(member)
-    }
-  }
-
-  /**
-   * @description Get VoiceMute Status
-   * @param {Discord.Member} member - Member to check
-   * @returns {Boolean} - false, true
-   */
-  getVoiceMuteStatus (member) {
-    if (member.selfMute) return false
-    if (member.serverMute) return false
-    else return true
-  }
-
-  /**
-   * @description Get Listen Status
-   * @param {Discord.Member} member - Member to check
-   * @returns {Boolean} - false, true
-   */
-  getListenStatus (member) {
-    if (member.serverDeaf) return false
-    if (member.selfDeaf) return false
-    else return true
-  }
-
-  /**
-   * @description If Playing Player Exists, set player's volume and edit database, else set database volume
-   * @param {Discord.Guild} guild - Guild of setVolume
-   * @param {Number} vol - Volume of guild
-   */
-  async setVolume (guild, vol) {
-    await this.client.database.updateGuildData(guild.id, { $set: { volume: vol } })
-    if (this.players.get(guild.id)) {
-      this.players.get(guild.id).player.volume(vol)
-    }
-    return vol
-  }
-
-  /**
-   * @param {String} search - Search String ('ytsearch: asdfmovie')
-   * @returns {Promise} - Search Result (Promise)
-   */
-  async getSongs (search, cache = true) {
-    const node = this.getBestNode()
-
-    // const params = new URLSearchParams()
-    // params.append('identifier', search)
-    // return fetch(`http://${node.host}:${node.port}/loadtracks?${params.toString()}`, { headers: { Authorization: node.password } })
-    //   .then(res => res.json())
-    //   .catch(err => {
-    //     console.error(err)
-    //     return undefined
-    //   })
-    if (this.client.audioCache.get(search) && cache) {
-      this.client.logger.debug(`[AudioManager] Search Keyword: ${search} Cache Available (${this.client.audioCache.get(search)}) returns Data`)
-      return this.client.audioCache.get(search)
-    } else {
-      const params = new URLSearchParams()
-      params.append('identifier', search)
-      const result = await fetch(`http://${node.host}:${node.port}/loadtracks?${params.toString()}`, { headers: { Authorization: node.password } })
-        .then(res => res.json())
-        .catch(err => {
-          console.error(err)
-          return null
-        })
-      if (!['LOAD_FAILED', 'NO_MATCHES'].includes(result.loadType) || result !== null) {
-        this.client.logger.debug(`[AudioManager] Cache not found. registring cache... (${search})`)
-        this.client.audioCache.set(search, result)
-        result.tracks.map(el => {
-          this.client.logger.debug(`[AudioManager] Registring Identifier: ${el.info.identifier}`)
-          this.client.audioCache.set(el.info.identifier, el)
-        })
-        return result
-      } else {
-        return result
+      for (const node of this.nodes.values()) {
+        node.leaveVoiceChannel(guildID)
       }
+    }
+  }
+
+  /**
+   * @param {String} guildID - guildID for player stop
+   * @param {Boolean} cleanQueue - if clears Tracks Queue
+   */
+  stop (guildID, cleanQueue = true) {
+    if (!guildID) return new Error('guildID is not provied')
+    this.leave(guildID)
+    if (cleanQueue) this.client.database.updateGuildData(guildID, { $set: { queue: [] } })
+    this.queue.setNowPlaying(guildID, { track: null })
+    this.client.database.updateGuildData(guildID, { $set: { nowplayingPosition: 0 } })
+    this.client.audio.utils.updateNowplayingMessage(guildID)
+  }
+
+  /**
+   * @param {String} guildId - guildId to set volume
+   * @param {Number} volume - Percentage of volume (0~150)
+   * @example - <Audio>.setVolume('672586746587774976', 150)
+   */
+  setVolume (guildID, vol) {
+    this.client.logger.debug(`${this.defaultPrefix.setVolume} Setting volume of guild ${guildID} to ${vol}..`)
+    this.client.database.updateGuildData(guildID, { $set: { volume: vol } })
+    if (!this.players.get(guildID)) return Promise.resolve(false)
+    else {
+      this.players.get(guildID).setVolume(vol)
+    }
+  }
+
+  /**
+   * @param {Object} data - Socket Data
+   */
+  async handleDisconnect (data) {
+    this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Reconnect voicechannel...`)
+    if (this.client.guilds.get(data.guildId).me.voice.channelID) {
+      const guildData = await this.client.database.getGuildData(data.guildId)
+      this.moveChannel(this.client.guilds.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
+        if (guildData.nowplaying.track !== null) await this.players.get(data.guildId).playTrack(guildData.nowplaying.track, { noReplace: false, startTime: guildData.nowplayingPosition || 0 })
+      }).catch((e) => {
+        this.client.logger.error(`${this.defaultPrefix.handleDisconnect} ${e.name}: ${e.message} Stack Trace:\n${e.stack}`)
+        this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Handle DisconnectHandler Error, Stops Audio Queue, Sets nowplaying is null...`)
+        this.stop(data.guildId)
+      })
+    }
+  }
+
+  /**
+   * @param {String} guildID - guild Id of voicechannel for move
+   * @param {String} channelID - channelID to moving
+   * @returns {Promise<true|Error>}
+   */
+  moveChannel (voiceChannelID, guildID) {
+    return new Promise((resolve, reject) => {
+      if (!this.players.get(guildID)) return resolve(this.join(voiceChannelID, guildID))
+      const beforePlayer = this.players.get(guildID)
+      const beforeObject = clone({
+        voiceChannel: (!beforePlayer.voiceConnection ? null : beforePlayer.voiceConnection.voiceChannelID),
+        volume: (!beforePlayer ? 100 : beforePlayer.volume),
+        track: (!beforePlayer ? null : beforePlayer.track),
+        position: (!beforePlayer ? 0 : beforePlayer.position),
+        paused: (!beforePlayer ? false : beforePlayer.paused)
+      })
+      if (beforeObject.voiceChannel === voiceChannelID) return reject(new Error('voiceChannel cannot be the same as the player\'s voiceChannel.'))
+      this.leave(guildID)
+      this.join(voiceChannelID, guildID, true).then(async () => {
+        if (beforeObject.track) await this.players.get(guildID).playTrack(beforeObject.track, { noReplace: false, startTime: beforeObject.position })
+        if (beforeObject.volume) this.players.get(guildID).setVolume(beforeObject.volume)
+        if (beforeObject.paused) await this.players.get(guildID).setPaused(beforeObject.paused)
+        this.client.logger.debug(`${this.defaultPrefix.moveChannel} [${guildID}] [${beforeObject.voiceChannel}] -> [${voiceChannelID}] Successfully moved voiceChannel.`)
+        resolve(true)
+      }).catch(e => {
+        this.client.logger.error(`${this.defaultPrefix.moveChannel} [${guildID}] [${beforeObject.voiceChannel}] -> [${voiceChannelID}] Failed move to voiceChannel [${e.name}: ${e.message}]`)
+        reject(e)
+      })
+    })
+  }
+
+  /**
+   * @description - Get Nodes sort by players.
+   */
+  getNode () {
+    return Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED').sort((a, b) => {
+      return a.players.size - b.players.size
+    })[0]
+  }
+
+  /**
+   * @param {String} query - Search String ('ytsearch: asdfmovie')
+   * @returns {Promise<Object>} - query Result (Promise)
+   */
+  async getTrack (query, cache = true) {
+    if (!query) return new Error(`${this.defaultPrefix.getTrack} Query is not provied`)
+    const node = this.getNode()
+    if (this.trackCache.get(query) && cache) {
+      this.client.logger.debug(`${this.defaultPrefix.getTrack} Query Keyword: ${query} Cache Available (${this.trackCache.get(query)}) returns Data`)
+      return this.trackCache.get(query)
+    }
+    const resultFetch = await node.rest._getFetch(`/loadtracks?${new URLSearchParams({ identifier: query }).toString()}`)
+      .catch(err => {
+        this.client.logger.debug(`${this.defaultPrefix.getTrack} Query Keyword: ${query} ${err.name}: ${err.message}`)
+      })
+    if (resultFetch !== null && !['LOAD_FAILED', 'NO_MATCHES'].includes(resultFetch.loadType)) {
+      this.client.logger.debug(`[AudioManager] Cache not found. registring cache... (${query})`)
+      this.trackCache.set(query, resultFetch)
+      resultFetch.tracks.map(el => {
+        this.client.logger.debug(`[AudioManager] Registring Identifier: ${el.info.identifier}`)
+        this.trackCache.set(el.info.identifier, el)
+      })
+      return resultFetch
+    } else {
+      return resultFetch
     }
   }
 }
 
-module.exports = AudioManager
+module.exports = Audio
+
+function clone (obj) {
+  if (obj === null || typeof (obj) !== 'object') { return obj }
+
+  var copy = obj.constructor()
+
+  for (var attr in obj) {
+    if (obj.hasOwnProperty(attr)) {
+      copy[attr] = clone(obj[attr])
+    }
+  }
+
+  return copy
+}

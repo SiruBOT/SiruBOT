@@ -20,7 +20,7 @@ class Command {
     const { message } = compressed
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'AUDIO_NOPLAYER'))
-    Audio.players.get(message.guild.id).stop(true)
+    Audio.stop(message.guild.id)
     message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_STOP_OK'))
   }
 }

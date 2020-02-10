@@ -27,7 +27,7 @@ class Command {
       message.channel.send(picker.get(locale, 'COMMANDS_CHANGELOG_NO', { COMMITSHA: gitInfo.abbreviatedSha }))
     } else {
       const obj = JSON.parse(result)
-      const embed = new Discord.RichEmbed(Object.assign(obj.locales[locale], obj.footer))
+      const embed = new Discord.MessageEmbed(Object.assign(obj.locales[locale], obj.footer))
       embed.setTitle(`${obj.locales[locale].title} - **${gitInfo.abbreviatedSha}**`)
       embed.setTimestamp(obj.timestamp)
       embed.setColor(obj.color)

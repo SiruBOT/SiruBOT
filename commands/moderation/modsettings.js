@@ -20,7 +20,7 @@ class Command {
     const { message, GuildData } = compressed
     const { locale, filter, warningMax, audioMessage, audioPlayrelated, repeat, shuffle, tch, vch } = GuildData
     const djRole = GuildData.dj_role
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
     const obj = {
       MOD: {
         LOCALE: picker.get(locale, 'NAME'),
@@ -30,8 +30,8 @@ class Command {
       AUDIO: {
         AUDIOPLAY: audioMessage === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         RELATED: audioPlayrelated === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
-        REPEAT_EMOJI: this.client._options.constructors['EMOJI_' + this.client.audio.getRepeatState(repeat).toUpperCase()],
-        REPEAT: picker.get(locale, this.client.audio.getRepeatState(GuildData.repeat).toUpperCase()),
+        REPEAT_EMOJI: this.client._options.constructors['EMOJI_' + this.client.audio.utils.getRepeatState(repeat).toUpperCase()],
+        REPEAT: picker.get(locale, this.client.audio.utils.getRepeatState(GuildData.repeat).toUpperCase()),
         SHUFFLE: shuffle === true ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         SHUFFLE_EMOJI: shuffle === true ? this.client._options.constructors.EMOJI_SHUFFLE : this.client._options.constructors.EMOJI_REPEAT_NONE
       },

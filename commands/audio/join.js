@@ -15,34 +15,32 @@ class Command {
    * @param {Object} compressed - Compressed Object (In CBOT)
    * @param {Boolean} silent - if Send Message
    */
-  async run (compressed, silent = false, addQueue = false) {
+  async run (compressed, silent = false) {
     const { message } = compressed
-    const Audio = this.client.audio
-    const vch = compressed.GuildData.vch
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
+    const voiceChannelID = message.member.voice.channelID
 
-    if (!message.member.voiceChannel) return sendSilent(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
-    if (!this.client.getRightChannel(message.member.voiceChannel, vch)) return sendSilent(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
+    const loadMessage = silent === true ? '' : await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_JOIN_LOAD', { VOICECHANNEL: voiceChannelID }))
 
-    const voiceChannel = message.member.voiceChannel
-    if (Audio.players.get(message.guild.id) && !message.guild.me.voiceChannel) {
-      Audio.players.get(message.guild.id).player.switchChannel('0', true)
-      Audio.players.get(message.guild.id).player.switchChannel(voiceChannel.id, true)
-      return sendSilent(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannel.id }))
+    const sendFunc = (sendContent, err) => {
+      if ((loadMessage.editable && silent === false)) loadMessage.edit(sendContent)
+      else if (err && (err !== 'A Player is already established in this channel')) message.channel.send(sendContent)
     }
-    const result = Audio.join({ guild: message.guild.id, channel: voiceChannel, textChannel: message.channel, addQueue })
-    if (result === true) return sendSilent(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannel.id }))
-    else {
-      message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_JOIN_FAIL', { VOICECHANNEL: voiceChannel.id }))
-      return false
-    }
-
-    function sendSilent (item) {
-      if (!silent) {
-        return message.channel.send(item)
+    return (() => {
+      if ((this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
+        return this.client.audio.moveChannel(voiceChannelID, message.guild.id)
+      } else {
+        return this.client.audio.join(voiceChannelID, message.guild.id)
       }
-    }
+    })().then(() => {
+      sendFunc(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannelID }))
+      return true
+    }).catch((e) => {
+      if (e.message === 'A Player is already established in this channel') sendFunc(picker.get(locale, 'COMMANDS_AUDIO_JOIN_DUPLICATED', { VOICECHANNEL: voiceChannelID }))
+      else sendFunc(picker.get(locale, 'COMMANDS_AUDIO_JOIN_FAIL', { VOICECHANNEL: voiceChannelID }) + `\`\`\`js\n > ${`${e.name}: ${e.message}`.split('\n').join('\n> ')}\`\`\``, e)
+      return e.message === 'A Player is already established in this channel' ? true : e.message
+    })
   }
 }
 

@@ -18,7 +18,7 @@ class Command {
   async run (compressed) {
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
-    const { message, args, GlobalUserData } = compressed
+    const { message, GlobalUserData } = compressed
     const able = this.checkAble(GlobalUserData.paydayDate)
     if (able.bool) {
       message.channel.send(picker.get(locale, 'COMMANDS_MONEY_PAYDAY_OK'))

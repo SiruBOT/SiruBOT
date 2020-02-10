@@ -1,8 +1,8 @@
 module.exports = {
   apps: [{
-    name: 'BOT-WEB',
+    name: 'RewriteWEB',
     script: './index.js',
-    instances: 0,
+    instances: 1,
     exec_mode: 'cluster'
   }]
 }

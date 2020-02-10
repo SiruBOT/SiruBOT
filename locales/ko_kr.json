@@ -75,6 +75,7 @@
     "PAGER_PAGE": "페이지 %CURRENT% / %PAGES%",
 
     "HANDLE_COMMANDS_DEFAULT_TEXT": "%EMOJI_NO%  **%SERVER%** 서버에서는 채널 <#%CHANNEL%> 에서만 저의 명령어를 사용하실수 있어요!",
+    "HANDLE_COMMANDS_ERROR": "> %EMOJI_WARN%  명령어를 처리하는 도중 알 수 없는 에러가 발생하였어요...\n> %EMOJI_WARN%  다음 에러 코드를 복사하여 개발자에게 전달해주세요!\n> %EMOJI_BULB% 에러 코드: ``%UUID%``",
     "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  이 명령어는 다음 권한이 필요해요. ``%REQUIRED%``",
 
     "COMMANDS_MONEY_PAYDAY_OK": "%EMOJI_MONEY%  당신의 잔고에 ``10000`` %MONEY_NAME%를 추가했어요!",
@@ -105,6 +106,7 @@
     "COMMANDS_CASINO_EVEN": "짝수",
 
     "NOWPLAYING_NOTRACK": "아무 노래도 재생중이지 않아요!",
+    "AUDIO_NO_NODES": "> %EMOJI_BULB%  현재 노래를 재생 할 수 있는 노드가 존재하지 않아요!",
     "AUDIO_NOPLAYER": "> %EMOJI_MUSIC%  현재 노래를 재생중이지 않아요!",
     "AUDIO_JOIN_VOICE_FIRST": "> %EMOJI_MUSIC%  먼저 음성 채널에 접속해주세요!",
     "AUDIO_NOT_DEFAULT_CH": "> %EMOJI_MUSIC%  이 명령어는 음성 채널 **<#%VOICECHANNEL%>** 에서만 사용 가능해요!",
@@ -130,8 +132,10 @@
 
     "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  재생중인 음악을 정지하고 대기열을 초기화했어요!",
     
+    "COMMANDS_AUDIO_JOIN_LOAD": "> %EMOJI_BULB%  음성 채널 **<#%VOICECHANNEL%>** 에 접속 중...",
     "COMMANDS_AUDIO_JOIN_OK": "> %EMOJI_MUSIC%  성공적으로 음성 채널 **<#%VOICECHANNEL%>** 에 접속했어요!",
     "COMMANDS_AUDIO_JOIN_FAIL": "> %EMOJI_MUSIC%  음성 채널 **<#%VOICECHANNEL%>** 에 접속을 실패했어요.. 채널의 권한을 확인해주세요!",
+    "COMMANDS_AUDIO_JOIN_DUPLICATED": "> %EMOJI_MUSIC%  음성 채널 **<#%VOICECHANNEL%>** 에 이미 접속되어 있어요!",
     "COMMANDS_AUDIO_SETDJ_SET": "> %EMOJI_MUSIC%  DJ 역할을 ``%DJNAME%`` 로 설정했어요!\n> %EMOJI_MUSIC%  DJ 명령어는 이 역할을 가지고 있거나, 관리자만 사용 가능해요!",
     "COMMANDS_AUDIO_SETDJ_NONE": "> %EMOJI_MUSIC%  DJ 역할을 **%NONE%** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 DJ 명령어는 관리자만 사용 가능해요!",
     "COMMANDS_AUDIO_SETTC_SET": "> %EMOJI_MUSIC%  명령어 채널을 %CHANNEL% 로 설정했어요!\n> %EMOJI_MUSIC%  앞으로 이 채널에서만 명령어를 사용하실 수 있어요!",
@@ -141,6 +145,7 @@
 
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  노래 로드를 실패했어요.. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 이 재생 목록 **%POSITION%**번에 추가되었어요!",
+    "COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY": "> %EMOJI_MUSIC%  **%TRACK% [%DURATION%]** 이 곧 재생되어요!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  이 재생 목록에 있는 노래 **%NUM%** 개를 재생 목록에 추가했어요!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST": "> %EMOJI_MUSIC%  이 노래에는 **%NUM%** 개의 노래가 포함되어있어요! 추가하실건가요?",
     "COMMANDS_AUDIO_PLAY_NO_VOICE_ME": "> %EMOJI_MUSIC%  먼저 저를 음성 채널에 추가해주세요!",

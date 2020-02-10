@@ -4,11 +4,20 @@ const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
 const settings = require('./modules/checker/getSettings')()
 const isTesting = require('./modules/checker/isTesting')()
 const ServerLoggingManager = require('./modules/logging/serverLoggerManager')
-const NodeCache = require('node-cache')
+const redis = require('redis')
 
 class Client extends Discord.Client {
   constructor (options) {
     super()
+
+    this.classPrefix = '[Client'
+    this.defaultPrefix = {
+      init: `${this.classPrefix}:init]`,
+      LoadCommands: `${this.classPrefix}:LoadCommands]`,
+      registerEvents: `${this.classPrefix}:registerEvents]`,
+      setActivity: `${this.classPrefix}:setActivity]`
+    }
+
     this._isTesting = isTesting
     this._options = options
     this.logger = new Logger(this)
@@ -26,26 +35,43 @@ class Client extends Discord.Client {
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
-    this.audio = new Audio({ client: this, shards: this._options.audio.shards, nodes: this._options.audio.nodes })
-    this.audioCache = new NodeCache()
+    // this.audio = new Audio({ client: this, shards: this._options.audio.shards, nodes: this._options.audio.nodes })
+    this.audio = new Audio(this,
+      this._options.audio.nodes,
+      {
+        moveOnDisconnect: false,
+        resumable: 'sirubot',
+        resumableTimeout: 60,
+        reconnectTries: 1500,
+        restTimeout: 10000
+      })
+
+    this.redisClient = redis.createClient(this._options.db.redis)
 
     this.loggerManager = new ServerLoggingManager(this)
   }
 
   init () {
     if (this.initialized) {
-      this.logger.error('[BOT] Bot is Already Initialized!')
-      return new Error('[BOT] Bot is Already Initialized!')
+      this.logger.error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
+      return new Error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
     }
-    if (!isTesting) { this.logger.info('[BOT] Initializing Bot..') }
+    if (!isTesting) { this.logger.info(`${this.defaultPrefix.init} Initializing Bot..`) }
     this.utils.localePicker.init()
     this.loggerManager.init()
     this.registerEvents()
     this.LoadCommands()
-    if (!isTesting) this.login(this._options.bot.token)
+    if (!isTesting) {
+      this.database.init()
+      this.login(this._options.bot.token)
+    }
   }
 
-  getRightChannel (channel, id) {
+  /**
+   * @param {*} channel - Channel ID for compare
+   * @param {*} id - Database's Channel ID for compare
+   */
+  chkRightChannel (channel, id) {
     if (id === channel.id) return true
     if (id === '0') return true
     if (this.channels.get(id)) {
@@ -56,10 +82,14 @@ class Client extends Discord.Client {
     }
   }
 
+  /**
+   * @description - Load Commands files in commands folder
+   * @returns {Collection} - Command Collection
+   */
   async LoadCommands () {
     const CommandsFile = await this.utils.asyncFunc.globAsync('./commands/**/*.js')
     const reLoadOrLoad = `${this.commands_loaded ? '(re)' : ''}Load`
-    const load = `[Commands] [${reLoadOrLoad}]`
+    const load = `${this.defaultPrefix.LoadCommands} [${reLoadOrLoad}]`
     this.logger.info(`${load} Loading Commands (${CommandsFile.length} Files)`)
     this.logger.debug(`${load} (Commands: ${CommandsFile.join(', ')})`)
     for (const cmd of CommandsFile) {
@@ -87,28 +117,34 @@ class Client extends Discord.Client {
         this.categories.set(item.category, array)
       }
     }
-    this.logger.info(`[Commands] Successfully ${reLoadOrLoad}ed Commands!`)
+    this.logger.info(`${this.defaultPrefix.LoadCommands} Successfully ${reLoadOrLoad}ed Commands!`)
     if (isTesting) process.exit(0)
     return this.commands
   }
 
+  /**
+   * @description Register Events in events folder
+   */
   async registerEvents () {
-    this.logger.info('[Events] Registering Events...')
+    this.logger.info(`${this.defaultPrefix.registerEvents} Registering Events...`)
     const eventsFile = await this.utils.asyncFunc.globAsync('./events/**/*.js')
-    this.logger.debug(`[Events] Event Files: ${eventsFile.join(' | ')}`)
+    this.logger.debug(`${this.defaultPrefix.registerEvents} Event Files: ${eventsFile.join(' | ')}`)
     for (const file of eventsFile) {
       const EventClass = require(file)
       const Event = new EventClass(this)
       this.on(EventClass.info.event, (...args) => Event.run(...args))
     }
-    this.logger.info('[Events] Events Successfully Loaded!')
+    this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)
   }
 
+  /**
+   * @description set Activity Interval (15000 Secs)
+   */
   activityInterval () {
     this.setActivity()
     setInterval(() => {
       this.setActivity()
-    }, 15000)
+    }, this._options.bot.gamesInterval)
   }
 
   async setActivity (act = undefined) {
@@ -116,7 +152,7 @@ class Client extends Discord.Client {
       this.activityNum++
       if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
       if (!act) act = await this.getActivityMessage(this._options.bot.games[this.activityNum])
-      this.logger.debug(`[Activity] Setting Bot's Activity to ${act}`)
+      this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${act}`)
       this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
     }
   }
@@ -133,7 +169,7 @@ class Client extends Discord.Client {
     let value
     switch (type) {
       case 'ping':
-        value = await this.shard.fetchClientValues('ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1))
+        value = await this.shard.fetchClientValues('ws.ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1))
         if (!value) value = this.ping
         return value
       case 'channels':

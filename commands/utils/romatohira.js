@@ -12,7 +12,7 @@ class Command {
     }
   }
 
-  run (compressed) {
+  async run (compressed) {
     const { message, args } = compressed
     if (args.length === 0) return message.channel.send('히라가나로 변환할 로마자를 작성해주세요!\n->romtohi [내용]')
     message.channel.send(hiraModule.romajiTohiragana(args.join(' ')))

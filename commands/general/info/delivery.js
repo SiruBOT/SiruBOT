@@ -29,7 +29,7 @@ class Command {
 
     const carrierCode = carriers[args[0].toUpperCase()]
     if (!carrierCode) return message.channel.send(`> ❎  택배사가 올바르지 않아요..\n> 사용 가능한 택배사 이름들\n> \`\`\`JS\n> ${Object.keys(carriers).join(', ')}\n> \`\`\``)
-    const fetchResult = await fetch(`https://apis.tracker.delivery/carriers/${carrierCode}/tracks/${args[1]}`).then(res => res.json())
+    const fetchResult = await fetch(`https://apis.tracker.delivery/carriers/${carrierCode}/tracks/${encodeURI(args[1])}`).then(res => res.json())
     if (fetchResult.message) return message.channel.send(`> ❎  ${fetchResult.message}`)
     const MappedResult = fetchResult.progresses.map(el => { return { message: el.description, time: moment(el.time).tz('Asia/Seoul').format('YYYYMMDD'), timeFormat: el.time, location: el.location } })
     const Result = {}
@@ -38,11 +38,11 @@ class Command {
       if (!Result[obj.time]) Result[obj.time] = []
       Result[obj.time].push(obj)
     }
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
     embed.setColor('#7289DA')
-    embed.setTitle(`보낸이: ${Result.raw.from.name} 받는이: ${Result.raw.to.name} (${Result.raw.state.text})`)
+    embed.setTitle(Discord.Util.escapeMarkdown(`보낸이: ${Result.raw.from.name} 받는이: ${Result.raw.to.name} (${Result.raw.state.text})`))
     for (const obj of Object.keys(Result)) {
-      if (obj !== 'raw') embed.addField(moment(obj).tz('Asia/Seoul').format('YYYY - MM - DD'), Result[obj].map(el => `**[${el.location.name}]** **${moment(el.timeFormat).tz('Asia/Seoul').format('HH:mm')}** - ${el.message}`))
+      if (obj !== 'raw') embed.addField(moment(obj).tz('Asia/Seoul').format('YYYY - MM - DD'), Result[obj].map(el => `**[${Discord.Util.escapeMarkdown(el.location.name)}]** **${Discord.Util.escapeMarkdown(moment(el.timeFormat).tz('Asia/Seoul').format('HH:mm'))}** - ${Discord.Util.escapeMarkdown(el.message)}`))
     }
     message.channel.send(embed)
   }

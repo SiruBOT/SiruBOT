@@ -76,7 +76,7 @@ module.exports.findElement = (options) => {
 }
 
 function getEmbed (pages, currentPage, picker, locale, title, member) {
-  return new Discord.RichEmbed()
+  return new Discord.MessageEmbed()
     .setTitle(title)
     .setColor(getColor(member))
     .setDescription(`\`\`\`JS\n${pages[currentPage].join('\n')}\`\`\``)

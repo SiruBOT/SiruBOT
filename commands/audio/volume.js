@@ -22,7 +22,7 @@ class Command {
       if (isNaN(args[0])) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_STRING'))
       if (Number(args[0]) < 1) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_UNDER_ONE'))
       if (Number(args[0]) > 150) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_HIGH_HDF'))
-      await this.client.audio.setVolume(message.guild, Number(args[0]))
+      await this.client.audio.setVolume(message.guild.id, Number(args[0]))
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_CHANGED', { VOLUME: Number(args[0]) }))
     } else {
       const guildData = await this.client.database.getGuildData(message.guild.id)

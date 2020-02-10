@@ -16,11 +16,11 @@ class Command {
   /**
    * @param {Object} compressed - Compressed Object (In CBOT)
    */
-  run (compressed) {
+  async run (compressed) {
     const { message } = compressed
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
 
     embed.setTitle(picker.get(locale, 'COMMANDS_PING_PING'))
     embed.setColor(this.client.utils.findUtil.getColor(message.member))
@@ -28,7 +28,7 @@ class Command {
 
     message.channel.send(message.author, embed).then((m) => {
       embed.setTitle(picker.get(locale, 'COMMANDS_PING_PONG'))
-      embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.pings.join('ms **=>** ')}ms`, RESPONCE: `${m.createdAt - message.createdTimestamp}ms` }))
+      embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.ws.ping}ms`, RESPONCE: `${m.createdAt - message.createdTimestamp}ms` }))
       m.edit(message.author, embed)
     })
   }

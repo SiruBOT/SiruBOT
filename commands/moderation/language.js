@@ -19,7 +19,7 @@ class Command {
     const picker = this.client.utils.localePicker
     const { message, GuildData, args } = compressed
     const { locale } = GuildData
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
     if (args[0] && picker.locales.keyArray().includes(args[0].toLowerCase())) {
       message.channel.send(picker.get(args[0].toLowerCase(), 'COMMANDS_LANGUAGE_CHANGED'))
       this.client.database.updateGuildData(message.guild.id, { $set: { locale: args[0].toLowerCase() } })

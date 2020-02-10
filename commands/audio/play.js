@@ -28,15 +28,17 @@ class Command {
     let searchStr = message.attachments.map(el => el.url)[0] ? message.attachments.map(el => el.url)[0] : args.join(' ')
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
 
-    if (!Audio.players.get(message.guild.id) || (Audio.players.get(message.guild.id) && !message.guild.me.voiceChannel)) {
-      const joinresult = await this.client.commands.get('join').run(compressed, true, !(searchStr.length === 0 && args.length === 0))
-      if (joinresult === false) return
+    if (!Audio.players.get(message.guild.id) || (this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
+      const voiceJoinSuccess = await this.client.commands.get('join').run(compressed, true)
+      if (voiceJoinSuccess !== true) return
     }
 
     if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
-    const searchResult = await Audio.getSongs(searchStr)
+    const searchResult = await Audio.getTrack(searchStr).catch((e) => {
+      throw e
+    })
 
     if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return false
 
@@ -88,28 +90,25 @@ class Command {
       const info = searchResult.tracks[0].info
       const track = searchResult.tracks[0]
       if (info.title.length === 0) track.info.title = searchStr.split('/').slice(-1)[0]
-      this.addQueue(message, track, picker, locale, true)
+      this.addQueue(message, track, picker, locale)
     }
   }
 
-  addQueue (message, items, picker, locale, single = false) {
+  async addQueue (message, items, picker, locale) {
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_NO_VOICE_ME'))
-    if (single) {
-      this.client.database.getGuildData(message.guild.id).then(guildData => {
-        const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).player.track)
-        const info = items.info
-        if (status || (guildData.nowplaying.track || guildData.queue.length > 0)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
-      })
-    }
-    Audio.players.get(message.guild.id).addQueue(items, message)
+    const guildData = await this.client.database.getGuildData(message.guild.id)
+    const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).track)
+    const { info } = items
+    const placeHolderWithTrackInfo = Object.assign({ TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 })
+    if (status || guildData.queue.length > 0) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
+    else message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
+    this.client.audio.queue.enQueue(message.guild.id, items, message)
   }
 
   chkSearchResult (searchResult, picker, locale, message) {
-    const keys = Object.keys(searchResult)
-    if (!keys.includes('loadType')) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.cause.message })) // andesite-node Handling
-    if (searchResult.loadType === 'NO_MATCHES' || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
     if (searchResult.loadType === 'LOAD_FAILED') return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
+    if (searchResult.loadType === 'NO_MATCHES' || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
     return true
   }
 }

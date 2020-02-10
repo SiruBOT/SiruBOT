@@ -15,7 +15,7 @@ class Command {
   /**
    * @param {Object} compressed - Compressed Object (In CBOT)
    */
-  run (compressed) {
+  async run (compressed) {
     const { message, args } = compressed
     if (args.length === 0) return message.channel.send('❎  코드를 적어주세요')
     let codeIn = `
@@ -28,7 +28,7 @@ const Discord = require('discord.js')\n` + args.join(' ')
         let code = type = res
 
         if (typeof code !== 'string') { code = require('util').inspect(code, { depth: 0 }) }
-        const embed = new Discord.RichEmbed()
+        const embed = new Discord.MessageEmbed()
           .setAuthor('코드 실행')
           .setColor('#4267B2')
         if (codeIn.length > 1000) {
@@ -53,14 +53,14 @@ const Discord = require('discord.js')\n` + args.join(' ')
       sendError(e)
     }
     function sendError (e) {
-      const embed = new Discord.RichEmbed()
+      const embed = new Discord.MessageEmbed()
         .setAuthor('오류!')
         .setColor('#D6564E')
       if (codeIn.length > 1000) {
         codeIn = codeIn.substr(0, 1000) + ' (1000자 이상..'
       }
       embed.addField(':inbox_tray: 입력', `\`\`\`js\n${codeIn} \`\`\``)
-      embed.addField(':outbox_tray: 오류', `\`\`\`js\n${e} \n\`\`\``)
+      embed.addField(':outbox_tray: 오류', `\`\`\`js\n${e.stack ? e.stack : e} \n\`\`\``)
       message.channel.send(embed)
     }
   }

@@ -9,3 +9,12 @@ function chunk (arr, chunkSize) {
   return array
 }
 module.exports.chunkArray = chunk
+
+function MapToArray (map) {
+  const array = []
+  for (const item of map.keys()) {
+    array.push(map.get(item))
+  }
+  return array
+}
+module.exports.MapToArray = MapToArray

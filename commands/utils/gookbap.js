@@ -12,7 +12,7 @@ class Command {
     }
   }
 
-  run (compressed) {
+  async run (compressed) {
     const { message, args } = compressed
     if (!args[0]) return message.channel.send('국밥의 가격을 입력해주세요.')
     if (!args[1]) return message.channel.send('소비한 금액을 입력해주세요.')

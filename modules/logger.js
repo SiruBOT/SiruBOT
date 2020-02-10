@@ -50,7 +50,7 @@ class Logger {
   getMessage (message = undefined) {
     let tempMessage
     if (this.client.shard) {
-      tempMessage = `[Shard ${this.client.shard.id}] ${message}`
+      tempMessage = `[Shard ${this.client.shard.ids}] ${message}`
     } else {
       tempMessage = message
     }

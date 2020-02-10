@@ -23,7 +23,7 @@ class LanguagePicker {
   }
 
   get (lang, name, placeholder = {}) {
-    this.client.logger.debug(`[LanguagePicker] [Get] Lang: ${lang}, PATH: ${name}, Placeholders: ${Object.keys(placeholder)}`)
+    this.client.logger.debug(`[LanguagePicker:Get] Lang: ${lang}, PATH: ${name}, Placeholders: ${Object.keys(placeholder)}`)
     let language = this.locales.get(lang)[name]
     if (!language) {
       for (const locale of this.locales.array()) {
@@ -33,14 +33,14 @@ class LanguagePicker {
       }
     }
     if (!language) {
-      this.client.logger.error(`[LanguagePicker] [Error] Language key is not exists! ${lang}.${name}`)
+      this.client.logger.error(`[LanguagePicker:Get] [Error] Language key is not exists! ${lang}.${name}`)
       return `${lang}.${name}`
     }
     const settings = { before: '%', after: '%' }
     const userPlaceholder = template(language, placeholder, settings)
     const localesKeys = template(userPlaceholder, this.locales.get(lang), settings)
     const result = template(localesKeys, this.client._options.constructors, settings)
-    this.client.logger.debug(`[LanguagePicker] [Get] Result: ${result}`)
+    this.client.logger.debug(`[LanguagePicker:Get] Result: ${result}`)
 
     return result
   }
