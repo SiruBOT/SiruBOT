@@ -113,6 +113,7 @@ class Queue extends EventEmitter {
    */
   skip (guildID) {
     this.client.logger.debug(`${this.defaultPrefix.skip} [${guildID}] Skips Track..`)
+    this.client.audio.skippers.set(guildID, [])
     return new Promise((resolve) => {
       this.audio.players.get(guildID).stopTrack().then((res) => {
         this.client.logger.debug(`${this.defaultPrefix.skip} [${guildID}] Skips Track.. Result: ${res}`)

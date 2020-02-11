@@ -20,7 +20,6 @@ class Event {
     if (message.channel.type === 'dm') return message.channel.send('❎  DM 에서는 명령어를 사용하실수 없어요..\n❎  You can\'t use commands on the DM.')
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
     // Test
-    if (message.author.id === '544347913632088074') return // Galaxy S8 Blacklist
     this.client.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     // End of Test
     await this.client.database.checkGuild(message.guild)
@@ -59,8 +58,7 @@ class Event {
             if (!message.member.voice.channel) return message.channel.send(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
             if (!this.client.chkRightChannel(message.member.voice.channel, vch)) return message.channel.send(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
             if (this.client.audio.utils.getVoiceStatus(message.member).listen === false) return message.channel.send(picker.get(locale, 'AUDIO_LISTEN_PLEASE'))
-            // const fetchedVoiceChannelStatus = await message.guild.me.voice.channel.fetch()
-            if ((message.guild.me.voice.channelID || this.client.audio.players.get(message.guild.id)) && message.guild.me.voice.channelID !== message.member.voice.channelID) return message.channel.send(picker.get(locale, 'AUDIO_SAME_VOICE', { VOICECHANNEL: message.guild.me.voice.channelID }))
+            if ((message.member.voice.channelID !== null ? message.member.voice.channelID : true) !== (message.guild.me.voice.channelID !== null ? message.guild.me.voice.channelID : true)) return message.channel.send(picker.get(locale, 'AUDIO_SAME_VOICE', { VOICECHANNEL: message.guild.me.voice.channelID }))
           }
           for (const userPerm of userPermissions) {
             if (Command.command.permissions.includes(userPerm)) {

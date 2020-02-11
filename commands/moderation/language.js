@@ -45,7 +45,7 @@ class Command {
           })
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()
-            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT'))
+            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then((m) => m.delete(5000))
           })
         })
       })

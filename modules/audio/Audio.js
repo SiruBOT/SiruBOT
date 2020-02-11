@@ -35,6 +35,7 @@ class Audio extends Shoukaku.Shoukaku {
     this.textChannels = new Collection()
     this.textMessages = new Collection()
     this.nowplayingMessages = new Collection()
+    this.skippers = new Collection()
 
     this.audioRouter = new AudioPlayerEventRouter(this)
 
@@ -131,8 +132,9 @@ class Audio extends Shoukaku.Shoukaku {
   async handleDisconnect (data) {
     this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Reconnect voicechannel...`)
     if (this.client.guilds.get(data.guildId).me.voice.channelID) {
+      this.players.get(data.guildId).disconnect()
       const guildData = await this.client.database.getGuildData(data.guildId)
-      this.moveChannel(this.client.guilds.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
+      this.join(this.client.guilds.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
         if (guildData.nowplaying.track !== null) await this.players.get(data.guildId).playTrack(guildData.nowplaying.track, { noReplace: false, startTime: guildData.nowplayingPosition || 0 })
       }).catch((e) => {
         this.client.logger.error(`${this.defaultPrefix.handleDisconnect} ${e.name}: ${e.message} Stack Trace:\n${e.stack}`)
@@ -176,10 +178,12 @@ class Audio extends Shoukaku.Shoukaku {
   /**
    * @description - Get Nodes sort by players.
    */
-  getNode () {
-    return Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED').sort((a, b) => {
-      return a.players.size - b.players.size
-    })[0]
+  getNode (name = undefined) {
+    const Arr = Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED')
+    if (!name || this.client.audio.nodes.get(name)) return Arr.sort((a, b) => { return a.players.size - b.players.size })[0]
+    else {
+      this.client.audio.nodes.get(name)
+    }
   }
 
   /**

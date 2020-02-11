@@ -123,9 +123,12 @@
     "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  Playing now... **%TRACK% [%DURATION%]**",
     "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_MUSIC%  Playing related video now... **%TRACK% [%DURATION%]**",
 
+    "REPEAT_ALL": "%ALL%",
+    "REPEAT_NONE": "%NONE%",
     "ALL": "All",
     "REPEAT_SINGLE": "Single",
     "NONE": "None",
+    "UNKNOWN": "Unknown",
 
     "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | %NUM% Items | ``[%TOTALTIME%]``",
 
@@ -151,6 +154,10 @@
 
     "COMMANDS_AUDIO_RELATED_ON": "> %EMOJI_STAR%  Related videos future turned **on** %EMOJI_SWITCH_ON%",
     "COMMANDS_AUDIO_RELATED_OFF": "> %EMOJI_STAR%  Related videos future turned **off** %EMOJI_SWITCH_OFF%",
+    
+    "COMMANDS_SKIP_NOTHING_TO_SKIP": "> %EMOJI_NO%  건너뛸 노래가 없어요..",
+    "COMMANDS_SKIP_SKIP_REQUESTED": "> %EMOJI_MUSIC%  **%REQUEST%** 님이 신청하신 %TITLE% 건너뛰기에 투표하였어요. [%CURRENT% 표, %TOSKIP% 표 필요]",
+    "COMMANDS_SKIP_SKIPPED": "> %EMOJI_MUSIC%  **%REQUEST%** 님이 신청하신 %TITLE% 곡이 건너뛰어졌어요!",
 
     "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NONE%  Repeat mode changed to **NONE**",
     "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **%ALL%**",

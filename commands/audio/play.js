@@ -94,16 +94,16 @@ class Command {
     }
   }
 
-  async addQueue (message, items, picker, locale) {
+  async addQueue (message, trackInfo, picker, locale) {
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_NO_VOICE_ME'))
     const guildData = await this.client.database.getGuildData(message.guild.id)
     const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).track)
-    const { info } = items
-    const placeHolderWithTrackInfo = Object.assign({ TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 })
+    const { info } = trackInfo
+    const placeHolderWithTrackInfo = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info), POSITION: guildData.queue.length + 1 })
     if (status || guildData.queue.length > 0) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
     else message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
-    this.client.audio.queue.enQueue(message.guild.id, items, message)
+    this.client.audio.queue.enQueue(message.guild.id, trackInfo, message)
   }
 
   chkSearchResult (searchResult, picker, locale, message) {

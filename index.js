@@ -132,6 +132,10 @@ class Client extends Discord.Client {
     for (const file of eventsFile) {
       const EventClass = require(file)
       const Event = new EventClass(this)
+      this.logger.warn(`${this.defaultPrefix.registerEvents} Removing Event Listener for event ${EventClass.info.event}`)
+      this.removeAllListeners(EventClass.info.event)
+      delete require.cache[require.resolve(file)]
+      this.logger.info(`${this.defaultPrefix.registerEvents} AddedEvent Listener for event ${EventClass.info.event}`)
       this.on(EventClass.info.event, (...args) => Event.run(...args))
     }
     this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)

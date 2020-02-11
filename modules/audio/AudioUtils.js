@@ -11,6 +11,20 @@ class AudioUtils {
   }
 
   /**
+   * @param {String} guildID
+   */
+  addSkipper (guildID, skipper) {
+    if (!guildID) return new Error('no GuildID Provied')
+    if (!this.client.audio.skippers.get(guildID)) this.client.audio.skippers.set(guildID, [])
+    if (!this.client.audio.skippers.get(guildID).includes(skipper)) this.client.audio.skippers.get(guildID).push(skipper)
+    return this.client.audio.skippers.get(guildID)
+  }
+
+  formatTrack (trackInfo) {
+    return `**${Discord.Util.escapeMarkdown(trackInfo.title)} [${this.client.utils.timeUtil.toHHMMSS(trackInfo.length / 1000, trackInfo.isStream)}]**`
+  }
+
+  /**
    * @param {String} - guildID Id to get playing state (pause,playing,no)
    * @returns {String} - 'pause', 'playing', 'none'
    */
@@ -168,6 +182,15 @@ class AudioUtils {
     if (member.selfMute) return false
     if (member.serverMute) return false
     else return true
+  }
+
+  /**
+   * @param {String} userID
+   * @param {String} guildID
+   */
+  async getMembersQueue (userID, guildID) {
+    const queueData = await this.client.audio.queue.get(guildID)
+    return queueData.filter((Track) => Track.request === userID)
   }
 
   /**

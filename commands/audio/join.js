@@ -28,10 +28,12 @@ class Command {
       else if (err && (err !== 'A Player is already established in this channel')) message.channel.send(sendContent)
     }
     return (() => {
-      if ((this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
+      if (!this.client.audio.players.get(message.guild.id) || !this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID || !message.guild.me.voice.channelID) {
+        return this.client.audio.join(voiceChannelID, message.guild.id)
+      } else if (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID !== message.member.voice.channelID) {
         return this.client.audio.moveChannel(voiceChannelID, message.guild.id)
       } else {
-        return this.client.audio.join(voiceChannelID, message.guild.id)
+        return Promise.resolve(true)
       }
     })().then(() => {
       sendFunc(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannelID }))
