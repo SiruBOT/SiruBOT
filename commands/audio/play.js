@@ -100,7 +100,7 @@ class Command {
     const guildData = await this.client.database.getGuildData(message.guild.id)
     const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).track)
     const { info } = trackInfo
-    const placeHolderWithTrackInfo = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info), POSITION: guildData.queue.length + 1 })
+    const placeHolderWithTrackInfo = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info || trackInfo[0].info), POSITION: guildData.queue.length + 1 })
     if (status || guildData.queue.length > 0) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
     else message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
     this.client.audio.queue.enQueue(message.guild.id, trackInfo, message)
