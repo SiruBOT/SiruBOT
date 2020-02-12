@@ -32,6 +32,7 @@ class Client extends Discord.Client {
 
     this.commands_loaded = false
     this.commands = new Discord.Collection()
+    this.events = new Discord.Collection()
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
@@ -125,18 +126,21 @@ class Client extends Discord.Client {
   /**
    * @description Register Events in events folder
    */
-  async registerEvents () {
+  async registerEvents (reload = false) {
     this.logger.info(`${this.defaultPrefix.registerEvents} Registering Events...`)
     const eventsFile = await this.utils.asyncFunc.globAsync('./events/**/*.js')
     this.logger.debug(`${this.defaultPrefix.registerEvents} Event Files: ${eventsFile.join(' | ')}`)
     for (const file of eventsFile) {
       const EventClass = require(file)
       const Event = new EventClass(this)
-      this.logger.warn(`${this.defaultPrefix.registerEvents} Removing Event Listener for event ${EventClass.info.event}`)
-      this.removeAllListeners(EventClass.info.event)
+      if (reload) {
+        this.logger.warn(`${this.defaultPrefix.registerEvents} Removing Event Listener for event ${EventClass.info.event}`)
+        this.removeListener(EventClass.info.event, this.events.get(EventClass.info.event))
+      }
       delete require.cache[require.resolve(file)]
       this.logger.info(`${this.defaultPrefix.registerEvents} AddedEvent Listener for event ${EventClass.info.event}`)
-      this.on(EventClass.info.event, (...args) => Event.run(...args))
+      this.events.set(EventClass.info.event, (...args) => Event.run(...args))
+      this.on(EventClass.info.event, this.events.get(EventClass.info.event))
     }
     this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)
   }
