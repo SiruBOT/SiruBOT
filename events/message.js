@@ -22,7 +22,7 @@ class Event {
     // Test
     this.client.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     // End of Test
-    await this.client.database.checkGuild(message.guild)
+    await this.client.database.checkGuild(message.guild.id)
     await this.client.database.checkGuildMember(message.member)
     await this.client.database.checkGlobalMember(message.author)
     const prefix = this.client._options.bot.prefix

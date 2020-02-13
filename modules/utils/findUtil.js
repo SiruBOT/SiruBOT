@@ -67,7 +67,7 @@ module.exports.findElement = (options) => {
           })
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()
-            if (args[1] === 'time') return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_TIMED_OUT').then((m) => m.delete(5000)))
+            if (args[1] === 'time') return reject(options.message.channel.send(options.picker.get(options.locale, 'GENERAL_TIMED_OUT').then((m) => m.delete(5000))))
           })
         })
       })

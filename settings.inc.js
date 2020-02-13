@@ -30,8 +30,11 @@ module.exports = {
     }
   },
   others: {
-    embed_warn: '#FFDADA',
-    embed_good: '#DAFFDA',
+    modEmbeds: {
+      warn: '#FFDADA',
+      good: '#DAFFDA',
+      ban: '#FF7575'
+    },
     embed_general: '#7289DA',
     changelog_url: 'https://*****/.github.io/' // https://*****/.github.io/[COMMITID.txt]
   },
@@ -48,6 +51,11 @@ module.exports = {
     EMOJI_WARN: '⚠️',
     EMOJI_BIN: '🗑️',
     EMOJI_HASH: '#️⃣',
+    EMOJI_PIN: '📌',
+    EMOJI_COP: '👮',
+    EMOJI_PERSON: '🙍',
+    EMOJI_PAPER: '📃',
+    EMOJI_HAMMER: '🔨',
 
     EMOJI_SPEAKER: '🔊',
     EMOJI_AUDIO_NONE: '⏹️',

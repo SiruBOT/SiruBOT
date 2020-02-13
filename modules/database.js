@@ -42,15 +42,15 @@ class DataManager {
   }
 
   async checkGuild (guild) {
-    this.client.logger.debug(`[DataBase:Guild:Check] (${guild.id}) Checking Guild`)
-    const mongoGuild = await this.connection.collection('guild').findOne({ _id: guild.id })
+    this.client.logger.debug(`[DataBase:Guild:Check] (${guild}) Checking Guild`)
+    const mongoGuild = await this.connection.collection('guild').findOne({ _id: guild })
     if (!mongoGuild) {
-      this.client.logger.info(`[DataBase:Guild:Check] (${guild.id}) Guild is not exist, create one.`)
+      this.client.logger.info(`[DataBase:Guild:Check] (${guild}) Guild is not exist, create one.`)
       const Model = new this.Models.Guild({
-        _id: guild.id
+        _id: guild
       })
       await Model.save()
-      this.client.logger.debug(`[DataBase:Guild:Check] (${guild.id}) Saving...`)
+      this.client.logger.debug(`[DataBase:Guild:Check] (${guild}) Saving...`)
     }
   }
 
@@ -84,33 +84,33 @@ class DataManager {
   }
 
   async getGuildData (id) {
-    const guildData = this.connection.collection('guild').findOne({ _id: id })
-    return guildData
+    await this.checkGuild(id)
+    return this.connection.collection('guild').findOne({ _id: id })
   }
 
   async getGlobalUserData (user) {
-    const userData = await this.connection.collection('globalMember').findOne({ _id: user.id })
-    return userData
+    await this.checkGlobalMember(user)
+    return this.connection.collection('globalMember').findOne({ _id: user.id })
   }
 
   async getGuildMemberData (member) {
-    const guildMemberData = this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(member, member.guild) })
-    return guildMemberData
+    await this.checkGuildMember(member)
+    return this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(member, member.guild) })
   }
 
   async updateGuildData (guild, query) {
-    const updated = await this.connection.collection('guild').updateOne({ _id: guild }, query)
-    return updated
+    await this.checkGuild(guild)
+    return this.connection.collection('guild').updateOne({ _id: guild }, query)
   }
 
   async updateGlobalUserData (member, query) {
-    const updated = await this.connection.collection('globalMember').updateOne({ _id: member.id }, query)
-    return updated
+    await this.checkGlobalMember(member)
+    return this.connection.collection('globalMember').updateOne({ _id: member.id }, query)
   }
 
   async updateGuildMemberData (member, query) {
-    const updated = await this.connection.collection('guildMember').updateOne({ _id: this.getGuildMemberID(member, member.guild) }, query)
-    return updated
+    await this.checkGuildMember(member)
+    return this.connection.collection('guildMember').updateOne({ _id: this.getGuildMemberID(member, member.guild) }, query)
   }
 
   getGuildMemberID (user, guild) {

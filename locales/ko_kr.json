@@ -149,9 +149,26 @@
     "YES": "네",
     "NO": "아니요",
 
-    "COMMANDS_MOD_WARN_USER": "> %EMOJI_WARN%  경고 기능",
-    "COMMANDS_MOD_WARN_TYPE_USER": "> %EMOJI_WARN%  경고할 유저를 입력해주세요!\n> %EMOJI_WARN%  ``%PREFIX%warn <유저> [사유]``",
+    "COMMANDS_MOD_WARN_TYPE_USER": "> %EMOJI_NO%  경고할 유저를 입력해주세요!\n> %EMOJI_WARN%  ``%PREFIX%warn <유저> [사유]``",
     "COMMANDS_MOD_WARN_NO_BOT": "> %EMOJI_NO%  봇은 경고할 수 없어요!",
+
+    "WARN_EMBED_ADDED_TITLE": "%EMOJI_PIN%  **경고 부여**",
+    "WARN_EMBED_ADDED_COP_TITLE": "%EMOJI_COP%  경고를 준 관리자",
+    "WARN_EMBED_ADDED_PRISONER_TITLE": "%EMOJI_PERSON%  경고를 받은 사용자",
+    "WARN_EMBED_USER_DESC": "**사용자:** %USER%\n**태그:** %TAG%\n**ID:** %ID%",
+    "WARN_EMBED_ADMIN_DESC": "**관리자:** %USER%\n**태그:** %TAG%\n**ID:** %ID%",
+    "WARN_EMBED_ADDED_FOOTER": "%PREFIX%check [유저] 로 사용자의 경고 수를 확인하실 수 있어요!",
+    "WARN_EMBED_INFO_TITLE": "%EMOJI_PAPER% 경고 정보",
+    "WARN_EMBED_INFO_DESC": "**경고 개수:** %CURRENT%/%MAX%\n**경고 사유:** %REASON%",
+
+    "BAN_EMBED_TITLE": "%EMOJI_HAMMER%  **사용자 차단**",
+    "BAN_EMBED_COP_TITLE": "%EMOJI_COP%  사용자를 차단한 관리자",
+    "BAN_EMBED_PRISONER_TITLE": "%EMOJI_PERSON%  차단당한 사용자",
+    "BAN_EMBED_INFO_TITLE": "%EMOJI_PAPER% 차단 정보",
+    "BAN_EMBED_INFO_DESC": "**차단 사유:** %REASON%",
+
+    "COMMANDS_MOD_BAN_TYPE_USER": "> %EMOJI_NO%  차단할 유저를 입력해주세요!\n> %EMOJI_WARN%  ``%PREFIX%ban <유저> [사유]``",
+
 
     "COMMANDS_LANGUAGE_EMBED_TITLE": "%EMOJI_LOCALES%  언어 목록",
     "COMMANDS_LANGUAGE_CHANGED": "%EMOJI_YES%  언어가  %FLAG% ``%NAME%`` 로 변경되었어요!",

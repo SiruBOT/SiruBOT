@@ -3,8 +3,8 @@ class Command {
   constructor (client) {
     this.client = client
     this.command = {
-      name: 'warn',
-      aliases: ['경고', 'ㅈㅁ구'],
+      name: 'ban',
+      aliases: ['밴', '차단', 'ㅠ무'],
       category: 'COMMANDS_MODERATION',
       require_voice: false,
       hide: false,
@@ -19,7 +19,7 @@ class Command {
     const picker = this.client.utils.localePicker
     const locale = compressed.GuildData.locale
     const { message, args } = compressed
-    if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_TYPE_USER'))
+    if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MOD_BAN_TYPE_USER'))
     const formatter = (a, number) => { return `[${number}] ${a.user.bot ? '[BOT]' : ''} ${a.displayName} (${a.user.tag}) [${a.id}]` }
     const search = args.shift()
     const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === this.client.utils.findUtil.getUserFromMention(this.client.users, search).id || a.user.username.toLowerCase() === search.toLowerCase() }
@@ -39,24 +39,19 @@ class Command {
         return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_NO_BOT'))
       } else if (member) {
         const why = !(args.join(' ').length === 0 ? null : args.join(' ')) ? picker.get(locale, 'NONE') : args.join(' ')
-        const obj = Object.assign({
-          why: why,
-          date: new Date(),
-          admin: message.author.id
-        })
-        await this.client.database.updateGuildMemberData(member, { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
-        const guildData = await this.client.database.getGuildData(message.guild.id)
-        const updatedUserData = await this.client.database.getGuildMemberData(member)
         const embed = new Discord.MessageEmbed()
-          .setTitle(picker.get(locale, 'WARN_EMBED_ADDED_TITLE'))
-          .addField(picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'), picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), true)
-          .addField(picker.get(locale, 'WARN_EMBED_ADDED_PRISONER_TITLE'), picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), true)
-          .addField(picker.get(locale, 'WARN_EMBED_INFO_TITLE'), picker.get(locale, 'WARN_EMBED_INFO_DESC', { MAX: guildData.warningMax, CURRENT: updatedUserData.warningCount, REASON: why }), true)
-          .setColor(this.client._options.others.modEmbeds.warn)
-          .setFooter(picker.get(locale, 'WARN_EMBED_ADDED_FOOTER'))
-          .setTimestamp(obj.date)
-        message.channel.send(embed)
-        this.client.loggerManager.send('warn', message.guild, { embed })
+        member.ban().then(() => {
+          embed.setTitle(picker.get(locale, 'BAN_EMBED_TITLE'))
+            .addField(picker.get(locale, 'BAN_EMBED_COP_TITLE'), picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), true)
+            .addField(picker.get(locale, 'BAN_EMBED_PRISONER_TITLE'), picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), true)
+            .addField(picker.get(locale, 'BAN_EMBED_INFO_TITLE'), picker.get(locale, 'BAN_EMBED_INFO_DESC', { REASON: why }), true)
+            .setColor(this.client._options.others.modEmbeds.ban)
+            .setTimestamp(new Date())
+          message.channel.send(embed)
+          this.client.loggerManager.send('ban', message.guild, { embed })
+        }).catch((e) => {
+          message.channel.send('Errored ' + e.message)
+        })
       }
     })
   }
