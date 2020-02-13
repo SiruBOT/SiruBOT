@@ -12,8 +12,8 @@ class Command {
   }
 
   /**
-     * @param {Object} compressed - Compressed Object (In CBOT)
-     */
+   * @param {Object} compressed - Compressed Object (In CBOT)
+   */
   async run (compressed) {
     const { message, args } = compressed
     await this.client.database.updateGuildData(message.guild.id, { $push: { enabledEvents: { $each: [{ name: args[0], value: args[1] }] } } })

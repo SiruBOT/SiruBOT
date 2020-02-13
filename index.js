@@ -145,23 +145,20 @@ class Client extends Discord.Client {
     this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)
   }
 
-  /**
-   * @description set Activity Interval (15000 Secs)
-   */
-  activityInterval () {
-    this.setActivity()
-    setInterval(() => {
-      this.setActivity()
-    }, this._options.bot.gamesInterval)
-  }
-
-  async setActivity (act = undefined) {
+  async setActivity () {
     if (this.user) {
-      this.activityNum++
-      if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
-      if (!act) act = await this.getActivityMessage(this._options.bot.games[this.activityNum])
-      this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${act}`)
-      this.user.setActivity(act, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
+      if (this.announceActivity) {
+        this.user.setActivity(this.announceActivity.act || 'Errored', this.announceActivity.options || {})
+        this.user.setStatus(this.announceActivity.status || 'online')
+        this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${this.announceActivity.act || 'Errored'}`)
+      } else {
+        this.activityNum++
+        if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
+        const activity = await this.getActivityMessage(this._options.bot.games[this.activityNum])
+        this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${activity}`)
+        this.user.setActivity(activity, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
+      }
+      setTimeout(() => this.setActivity(), this._options.bot.gamesInterval)
     }
   }
 
@@ -211,5 +208,5 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 process.on('message', (data) => {
-  if (data === 'spawned-all-shards') client.activityInterval()
+  if (data === 'spawned-all-shards') client.setActivity()
 })

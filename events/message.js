@@ -28,10 +28,11 @@ class Event {
     const prefix = this.client._options.bot.prefix
     if (message.content.startsWith(prefix)) {
       const GlobalUserData = await this.client.database.getGlobalUserData(message.author)
-      const GuildMemberData = await this.client.database.getGuildMemberData(message.member)
-      const GuildData = await this.client.database.getGuildData(message.guild.id)
       const args = message.content.slice(prefix.length).trim().split(/ +/g)
       const command = args.shift().toLowerCase()
+      if (GlobalUserData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
+      const GuildMemberData = await this.client.database.getGuildMemberData(message.member)
+      const GuildData = await this.client.database.getGuildData(message.guild.id)
       const userPermissions = this.client.utils.permissionChecker.getUserPermission(message.member, { GlobalUserData: GlobalUserData, GuildMemberData: GuildMemberData, GuildData: GuildData })
       const compressed = Object.assign({
         GlobalUserData: GlobalUserData,
