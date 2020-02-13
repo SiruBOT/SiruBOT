@@ -15,7 +15,7 @@
     "cheerio": "^1.0.0-rc.3",
     "cyclic": "^0.2.1",
     "date-utils": "^1.2.21",
-    "discord.js": "github:discordjs/discord.js",
+    "discord.js": "github:discordjs/discord.js#fe7df708e44e0280dfaf0f8e457b154781bb5140",
     "git-repo-info": "^2.1.1",
     "glob": "^7.1.6",
     "moment": "^2.24.0",
