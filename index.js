@@ -178,15 +178,15 @@ class Client extends Discord.Client {
         if (!value) value = this.ping
         return value
       case 'channels':
-        value = await this.shard.fetchClientValues('channels.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        value = await this.shard.fetchClientValues('channels.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
         if (!value) value = this.channels.size
         return value
       case 'guilds':
-        value = await this.shard.fetchClientValues('guilds.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        value = await this.shard.fetchClientValues('guilds.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
         if (!value) value = this.guilds.size
         return value
       case 'users':
-        value = await this.shard.fetchClientValues('users.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        value = await this.shard.fetchClientValues('users.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
         if (!value) value = this.users.size
         return value
     }
