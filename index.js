@@ -75,8 +75,8 @@ class Client extends Discord.Client {
   chkRightChannel (channel, id) {
     if (id === channel.id) return true
     if (id === '0') return true
-    if (this.channels.get(id)) {
-      if (this.channels.get(id).id === channel.id) return true
+    if (this.channels.cache.get(id)) {
+      if (this.channels.cache.get(id).id === channel.id) return true
       else return false
     } else {
       return true

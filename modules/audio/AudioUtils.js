@@ -143,9 +143,9 @@ class AudioUtils {
    * @param {*} channelID2 - Database's channel Id
    */
   getChannel (channelID1, channelID2) {
-    if (channelID1 === channelID2) return this.client.channels.get(channelID2)
-    if (this.client.channels.get(channelID2)) return this.client.channels.get(channelID2)
-    else return this.client.channels.get(channelID1)
+    if (channelID1 === channelID2) return this.client.channels.cache.get(channelID2)
+    if (this.client.channels.cache.get(channelID2)) return this.client.channels.cache.get(channelID2)
+    else return this.client.channels.cache.get(channelID1)
   }
 
   /**
