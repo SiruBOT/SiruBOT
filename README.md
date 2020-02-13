@@ -38,11 +38,11 @@
 
 > [Click Here (Redirect To MongoDB Web)](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials)
 
-## Install Java(JDA) and Lavalink for Audio
+## Install Java(JDK 11) and Lavalink for Audio Feature
 
-> [Click Here (JDA)](https://www.oracle.com/java/technologies/javase-downloads.html)
+> [Click Here (Java)](https://www.oracle.com/java/technologies/javase-downloads.html)
 
-> [Click Here (Lavalink)](https://ci.fredboat.com/viewLog.html?buildId=lastSuccessful&buildTypeId=Lavalink_Build&tab=artifacts&guest=1)
+> [Click Here (Lavalink)](https://github.com/Frederikam/Lavalink/blob/master/README.md)
 
 ## License
 
