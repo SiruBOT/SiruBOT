@@ -25,7 +25,7 @@ class Command {
     const options = {
       title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
       formatter: formatter,
-      collection: message.guild.members,
+      collection: message.guild.members.cache,
       filter: filter,
       message: message,
       locale: locale,
@@ -37,9 +37,7 @@ class Command {
       if (user.bot === true) {
         return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_NO_BOT'))
       } else if (user) {
-        let why
-        why = args.join(' ')
-        if (why.length === 0) why = null
+        const why = args.join(' ').length === 0 ? null : args.join(' ')
         const obj = {
           why: why,
           date: new Date(),

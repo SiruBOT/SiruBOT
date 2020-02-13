@@ -36,9 +36,9 @@ class Command {
         SHUFFLE_EMOJI: shuffle === true ? this.client._options.constructors.EMOJI_SHUFFLE : this.client._options.constructors.EMOJI_REPEAT_NONE
       },
       DEFAULT: {
-        DJROLE: this.getName(djRole, message.guild.roles, locale, picker),
-        TCH: this.getName(tch, message.guild.channels, locale, picker),
-        VCH: this.getName(vch, message.guild.channels, locale, picker)
+        DJROLE: this.getName(djRole, message.guild.roles.cache, locale, picker),
+        TCH: this.getName(tch, message.guild.channels.cache, locale, picker),
+        VCH: this.getName(vch, message.guild.channels.cache, locale, picker)
       }
     }
     for (const item of ['MOD', 'AUDIO', 'DEFAULT']) {

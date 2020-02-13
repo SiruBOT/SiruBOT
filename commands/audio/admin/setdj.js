@@ -28,7 +28,7 @@ class Command {
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
         formatter: formatter,
-        collection: message.guild.roles,
+        collection: message.guild.roles.cache,
         filter: filter,
         message: message,
         locale: locale,

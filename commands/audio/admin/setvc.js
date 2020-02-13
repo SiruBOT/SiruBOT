@@ -28,7 +28,7 @@ class Command {
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
         formatter: formatter,
-        collection: message.guild.channels.filter(el => el.type === 'voice'),
+        collection: message.guild.channels.cache.filter(el => el.type === 'voice'),
         filter: filter,
         message: message,
         locale: locale,
