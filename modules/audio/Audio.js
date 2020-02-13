@@ -67,7 +67,7 @@ class Audio extends Shoukaku.Shoukaku {
         if (!moveChannel) this.queue.autoPlay(guildID)
         resolve(true)
       }).catch(e => {
-        this.client.guilds.get(guildID)
+        this.client.guilds.cache.get(guildID)
         this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)
         reject(e)
       })
@@ -131,10 +131,10 @@ class Audio extends Shoukaku.Shoukaku {
    */
   async handleDisconnect (data) {
     this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Reconnect voicechannel...`)
-    if (this.client.guilds.get(data.guildId).me.voice.channelID) {
+    if (this.client.guilds.cache.get(data.guildId).me.voice.channelID) {
       this.players.get(data.guildId).disconnect()
       const guildData = await this.client.database.getGuildData(data.guildId)
-      this.join(this.client.guilds.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
+      this.join(this.client.guilds.cache.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
         if (guildData.nowplaying.track !== null) await this.players.get(data.guildId).playTrack(guildData.nowplaying.track, { noReplace: false, startTime: guildData.nowplayingPosition || 0 })
       }).catch((e) => {
         this.client.logger.error(`${this.defaultPrefix.handleDisconnect} ${e.name}: ${e.message} Stack Trace:\n${e.stack}`)

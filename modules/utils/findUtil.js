@@ -106,7 +106,7 @@ function getUserFromMention (users, mention) {
     if (mention.startsWith('!')) {
       mention = mention.slice(1)
     }
-    return users.get(mention)
+    return users.cache.get(mention)
   } else {
     return false
   }

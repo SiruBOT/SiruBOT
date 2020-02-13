@@ -45,7 +45,7 @@ class Command {
           date: new Date(),
           admin: message.author.id
         }
-        this.client.database.updateGuildMemberData(message.guild.members.get(user.id), { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
+        this.client.database.updateGuildMemberData(message.guild.members.cache.get(user.id), { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
         this.client.loggerManager.send('warn', message.guild, user, obj)
       }
     })

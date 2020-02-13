@@ -28,7 +28,7 @@ class Command {
     const { message, args } = compressed
     if (args.length === 0) return message.channel.send('> ❎  매개 변수를 정확히 입력해 주세요! ``->blacklist [추가|제거|확인] [유저 ID]``)')
     if (!methods[args[0]]) return message.channel.send('> ❎  올바르지 않은 작업이에요! [추가|제거|확인] 중 하나를 입력해 주세요!')
-    const user = this.client.users.get(args[1])
+    const user = this.client.users.cache.get(args[1])
     if (methods[args[0]] && user) return message.channel.send('> ❎  없는 유저 ID인거 같아요! 다시한번 확인해주세요!')
     const userData = this.client.database.getGlobalUserData(user)
     if (!userData) return message.channel.send('> ❎  이 유저는 가입되지 않은 (시루봇을 한번도 사용하지 않은) 유저 인것 같아요!')

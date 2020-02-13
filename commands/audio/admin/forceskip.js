@@ -20,7 +20,7 @@ class Command {
     const picker = this.client.utils.localePicker
     if (!GuildData.queue[0] || !GuildData.nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
     if (GuildData.nowplaying.track && this.client.audio.players.get(message.guild.id)) {
-      const placeHolder = { TITLE: this.client.audio.utils.formatTrack(GuildData.nowplaying.info), REQUEST: message.guild.members.get(GuildData.nowplaying.request) ? message.guild.members.get(GuildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN') }
+      const placeHolder = { TITLE: this.client.audio.utils.formatTrack(GuildData.nowplaying.info), REQUEST: message.guild.members.cache.get(GuildData.nowplaying.request) ? message.guild.members.cache.get(GuildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN') }
       this.client.audio.queue.skip(message.guild.id)
       return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
     } else {

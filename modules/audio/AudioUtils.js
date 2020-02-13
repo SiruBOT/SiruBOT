@@ -62,15 +62,15 @@ class AudioUtils {
     if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) {
       messageEmbed
         .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
-        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guildID).me))
+        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.cache.get(guildID).me))
     } else {
-      const request = this.client.users.get(guildData.nowplaying.request)
+      const request = this.client.users.cache.get(guildData.nowplaying.request)
       messageEmbed
         .setAuthor(request.tag, request.displayAvatarURL)
         .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
         .setURL(guildData.nowplaying.info.uri)
         .setDescription(this.getNowplayingText(guildID, guildData))
-        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.get(guildID).me))
+        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.cache.get(guildID).me))
         .setThumbnail(this.validateYouTubeUrl(guildData.nowplaying.info.uri) ? `https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
     }
     return messageEmbed
@@ -126,7 +126,7 @@ class AudioUtils {
     if (audioMessage) {
       const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)
       if (!sendChannel) return this.client.logger.error(`${this.defaultPrefix.sendMessage} Channel Not Found... Please check database or audio TextChannels!`)
-      if (sendChannel.permissionsFor(this.client.guilds.get(guildID).me).has('SEND_MESSAGES')) {
+      if (sendChannel.permissionsFor(this.client.guilds.cache.get(guildID).me).has('SEND_MESSAGES')) {
         this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send Message "${text}" to channel ${sendChannel.id}`)
         if (this.client.audio.textMessages.get(guildID) && this.client.audio.textMessages.get(guildID).deletable) {
           this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
