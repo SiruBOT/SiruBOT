@@ -20,8 +20,9 @@
 
 ## Clone this repository
 > ### Using Git CLI
-> ``` cd ./mybot
+> ```
 > git clone https://github.com/cotwo0139/CHINOBOT_BETA.git
+> cd ./CHINOBOT_BETA.git
 > ```
 > ### Or Download This Repository
 
