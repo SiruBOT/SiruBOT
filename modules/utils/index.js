@@ -6,5 +6,6 @@ module.exports = {
   findUtil: require('./findUtil'),
   timeUtil: require('./time'),
   arrayUtil: require('./arrayUtil'),
-  asyncFunc: require('./asyncFunc')
+  asyncFunc: require('./asyncFunc'),
+  images: require('./images')
 }

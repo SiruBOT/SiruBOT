@@ -2,7 +2,7 @@ const Discord = require('discord.js')
 
 class PermissionChecker {
   /**
-   * @param {Discord.Client = {}} client - Discord Client
+   * @param {Discord.Client} client - Discord Client
    */
   constructor (client = {}) {
     this.client = client
