@@ -166,6 +166,7 @@
     "BAN_EMBED_PRISONER_TITLE": "%EMOJI_PERSON%  차단당한 사용자",
     "BAN_EMBED_INFO_TITLE": "%EMOJI_PAPER% 차단 정보",
     "BAN_EMBED_INFO_DESC": "**차단 사유:** %REASON%",
+    "WARN_BANNED_REASON": "경고가 %MAX% 개가 넘어서 차단되었습니다.",
 
     "COMMANDS_MOD_BAN_TYPE_USER": "> %EMOJI_NO%  차단할 유저를 입력해주세요!\n> %EMOJI_WARN%  ``%PREFIX%ban <유저> [사유]``",
 

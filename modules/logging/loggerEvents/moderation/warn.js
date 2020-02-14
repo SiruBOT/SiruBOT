@@ -11,7 +11,7 @@ class CustomEvent {
      */
   async run (compressed) {
     const { guild, args, eventData } = compressed
-    const { embed } = args
+    const { embed } = args[0]
     if (guild.channels.cache.get(eventData.value)) guild.channels.cache.get(eventData.value).send(embed)
   }
 }

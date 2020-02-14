@@ -20,12 +20,11 @@ class Command {
     const locale = compressed.GuildData.locale
     const { message, args } = compressed
     if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_TYPE_USER'))
-    const formatter = (a, number) => { return `[${number}] ${a.user.bot ? '[BOT]' : ''} ${a.displayName} (${a.user.tag}) [${a.id}]` }
     const search = args.shift()
-    const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === this.client.utils.findUtil.getUserFromMention(this.client.users, search) ? this.client.utils.findUtil.getUserFromMention(this.client.users, search).id : null || a.user.username.toLowerCase() === search.toLowerCase() }
+    const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === (this.client.utils.findUtil.getUserFromMention(message.guild.members.cache, search) ? this.client.utils.findUtil.getUserFromMention(message.guild.members.cache, search).id : null) || a.user.username.toLowerCase() === search.toLowerCase() }
     const options = {
       title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
-      formatter: formatter,
+      formatter: this.client.utils.findFormatters.guildMember,
       collection: message.guild.members.cache,
       filter: filter,
       message: message,
@@ -57,6 +56,7 @@ class Command {
           .setTimestamp(obj.date)
         message.channel.send(embed)
         this.client.loggerManager.send('warn', message.guild, { embed })
+        if (updatedUserData.warningCount >= guildData.warningMax) { this.client.commands.get('ban').ban({ member, args: picker.get(locale, 'WARN_BANNED_REASON', { MAX: guildData.warningMax }).split(' '), picker, locale, message }) }
       }
     })
   }

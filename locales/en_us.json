@@ -149,6 +149,27 @@
     "YES": "Yes",
     "NO": "No",
 
+    "COMMANDS_MOD_WARN_TYPE_USER": "> %EMOJI_NO%  Please Enter member to warn!\n> %EMOJI_WARN%  ``%PREFIX%warn <Member> [Reason]``",
+    "COMMANDS_MOD_WARN_NO_BOT": "> %EMOJI_NO%  You can't warn bot!",
+
+    "WARN_EMBED_ADDED_TITLE": "%EMOJI_PIN%  **Warn Point Added**",
+    "WARN_EMBED_ADDED_COP_TITLE": "%EMOJI_COP%  Processed admin",
+    "WARN_EMBED_ADDED_PRISONER_TITLE": "%EMOJI_PERSON%  Warned Member",
+    "WARN_EMBED_USER_DESC": "**Member:** %USER%\n**TAG:** %TAG%\n**ID:** %ID%",
+    "WARN_EMBED_ADMIN_DESC": "**Admin:** %USER%\n**TAG:** %TAG%\n**ID:** %ID%",
+    "WARN_EMBED_ADDED_FOOTER": "%PREFIX%check [Member] can check the number of warnings member have!",
+    "WARN_EMBED_INFO_TITLE": "%EMOJI_PAPER% Warning Information",
+    "WARN_EMBED_INFO_DESC": "**Warning Points:** %CURRENT%/%MAX%\n**Warning Reason:** %REASON%",
+
+    "BAN_EMBED_TITLE": "%EMOJI_HAMMER%  **Member Banned**",
+    "BAN_EMBED_COP_TITLE": "%EMOJI_COP%  Processed admin",
+    "BAN_EMBED_PRISONER_TITLE": "%EMOJI_PERSON%  Banned Member",
+    "BAN_EMBED_INFO_TITLE": "%EMOJI_PAPER% Banning Information",
+    "BAN_EMBED_INFO_DESC": "**Ban Reason:** %REASON%",
+    "WARN_BANNED_REASON": "Members have at least %MAX% warning points",
+
+    "COMMANDS_MOD_BAN_TYPE_USER": "> %EMOJI_NO%  Please Enter member to ban!\n> %EMOJI_WARN%  ``%PREFIX%ban <Member> [Reason]``",
+
     "COMMANDS_LANGUAGE_EMBED_TITLE": "%EMOJI_LOCALES%  Language list",
     "COMMANDS_LANGUAGE_CHANGED": "%EMOJI_YES%  Language changed to  %FLAG% ``%NAME%``!",
     "COMMANDS_LANGUAGE_SET_DESC": "Please use ``%PREFIX%lang en_us`` command to change language %NAME%"
