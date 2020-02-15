@@ -1,6 +1,6 @@
 const Lyrics = require('slyrics')
 const lyrics = new Lyrics()
-const providers = ['melon', 'atoz']
+// const providers = ['melon', 'atoz']
 const Discord = require('discord.js')
 
 class Command {
@@ -9,7 +9,7 @@ class Command {
     this.command = {
       name: 'lyrics',
       aliases: ['가사', 'lyric'],
-      category: 'COMMANDS_GENERAL_UTILS',
+      category: 'MUSIC_GENERAL',
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

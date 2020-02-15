@@ -191,6 +191,43 @@ class Client extends Discord.Client {
         return value
     }
   }
+
+  clearAudio () {
+    const players = this.audio.players
+    this.logger.info(`[Shutdown] Disconnect All Players.... (${players.size} Players)`)
+    for (const player of client.audio.players.values()) {
+      this.logger.debug(`[Shutdown] Stopping player of guild: ${player.guild}`)
+      if (player.voiceConnection.guildID) client.audio.stop(player.voiceConnection.guildID, false)
+    }
+  }
+
+  reload () {
+    this.client.init(true)
+    this.client.LoadCommands()
+    this.client.utils.localePicker.init()
+    delete require.cache[require.resolve('./settings.js')]
+    this.client._options = require('./settings.js')
+    delete require.cache[require.resolve('./models')]
+    this.client.database.Models = require('./models')
+    delete require.cache[require.resolve('./modules/utils')]
+    this.client.utils = require('./modules/utils')
+    delete require.cache[require.resolve('./locales/localePicker')]
+    delete require.cache[require.resolve('./modules')]
+    const NewLocalePicker = require('./locales/localePicker')
+    const { NewPermissionChecker } = require('./modules')
+    this.client.utils.localePicker = new NewLocalePicker(this.client)
+    this.client.utils.permissionChecker = new NewPermissionChecker(this.client)
+    this.client.utils.localePicker.init()
+    this.client.loggerManager.init()
+    this.client.registerEvents(true)
+    return this.shard.ids
+  }
+
+  shutdown () {
+    this.clearAudio()
+    this.logger.warn('[Shutdown] Shutting Down...')
+    process.exit(0)
+  }
 }
 
 const client = new Client(settings)

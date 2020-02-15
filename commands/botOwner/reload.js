@@ -2,8 +2,8 @@ class Command {
   constructor (client) {
     this.client = client
     this.command = {
-      name: 'shutdown',
-      aliases: ['셧다운'],
+      name: 'reload',
+      aliases: ['리로드', 'loadcommands', 'flfhem', 'ㄱ디ㅐㅁㅇ'],
       category: 'BOT_OWNER',
       require_voice: false,
       hide: false,
@@ -16,8 +16,11 @@ class Command {
    */
   async run (compressed) {
     const { message } = compressed
-    message.channel.send(`📫  모든 샤드 ${this.client.shard.count} 개에 종료 신호를 보냅니다...`)
-    this.client.shard.broadcastEval('this.shutdown()')
+    message.channel.send(`❎  모든 샤드 ${this.client.shard.count} 개에 리로드 신호를 보냅니다...`).then(async m => {
+      this.client.shard.broadcastEval('this.reload()').then(() => {
+        m.edit('✅  리로드 완료!')
+      })
+    })
   }
 }
 
