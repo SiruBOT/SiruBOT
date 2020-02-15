@@ -202,24 +202,24 @@ class Client extends Discord.Client {
   }
 
   reload () {
-    this.client.init(true)
-    this.client.LoadCommands()
-    this.client.utils.localePicker.init()
+    this.init(true)
+    this.LoadCommands()
+    this.utils.localePicker.init()
     delete require.cache[require.resolve('./settings.js')]
-    this.client._options = require('./settings.js')
+    this._options = require('./settings.js')
     delete require.cache[require.resolve('./models')]
-    this.client.database.Models = require('./models')
+    this.database.Models = require('./models')
     delete require.cache[require.resolve('./modules/utils')]
-    this.client.utils = require('./modules/utils')
+    this.utils = require('./modules/utils')
     delete require.cache[require.resolve('./locales/localePicker')]
     delete require.cache[require.resolve('./modules')]
     const NewLocalePicker = require('./locales/localePicker')
     const { NewPermissionChecker } = require('./modules')
-    this.client.utils.localePicker = new NewLocalePicker(this.client)
-    this.client.utils.permissionChecker = new NewPermissionChecker(this.client)
-    this.client.utils.localePicker.init()
-    this.client.loggerManager.init()
-    this.client.registerEvents(true)
+    this.utils.localePicker = new NewLocalePicker(this.client)
+    this.utils.permissionChecker = new NewPermissionChecker(this.client)
+    this.utils.localePicker.init()
+    this.loggerManager.init()
+    this.registerEvents(true)
     return this.shard.ids
   }
 
