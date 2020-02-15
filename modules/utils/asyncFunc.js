@@ -1,5 +1,5 @@
 const glob = require('glob')
-const globAsync = (path) => {
+module.exports.globAsync = (path) => {
   return new Promise((resolve, reject) => {
     glob(path, (err, res) => {
       if (err) return reject(err)
@@ -7,4 +7,3 @@ const globAsync = (path) => {
     })
   })
 }
-module.exports.globAsync = globAsync

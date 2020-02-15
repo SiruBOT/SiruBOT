@@ -1,6 +1,6 @@
 const Canvas = require('canvas')
 const path = require('path')
-const resources = require(path.join(process.cwd(), './resources'))
+module.exports.resources = require(path.join(process.cwd(), './resources'))
 
 /**
  * @param {Canvas.CanvasRenderingContext2D} ctx - object of canvas ctx
@@ -12,7 +12,7 @@ const resources = require(path.join(process.cwd(), './resources'))
  * @example - <this>.drawCircle(ctx, canvas.width / 2, canvas.height / 2, 128, 'fill')
  * @returns {Canvas.CanvasRenderingContext2D} - Processed Ctx
  */
-const drawCircle = (ctx, x, y, circleDiameter, method = 'fill') => {
+module.exports.drawCircle = (ctx, x, y, circleDiameter, method = 'fill') => {
   ctx.beginPath()
   ctx.arc(x, y, circleDiameter / 2, 0, Math.PI * 2)
   ctx.closePath()
@@ -26,7 +26,6 @@ const drawCircle = (ctx, x, y, circleDiameter, method = 'fill') => {
   }
   return ctx
 }
-module.exports.drawCircle = drawCircle
 
 /**
  * @param {String} avatarURL - Avatar Image URL
@@ -36,20 +35,18 @@ module.exports.drawCircle = drawCircle
  * @example - Image Result: https://cdn.discordapp.com/attachments/672586746587774979/677917717667512320/image.png
  * @returns {Buffer} - Image data buffer
  */
-const getStatusImage = async (avatarURL, status, size = 256) => {
+module.exports.getStatusImage = async (avatarURL, status, size = 256) => {
   if (!avatarURL || !status) return new Error('avatarURL, Status not provided')
   const avatarImage = await Canvas.loadImage(avatarURL)
   const canvas = Canvas.createCanvas(size, size)
   const ctx = canvas.getContext('2d')
   ctx.drawImage(avatarImage, 0, 0, size, size)
   ctx.globalCompositeOperation = 'destination-in'
-  drawCircle(ctx, size / 2, size / 2, size, 'fill')
+  this.drawCircle(ctx, size / 2, size / 2, size, 'fill')
   ctx.globalCompositeOperation = 'destination-out'
-  drawCircle(ctx, (size / 2.4) * 2, (size / 2.4) * 2, size / 3.2, 'fill')
+  this.drawCircle(ctx, (size / 2.4) * 2, (size / 2.4) * 2, size / 3.2, 'fill')
   ctx.globalCompositeOperation = 'source-over'
-  const statusImage = await Canvas.loadImage(path.join(process.cwd(), './resources', resources.statusIndicators[status]))
+  const statusImage = await Canvas.loadImage(path.join(process.cwd(), './resources', this.resources.statusIndicators[status]))
   ctx.drawImage(statusImage, (size / 2.8) * 2, (size / 2.8) * 2, size / 4.2, size / 4.2)
   return canvas.toBuffer()
 }
-
-module.exports.getStatusImage = getStatusImage

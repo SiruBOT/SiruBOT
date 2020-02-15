@@ -78,26 +78,32 @@ module.exports.findElement = (options) => {
 function getEmbed (pages, currentPage, picker, locale, title, member) {
   return new Discord.MessageEmbed()
     .setTitle(title)
-    .setColor(getColor(member))
+    .setColor(this.getColor(member))
     .setDescription(`\`\`\`JS\n${pages[currentPage].join('\n')}\`\`\``)
     .setFooter(picker.get(locale, 'PAGER_PAGE', { CURRENT: currentPage + 1, PAGES: pages.length }))
 }
 
 /**
+ * @param {Discord.Presence} presence - User's Presence Object in Discord.JS
+ */
+module.exports.getStatus = (presence) => {
+  if (presence.activities[0]) return presence.activities[0].type === 'STREAMING' ? 'stream' : presence.status
+  return presence.status
+}
+
+/**
  * @param {Discord.GuildMember} member - Get Member's highest color, if 0 (black) returns Discord Blurple Color (#7289DA)
  */
-module.exports.getColor = getColor
-function getColor (member) {
+module.exports.getColor = (member) => {
   if (member.highestRole && member.highestRole.color !== 0) return member.highestRole.color
   else return settings.others.embed_general
 }
 
-module.exports.getUserFromMention = getUserFromMention
 /**
 * @param {Map} users - Bot's Users (Collection)
 * @param {String} mention - Discord Mention String
 */
-function getUserFromMention (users, mention) {
+module.exports.getUserFromMention = (users, mention) => {
   if (!mention) return false
 
   if (mention.startsWith('<@') && mention.endsWith('>')) {

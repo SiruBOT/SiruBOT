@@ -31,7 +31,7 @@ class Command {
     const user = this.client.users.cache.get(args[1])
     if (methods[args[0]] && !user) return message.channel.send('> ❎  없는 유저 ID인거 같아요! 다시한번 확인해주세요!')
     const userData = this.client.database.getGlobalUserData(user)
-    if (!userData) return message.channel.send('> ❎  이 유저는 가입되지 않은 (시루봇을 한번도 사용하지 않은) 유저 인것 같아요!')
+    if (!userData) return message.channel.send('> ❎  이 유저는 가입되지 않은 (봇을 한번도 사용하지 않은) 유저 인것 같아요!')
     switch (methods[args[0]]) {
       case '추가':
         this.client.database.updateGlobalUserData(user, { $set: { blacklisted: true } })

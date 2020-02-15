@@ -9,6 +9,7 @@ const Schema = new mongo.Schema({
   locale: { type: String, default: 'ko_kr' },
   filter: { type: Boolean, default: false },
   customFilter: { type: Array, default: [] },
+
   warningMax: { type: Number, default: 10 },
   announceChannel: { type: String, default: '0' },
 

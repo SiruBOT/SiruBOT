@@ -1,13 +1,11 @@
 const Logger = require('../logger')
 const logger = new Logger()
 
-module.exports = safeEdit
 /**
- *
  * @param {Discord.Message} message - To Edit
  * @param {String} data - Edit Data
  */
-function safeEdit (message, ...args) {
+module.exports = (message, ...args) => {
   logger.debug(`[Utils] [Safe_Edit] Edit Message ${message.id} to ${escapeLineBreak(...args)}...`)
   message.edit(...args).catch((e) => {
     logger.debug(`[Utils] [Safe_Edit] Edit Message Not Found. Sending Message.. (Channel: ${message.channel})`)
@@ -15,12 +13,11 @@ function safeEdit (message, ...args) {
   })
 }
 
-module.exports.massReact = massReact
 /**
  * @param {Discord.Message} message - to React (Message)
  * @param {Array} array - Array to react
  */
-async function massReact (message, array) {
+module.exports.massReact = async (message, array) => {
   for (const item of array) {
     if (!message.deleted) {
       await message.react(item)

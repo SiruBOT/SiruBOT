@@ -1,4 +1,4 @@
-module.exports.chooseWeighted = function (items, chances) {
+module.exports.chooseWeighted = (items, chances) => {
   const sum = chances.reduce((acc, el) => acc + el, 0)
   let acc = 0
   chances = chances.map(el => (acc = el + acc))
