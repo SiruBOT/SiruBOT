@@ -31,7 +31,7 @@
     "redis": "^3.0.2",
     "req-fast": "^0.2.19",
     "saslprep": "^1.0.3",
-    "slyrics": "^0.1.40",
+    "slyrics": "^0.1.42",
     "string-placeholder": "^1.0.2",
     "table": "^5.4.6",
     "winston": "^3.2.1",
