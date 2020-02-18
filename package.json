@@ -1,6 +1,6 @@
 {
   "name": "chinobot-rewrite",
-  "version": "1.0.0",
+  "version": "1.7.8",
   "description": "[![Build Status](https://travis-ci.org/cotwo0139/CHINOBOT_BETA.svg?branch=master)](https://travis-ci.org/cotwo0139/CHINOBOT_BETA)",
   "main": "index.js",
   "scripts": {

@@ -5,6 +5,6 @@ const Schema = new mongo.Schema({
   is_supporter: { type: Boolean, default: false },
   profile: { type: String, default: 'default' },
   blacklisted: { type: Boolean, default: false }
-}, { collection: 'globalMember', versionKey: false })
+}, { collection: 'globalUser', versionKey: false })
 
-module.exports = mongo.model('globalMember', Schema)
+module.exports = mongo.model('globalUser', Schema)

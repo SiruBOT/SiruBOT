@@ -1,7 +1,7 @@
 module.exports = {
   Guild: require('./guild'),
-  GuildMember: require('./guildMember'),
-  GlobalMember: require('./globalMember'),
+  Member: require('./guildMember'),
+  User: require('./globalUser'),
   ErrorInfo: require('./ErrorInfo'),
   customCommand: require('./customCommand'),
   Ticket: require('./ticket')

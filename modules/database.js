@@ -6,69 +6,134 @@ class DataManager {
     this.client = client
     this.connection = Mongo.connection
     this.Models = require('../models')
+    this.classPrefix = '[DataBase'
+    this.defaultPrefix = {
+      init: `${this.classPrefix}:Init]`,
+      checkMember: `${this.classPrefix}:${this.methods.check}:${this.collections.member}]`,
+      checkUser: `${this.classPrefix}:${this.methods.check}:${this.collections.user}]`,
+      checkGuild: `${this.classPrefix}:${this.methods.check}:${this.collections.guild}]`,
+      removeGuild: `${this.classPrefix}:${this.methods.remove}:${this.collections.guild}]`,
+      removeMember: `${this.classPrefix}:${this.methods.remove}:${this.collections.member}]`,
+      addErrorInfo: `${this.classPrefix}:${this.methods.add}:${this.collections.error}`
+    }
+    this.collections = {
+      member: 'Member',
+      user: 'User',
+      guild: 'Guild',
+      error: 'ErrorInfo'
+    }
+    this.methods = {
+      check: 'Check',
+      update: 'Update',
+      remove: 'Remove',
+      add: 'Add'
+    }
   }
 
+  /**
+   * Connect DataBase by client's Configuration
+   */
   init () {
-    const options = this.client._options
-    const logger = this.client.logger
-    logger.info(`[DataBase] [INIT] Connecting URL (${options.db.mongo.mongoURL})`)
-    Mongo.connect(options.db.mongo.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: options.db.mongo.user, pass: options.db.mongo.password })
+    const { _options, logger } = this.client
+    logger.info(`${this.defaultPrefix.init} Connecting URL (${_options.db.mongo.mongoURL})`)
+    Mongo.connect(_options.db.mongo.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: _options.db.mongo.user, pass: _options.db.mongo.password })
   }
 
-  async checkGuildMember (guildMember) {
-    this.client.logger.debug(`[DataBase:GuildMember:Check] (${this.getGuildMemberID(guildMember, guildMember.guild)}) Checking GuildMember`)
-    const mongoResult = await this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(guildMember, guildMember.guild) })
+  /**
+   * @param {String} memberID - guildMember id to check
+   * @param {String} guildID - guildMember's guild id to check
+   * @description - Checks if guildMember is not exists, create document, or do nothing
+   * @returns {void}
+   */
+  async checkMember (memberID, guildID) {
+    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    const formattedMemberID = this.getMemberID(memberID, guildID)
+    this.client.logger.debug(`${this.defaultPrefix.checkMember} (${formattedMemberID}) Checking Member`)
+    const mongoResult = await this.connection.collection('guildMember').findOne({ _id: formattedMemberID })
     if (!mongoResult) {
-      this.client.logger.info(`[DataBase:GuildMember:Check] (${this.getGuildMemberID(guildMember, guildMember.guild)}) GuildMember does not exist, create one.`)
-      const Model = new this.Models.GuildMember({
-        _id: this.getGuildMemberID(guildMember, guildMember.guild)
-      })
-      await Model.save()
-      this.client.logger.debug(`[DataBase:GuildMember:Check] (${this.getGuildMemberID(guildMember, guildMember.guild)}) Saving...`)
+      this.client.logger.info(`${this.defaultPrefix.checkMember} (${formattedMemberID}) Member does not exist, create one.`)
+      new this.Models.Member({
+        _id: formattedMemberID
+      }).save()
+      this.client.logger.debug(`${this.defaultPrefix.checkMember} (${formattedMemberID}) Saving...`)
     }
   }
 
-  async checkGlobalMember (guildMember) {
-    this.client.logger.debug(`[DataBase:GlobalMember:Check] (${guildMember.id}) Checking GlobalMember`)
-    const mongoResult = await this.connection.collection('globalMember').findOne({ _id: guildMember.id })
+  /**
+   * @param {String} userID - User's id to check
+   * @description - Checks if globalUser is not exists, create document, or do nothing
+   * @returns {void}
+   */
+  async checkUser (userID) {
+    if (!userID) return new Error('userID is not provided')
+    this.client.logger.debug(`${this.defaultPrefix.checkUser} (${userID}}) Checking GlobalMember`)
+    const mongoResult = await this.connection.collection('globalUser').findOne({ _id: userID })
     if (!mongoResult) {
-      this.client.logger.info(`[DataBase:GlobalMember:Check] (${guildMember.id}) Global Member is not exist, create one.`)
-      const Model = new this.Models.GlobalMember({
-        _id: guildMember.id
-      })
-      await Model.save()
-      this.client.logger.debug(`[DataBase:GlobalMember:Check] (${guildMember.id}) Saving...`)
+      this.client.logger.info(`${this.defaultPrefix.checkUser} (${userID}) Global Member is not exist, create one.`)
+      new this.Models.User({
+        _id: userID
+      }).save()
+      this.client.logger.debug(`${this.defaultPrefix.checkUser} (${userID}) Saving...`)
     }
   }
 
-  async checkGuild (guild) {
-    this.client.logger.debug(`[DataBase:Guild:Check] (${guild}) Checking Guild`)
-    const mongoGuild = await this.connection.collection('guild').findOne({ _id: guild })
+  /**
+   * @param {String} guildID - Guild's id to check
+   * @description - Checks if guild is not exists, create document, or do nothing
+   * @returns {void}
+   */
+  async checkGuild (guildID) {
+    if (!guildID) return new Error('guildID is not provided')
+    this.client.logger.debug(`${this.defaultPrefix.checkGuild} (${guildID}) Checking Guild`)
+    const mongoGuild = await this.connection.collection('guild').findOne({ _id: guildID })
     if (!mongoGuild) {
-      this.client.logger.info(`[DataBase:Guild:Check] (${guild}) Guild is not exist, create one.`)
+      this.client.logger.info(`${this.defaultPrefix.checkGuild} (${guildID}) Guild is not exist, create one.`)
       const Model = new this.Models.Guild({
-        _id: guild
+        _id: guildID
       })
       await Model.save()
-      this.client.logger.debug(`[DataBase:Guild:Check] (${guild}) Saving...`)
+      this.client.logger.debug(`${this.defaultPrefix.checkGuild} (${guildID}) Saving...`)
     }
   }
 
-  async deleteGuild (guild) {
-    this.client.logger.debug(`[DataBase:Guild:Remove] (${guild.id}) Removing Guild From Database..`)
-    const res = await this.connection.collection('guild').deleteOne({ _id: guild.id })
-    this.client.logger.debug(`[DataBase:Guild:Remove] (${guild.id}) Removed Guild From DataBase. (${JSON.stringify(res)}`)
+  /**
+   * @param {String} guildID - Guild's id to remove
+   * @description - Remove Guild Document provided guildID
+   * @returns {void}
+   */
+  async removeGuild (guildID) {
+    if (!guildID) return new Error('guildID is not provided')
+    this.client.logger.debug(`${this.defaultPrefix.removeGuild} (${guildID}) Removing Guild From Database..`)
+    const res = await this.connection.collection('guild').deleteOne({ _id: guildID })
+    this.client.logger.debug(`${this.defaultPrefix.removeGuild} (${guildID}) Removed Guild From DataBase. (${JSON.stringify(res)}`)
   }
 
-  async deleteGuildMember (member) {
-    this.client.logger.debug(`[DataBase:GuildMember:Remove] (${this.getGuildMemberID(member, member.guild)}) Removing GlobalMember from Database..`)
-    const res = await this.connection.collection('guildMember').deleteOne({ _id: this.getGuildMemberID(member, member.guild) })
-    this.client.logger.debug(`[DataBase:GuildMember:Remove] Removed GuildMember From DataBase. (${this.getGuildMemberID(member, member.guild)}) (${JSON.stringify(res)})`)
+  /**
+   * @param {String} memberID - guildMember's user id to remove
+   * @param {String} guildID - guildMember's guild id to remove
+   * @description - Remove guildMember Document provided guildMemberID
+   * @returns {void}
+   */
+  async removeMember (memberID, guildID) {
+    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    const formattedMemberID = this.getMemberID(memberID, guildID)
+    this.client.logger.debug(`${this.defaultPrefix.removeMember} (${formattedMemberID}) Removing GlobalMember from Database..`)
+    const res = await this.connection.collection('guildMember').deleteOne({ _id: formattedMemberID })
+    this.client.logger.debug(`${this.defaultPrefix.removeMember} Removed Member From DataBase. (${formattedMemberID}) (${JSON.stringify(res)})`)
   }
 
+  /**
+   * @param {String} name - Error message
+   * @param {String} stack - Error Stack Trace
+   * @param {String} author - Error Author (Command Message Author ID)
+   * @param {String} guild - Error Guild (Command Message's guildID)
+   * @param {String} command - Command Name (In Command Message)
+   * @param {Array} args - Command Args
+   * @returns {String} - UUID of ErrorInformation
+   */
   addErrorInfo (name, stack, author, guild, command, args) {
     const createdUUID = uuid.v4()
-    this.client.logger.info(`[DataBase:ErrorInfo:Create] Added ErrorInfo [UUID: ${createdUUID}]`)
+    this.client.logger.info(`${this.defaultPrefix.addErrorInfo} Added ErrorInfo [UUID: ${createdUUID}]`)
     const Model = new this.Models.ErrorInfo({
       _id: createdUUID,
       name,
@@ -79,42 +144,71 @@ class DataManager {
       args
     })
     Model.save()
-    this.client.logger.debug(`[DataBase:ErrorInfo:Create] (${createdUUID}) Saving...`)
+    this.client.logger.debug(`${this.defaultPrefix.addErrorInfo} (${createdUUID}) Saving...`)
     return createdUUID
   }
 
-  async getGuildData (id) {
-    await this.checkGuild(id)
-    return this.connection.collection('guild').findOne({ _id: id })
+  /**
+   * @param {String} guildID - guilldID to get data
+   */
+  async getGuild (guildID) {
+    if (!guildID) return new Error('guildID is not provided')
+    await this.checkGuild(guildID)
+    return this.connection.collection('guild').findOne({ _id: guildID })
   }
 
-  async getGlobalUserData (user) {
-    await this.checkGlobalMember(user)
-    return this.connection.collection('globalMember').findOne({ _id: user.id })
+  /**
+   * @param {String} userID - userID to get data
+   */
+  async getUser (userID) {
+    if (!userID) return new Error('userID is not provided')
+    await this.checkGlobalMember(userID)
+    return this.connection.collection('globalMember').findOne({ _id: userID })
   }
 
-  async getGuildMemberData (member) {
-    await this.checkGuildMember(member)
-    return this.connection.collection('guildMember').findOne({ _id: this.getGuildMemberID(member, member.guild) })
+  /**
+   * @param {String} memberID - memberID to get guildMemberData
+   * @param {String} guildID - guildID to get guildMemberData
+   */
+  async getMember (memberID, guildID) {
+    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    await this.checkMember(memberID, guildID)
+    return this.connection.collection('guildMember').findOne({ _id: this.getMemberID(memberID, guildID) })
   }
 
-  async updateGuildData (guild, query) {
-    await this.checkGuild(guild)
-    return this.connection.collection('guild').updateOne({ _id: guild }, query)
+  /**
+   * @param {String} guildID - guildID to update
+   * @param {Object} query - mongodb Query
+   */
+  async updateGuild (guildID, query) {
+    if (!guildID) return new Error('guildID is not provided')
+    await this.checkGuild(guildID)
+    return this.connection.collection('guild').updateOne({ _id: guildID }, query)
   }
 
-  async updateGlobalUserData (member, query) {
-    await this.checkGlobalMember(member)
-    return this.connection.collection('globalMember').updateOne({ _id: member.id }, query)
+  /**
+   * @param {String} userID - userID to update
+   * @param {Object} query - mongodb Query
+   */
+  async updateUser (userID, query) {
+    if (!userID) return new Error('userID is not provided')
+    await this.checkGlobalMember(userID)
+    return this.connection.collection('globalUser').updateOne({ _id: userID }, query)
   }
 
-  async updateGuildMemberData (member, query) {
-    await this.checkGuildMember(member)
-    return this.connection.collection('guildMember').updateOne({ _id: this.getGuildMemberID(member, member.guild) }, query)
+  /**
+   * @param {String} memberID - memberID to update
+   * @param {String} guildID - guildID to update
+   * @param {Object} query - mongodb Query
+   */
+  async updateMember (memberID, guildID, query) {
+    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    await this.checkMember(memberID, guildID)
+    return this.connection.collection('guildMember').updateOne({ _id: this.getMemberID(memberID, guildID) }, query)
   }
 
-  getGuildMemberID (user, guild) {
-    return `${user.id}-${guild.id}`
+  getMemberID (userID, guildID) {
+    return `${userID}-${guildID}`
   }
 }
 module.exports = DataManager
