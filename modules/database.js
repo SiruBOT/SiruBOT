@@ -6,16 +6,6 @@ class DataManager {
     this.client = client
     this.connection = Mongo.connection
     this.Models = require('../models')
-    this.classPrefix = '[DataBase'
-    this.defaultPrefix = {
-      init: `${this.classPrefix}:Init]`,
-      checkMember: `${this.classPrefix}:${this.methods.check}:${this.collections.member}]`,
-      checkUser: `${this.classPrefix}:${this.methods.check}:${this.collections.user}]`,
-      checkGuild: `${this.classPrefix}:${this.methods.check}:${this.collections.guild}]`,
-      removeGuild: `${this.classPrefix}:${this.methods.remove}:${this.collections.guild}]`,
-      removeMember: `${this.classPrefix}:${this.methods.remove}:${this.collections.member}]`,
-      addErrorInfo: `${this.classPrefix}:${this.methods.add}:${this.collections.error}`
-    }
     this.collections = {
       member: 'Member',
       user: 'User',
@@ -27,6 +17,16 @@ class DataManager {
       update: 'Update',
       remove: 'Remove',
       add: 'Add'
+    }
+    this.classPrefix = '[DataBase'
+    this.defaultPrefix = {
+      init: `${this.classPrefix}:Init]`,
+      checkMember: `${this.classPrefix}:${this.methods.check}:${this.collections.member}]`,
+      checkUser: `${this.classPrefix}:${this.methods.check}:${this.collections.user}]`,
+      checkGuild: `${this.classPrefix}:${this.methods.check}:${this.collections.guild}]`,
+      removeGuild: `${this.classPrefix}:${this.methods.remove}:${this.collections.guild}]`,
+      removeMember: `${this.classPrefix}:${this.methods.remove}:${this.collections.member}]`,
+      addErrorInfo: `${this.classPrefix}:${this.methods.add}:${this.collections.error}`
     }
   }
 
