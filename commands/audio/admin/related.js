@@ -23,11 +23,11 @@ class Command {
     switch (compressed.GuildData.audioPlayrelated) {
       case true:
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_RELATED_OFF'))
-        this.client.database.updateGuildData(message.guild.id, { $set: { audioPlayrelated: false } })
+        this.client.database.updateGuild(message.guild.id, { $set: { audioPlayrelated: false } })
         break
       case false:
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_RELATED_ON'))
-        this.client.database.updateGuildData(message.guild.id, { $set: { audioPlayrelated: true } })
+        this.client.database.updateGuild(message.guild.id, { $set: { audioPlayrelated: true } })
         break
     }
   }

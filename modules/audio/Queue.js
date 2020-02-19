@@ -28,7 +28,7 @@ class Queue extends EventEmitter {
     this.client.logger.debug(`${this.defaultPrefix.get} [${guildID}] Get Queue`)
     return new Promise((resolve, reject) => {
       if (!guildID) return reject(new Error('GuildID is not Provided'))
-      this.client.database.getGuildData(guildID)
+      this.client.database.getGuild(guildID)
         .then(res => {
           resolve(res.queue)
         })
@@ -48,11 +48,11 @@ class Queue extends EventEmitter {
         return el
       })
       this.client.logger.debug(`${this.defaultPrefix.enQueue} [${guildID}] Added Track(s) (${track.length} Items)`)
-      await this.client.database.updateGuildData(guildID, { $push: { queue: { $each: result } } })
+      await this.client.database.updateGuild(guildID, { $push: { queue: { $each: result } } })
     } else {
       this.client.logger.debug(`${this.defaultPrefix.enQueue} [${guildID}] Added Track (${track.track})`)
       track.request = message.author.id
-      await this.client.database.updateGuildData(guildID, { $push: { queue: track } })
+      await this.client.database.updateGuild(guildID, { $push: { queue: track } })
     }
     this.autoPlay(guildID)
   }
@@ -83,10 +83,10 @@ class Queue extends EventEmitter {
    * @example - <Queue>.deQueue('672586746587774976'fgh)
    */
   async deQueue (guildID, skip = false) {
-    const guildData = await this.client.database.getGuildData(guildID)
+    const guildData = await this.client.database.getGuild(guildID)
     if (skip || (guildData.repeat !== 2 && skip)) {
       this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Shift Track (Skip)`)
-      await this.client.database.updateGuildData(guildID, { $pop: { queue: -1 } })
+      await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
       return this.playNext(guildID)
     } else {
       switch (guildData.repeat) {
@@ -95,11 +95,11 @@ class Queue extends EventEmitter {
           break
         case 1:
           this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] UnShift Track (Repeat: ALL)`)
-          await this.client.database.updateGuildData(guildID, { $push: { queue: guildData.nowplaying } })
+          await this.client.database.updateGuild(guildID, { $push: { queue: guildData.nowplaying } })
           break
         case 2:
           this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] UnShift Track (Repeat: Single)`)
-          await this.client.database.updateGuildData(guildID, { $push: { queue: guildData.nowplaying } })
+          await this.client.database.updateGuild(guildID, { $push: { queue: guildData.nowplaying } })
           break
       }
       return this.autoPlay(guildID, true)
@@ -129,7 +129,7 @@ class Queue extends EventEmitter {
    */
   async playNext (guildID) {
     const queueData = await this.get(guildID)
-    const guildData = await this.client.database.getGuildData(guildID)
+    const guildData = await this.client.database.getGuild(guildID)
     if (queueData.length !== 0 || guildData.repeat === 2) {
       if (guildData.nowplaying.track !== null && guildData.repeat === 2) {
         await this.play(guildID, guildData.nowplaying)
@@ -161,7 +161,7 @@ class Queue extends EventEmitter {
       await this.setNowPlaying(guildID, trackData)
       this.emit('queueEvent', { guildID, trackData, op: 'trackStarted' })
       await this.client.audio.setPlayersDefaultSetting(guildID)
-      await this.client.database.updateGuildData(guildID, { $pop: { queue: -1 } })
+      await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
     }).catch(async (e) => {
       await this.setNowPlaying(guildID, { track: null })
       this.client.logger.error(`${this.defaultPrefix.play} [${guildID}] Error playing ${track}\n${e.stack}`)
@@ -177,7 +177,7 @@ class Queue extends EventEmitter {
   setNowPlaying (guildID, item) {
     this.client.logger.debug(`${this.defaultPrefix.setNowPlaying} [${guildID}] Updating Nowplaying to ${!item ? null : item.track}...`)
     if (this.audio.players.get(guildID)) this.audio.players.get(guildID).track = item.track
-    return this.client.database.updateGuildData(guildID, { $set: { nowplaying: item } })
+    return this.client.database.updateGuild(guildID, { $set: { nowplaying: item } })
   }
 }
 

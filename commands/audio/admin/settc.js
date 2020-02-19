@@ -21,7 +21,7 @@ class Command {
     if (!args[0]) return message.channel.send('No')
     if (['none', '없음', 'null', 'remove', '지우기'].includes(args.join(' ').toLowerCase())) {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETTC_NONE'))
-      this.client.database.updateGuildData(message.guild.id, { $set: { tch: '0' } })
+      this.client.database.updateGuild(message.guild.id, { $set: { tch: '0' } })
     } else {
       const formatter = (channel, number) => { return `[${number}] #${channel.name} [${channel.id}]` }
       const filter = (channel) => { return channel.name.toLowerCase() === args.join(' ').toLowerCase() || channel.id === args.join(' ') || channel.id === (message.mentions.channels.array()[0] === undefined ? false : message.mentions.channels.array()[0].id) }
@@ -37,7 +37,7 @@ class Command {
       this.client.utils.findUtil.findElement(options).then(async (res) => {
         if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETTC_SET', { CHANNEL: `<#${res.id}>` }))
-        this.client.database.updateGuildData(message.guild.id, { $set: { tch: res.id } })
+        this.client.database.updateGuild(message.guild.id, { $set: { tch: res.id } })
       })
     }
   }

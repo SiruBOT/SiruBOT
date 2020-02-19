@@ -24,7 +24,7 @@ class Command {
     let page = 0
     const client = this.client
     async function updateData () {
-      const guildData = await client.database.getGuildData(message.guild.id)
+      const guildData = await client.database.getGuild(message.guild.id)
       const locale = guildData.locale
       const allDuration = guildData.queue.map(el => el.info.isStream === false ? el.info.length : 0).reduce((a, b) => {
         return a + b

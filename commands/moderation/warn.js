@@ -44,8 +44,8 @@ class Command {
           admin: message.author.id
         })
         await this.client.database.updateGuildMemberData(member, { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
-        const guildData = await this.client.database.getGuildData(message.guild.id)
-        const updatedUserData = await this.client.database.getGuildMemberData(member)
+        const guildData = await this.client.database.getGuild(message.guild.id)
+        const updatedUserData = await this.client.database.getMember(member.id, member.guild.id)
         const embed = new Discord.MessageEmbed()
           .setTitle(picker.get(locale, 'WARN_EMBED_ADDED_TITLE'))
           .addField(picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'), picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), true)

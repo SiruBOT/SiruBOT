@@ -57,7 +57,7 @@ class AudioUtils {
    * @param {String} guild - Guild Id to get nowplaying Embed
    */
   async getNowplayingEmbed (guildID) {
-    const guildData = await this.client.database.getGuildData(guildID)
+    const guildData = await this.client.database.getGuild(guildID)
     const messageEmbed = new Discord.MessageEmbed()
     if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) {
       messageEmbed
@@ -121,7 +121,7 @@ class AudioUtils {
    * @example - <AudioUtils>.sendMessage('672586746587774976', 'Hello World!')
    */
   async sendMessage (guildID, text) {
-    const guildData = await this.client.database.getGuildData(guildID)
+    const guildData = await this.client.database.getGuild(guildID)
     const { audioMessage, tch } = guildData
     if (audioMessage) {
       const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)

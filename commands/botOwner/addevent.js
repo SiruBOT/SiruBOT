@@ -16,7 +16,7 @@ class Command {
    */
   async run (compressed) {
     const { message, args } = compressed
-    await this.client.database.updateGuildData(message.guild.id, { $push: { enabledEvents: { $each: [{ name: args[0], value: args[1] }] } } })
+    await this.client.database.updateGuild(message.guild.id, { $push: { enabledEvents: { $each: [{ name: args[0], value: args[1] }] } } })
     message.channel.send('Ok.')
   }
 }

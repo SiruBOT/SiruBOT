@@ -21,7 +21,7 @@ class Command {
     if (!args[0]) return message.channel.send('No')
     if (['none', '없음', 'null', 'remove', '지우기'].includes(args[0].toLowerCase())) {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_NONE'))
-      this.client.database.updateGuildData(message.guild.id, { $set: { dj_role: '0' } })
+      this.client.database.updateGuild(message.guild.id, { $set: { dj_role: '0' } })
     } else {
       const formatter = (role, number) => { return `[${number}] ${role.name} [${role.id}]` }
       const filter = (role) => { return role.name.toLowerCase() === args.join(' ').toLowerCase() || role.id === args.join(' ') || role.name.replace('@everyone', 'everyone') === args.join(' ').toLowerCase().replace('@', '') || role.id === (message.mentions.roles.array()[0] === undefined ? false : message.mentions.roles.array()[0].id) }
@@ -37,7 +37,7 @@ class Command {
       this.client.utils.findUtil.findElement(options).then(async (res) => {
         if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_SET', { DJNAME: res.name }))
-        this.client.database.updateGuildData(message.guild.id, { $set: { dj_role: res.id } })
+        this.client.database.updateGuild(message.guild.id, { $set: { dj_role: res.id } })
       })
     }
   }

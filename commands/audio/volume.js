@@ -25,7 +25,7 @@ class Command {
       await this.client.audio.setVolume(message.guild.id, Number(args[0]))
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_CHANGED', { VOLUME: Number(args[0]) }))
     } else {
-      const guildData = await this.client.database.getGuildData(message.guild.id)
+      const guildData = await this.client.database.getGuild(message.guild.id)
       return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_CURRENT', { VOLUME: guildData.volume }))
     }
   }

@@ -23,16 +23,16 @@ class Event {
     this.client.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     // End of Test
     await this.client.database.checkGuild(message.guild.id)
-    await this.client.database.checkGuildMember(message.member)
-    await this.client.database.checkGlobalMember(message.author)
+    await this.client.database.checkMember(message.member.id, message.guild.id)
+    await this.client.database.checkUser(message.author.id)
     const prefix = this.client._options.bot.prefix
     if (message.content.startsWith(prefix)) {
-      const GlobalUserData = await this.client.database.getGlobalUserData(message.author)
+      const GlobalUserData = await this.client.database.getUser(message.author.id)
       const args = message.content.slice(prefix.length).trim().split(/ +/g)
       const command = args.shift().toLowerCase()
       if (GlobalUserData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
-      const GuildMemberData = await this.client.database.getGuildMemberData(message.member)
-      const GuildData = await this.client.database.getGuildData(message.guild.id)
+      const GuildMemberData = await this.client.database.getMember(message.member.id, message.guild.id)
+      const GuildData = await this.client.database.getGuild(message.guild.id)
       const userPermissions = this.client.utils.permissionChecker.getUserPermission(message.member, { GlobalUserData: GlobalUserData, GuildMemberData: GuildMemberData, GuildData: GuildData })
       const compressed = Object.assign({
         GlobalUserData: GlobalUserData,

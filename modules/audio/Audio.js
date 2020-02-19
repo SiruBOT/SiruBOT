@@ -81,7 +81,7 @@ class Audio extends Shoukaku.Shoukaku {
   */
   async setPlayersDefaultSetting (guildID) {
     if (!guildID) return new Error('no guildID Provied')
-    const { volume } = await this.client.database.getGuildData(guildID)
+    const { volume } = await this.client.database.getGuild(guildID)
     this.client.logger.debug(`${this.defaultPrefix.setPlayerDefaultSetting} Set player volume for guild ${guildID} (${volume})`)
     return this.players.get(guildID).setVolume(volume)
   }
@@ -106,9 +106,9 @@ class Audio extends Shoukaku.Shoukaku {
   stop (guildID, cleanQueue = true) {
     if (!guildID) return new Error('guildID is not provied')
     this.leave(guildID)
-    if (cleanQueue) this.client.database.updateGuildData(guildID, { $set: { queue: [] } })
+    if (cleanQueue) this.client.database.updateGuild(guildID, { $set: { queue: [] } })
     this.queue.setNowPlaying(guildID, { track: null })
-    this.client.database.updateGuildData(guildID, { $set: { nowplayingPosition: 0 } })
+    this.client.database.updateGuild(guildID, { $set: { nowplayingPosition: 0 } })
     this.client.audio.utils.updateNowplayingMessage(guildID)
   }
 
@@ -119,7 +119,7 @@ class Audio extends Shoukaku.Shoukaku {
    */
   setVolume (guildID, vol) {
     this.client.logger.debug(`${this.defaultPrefix.setVolume} Setting volume of guild ${guildID} to ${vol}..`)
-    this.client.database.updateGuildData(guildID, { $set: { volume: vol } })
+    this.client.database.updateGuild(guildID, { $set: { volume: vol } })
     if (!this.players.get(guildID)) return Promise.resolve(false)
     else {
       this.players.get(guildID).setVolume(vol)
@@ -133,7 +133,7 @@ class Audio extends Shoukaku.Shoukaku {
     this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Reconnect voicechannel...`)
     if (this.client.guilds.cache.get(data.guildId).me.voice.channelID) {
       this.players.get(data.guildId).disconnect()
-      const guildData = await this.client.database.getGuildData(data.guildId)
+      const guildData = await this.client.database.getGuild(data.guildId)
       this.join(this.client.guilds.cache.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
         if (guildData.nowplaying.track !== null) await this.players.get(data.guildId).playTrack(guildData.nowplaying.track, { noReplace: false, startTime: guildData.nowplayingPosition || 0 })
       }).catch((e) => {

@@ -22,7 +22,7 @@ class Command {
     const embed = new Discord.MessageEmbed()
     if (args[0] && picker.locales.keyArray().includes(args[0].toLowerCase())) {
       message.channel.send(picker.get(args[0].toLowerCase(), 'COMMANDS_LANGUAGE_CHANGED'))
-      this.client.database.updateGuildData(message.guild.id, { $set: { locale: args[0].toLowerCase() } })
+      this.client.database.updateGuild(message.guild.id, { $set: { locale: args[0].toLowerCase() } })
     } else {
       const functionList = []
       const flagList = picker.locales.keyArray().map(el => picker.get(el, 'FLAG'))
@@ -36,7 +36,7 @@ class Command {
           picker.locales.keyArray().map(el => functionList.push((r) => {
             r.remove(message.author)
             message.channel.send(picker.get(el, 'COMMANDS_LANGUAGE_CHANGED'))
-            this.client.database.updateGuildData(message.guild.id, { $set: { locale: el } })
+            this.client.database.updateGuild(message.guild.id, { $set: { locale: el } })
             collector.stop()
           }))
           collector.on('collect', r => {

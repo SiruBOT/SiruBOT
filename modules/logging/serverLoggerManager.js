@@ -15,7 +15,7 @@ class ServerLogger {
   async send (name, guild, ...args) {
     this.client.logger.info(`[GuildLoggerManager] Executing Event ${name}, In guild ${guild.id}, args ${args}`)
     if (this.events.keyArray().includes(name)) {
-      const guildData = await this.client.database.getGuildData(guild.id)
+      const guildData = await this.client.database.getGuild(guild.id)
       const nameIndex = guildData.enabledEvents.findIndex(el => el.name === name)
       if (nameIndex !== -1) {
         this.events.get(name).run({ guild, args, guildData, eventData: guildData.enabledEvents[nameIndex] })

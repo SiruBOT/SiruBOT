@@ -10,8 +10,8 @@ class Event {
   run (member) {
     this.client.logger.debug(`[GuildMemberAdd] Check Guild Member, Check Guild ${member.guild.id}`)
     this.client.database.checkGuild(member.guild.id)
-    this.client.database.checkGuildMember(member)
-    this.client.database.checkGlobalMember(member)
+    this.client.database.checkMember(member.id, member.guild.id)
+    this.client.database.checkUser(member.id)
   }
 }
 module.exports = Event

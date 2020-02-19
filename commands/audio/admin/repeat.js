@@ -22,15 +22,15 @@ class Command {
     switch (compressed.GuildData.repeat) {
       case 0:
         message.channel.send(picker.get(locale, 'COMMANDS_REPEAT_ALL'))
-        this.client.database.updateGuildData(message.guild.id, { $set: { repeat: 1 } })
+        this.client.database.updateGuild(message.guild.id, { $set: { repeat: 1 } })
         break
       case 1:
         message.channel.send(picker.get(locale, 'COMMANDS_REPEAT_SINGLE'))
-        this.client.database.updateGuildData(message.guild.id, { $set: { repeat: 2 } })
+        this.client.database.updateGuild(message.guild.id, { $set: { repeat: 2 } })
         break
       case 2:
         message.channel.send(picker.get(locale, 'COMMANDS_REPEAT_NONE'))
-        this.client.database.updateGuildData(message.guild.id, { $set: { repeat: 0 } })
+        this.client.database.updateGuild(message.guild.id, { $set: { repeat: 0 } })
         break
     }
   }

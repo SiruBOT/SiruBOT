@@ -162,7 +162,7 @@ class DataManager {
    */
   async getUser (userID) {
     if (!userID) return new Error('userID is not provided')
-    await this.checkGlobalMember(userID)
+    await this.checkUser(userID)
     return this.connection.collection('globalMember').findOne({ _id: userID })
   }
 
@@ -192,7 +192,7 @@ class DataManager {
    */
   async updateUser (userID, query) {
     if (!userID) return new Error('userID is not provided')
-    await this.checkGlobalMember(userID)
+    await this.checkUser(userID)
     return this.connection.collection('globalUser').updateOne({ _id: userID }, query)
   }
 
