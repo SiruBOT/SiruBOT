@@ -163,7 +163,7 @@ class DataManager {
   async getUser (userID) {
     if (!userID) return new Error('userID is not provided')
     await this.checkUser(userID)
-    return this.connection.collection('globalMember').findOne({ _id: userID })
+    return this.connection.collection('globalUser').findOne({ _id: userID })
   }
 
   /**

@@ -202,9 +202,6 @@ class Client extends Discord.Client {
   }
 
   reload () {
-    this.init(true)
-    this.LoadCommands()
-    this.utils.localePicker.init()
     delete require.cache[require.resolve('./settings.js')]
     this._options = require('./settings.js')
     delete require.cache[require.resolve('./models')]
@@ -214,11 +211,12 @@ class Client extends Discord.Client {
     delete require.cache[require.resolve('./locales/localePicker')]
     delete require.cache[require.resolve('./modules')]
     const NewLocalePicker = require('./locales/localePicker')
-    const { NewPermissionChecker } = require('./modules')
-    this.utils.localePicker = new NewLocalePicker(this.client)
-    this.utils.permissionChecker = new NewPermissionChecker(this.client)
+    const NewPermissionChecker = require('./modules').PermissionChecker
+    this.utils.localePicker = new NewLocalePicker(this)
+    this.utils.permissionChecker = new NewPermissionChecker(this)
     this.utils.localePicker.init()
     this.loggerManager.init()
+    this.LoadCommands()
     this.registerEvents(true)
     return this.shard.ids
   }

@@ -67,7 +67,7 @@ class Command {
             message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST', { NUM: searchResult.tracks.length }))
           }, () => {
             collector.stop()
-            return message.channel.send(picker.get(locale, 'GENERAL_USER_STOP'))
+            return message.channel.send(picker.get(locale, 'GENERAL_USER_STOP')).then(m => m.delete(5000))
           }]
 
           collector.on('collect', r => {
@@ -77,7 +77,7 @@ class Command {
 
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()
-            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT'))
+            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete(5000))
           })
         })
       } else {
@@ -98,11 +98,12 @@ class Command {
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_NO_VOICE_ME'))
     const guildData = await this.client.database.getGuild(message.guild.id)
-    const status = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).track && !Array.isArray(trackInfo))
+    const npStatus = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).track)
+    const status = (npStatus && !Array.isArray(trackInfo))
     const { info } = trackInfo
     const placeHolderWithTrackInfo = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info || trackInfo[0].info), POSITION: guildData.queue.length + 1 })
-    if (status || guildData.queue.length > 0) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
-    else message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
+    if (status || (guildData.queue.length > 0)) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
+    else if (!npStatus) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
     this.client.audio.queue.enQueue(message.guild.id, trackInfo, message)
   }
 

@@ -67,8 +67,7 @@ class Event {
               this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${Command.command.name} at ${new Date().getTime()}`)
               return Command.run(compressed).catch((e) => {
                 this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
-                const errorUUID = this.client.database.addErrorInfo(e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args)
-                message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: errorUUID }))
+                message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo(e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))
               })
             }
           }
