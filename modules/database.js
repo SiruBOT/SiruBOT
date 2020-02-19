@@ -66,7 +66,7 @@ class DataManager {
    */
   async checkUser (userID) {
     if (!userID) return new Error('userID is not provided')
-    this.client.logger.debug(`${this.defaultPrefix.checkUser} (${userID}}) Checking GlobalMember`)
+    this.client.logger.debug(`${this.defaultPrefix.checkUser} (${userID}) Checking GlobalMember`)
     const mongoResult = await this.connection.collection('globalUser').findOne({ _id: userID })
     if (!mongoResult) {
       this.client.logger.info(`${this.defaultPrefix.checkUser} (${userID}) Global Member is not exist, create one.`)
