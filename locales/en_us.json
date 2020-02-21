@@ -80,6 +80,7 @@
 
     "NOWPLAYING_NOTRACK": "Currently nothing playing!",
     "AUDIO_NO_NODES": "> %EMOJI_BULB%  Currently available nodes do not exist!",
+    "UNABLE_USE_COMMAND_SHUTDOWN": "> %EMOJI_NO%  Command cannot be used when the bot is shutting down..",
     "AUDIO_NOPLAYER": "> %EMOJI_MUSIC%  Currently nothing playing!",
     "AUDIO_JOIN_VOICE_FIRST": "> %EMOJI_MUSIC%  Firstly, please join voice channel!",
     "AUDIO_NOT_DEFAULT_CH": "> %EMOJI_MUSIC%  This command able in voicechannel **<#%VOICECHANNEL%>**",

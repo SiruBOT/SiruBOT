@@ -5,6 +5,7 @@ class Command {
       name: 'join',
       aliases: ['ㅓㅐㅑㅜ'],
       category: 'MUSIC_DJ',
+      require_nodes: true,
       require_voice: false,
       hide: false,
       permissions: ['DJ', 'Administrator']

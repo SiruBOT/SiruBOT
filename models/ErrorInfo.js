@@ -2,6 +2,7 @@ const mongo = require('mongoose')
 
 const Schema = new mongo.Schema({
   _id: { type: String },
+  type: { type: String, default: 'default' },
   name: { type: String },
   stack: { type: String },
   author: { type: String, default: '0' },

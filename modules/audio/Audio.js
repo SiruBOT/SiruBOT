@@ -132,7 +132,7 @@ class Audio extends Shoukaku.Shoukaku {
   async handleDisconnect (data) {
     this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Reconnect voicechannel...`)
     if (this.client.guilds.cache.get(data.guildId).me.voice.channelID) {
-      this.players.get(data.guildId).disconnect()
+      this.leave(data.guildId)
       const guildData = await this.client.database.getGuild(data.guildId)
       this.join(this.client.guilds.cache.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
         if (guildData.nowplaying.track !== null) await this.players.get(data.guildId).playTrack(guildData.nowplaying.track, { noReplace: false, startTime: guildData.nowplayingPosition || 0 })
@@ -179,11 +179,14 @@ class Audio extends Shoukaku.Shoukaku {
    * @description - Get Nodes sort by players.
    */
   getNode (name = undefined) {
-    const Arr = Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED')
-    if (!name || this.client.audio.nodes.get(name)) return Arr.sort((a, b) => { return a.players.size - b.players.size })[0]
+    if (!name || this.client.audio.nodes.get(name)) return this.getUsableNodes().sort((a, b) => { return a.players.size - b.players.size })[0]
     else {
       this.client.audio.nodes.get(name)
     }
+  }
+
+  getUsableNodes () {
+    return Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED')
   }
 
   /**
@@ -197,10 +200,7 @@ class Audio extends Shoukaku.Shoukaku {
       this.client.logger.debug(`${this.defaultPrefix.getTrack} Query Keyword: ${query} Cache Available (${this.trackCache.get(query)}) returns Data`)
       return this.trackCache.get(query)
     }
-    const resultFetch = await node.rest._getFetch(`/loadtracks?${new URLSearchParams({ identifier: query }).toString()}`)
-      .catch(err => {
-        this.client.logger.debug(`${this.defaultPrefix.getTrack} Query Keyword: ${query} ${err.name}: ${err.message}`)
-      })
+    const resultFetch = await this.getFetch(node, query)
     if (resultFetch !== null && !['LOAD_FAILED', 'NO_MATCHES'].includes(resultFetch.loadType)) {
       this.client.logger.debug(`[AudioManager] Cache not found. registring cache... (${query})`)
       this.trackCache.set(query, resultFetch)
@@ -208,10 +208,21 @@ class Audio extends Shoukaku.Shoukaku {
         this.client.logger.debug(`[AudioManager] Registring Identifier: ${el.info.identifier}`)
         this.trackCache.set(el.info.identifier, el)
       })
-      return resultFetch
-    } else {
-      return resultFetch
     }
+    return resultFetch
+  }
+
+  getFetch (node, query) {
+    return new Promise((resolve) => {
+      node.rest._getFetch(`/loadtracks?${new URLSearchParams({ identifier: query }).toString()}`)
+        .then(data => {
+          resolve(data)
+        })
+        .catch(err => {
+          this.client.logger.error(`${this.defaultPrefix.getTrack} Query Keyword: ${query} ${err.name}: ${err.message}`)
+          resolve(Object.assign({ loadType: 'LOAD_FAILED', exception: { message: err.message } }))
+        })
+    })
   }
 }
 

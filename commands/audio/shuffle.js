@@ -6,6 +6,7 @@ class Command {
       aliases: ['노ㅕㄹ릳', '셔플'],
       category: 'MUSIC_GENERAL',
       require_voice: false,
+      require_nodes: false,
       hide: false,
       permissions: ['Everyone']
     }

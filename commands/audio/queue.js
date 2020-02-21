@@ -6,6 +6,7 @@ class Command {
     this.command = {
       name: 'queue',
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: false,
       hide: false,
       aliases: ['벼뎓', '큐', '대기열', '재생목록', 'playlist', 'zb', 'eorlduf'],

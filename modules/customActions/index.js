@@ -1,9 +1,14 @@
 class ActionProcess {
-  constructor ({ guild, channel, message }) {
+  constructor ({ guild, channel, message, client }) {
+    this.client = client
     this.guild = guild
+    this.channel = channel
+    this.message = message
   }
 
-  performActions () {
+  performActions (actions) {
 
   }
 }
+
+module.exports = ActionProcess

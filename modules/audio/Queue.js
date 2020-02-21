@@ -85,21 +85,23 @@ class Queue extends EventEmitter {
   async deQueue (guildID, skip = false) {
     const guildData = await this.client.database.getGuild(guildID)
     if (skip || (guildData.repeat !== 2 && skip)) {
-      this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Shift Track (Skip)`)
+      this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Shift Track`)
       await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
       return this.playNext(guildID)
     } else {
       switch (guildData.repeat) {
         case 0:
-          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing (No Shift) Track (Repeat: None)`)
+          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Next Track (Repeat: ${guildData.repeat})`)
           break
         case 1:
-          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] UnShift Track (Repeat: ALL)`)
-          await this.client.database.updateGuild(guildID, { $push: { queue: guildData.nowplaying } })
-          break
         case 2:
-          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] UnShift Track (Repeat: Single)`)
-          await this.client.database.updateGuild(guildID, { $push: { queue: guildData.nowplaying } })
+          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] UnShift Track (Repeat: ${guildData.repeat})`)
+          if (guildData.nowplaying.info && guildData.nowplaying.info.isStream) {
+            this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
+            return
+          } else {
+            await this.client.database.updateGuild(guildID, { $push: { queue: guildData.nowplaying } })
+          }
           break
       }
       return this.autoPlay(guildID, true)

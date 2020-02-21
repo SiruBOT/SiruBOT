@@ -6,6 +6,7 @@ class Command {
       name: 'profile',
       aliases: ['프로필', 'ㅔ개랴ㅣㄷ'],
       category: 'BOT_OWNER',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['BotOwner']

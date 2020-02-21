@@ -48,9 +48,10 @@ class Event {
       const picker = this.client.utils.localePicker
       const Command = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (Command) {
+        if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))
         let ablePermissions = 0
         if (this.client.chkRightChannel(message.channel, GuildData.tch)) {
-          if (Command.command.category.startsWith('MUSIC_')) {
+          if (Command.command.require_nodes) {
             if (GuildData.tch === '0') this.client.audio.textChannels.set(message.guild.id, message.channel.id)
             if (!this.client.audio.getNode()) return message.channel.send(picker.get(locale, 'AUDIO_NO_NODES'))
           }
@@ -67,7 +68,7 @@ class Event {
               this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${Command.command.name} at ${new Date().getTime()}`)
               return Command.run(compressed).catch((e) => {
                 this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
-                message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo(e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))
+                message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))
               })
             }
           }

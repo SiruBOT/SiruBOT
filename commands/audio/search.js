@@ -7,6 +7,7 @@ class Command {
       name: 'search',
       aliases: ['ㄴㄷㅁㄱ초', '검색', '유튜브검색'],
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

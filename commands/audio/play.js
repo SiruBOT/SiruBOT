@@ -7,6 +7,7 @@ class Command {
       name: 'play',
       aliases: ['ㅔㅣ묘'],
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

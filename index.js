@@ -36,14 +36,9 @@ class Client extends Discord.Client {
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
-    // this.audio = new Audio({ client: this, shards: this._options.audio.shards, nodes: this._options.audio.nodes })
     this.audio = new Audio(this,
       this._options.audio.nodes,
       {
-        moveOnDisconnect: false,
-        resumable: 'sirubot',
-        resumableTimeout: 60,
-        reconnectTries: 1500,
         restTimeout: 10000
       })
 
@@ -192,13 +187,14 @@ class Client extends Discord.Client {
     }
   }
 
-  clearAudio () {
+  async clearAudio () {
     const players = this.audio.players
     this.logger.info(`[Shutdown] Disconnect All Players.... (${players.size} Players)`)
     for (const player of client.audio.players.values()) {
       this.logger.debug(`[Shutdown] Stopping player of guild: ${player.guild}`)
-      if (player.voiceConnection.guildID) client.audio.stop(player.voiceConnection.guildID, false)
+      client.audio.stop(player.voiceConnection.guildID, false)
     }
+    return true
   }
 
   reload () {
@@ -222,9 +218,14 @@ class Client extends Discord.Client {
   }
 
   shutdown () {
-    this.clearAudio()
-    this.logger.warn('[Shutdown] Shutting Down...')
-    process.exit(0)
+    this.shuttingDown = true
+    this.clearAudio().then(() => {
+      this.logger.warn('[Shutdown] Shutting Down In 10 seconds...')
+      setTimeout(() => {
+        process.exit(0)
+      }, 10000)
+    })
+    return this.shard.ids
   }
 }
 

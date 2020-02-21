@@ -4,6 +4,7 @@ class Command {
     this.command = {
       name: 'scplay',
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: true,
       hide: false,
       aliases: ['ㄴㅊㅔㅣ묘'],

@@ -5,6 +5,7 @@ class Command {
       name: 'repeat',
       aliases: ['ㄱ덷ㅁㅅ', '반복', 'loop', 'loop'],
       category: 'MUSIC_DJ',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['DJ', 'Administrator']

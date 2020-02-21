@@ -5,6 +5,7 @@ class Command {
       name: 'scsearch',
       aliases: ['ㄴㅊㄴㄷㅁㄱ초', '사운드클라우드검색'],
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

@@ -6,6 +6,7 @@ class Command {
       name: 'related',
       aliases: ['추천', 'ㄱ딤ㅅㄷㅇ'],
       category: 'MUSIC_DJ',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['DJ', 'Administrator']

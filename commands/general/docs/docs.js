@@ -8,6 +8,7 @@ class Command {
       name: 'docs',
       aliases: ['앷ㄴ', 'djsdocs', 'djs'],
       category: 'COMMANDS_GENERAL_INFO',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

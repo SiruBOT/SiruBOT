@@ -5,6 +5,7 @@ class Command {
       name: 'skip',
       aliases: ['스킵', '나ㅑㅔ', '건너뛰기'],
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

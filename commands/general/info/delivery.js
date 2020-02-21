@@ -13,6 +13,7 @@ class Command {
       name: 'delivery',
       aliases: ['택배', '택배조회'],
       category: 'COMMANDS_GENERAL_INFO',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

@@ -5,6 +5,7 @@ class Command {
       name: 'forceskip',
       aliases: ['강제스킵', '랙ㅊㄷ나ㅑㅔ', '강제건너뛰기', 'fskip'],
       category: 'MUSIC_DJ',
+      require_nodes: true,
       require_voice: true,
       hide: false,
       permissions: ['DJ', 'Administrator']

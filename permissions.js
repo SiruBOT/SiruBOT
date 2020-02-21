@@ -42,10 +42,6 @@ module.exports.categories = [{
   requiredPermissions: ['Everyone']
 },
 {
-  category: 'COMMANDS_MONEY_CASINO',
-  requiredPermissions: ['Everyone']
-},
-{
   category: 'COMMANDS_MONEY_GENERAL',
   requiredPermissions: ['Everyone']
 },

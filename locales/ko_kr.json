@@ -73,6 +73,7 @@
 
     "NOWPLAYING_NOTRACK": "아무 노래도 재생중이지 않아요!",
     "AUDIO_NO_NODES": "> %EMOJI_BULB%  현재 노래를 재생 할 수 있는 노드가 존재하지 않아요!",
+    "UNABLE_USE_COMMAND_SHUTDOWN": "> %EMOJI_NO%  현재 봇의 종료가 진행 중이네요.. 봇 종료 진행 중에는 명령어를 사용하실 수 없어요...",
     "AUDIO_NOPLAYER": "> %EMOJI_MUSIC%  현재 노래를 재생중이지 않아요!",
     "AUDIO_JOIN_VOICE_FIRST": "> %EMOJI_MUSIC%  먼저 음성 채널에 접속해주세요!",
     "AUDIO_NOT_DEFAULT_CH": "> %EMOJI_MUSIC%  이 명령어는 음성 채널 **<#%VOICECHANNEL%>** 에서만 사용 가능해요!",

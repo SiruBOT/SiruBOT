@@ -8,6 +8,7 @@ class Command {
       name: 'changelog',
       aliases: ['변경로그', '초뭏디ㅐㅎ'],
       category: 'COMMANDS_GENERAL_INFO',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

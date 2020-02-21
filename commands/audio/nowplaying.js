@@ -5,6 +5,7 @@ class Command {
       name: 'nowplaying',
       aliases: ['np', 'ㅞ'],
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

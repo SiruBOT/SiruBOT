@@ -7,6 +7,7 @@ class Command {
       name: 'poll',
       aliases: ['투표'],
       category: 'COMMANDS_MODERATION',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

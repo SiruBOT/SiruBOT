@@ -6,6 +6,7 @@ class Command {
       name: 'ban',
       aliases: ['밴', '차단', 'ㅠ무'],
       category: 'COMMANDS_MODERATION',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

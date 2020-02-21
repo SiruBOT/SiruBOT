@@ -123,6 +123,7 @@ class DataManager {
   }
 
   /**
+   * @param {String} type - Error Type (default, audioError, commandError)
    * @param {String} name - Error message
    * @param {String} stack - Error Stack Trace
    * @param {String} author - Error Author (Command Message Author ID)
@@ -131,11 +132,12 @@ class DataManager {
    * @param {Array} args - Command Args
    * @returns {String} - UUID of ErrorInformation
    */
-  addErrorInfo (name, stack, author, guild, command, args) {
+  addErrorInfo (type = 'default', name, stack, author, guild, command, args) {
     const createdUUID = uuid.v4()
     this.client.logger.info(`${this.defaultPrefix.addErrorInfo} Added ErrorInfo [UUID: ${createdUUID}]`)
     const Model = new this.Models.ErrorInfo({
       _id: createdUUID,
+      type,
       name,
       stack,
       author,
@@ -153,7 +155,6 @@ class DataManager {
    */
   async getGuild (guildID) {
     if (!guildID) return new Error('guildID is not provided')
-    await this.checkGuild(guildID)
     return this.connection.collection('guild').findOne({ _id: guildID })
   }
 
@@ -162,7 +163,6 @@ class DataManager {
    */
   async getUser (userID) {
     if (!userID) return new Error('userID is not provided')
-    await this.checkUser(userID)
     return this.connection.collection('globalUser').findOne({ _id: userID })
   }
 
@@ -172,7 +172,6 @@ class DataManager {
    */
   async getMember (memberID, guildID) {
     if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
-    await this.checkMember(memberID, guildID)
     return this.connection.collection('guildMember').findOne({ _id: this.getMemberID(memberID, guildID) })
   }
 
@@ -182,7 +181,6 @@ class DataManager {
    */
   async updateGuild (guildID, query) {
     if (!guildID) return new Error('guildID is not provided')
-    await this.checkGuild(guildID)
     return this.connection.collection('guild').updateOne({ _id: guildID }, query)
   }
 
@@ -192,7 +190,6 @@ class DataManager {
    */
   async updateUser (userID, query) {
     if (!userID) return new Error('userID is not provided')
-    await this.checkUser(userID)
     return this.connection.collection('globalUser').updateOne({ _id: userID }, query)
   }
 
@@ -203,7 +200,6 @@ class DataManager {
    */
   async updateMember (memberID, guildID, query) {
     if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
-    await this.checkMember(memberID, guildID)
     return this.connection.collection('guildMember').updateOne({ _id: this.getMemberID(memberID, guildID) }, query)
   }
 

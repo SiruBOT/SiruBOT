@@ -6,6 +6,7 @@ class Command {
       name: 'settings',
       aliases: ['설정', 'ㄴㄷㅅ샤ㅜㅎㄴ'],
       category: 'COMMANDS_MODERATION',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

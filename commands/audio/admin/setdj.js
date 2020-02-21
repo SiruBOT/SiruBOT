@@ -5,6 +5,7 @@ class Command {
       name: 'setdj',
       aliases: ['ㄴㄷㅅ어'],
       category: 'COMMANDS_MODERATION',
+      require_nodes: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

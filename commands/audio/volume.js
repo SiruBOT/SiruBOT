@@ -5,6 +5,7 @@ class Command {
       name: 'volume',
       aliases: ['볼륨', 'vol', 'qhffba', '패ㅣㅕㅡㄷ', '패ㅣ'],
       category: 'MUSIC_GENERAL',
+      require_nodes: true,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']
