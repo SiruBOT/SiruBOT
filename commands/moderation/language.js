@@ -5,7 +5,7 @@ class Command {
     this.command = {
       name: 'language',
       aliases: ['언어', 'ㅣ무혐ㅎㄷ', 'lang', 'locale'],
-      category: 'COMMANDS_MODERATION',
+      category: 'MODERATION',
       require_nodes: false,
       require_voice: false,
       hide: false,

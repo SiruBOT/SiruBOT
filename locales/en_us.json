@@ -41,9 +41,9 @@
     "CATEGORY_MUSIC_DJ": "DJ Commands",
     "CATEGORY_MUSIC_GENERAL": "Music Commands",
     "CATEGORY_BOT_OWNER": "Bot Owner only Commands",
-    "CATEGORY_COMMANDS_GENERAL_INFO": "Information Commands",
-    "CATEGORY_COMMANDS_GENERAL_UTILS": "Utils Commands",
-    "CATEGORY_COMMANDS_MODERATION": "Moderation Commands",
+    "CATEGORY_GENERAL_INFO": "Information Commands",
+    "CATEGORY_GENERAL_UTILS": "Utils Commands",
+    "CATEGORY_MODERATION": "Moderation Commands",
 
     "REMARK_2": "(주석) 커맨드에 사용되는 멘트들",
     

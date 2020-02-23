@@ -5,7 +5,7 @@ class Command {
     this.command = {
       name: 'settings',
       aliases: ['설정', 'ㄴㄷㅅ샤ㅜㅎㄴ'],
-      category: 'COMMANDS_MODERATION',
+      category: 'MODERATION',
       require_nodes: false,
       require_voice: false,
       hide: false,

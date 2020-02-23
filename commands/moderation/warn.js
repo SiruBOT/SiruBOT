@@ -5,7 +5,7 @@ class Command {
     this.command = {
       name: 'warn',
       aliases: ['경고', 'ㅈㅁ구'],
-      category: 'COMMANDS_MODERATION',
+      category: 'MODERATION',
       require_nodes: false,
       require_voice: false,
       hide: false,

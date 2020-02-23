@@ -4,7 +4,7 @@ class Command {
     this.command = {
       name: 'settc',
       aliases: ['ㄴㄷㅅㅅㅊ'],
-      category: 'COMMANDS_MODERATION',
+      category: 'MODERATION',
       require_voice: false,
       require_nodes: false,
       hide: false,

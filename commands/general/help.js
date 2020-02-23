@@ -6,7 +6,7 @@ class Command {
     this.command = {
       name: 'help',
       aliases: ['도움', '도움말', 'ㅗ디ㅔ'],
-      category: 'COMMANDS_GENERAL_INFO',
+      category: 'GENERAL_INFO',
       require_nodes: false,
       require_voice: false,
       hide: false,

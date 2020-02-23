@@ -6,7 +6,7 @@ class Command {
     this.command = {
       name: 'ping',
       aliases: ['ㅔㅑㅜㅎ', '핑'],
-      category: 'COMMANDS_GENERAL_INFO',
+      category: 'GENERAL_INFO',
       require_nodes: false,
       require_voice: false,
       hide: false,

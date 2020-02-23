@@ -6,7 +6,7 @@ class Command {
     this.command = {
       name: 'poll',
       aliases: ['투표'],
-      category: 'COMMANDS_MODERATION',
+      category: 'MODERATION',
       require_nodes: false,
       require_voice: false,
       hide: false,

@@ -7,7 +7,7 @@ class Command {
     this.command = {
       name: 'changelog',
       aliases: ['변경로그', '초뭏디ㅐㅎ'],
-      category: 'COMMANDS_GENERAL_INFO',
+      category: 'GENERAL_INFO',
       require_nodes: false,
       require_voice: false,
       hide: false,

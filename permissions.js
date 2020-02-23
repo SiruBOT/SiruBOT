@@ -22,7 +22,7 @@ module.exports = [{
 }]
 
 module.exports.categories = [{
-  category: 'COMMANDS_MODERATION',
+  category: 'MODERATION',
   requiredPermissions: ['Administrator']
 },
 {
@@ -38,14 +38,10 @@ module.exports.categories = [{
   requiredPermissions: ['BotOwner']
 },
 {
-  category: 'COMMANDS_GENERAL_INFO',
+  category: 'GENERAL_INFO',
   requiredPermissions: ['Everyone']
 },
 {
-  category: 'COMMANDS_MONEY_GENERAL',
-  requiredPermissions: ['Everyone']
-},
-{
-  category: 'COMMANDS_GENERAL_UTILS',
+  category: 'GENERAL_UTILS',
   requiredPermissions: ['Everyone']
 }]

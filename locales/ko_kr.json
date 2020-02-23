@@ -40,9 +40,9 @@
     "CATEGORY_MUSIC_DJ": "DJ 명령어들",
     "CATEGORY_MUSIC_GENERAL": "음악 명령어들",
     "CATEGORY_BOT_OWNER": "봇 제작자 전용 명령어들",
-    "CATEGORY_COMMANDS_GENERAL_INFO": "정보 명령어들",
-    "CATEGORY_COMMANDS_GENERAL_UTILS": "도구들",
-    "CATEGORY_COMMANDS_MODERATION": "관리자 명령어들",
+    "CATEGORY_GENERAL_INFO": "정보 명령어들",
+    "CATEGORY_GENERAL_UTILS": "도구들",
+    "CATEGORY_MODERATION": "관리자 명령어들",
 
     "REMARK_2": "(주석) 커맨드에 사용되는 멘트들",
 
