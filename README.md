@@ -1,4 +1,4 @@
-# 📃 Chinobot Development Version
+# 📃 SiruBOT Development Version
 ![Language](https://img.shields.io/badge/language-Javascript,%20Node.js-brightgreen) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 ## This Project Use Standard JS Style
 [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
