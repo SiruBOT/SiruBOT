@@ -112,6 +112,7 @@
     "COMMANDS_AUDIO_SETVC_SET": "> %EMOJI_MUSIC%  I set up a voice channel %CHANNEL%!",
     "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  I set up a voice channel **%NONE%**!",
 
+    "COMMANDS_AUDIO_LOAD": "> %EMOJI_SANDCLOCK%  Loading Track...",
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  Added **%TRACK% [%DURATION%]** to the queue at position **%POSITION%**",
     "COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY": "> %EMOJI_MUSIC%  Now Playing.. **%TRACK% [%DURATION%]**",

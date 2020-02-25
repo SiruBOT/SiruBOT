@@ -35,9 +35,11 @@ class Command {
     if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
+    const loadingMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_LOAD'))
     const searchResult = await Audio.getTrack(searchStr).catch((e) => {
       throw e
     })
+    loadingMessage.delete()
 
     if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return false
 

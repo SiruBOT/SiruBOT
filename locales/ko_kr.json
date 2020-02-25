@@ -111,6 +111,7 @@
     "COMMANDS_AUDIO_SETVC_SET": "> %EMOJI_MUSIC%  음성 채널을 %CHANNEL% 로 설정했어요!\n> %EMOJI_MUSIC%  앞으로 이 음성 채널에서만 음성 기능을 사용하실수 있어요!",
     "COMMANDS_AUDIO_SETVC_NONE": "> %EMOJI_MUSIC%  음성 채널을 **%NONE%** 으로 설정했어요!\n> %EMOJI_MUSIC%  이제 모든 음성 채널에서 음성 기능을 사용하실수 있어요!",
 
+    "COMMANDS_AUDIO_LOAD": "> %EMOJI_SANDCLOCK%  노래 로드 중...",
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  노래 로드를 실패했어요.. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  %TRACK% 이 재생 목록 **%POSITION%**번에 추가되었어요!",
     "COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY": "> %EMOJI_MUSIC%  %TRACK% 이 곧 재생되어요!",
