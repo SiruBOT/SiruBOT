@@ -43,7 +43,7 @@ class Command {
     embed.setColor('#7289DA')
     embed.setTitle(Discord.Util.escapeMarkdown(`보낸이: ${Result.raw.from.name} 받는이: ${Result.raw.to.name} (${Result.raw.state.text})`))
     for (const obj of Object.keys(Result)) {
-      if (obj !== 'raw') embed.addField(moment(obj).tz('Asia/Seoul').format('YYYY - MM - DD'), Result[obj].map(el => `**[${Discord.Util.escapeMarkdown(el.location.name)}]** **${Discord.Util.escapeMarkdown(moment(el.timeFormat).tz('Asia/Seoul').format('HH:mm'))}** - ${Discord.Util.escapeMarkdown(el.message)}`.replace(/\n/gi, '')))
+      if (obj !== 'raw') embed.addFields({ name: moment(obj).tz('Asia/Seoul').format('YYYY - MM - DD'), value: Result[obj].map(el => `**[${Discord.Util.escapeMarkdown(el.location.name)}]** **${Discord.Util.escapeMarkdown(moment(el.timeFormat).tz('Asia/Seoul').format('HH:mm'))}** - ${Discord.Util.escapeMarkdown(el.message)}`.replace(/\n/gi, '')) })
     }
     message.channel.send(embed)
   }

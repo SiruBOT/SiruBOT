@@ -66,7 +66,7 @@ class AudioUtils {
     } else {
       const request = this.client.users.cache.get(guildData.nowplaying.request)
       messageEmbed
-        .setAuthor(request.tag, request.displayAvatarURL)
+        .setAuthor(request.tag, request.displayAvatarURL({ format: 'png', size: 512 }))
         .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
         .setURL(guildData.nowplaying.info.uri)
         .setDescription(this.getNowplayingText(guildID, guildData))

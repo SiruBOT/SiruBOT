@@ -22,7 +22,7 @@ class Command {
     const locale = compressed.GuildData.locale
     const picker = this.client.utils.localePicker
     const embed = new Discord.MessageEmbed()
-      .setThumbnail(message.guild.me.user.displayAvatarURL)
+      .setThumbnail(message.guild.me.user.displayAvatarURL({ format: 'png' , size: 512 }))
       .setColor(this.client.utils.findUtil.getColor(message.guild.me))
       .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }))
     const command = this.client.commands.get(args[0]) || this.client.commands.get(this.client.aliases.get(args[0]))
@@ -31,7 +31,7 @@ class Command {
       for (const item of this.client.categories.keyArray()) {
         for (const permission of userPermissions) {
           if (this.client.utils.permissionChecker.permissions.categories.filter(el => el.category === item)[0].requiredPermissions.includes(permission)) {
-            embed.addField(picker.get(locale, `CATEGORY_${item}`), '> ' + this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '), true)
+            embed.addFields({ name: picker.get(locale, `CATEGORY_${item}`), value: '> ' + this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '), inline: true })
             continue
           }
         }

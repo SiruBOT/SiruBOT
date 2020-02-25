@@ -44,14 +44,14 @@ class Command {
           date: new Date(),
           admin: message.author.id
         })
-        await this.client.database.updateGuildMemberData(member, { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
+        await this.client.database.updateMember(member.id, member.guild.id, { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
         const guildData = await this.client.database.getGuild(message.guild.id)
         const updatedUserData = await this.client.database.getMember(member.id, member.guild.id)
         const embed = new Discord.MessageEmbed()
           .setTitle(picker.get(locale, 'WARN_EMBED_ADDED_TITLE'))
-          .addField(picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'), picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), true)
-          .addField(picker.get(locale, 'WARN_EMBED_ADDED_PRISONER_TITLE'), picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), true)
-          .addField(picker.get(locale, 'WARN_EMBED_INFO_TITLE'), picker.get(locale, 'WARN_EMBED_INFO_DESC', { MAX: guildData.warningMax, CURRENT: updatedUserData.warningCount, REASON: why }), true)
+          .addFields({ name: picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'), value: picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), inline: true })
+          .addFields({ name: picker.get(locale, 'WARN_EMBED_ADDED_PRISONER_TITLE'), value: picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), inline: true })
+          .addFields({ name: picker.get(locale, 'WARN_EMBED_INFO_TITLE'), value: picker.get(locale, 'WARN_EMBED_INFO_DESC', { MAX: guildData.warningMax, CURRENT: updatedUserData.warningCount, REASON: why }), inline: true })
           .setColor(this.client._options.others.modEmbeds.warn)
           .setFooter(picker.get(locale, 'WARN_EMBED_ADDED_FOOTER'))
           .setTimestamp(obj.date)

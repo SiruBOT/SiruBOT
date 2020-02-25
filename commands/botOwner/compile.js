@@ -35,7 +35,7 @@ const Discord = require('discord.js')\n` + args.join(' ')
         if (codeIn.length > 1000) {
           codeIn = codeIn.substr(0, 1000) + ' (1000자 이상..'
         }
-        embed.addField(':inbox_tray: 입력', `\`\`\`js\n${codeIn} \`\`\``)
+        embed.addFields({ name: ':inbox_tray: 입력', value: `\`\`\`js\n${codeIn} \`\`\`` })
         if (isJSON(code) === true) {
           code = JSON.stringify(code)
         }
@@ -45,7 +45,7 @@ const Discord = require('discord.js')\n` + args.join(' ')
         if (code.length > 1000) {
           code = code.substr(0, 1000) + ' (1000자 이상..'
         }
-        embed.addField(':outbox_tray: 출력', `\`\`\`js\n${code} \n\`\`\``)
+        embed.addFields({ name: ':outbox_tray: 출력', value: `\`\`\`js\n${code} \n\`\`\`` })
         message.channel.send(embed)
       }).catch(e => {
         sendError(e)
@@ -60,8 +60,8 @@ const Discord = require('discord.js')\n` + args.join(' ')
       if (codeIn.length > 1000) {
         codeIn = codeIn.substr(0, 1000) + ' (1000자 이상..'
       }
-      embed.addField(':inbox_tray: 입력', `\`\`\`js\n${codeIn} \`\`\``)
-      embed.addField(':outbox_tray: 오류', `\`\`\`js\n${e.stack ? e.stack : e} \n\`\`\``)
+      embed.addFields({ name: ':inbox_tray: 입력', value: `\`\`\`js\n${codeIn} \`\`\`` })
+      embed.addFields({ name: ':outbox_tray: 오류', value: `\`\`\`js\n${e.stack ? e.stack : e} \n\`\`\`` })
       message.channel.send(embed)
     }
   }

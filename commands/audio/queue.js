@@ -47,27 +47,30 @@ class Command {
     }
     const data = await updateData()
     message.channel.send(data.nowplaying, data.embed).then(m => {
+      if (page === 0) return
       const emojiList = ['◀️', '⏹️', '▶️']
       this.client.utils.massReact(m, emojiList).then(() => {
         const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
         const collector = m.createReactionCollector(filter, { time: 60000 })
-        const functionList = [(r) => {
-          r.remove(message.author)
+        const functionList = [async (r) => {
+          r.users.remove(message.author)
           if (page === 0) page = data.chunkedDescriptionArray.length - 1
           else page--
           updateData().then(res => m.edit(res.nowplaying, res.embed))
-        }, () => {
+        }, async (r) => {
           collector.stop()
-          m.reactions.forEach((el) => el.remove())
-        }, (r) => {
-          r.remove(message.author)
+          m.reactions.removeAll()
+        }, async (r) => {
+          r.users.remove(message.author)
           if (page >= data.chunkedDescriptionArray.length - 1) page = 0
           else page++
           updateData().then(res => m.edit(res.nowplaying, res.embed))
         }]
-        collector.on('collect', r => {
+        collector.on('collect', (r) => {
           const index = emojiList.findIndex((el) => el === r.emoji.name)
-          functionList[index](r)
+          functionList[index](r).catch((e) => {
+            this.client.logger.error(e.stack || e.message)
+          })
         })
       })
     })

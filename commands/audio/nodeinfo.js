@@ -34,8 +34,11 @@ class Command {
     const { message } = compressed
     const embed = new Discord.MessageEmbed()
     for (const item of this.client.audio.nodes.values()) {
-      embed.addField(`**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.players.size} Players)` : `, ${item.state}`}`,
-      `**${niceBytes(item.stats.memory.used)}** Used\n**${item.stats.cpu.cores}** Cores\n**${Number(item.stats.cpu.systemLoad).toFixed(2)}%** System Loads\n**${Number(item.stats.cpu.lavalinkLoad).toFixed(2)}%** Lavalink Loads`, true)
+      embed.addFields({
+        name: `**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.players.size} Players)` : `, ${item.state}`}`,
+        value: `**${niceBytes(item.stats.memory.used)}** Used\n**${item.stats.cpu.cores}** Cores\n**${Number(item.stats.cpu.systemLoad).toFixed(2)}%** System Loads\n**${Number(item.stats.cpu.lavalinkLoad).toFixed(2)}%** Lavalink Loads`,
+        inline: true
+      })
     }
     embed.setTitle('Lavalink Nodes - Powered By Shoukaku')
     embed.setColor('#7289DA')

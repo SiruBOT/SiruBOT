@@ -48,9 +48,9 @@ class Command {
     const embed = new Discord.MessageEmbed()
     member.ban().then(() => {
       embed.setTitle(picker.get(locale, 'BAN_EMBED_TITLE'))
-        .addField(picker.get(locale, 'BAN_EMBED_COP_TITLE'), picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), true)
-        .addField(picker.get(locale, 'BAN_EMBED_PRISONER_TITLE'), picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), true)
-        .addField(picker.get(locale, 'BAN_EMBED_INFO_TITLE'), picker.get(locale, 'BAN_EMBED_INFO_DESC', { REASON: why }), true)
+        .addFields({ name: picker.get(locale, 'BAN_EMBED_COP_TITLE'), value: picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), inline: true })
+        .addFields({ name: picker.get(locale, 'BAN_EMBED_PRISONER_TITLE'), value: picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), inline: true })
+        .addFields({ name: picker.get(locale, 'BAN_EMBED_INFO_TITLE'), value: picker.get(locale, 'BAN_EMBED_INFO_DESC', { REASON: why }), inline: true })
         .setColor(this.client._options.others.modEmbeds.ban)
         .setTimestamp(new Date())
       message.channel.send(embed)

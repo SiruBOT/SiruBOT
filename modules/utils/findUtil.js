@@ -40,22 +40,22 @@ module.exports.findElement = (options) => {
         massReact(m, emojiList).then(() => {
           const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === options.message.author.id
           const collector = m.createReactionCollector(filter, { time: 60000 })
-          const functionList = [(r) => {
-            r.remove(options.message.author)
+          const functionList = [async (r) => {
+            r.users.remove(options.message.author)
             if (currentPage === 0) currentPage = chunkedFormatted.length - 1
             else currentPage--
             m.edit(getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
-          }, () => {
+          }, async () => {
             collector.stop()
             return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_USER_STOP'))
-          }, (r) => {
-            r.remove(options.message.author)
+          }, async (r) => {
+            r.users.remove(options.message.author)
             if (currentPage >= chunkedFormatted.length - 1) currentPage = 0
             else currentPage++
             m.edit(getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
           }]
           for (let i = 0; i < chunkedFormatted[0].length; i++) {
-            functionList.push(() => {
+            functionList.push(async () => {
               m.delete()
               collector.stop()
               return resolve(chunked[currentPage][i])
@@ -63,7 +63,9 @@ module.exports.findElement = (options) => {
           }
           collector.on('collect', r => {
             const index = emojiList.findIndex((el) => el === r.emoji.name)
-            functionList[index](r)
+            functionList[index](r).catch((e) => {
+				reject(e)
+			})
           })
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()

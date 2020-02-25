@@ -43,7 +43,7 @@ class Command {
       }
     }
     for (const item of ['MOD', 'AUDIO', 'DEFAULT']) {
-      embed.addField(picker.get(locale, 'COMMANDS_MODSETTINGS_FIELD_' + item), picker.get(locale, 'COMMANDS_MODSETTINGS_DESC_' + item, obj[item]), true)
+      embed.addFields({ name: picker.get(locale, 'COMMANDS_MODSETTINGS_FIELD_' + item), value: picker.get(locale, 'COMMANDS_MODSETTINGS_DESC_' + item, obj[item]), inline: true })
     }
     embed.setTimestamp(new Date())
     embed.setColor(this.client.utils.findUtil.getColor(message.guild.me))
