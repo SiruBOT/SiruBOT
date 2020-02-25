@@ -51,10 +51,8 @@ class Command {
         for (let i = 0; i < searchResult.playlistInfo.selectedTrack; i++) {
           searchResult.tracks.shift()
         }
-        const info = searchResult.tracks[0].info
         this.addQueue(message, searchResult.tracks[0], picker, locale)
         searchResult.tracks.shift()
-        if (guildData.nowplaying.track) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', { TRACK: Discord.Util.escapeMarkdown(info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(info.length / 1000, info.isStream), POSITION: guildData.queue.length + 1 }))
         if (searchResult.tracks.length === 0) return
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length })).then((m) => {
           const emojiList = ['📥', '🚫']
@@ -96,14 +94,12 @@ class Command {
   }
 
   async addQueue (message, trackInfo, picker, locale) {
-    const Audio = this.client.audio
-    if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_NO_VOICE_ME'))
     const guildData = await this.client.database.getGuild(message.guild.id)
-    const npStatus = (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id).track)
+    const npStatus = (guildData.nowplaying.track)
     const status = (npStatus && !Array.isArray(trackInfo))
     const { info } = trackInfo
     const placeHolderWithTrackInfo = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info || trackInfo[0].info), POSITION: guildData.queue.length + 1 })
-    if (status || (guildData.queue.length > 0)) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
+    if (status && (guildData.queue.length > 0)) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
     else if (!npStatus) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
     this.client.audio.queue.enQueue(message.guild.id, trackInfo, message)
   }

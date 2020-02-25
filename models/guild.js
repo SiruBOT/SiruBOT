@@ -4,8 +4,10 @@ const Schema = new mongo.Schema({
   _id: String,
 
   // Mod
+  welcome: { type: Boolean, default: false },
   welcomeChannel: { type: String, default: '0' },
-  welcomeMessage: { type: String, default: '환영합니다!' },
+  welcomeMessage: { type: Array, default: '환영합니다!' },
+
   locale: { type: String, default: 'ko_kr' },
   filter: { type: Boolean, default: false },
   customFilter: { type: Array, default: [] },
