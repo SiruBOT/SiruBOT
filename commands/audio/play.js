@@ -1,5 +1,3 @@
-// TODO: Attachments
-const Discord = require('discord.js')
 class Command {
   constructor (client) {
     this.client = client
@@ -44,7 +42,6 @@ class Command {
     if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return false
 
     if (searchResult.loadType === 'PLAYLIST_LOADED') {
-      const guildData = await this.client.database.getGuild(message.guild.id)
       const playingList = searchResult.playlistInfo.selectedTrack !== -1
       // If selected Track is exist, shift
       if (playingList) {
