@@ -18,7 +18,7 @@ class Command {
    */
   async run (compressed) {
     const { message, args } = compressed
-    if (args.length === 0) return message.channel.send('❎  코드를 적어주세요')
+    if (args.length === 0) return message.channel.send(`${this.client._options.constructors.EMOJI_NO}  코드를 적어주세요`)
     let codeIn = `
 const child = require('child_process')
 const Discord = require('discord.js')\n` + args.join(' ')

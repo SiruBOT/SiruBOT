@@ -17,7 +17,7 @@ class Event {
 
   async handleCommand (message) {
     if (message.author.bot) return
-    if (message.channel.type === 'dm') return message.channel.send('❎  DM 에서는 명령어를 사용하실수 없어요..\n❎  You can\'t use commands on the DM.')
+    if (message.channel.type === 'dm') return message.channel.send(`${this.client._options.constructors.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${this.client._options.constructors.EMOJI_NO}  You can\'t use commands on the DM.`)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
     // Test
     this.client.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
@@ -27,36 +27,36 @@ class Event {
     await this.client.database.checkUser(message.author.id)
     const prefix = this.client._options.bot.prefix
     if (message.content.startsWith(prefix)) {
-      const GlobalUserData = await this.client.database.getUser(message.author.id)
+      const userData = await this.client.database.getUser(message.author.id)
       const args = message.content.slice(prefix.length).trim().split(/ +/g)
       const command = args.shift().toLowerCase()
-      if (GlobalUserData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
-      const GuildMemberData = await this.client.database.getMember(message.member.id, message.guild.id)
-      const GuildData = await this.client.database.getGuild(message.guild.id)
-      const userPermissions = this.client.utils.permissionChecker.getUserPermission(message.member, { GlobalUserData: GlobalUserData, GuildMemberData: GuildMemberData, GuildData: GuildData })
+      if (userData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
+      const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
+      const guildData = await this.client.database.getGuild(message.guild.id)
+      const userPermissions = this.client.utils.permissionChecker.getUserPerm(message.member, { userData, memberData, guildData })
       const compressed = Object.assign({
-        GlobalUserData: GlobalUserData,
-        GuildMemberData: GuildMemberData,
-        GuildData: GuildData,
+        userData: userData,
+        memberData: memberData,
+        guildData: guildData,
         message: message,
         args: args,
         prefix: prefix,
         userPermissions: userPermissions
       })
 
-      const locale = compressed.GuildData.locale
+      const locale = compressed.guildData.locale
       const picker = this.client.utils.localePicker
       const Command = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (Command) {
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))
         let ablePermissions = 0
-        if (this.client.chkRightChannel(message.channel, GuildData.tch)) {
+        if (this.client.chkRightChannel(message.channel, guildData.tch)) {
           if (Command.command.require_nodes) {
-            if (GuildData.tch === '0') this.client.audio.textChannels.set(message.guild.id, message.channel.id)
+            if (guildData.tch === '0') this.client.audio.textChannels.set(message.guild.id, message.channel.id)
             if (!this.client.audio.getNode()) return message.channel.send(picker.get(locale, 'AUDIO_NO_NODES'))
           }
           if (Command.command.require_voice) {
-            const vch = GuildData.vch
+            const vch = guildData.vch
             if (!message.member.voice.channel) return message.channel.send(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
             if (this.client.audio.utils.getVoiceStatus(message.member).listen === false) return message.channel.send(picker.get(locale, 'AUDIO_LISTEN_PLEASE'))
             if ((message.guild.me.voice.channelID && message.guild.me.voice.channelID !== message.member.voice.channelID)) return message.channel.send(picker.get(locale, 'AUDIO_SAME_VOICE', { VOICECHANNEL: message.guild.me.voice.channelID }))
@@ -79,7 +79,7 @@ class Event {
           if (this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
             message.delete()
           }
-          message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: GuildData.tch })).catch((e) => {
+          message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: guildData.tch })).catch((e) => {
             this.client.logger.debug(`${this.defaultPrefix.handleCommand} Author Send Fail.. ${message.author.tag}(${message.author.id})`)
           })
         }

@@ -16,12 +16,12 @@ class Command {
      * @param {Object} compressed - Compressed Object (In CBOT)
      */
   async run (compressed) {
-    const { message, GuildData } = compressed
-    const { locale } = GuildData
+    const { message, guildData } = compressed
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
-    if (!GuildData.queue[0] || !GuildData.nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
-    if (GuildData.nowplaying.track && this.client.audio.players.get(message.guild.id)) {
-      const placeHolder = { TITLE: this.client.audio.utils.formatTrack(GuildData.nowplaying.info), REQUEST: message.guild.members.cache.get(GuildData.nowplaying.request) ? message.guild.members.cache.get(GuildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN') }
+    if (!guildData.queue[0] || !guildData.nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
+    if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id)) {
+      const placeHolder = { TITLE: this.client.audio.utils.formatTrack(guildData.nowplaying.info), REQUEST: message.guild.members.cache.get(guildData.nowplaying.request) ? message.guild.members.cache.get(guildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN') }
       this.client.audio.queue.skip(message.guild.id)
       return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
     } else {

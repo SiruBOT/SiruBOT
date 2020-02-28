@@ -21,7 +21,7 @@ class Command {
   async run (compressed, isSoundCloud) {
     // Default Variables
     const { message, args } = compressed
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
   }
 }

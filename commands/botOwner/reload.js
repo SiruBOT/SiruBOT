@@ -17,7 +17,7 @@ class Command {
    */
   async run (compressed) {
     const { message } = compressed
-    message.channel.send(`✅  모든 샤드 ${this.client.shard.count} 개에 리로드 신호를 보냅니다...`).then(async m => {
+    message.channel.send(`${this.client._options.constructors.EMOJI_YES}  모든 샤드 ${this.client.shard.count} 개에 리로드 신호를 보냅니다...`).then(async m => {
       this.client.shard.broadcastEval('this.reload()')
     })
   }

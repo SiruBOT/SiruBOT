@@ -18,7 +18,7 @@ class Command {
    */
   async run (compressed, silent = false) {
     const { message } = compressed
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
     const voiceChannelID = message.member.voice.channelID
 

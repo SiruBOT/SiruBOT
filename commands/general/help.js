@@ -19,7 +19,7 @@ class Command {
    */
   async run (compressed) {
     const { message, args, prefix, userPermissions } = compressed
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
     const embed = new Discord.MessageEmbed()
       .setThumbnail(message.guild.me.user.displayAvatarURL({ format: 'png' , size: 512 }))

@@ -18,10 +18,10 @@ class Command {
    */
   async run (compressed) {
     const { message } = compressed
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
 
-    switch (compressed.GuildData.audioPlayrelated) {
+    switch (compressed.guildData.audioPlayrelated) {
       case true:
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_RELATED_OFF'))
         this.client.database.updateGuild(message.guild.id, { $set: { audioPlayrelated: false } })

@@ -18,9 +18,9 @@ class Command {
      */
   async run (compressed) {
     const { message } = compressed
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
-    switch (compressed.GuildData.repeat) {
+    switch (compressed.guildData.repeat) {
       case 0:
         message.channel.send(picker.get(locale, 'COMMANDS_REPEAT_ALL'))
         this.client.database.updateGuild(message.guild.id, { $set: { repeat: 1 } })

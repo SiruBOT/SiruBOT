@@ -18,8 +18,8 @@ class Command {
    */
   async run (compressed) {
     const picker = this.client.utils.localePicker
-    const { message, GuildData, args } = compressed
-    const { locale } = GuildData
+    const { message, guildData, args } = compressed
+    const { locale } = guildData
     const embed = new Discord.MessageEmbed()
     if (args[0] && picker.locales.keyArray().includes(args[0].toLowerCase())) {
       message.channel.send(picker.get(args[0].toLowerCase(), 'COMMANDS_LANGUAGE_CHANGED'))

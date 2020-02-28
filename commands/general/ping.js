@@ -19,7 +19,7 @@ class Command {
    */
   async run (compressed) {
     const { message } = compressed
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
     const embed = new Discord.MessageEmbed()
 

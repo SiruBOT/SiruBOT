@@ -28,7 +28,7 @@ class PermissionChecker {
    * @param {Object} otherData
    * @returns {Array} - Permission Array for this bot (permissions.js)
    */
-  getUserPermission (member, otherData) {
+  getUserPerm (member, otherData) {
     const resultArray = []
     for (const perm of this.permissions) {
       if (perm.filter(member, otherData)) resultArray.push(perm.name)

@@ -16,7 +16,7 @@ class Command {
    * @param {Object} compressed - Compressed Object (In CBOT)
    */
   async run (compressed) {
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
     const { message } = compressed
     const Audio = this.client.audio

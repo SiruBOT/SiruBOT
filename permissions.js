@@ -6,7 +6,7 @@ module.exports = [{
 },
 {
   name: 'DJ',
-  filter: (member, others) => others.GuildData.dj_role === '1' ? true : member.roles.cache.has(others.GuildData.dj_role)
+  filter: (member, others) => others.guildData.dj_role === '1' ? true : member.roles.cache.has(others.guildData.dj_role)
 },
 {
   name: 'Administrator',

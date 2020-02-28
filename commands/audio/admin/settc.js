@@ -17,7 +17,7 @@ class Command {
    */
   async run (compressed) {
     const picker = this.client.utils.localePicker
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const { message, args } = compressed
     if (!args[0]) return message.channel.send('No')
     if (['none', '없음', 'null', 'remove', '지우기'].includes(args.join(' ').toLowerCase())) {

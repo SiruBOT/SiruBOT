@@ -18,7 +18,7 @@ class Command {
    */
   async run (compressed) {
     const picker = this.client.utils.localePicker
-    const locale = compressed.GuildData.locale
+    const locale = compressed.guildData.locale
     const { message, args } = compressed
     if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_TYPE_USER'))
     const search = args.shift()

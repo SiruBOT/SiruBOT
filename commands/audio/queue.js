@@ -19,7 +19,7 @@ class Command {
    */
   async run (compressed) {
     if (!this.client.audio.players.get(compressed.message.guild.id)) return this.client.commands.get('nowplaying').run(compressed)
-    if (compressed.GuildData.queue.length === 0) return this.client.commands.get('nowplaying').run(compressed)
+    if (compressed.guildData.queue.length === 0) return this.client.commands.get('nowplaying').run(compressed)
     const { message } = compressed
     const picker = this.client.utils.localePicker
     let page = 0
