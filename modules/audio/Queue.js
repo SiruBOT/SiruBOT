@@ -17,7 +17,8 @@ class Queue extends EventEmitter {
       play: `${this.classPrefix}:play]`,
       autoPlay: `${this.classPrefix}:autoPlay]`,
       setNowPlaying: `${this.classPrefix}:setNowPlaying]`,
-      skip: `${this.classPrefix}:skip]`
+      skip: `${this.classPrefix}:skip]`,
+      playRelated: `${this.classPrefix}:playRelated]`
     }
   }
 
@@ -41,17 +42,19 @@ class Queue extends EventEmitter {
    * @param {Object|Array<Object>} track - Item(s) add Queue
    * @param {Object} message = Message
    */
-  async enQueue (guildID, track, message) {
+  async enQueue (guildID, track, requestID) {
     if (Array.isArray(track)) {
       const result = track.map(el => {
-        el.request = message.author.id
+        el.request = requestID
+        el.related = requestID === this.client.user.id
         return el
       })
       this.client.logger.debug(`${this.defaultPrefix.enQueue} [${guildID}] Added Track(s) (${track.length} Items)`)
       await this.client.database.updateGuild(guildID, { $push: { queue: { $each: result } } })
     } else {
       this.client.logger.debug(`${this.defaultPrefix.enQueue} [${guildID}] Added Track (${track.track})`)
-      track.request = message.author.id
+      track.request = requestID
+      track.related = requestID === this.client.user.id
       await this.client.database.updateGuild(guildID, { $push: { queue: track } })
     }
     this.autoPlay(guildID)
@@ -78,6 +81,34 @@ class Queue extends EventEmitter {
   }
 
   /**
+   * @param {String} guildID - guild id playing related video
+   * @param {String} originVideoId - video id
+   */
+  async playRelated (guildID, originVideoId) {
+    this.client.channels.cache.get('677722378784079875').send(originVideoId)
+    const relatedTracks = await this.audio.getRelated(originVideoId)
+    if (relatedTracks.items.length === 0) return this.playNext(guildID)
+    let number = 0
+    for (const item of relatedTracks.items) {
+      if (this.audio.playedTracks.get(guildID).includes(item.identifier)) {
+        number += 1
+        break
+      } else if (originVideoId === item.identifier) {
+        number = 0
+        this.audio.playedTracks.set(guildID, [])
+        break
+      } else {
+        break
+      }
+    }
+    const lavaLinktracks = await this.audio.getTrack(`https://youtube.com/watch?v=${relatedTracks.items[number].identifier}`)
+    if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType)) return this.playNext(guildID)
+    this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${lavaLinktracks.tracks[0].info.title} (${lavaLinktracks.tracks[0].info.identifier})`)
+    if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort addqueue. Player is not exists!`)
+    this.enQueue(guildID, lavaLinktracks.tracks[0], this.client.user.id)
+  }
+
+  /**
    * @description - Removes the front item in the queue of the guild, depending on the repeat state
    * @param {String} guildID - guild id to skips
    * @example - <Queue>.deQueue('672586746587774976'fgh)
@@ -87,12 +118,16 @@ class Queue extends EventEmitter {
     if (skip || (guildData.repeat !== 2 && skip)) {
       this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Shift Track`)
       await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
-      return this.playNext(guildID)
     } else {
       switch (guildData.repeat) {
         case 0:
-          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Next Track (Repeat: ${guildData.repeat})`)
-          break
+          if (guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
+            this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Related Track (Repeat: ${guildData.repeat}, playingRelated: ${guildData.audioPlayrelated})`)
+            return this.playRelated(guildID, this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri))
+          } else {
+            this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Next Track (Repeat: ${guildData.repeat})`)
+            return this.playNext(guildID)
+          }
         case 1:
         case 2:
           this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] UnShift Track (Repeat: ${guildData.repeat})`)
@@ -160,6 +195,8 @@ class Queue extends EventEmitter {
     const { track } = trackData
     this.client.logger.debug(`${this.defaultPrefix.play} [${guildID}] Playing Item ${track}...`)
     this.audio.players.get(guildID).playTrack(track, { noReplace: false }).then(async () => {
+      if (!this.audio.playedTracks.get(guildID)) this.audio.playedTracks.set(guildID, [])
+      this.audio.playedTracks.get(guildID).push(trackData.info.identifier)
       await this.setNowPlaying(guildID, trackData)
       this.emit('queueEvent', { guildID, trackData, op: 'trackStarted' })
       await this.client.audio.setPlayersDefaultSetting(guildID)

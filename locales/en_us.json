@@ -2,12 +2,9 @@
     "FLAG": "%EMOJI_REGIONS_US_CENTRAL%",
     "NAME": "English",
 
-    "BOT_NAME": "ChinoBot",
+    "BOT_NAME": "SiruBOT",
 
-    "MONEY_NAME": "ChiMoney",
-
-
-    "REMARK_1": "(주석) 명령어 정보들",
+    "REMARK_1": "Remark (Commands Info)",
 
     "COMMANDS_HELP_DESC_SETDJ": "DJ 명령어를 실행할 수 있는 역할을 설정해요!",
     "COMMANDS_HELP_DESC_SETTC": "명령어를 실행할 수 있는 채팅 채널을 설정해요!",
@@ -123,9 +120,9 @@
     "COMMANDS_AUDIO_RELATED_ON": "> %EMOJI_STAR%  Related videos future turned **on** %EMOJI_SWITCH_ON%",
     "COMMANDS_AUDIO_RELATED_OFF": "> %EMOJI_STAR%  Related videos future turned **off** %EMOJI_SWITCH_OFF%",
     
-    "COMMANDS_SKIP_NOTHING_TO_SKIP": "> %EMOJI_NO%  건너뛸 노래가 없어요..",
-    "COMMANDS_SKIP_SKIP_REQUESTED": "> %EMOJI_MUSIC%  **%REQUEST%** 님이 신청하신 %TITLE% 건너뛰기에 투표하였어요. [%CURRENT% 표, %TOSKIP% 표 필요]",
-    "COMMANDS_SKIP_SKIPPED": "> %EMOJI_MUSIC%  **%REQUEST%** 님이 신청하신 %TITLE% 곡이 건너뛰어졌어요!",
+    "COMMANDS_SKIP_NOTHING_TO_SKIP": "> %EMOJI_NO%  There's nothing to skip..",
+    "COMMANDS_SKIP_SKIP_REQUESTED": "> %EMOJI_MUSIC%  You voted to skip **%REQUEST%** - %TITLE%. [%CURRENT% votes, Requires %TOSKIP% votes]",
+    "COMMANDS_SKIP_SKIPPED": "> %EMOJI_MUSIC%  Skipped **%REQUEST%** - %TITLE%",
 
     "COMMANDS_REPEAT_NONE": "> %EMOJI_REPEAT_NONE%  Repeat mode changed to **NONE**",
     "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **%ALL%**",

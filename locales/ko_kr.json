@@ -2,9 +2,7 @@
     "FLAG": "%EMOJI_REGIONS_SOUTH_KOREA%",
     "NAME": "한국어",
 
-    "BOT_NAME": "치노봇",
-
-    "MONEY_NAME": "치머니",
+    "BOT_NAME": "시루봇",
 
     "REMARK_1": "(주석) 명령어 정보들",
 
@@ -81,7 +79,7 @@
     "AUDIO_LISTEN_PLEASE": "> %EMOJI_NO%  먼저 듣기 상태를 활성화해주세요!",
     "AUDIO_ALL_SONGS_FINISHED": "> %EMOJI_MUSIC%  대기열의 모든 노래를 재생했어요!",
     "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  현재 재생 중: **%TRACK% [%DURATION%]**",
-    "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_MUSIC%  추천 영상 재생 중: **%TRACK% [%DURATION%]**",
+    "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_STAR%  추천 영상 재생 중: **%TRACK% [%DURATION%]**",
 
     "ALL": "전체",
     "REPEAT_ALL": "%ALL%",

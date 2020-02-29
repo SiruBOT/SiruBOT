@@ -77,6 +77,17 @@ class AudioUtils {
   }
 
   /**
+   * @description - get video id from youtube url
+   * @param {String} url - youtube url
+   */
+  getvIdfromUrl (url) {
+    if (!url) return undefined
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+    const match = url.match(regExp)
+    return (match && match[7].length === 11) ? match[7] : undefined
+  }
+
+  /**
    * @param {String} url - Url to check validate
    * @return {Boolean} - If url is youtube url, returns true, else returns false
    */
@@ -116,11 +127,12 @@ class AudioUtils {
 
   /**
    * @description - If previous message is deletable, delete message. then send new Text message
-   * @param {*} guildID - guildId for sending message
-   * @param {*} text - text content to send
-   * @example - <AudioUtils>.sendMessage('672586746587774976', 'Hello World!')
+   * @param {String} guildID - guildId for sending message
+   * @param {String} text - text content to send
+   * @param {[Boolean]} forceSend - ignore condition (guildData.audioMessage)
+   * @example - <AudioUtils>.sendMessage('672586746587774976', 'Hello World!', [false])
    */
-  async sendMessage (guildID, text) {
+  async sendMessage (guildID, text, forceSend = false) {
     const guildData = await this.client.database.getGuild(guildID)
     const { audioMessage, tch } = guildData
     if (audioMessage) {
@@ -132,7 +144,9 @@ class AudioUtils {
           this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
           this.client.audio.textMessages.get(guildID).delete()
         }
-        sendChannel.send(text).then(m => this.client.audio.textMessages.set(guildID, m))
+        if (forceSend || guildData.audioMessage) {
+          sendChannel.send(text).then(m => this.client.audio.textMessages.set(guildID, m))
+        }
       }
     }
   }

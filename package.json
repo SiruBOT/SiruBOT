@@ -27,6 +27,7 @@
     "node-uuid": "^1.4.8",
     "opusscript": "0.0.7",
     "qrcode-reader": "^1.0.4",
+    "random-http-useragent": "^1.1.22",
     "redis": "^3.0.2",
     "req-fast": "^0.2.19",
     "saslprep": "^1.0.3",

@@ -5,6 +5,9 @@ const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
 const AudioUtils = require('./AudioUtils')
 const QueueEvents = require('./QueueEvents')
 const { Collection } = require('discord.js')
+const fetch = require('node-fetch')
+const cheerio = require('cheerio')
+const randomUA = require('random-http-useragent')
 
 class Audio extends Shoukaku.Shoukaku {
   constructor (...args) {
@@ -24,7 +27,8 @@ class Audio extends Shoukaku.Shoukaku {
       stop: `${this.classPrefix}:stop]`,
       handleDisconnect: `${this.classPrefix}:handleDisconnect]`,
       setPlayerDefaultSetting: `${this.classPrefix}:setPlayerDefaultSetting]`,
-      setVolume: `${this.classPrefix}:setVolume]`
+      setVolume: `${this.classPrefix}:setVolume]`,
+      getRelated: `${this.classPrefix}:getRelated]`
     }
 
     this.queue = new Queue(this)
@@ -36,6 +40,7 @@ class Audio extends Shoukaku.Shoukaku {
     this.textMessages = new Collection()
     this.nowplayingMessages = new Collection()
     this.skippers = new Collection()
+    this.playedTracks = new Collection()
 
     this.audioRouter = new AudioPlayerEventRouter(this)
 
@@ -105,6 +110,7 @@ class Audio extends Shoukaku.Shoukaku {
    */
   stop (guildID, cleanQueue = true) {
     if (!guildID) return new Error('guildID is not provied')
+    this.playedTracks.set(guildID, [])
     this.leave(guildID)
     if (cleanQueue) this.client.database.updateGuild(guildID, { $set: { queue: [] } })
     this.queue.setNowPlaying(guildID, { track: null })
@@ -187,6 +193,49 @@ class Audio extends Shoukaku.Shoukaku {
 
   getUsableNodes () {
     return Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED')
+  }
+
+  /**
+   * @param {String} vId - Youtube Video Id
+   */
+  async getRelated (vId) {
+    let $ = await this.fetchRelated(vId)
+    if ($('body > div.content-error').text().length !== 0) {
+      this.client.logger.error(`${this.defaultPrefix.getRelated} Failed to fetch... retrying..`)
+      $ = await this.fetchRelated(vId)
+    }
+    let relatedSongs = this.parseYoutubeHTML($)
+    if (relatedSongs.length === 0) {
+      this.client.logger.error(`${this.defaultPrefix.getRelated} Array is [], retrying one time.`)
+      $ = await this.fetchRelated(vId)
+      relatedSongs = this.parseYoutubeHTML($)
+    }
+    return { items: relatedSongs }
+  }
+
+  parseYoutubeHTML ($) {
+    const relatedSongs = []
+    const upnext = $('#watch7-sidebar-modules > div:nth-child(1) > div > div.watch-sidebar-body > ul > li > div.content-wrapper > a')
+    if (upnext.attr('href')) relatedSongs.push({ uri: `https://youtube.com${upnext.attr('href')}`, identifier: this.utils.getvIdfromUrl(upnext.attr('href')), title: upnext.attr('title') })
+    $('#watch-related').children().each((...item) => {
+      const url = $(item).children('.content-wrapper').children('a').attr('href')
+      const title = $(item).children('.content-wrapper').children('a').attr('title')
+      if (url) relatedSongs.push({ uri: `https://youtube.com${url}`, identifier: this.utils.getvIdfromUrl(url), title: title })
+    })
+    return relatedSongs
+  }
+
+  async fetchRelated (vId) {
+    const ua = await randomUA.get()
+    this.client.channels.cache.get('677722378784079875').send(ua)
+    const result = await fetch(`https://www.youtube.com/watch?v=${vId}`, { headers: { 'User-Agent': ua } })
+      .then(async res => {
+        return { body: res.text(), status: res.status }
+      }).catch(err => {
+        this.client.error(err.stack || err.message)
+        return { body: Promise.resolve(null), status: 500 }
+      })
+    return cheerio.load(await result.body)
   }
 
   /**

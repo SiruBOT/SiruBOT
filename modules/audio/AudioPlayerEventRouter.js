@@ -46,7 +46,6 @@ class AudioPlayerEventRouter {
         this.RouteTrackExcepetionErrors(data)
         break
     }
-    this.client.audio.utils.updateNowplayingMessage(data.guildID, true)
   }
 
   RouteTrackExcepetionErrors (data) {
