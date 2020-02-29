@@ -85,7 +85,6 @@ class Queue extends EventEmitter {
    * @param {String} originVideoId - video id
    */
   async playRelated (guildID, originVideoId) {
-    this.client.channels.cache.get('677722378784079875').send(originVideoId)
     const relatedTracks = await this.audio.getRelated(originVideoId)
     if (relatedTracks.items.length === 0) return this.playNext(guildID)
     let number = 0

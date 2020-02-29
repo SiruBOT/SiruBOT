@@ -227,7 +227,6 @@ class Audio extends Shoukaku.Shoukaku {
 
   async fetchRelated (vId) {
     const ua = await randomUA.get()
-    this.client.channels.cache.get('677722378784079875').send(ua)
     const result = await fetch(`https://www.youtube.com/watch?v=${vId}`, { headers: { 'User-Agent': ua } })
       .then(async res => {
         return { body: res.text(), status: res.status }
