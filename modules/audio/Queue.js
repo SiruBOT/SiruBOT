@@ -86,9 +86,9 @@ class Queue extends EventEmitter {
    */
   async playRelated (guildID, originVideoId) {
     const relatedTracks = await this.audio.getRelated(originVideoId)
-    if (relatedTracks.items.length === 0) return this.playNext(guildID)
+    if (relatedTracks.length === 0) return this.playNext(guildID)
     let number = 0
-    for (const item of relatedTracks.items) {
+    for (const item of relatedTracks) {
       if (this.audio.playedTracks.get(guildID).includes(item.identifier)) {
         number += 1
         break
@@ -100,7 +100,7 @@ class Queue extends EventEmitter {
         break
       }
     }
-    const lavaLinktracks = await this.audio.getTrack(`https://youtube.com/watch?v=${relatedTracks.items[number].identifier}`)
+    const lavaLinktracks = await this.audio.getTrack(`https://youtube.com/watch?v=${relatedTracks[number].identifier}`)
     if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType)) return this.playNext(guildID)
     this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${lavaLinktracks.tracks[0].info.title} (${lavaLinktracks.tracks[0].info.identifier})`)
     if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort addqueue. Player is not exists!`)

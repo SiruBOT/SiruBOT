@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'skip',
-      aliases: ['스킵', '나ㅑㅔ', '건너뛰기'],
+      aliases: ['스킵', '건너뛰기', '나ㅑㅔ'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
       require_voice: true,

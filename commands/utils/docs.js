@@ -26,7 +26,7 @@ class Command {
     const result = await fetch(`https://djsdocs.sorta.moe/v2/embed?src=https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json&q=${args.join()}`).then(res => res.json())
     if (!result) return message.reply(picker.get(locale, 'GENERAL_NO_RESULT'))
     const embed = new Discord.MessageEmbed(result)
-    embed.setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png' , size: 512 }))
+    embed.setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png', size: 512 }))
     message.channel.send(embed)
   }
 }

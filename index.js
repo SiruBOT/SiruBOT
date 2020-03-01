@@ -104,7 +104,6 @@ class Client extends Discord.Client {
       }
     }
     this.commands_loaded = true
-    this.categories = new Discord.Collection()
     for (const item of this.commands.array().map(el => el.command).filter(el => el.hide === false)) {
       if (!this.categories.keyArray().includes(item.category)) this.categories.set(item.category, [])
       if (this.categories.keyArray().includes(item.category) && this.categories.get(item.category).includes(item.name) === false) {
@@ -131,6 +130,7 @@ class Client extends Discord.Client {
       if (reload) {
         this.logger.warn(`${this.defaultPrefix.registerEvents} Removing Event Listener for event ${EventClass.info.event}`)
         this.removeListener(EventClass.info.event, this.events.get(EventClass.info.event))
+        this.events.delete(EventClass.info.event)
       }
       delete require.cache[require.resolve(file)]
       this.logger.info(`${this.defaultPrefix.registerEvents} AddedEvent Listener for event ${EventClass.info.event}`)
@@ -212,6 +212,9 @@ class Client extends Discord.Client {
     this.utils.permissionChecker = new NewPermissionChecker(this)
     this.utils.localePicker.init()
     this.loggerManager.init()
+    this.commands = new Discord.Collection()
+    this.aliases = new Discord.Collection()
+    this.categories = new Discord.Collection()
     this.LoadCommands()
     this.registerEvents(true)
     return this.shard.ids

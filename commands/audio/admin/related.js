@@ -4,7 +4,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'related',
-      aliases: ['추천', 'ㄱ딤ㅅㄷㅇ'],
+      aliases: ['추천영상', 'ㄱ딤ㅅㄷㅇ'],
       category: 'MUSIC_DJ',
       require_nodes: false,
       require_voice: false,

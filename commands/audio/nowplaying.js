@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'nowplaying',
-      aliases: ['np', 'ㅞ'],
+      aliases: ['현', 'np', 'ㅞ'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
       require_voice: false,

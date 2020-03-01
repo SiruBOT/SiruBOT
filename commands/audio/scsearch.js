@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'scsearch',
-      aliases: ['ㄴㅊㄴㄷㅁㄱ초', '사운드클라우드검색'],
+      aliases: ['사운드클라우드검색', '사클검색', 'ㄴㅊㄴㄷㅁㄱ초', 'tkzmfrjator'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
       require_voice: true,

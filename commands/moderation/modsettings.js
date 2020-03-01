@@ -4,7 +4,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'settings',
-      aliases: ['설정', 'ㄴㄷㅅ샤ㅜㅎㄴ'],
+      aliases: ['서버설정', '설정', 'ㄴㄷㅅ샤ㅜㅎㄴ', 'ㄴㅍㄴㄷㅅ샤ㅜㅎㄴ', 'svsettings', 'tjfwjd'],
       category: 'MODERATION',
       require_nodes: false,
       require_voice: false,

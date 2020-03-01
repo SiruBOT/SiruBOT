@@ -5,7 +5,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'ping',
-      aliases: ['ㅔㅑㅜㅎ', '핑'],
+      aliases: ['핑', 'ㅔㅑㅜㅎ'],
       category: 'GENERAL_INFO',
       require_nodes: false,
       require_voice: false,

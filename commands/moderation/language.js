@@ -4,7 +4,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'language',
-      aliases: ['언어', 'ㅣ무혐ㅎㄷ', 'lang', 'locale'],
+      aliases: ['언어', 'ㅣㅐㅊ믿', 'ㅣ뭏', 'locale', 'lang', 'djsdj'],
       category: 'MODERATION',
       require_nodes: false,
       require_voice: false,

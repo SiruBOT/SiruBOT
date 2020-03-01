@@ -28,7 +28,10 @@ class Audio extends Shoukaku.Shoukaku {
       handleDisconnect: `${this.classPrefix}:handleDisconnect]`,
       setPlayerDefaultSetting: `${this.classPrefix}:setPlayerDefaultSetting]`,
       setVolume: `${this.classPrefix}:setVolume]`,
-      getRelated: `${this.classPrefix}:getRelated]`
+      getRelated: `${this.classPrefix}:getRelated]`,
+      fetchRelated: `${this.classPrefix}:fetchRelated]`,
+      getUA: `${this.classPrefix}:getUA]`,
+      parseYoutubeHTML: `${this.classPrefix}:parseYoutubeHTML]`
     }
 
     this.queue = new Queue(this)
@@ -45,7 +48,8 @@ class Audio extends Shoukaku.Shoukaku {
     this.audioRouter = new AudioPlayerEventRouter(this)
 
     this.client.logger.info(`${this.classPrefix}] Init Audio..`)
-    this.trackCache = new NodeCache({ ttl: 500 })
+    this.trackCache = new NodeCache({ ttl: 3600 })
+    this.relatedCache = new NodeCache({ ttl: 43200 })
 
     this.on('ready', (name, resumed) => this.client.logger.info(`${this.lavalinkPrefix} Lavalink Node: ${name} is now connected. This connection is ${resumed ? 'resumed' : 'a new connection'}`))
     this.on('error', (name, error) => this.client.logger.error(`${this.lavalinkPrefix} Lavalink Node: ${name} emitted an error. ${error.stack}`))
@@ -72,7 +76,6 @@ class Audio extends Shoukaku.Shoukaku {
         if (!moveChannel) this.queue.autoPlay(guildID)
         resolve(true)
       }).catch(e => {
-        this.client.guilds.cache.get(guildID)
         this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)
         reject(e)
       })
@@ -136,18 +139,9 @@ class Audio extends Shoukaku.Shoukaku {
    * @param {Object} data - Socket Data
    */
   async handleDisconnect (data) {
-    this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Reconnect voicechannel...`)
-    if (this.client.guilds.cache.get(data.guildId).me.voice.channelID) {
-      this.leave(data.guildId)
-      const guildData = await this.client.database.getGuild(data.guildId)
-      this.join(this.client.guilds.cache.get(data.guildId).me.voice.channelID, data.guildId).then(async () => {
-        if (guildData.nowplaying.track !== null) await this.players.get(data.guildId).playTrack(guildData.nowplaying.track, { noReplace: false, startTime: guildData.nowplayingPosition || 0 })
-      }).catch((e) => {
-        this.client.logger.error(`${this.defaultPrefix.handleDisconnect} ${e.name}: ${e.message} Stack Trace:\n${e.stack}`)
-        this.client.logger.debug(`${this.defaultPrefix.handleDisconnect} Handle DisconnectHandler Error, Stops Audio Queue, Sets nowplaying is null...`)
-        this.stop(data.guildId)
-      })
-    }
+    const guildData = await this.client.database.getGuild(data.guildId)
+    this.client.audio.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
+    this.stop(data.guildId, false)
   }
 
   /**
@@ -199,20 +193,35 @@ class Audio extends Shoukaku.Shoukaku {
    * @param {String} vId - Youtube Video Id
    */
   async getRelated (vId) {
-    let $ = await this.fetchRelated(vId)
-    if ($('body > div.content-error').text().length !== 0) {
-      this.client.logger.error(`${this.defaultPrefix.getRelated} Failed to fetch... retrying..`)
-      $ = await this.fetchRelated(vId)
+    if (this.relatedCache.get(vId) && this.relatedCache.get(vId).length !== 0) {
+      this.client.logger.error(`${this.defaultPrefix.getRelated} Cache Hit [${vId}], returns ${this.relatedCache.get(vId).length} Items`)
+      return this.relatedCache.get(vId)
+    } else {
+      this.client.logger.error(`${this.defaultPrefix.getRelated} No Cache Hits [${vId}], Fetch Related Videos..`)
+      let $ = await this.fetchRelated(vId)
+      if ($('body > div.content-error').text().length !== 0) {
+        this.client.logger.error(`${this.defaultPrefix.getRelated} Failed to fetch [${vId}]... retrying..`)
+        $ = await this.fetchRelated(vId)
+      }
+      let relatedSongs = this.parseYoutubeHTML($)
+      if (relatedSongs.length === 0) {
+        this.client.logger.error(`${this.defaultPrefix.getRelated} [${vId}] Array is [], retrying one time.`)
+        $ = await this.fetchRelated(vId)
+        relatedSongs = this.parseYoutubeHTML($)
+      }
+      if (relatedSongs.length !== 0) {
+        this.client.logger.error(`${this.defaultPrefix.getRelated} Registering Cache [${vId}], ${relatedSongs.length} Items`)
+        this.relatedCache.set(vId, relatedSongs)
+      }
+      return relatedSongs
     }
-    let relatedSongs = this.parseYoutubeHTML($)
-    if (relatedSongs.length === 0) {
-      this.client.logger.error(`${this.defaultPrefix.getRelated} Array is [], retrying one time.`)
-      $ = await this.fetchRelated(vId)
-      relatedSongs = this.parseYoutubeHTML($)
-    }
-    return { items: relatedSongs }
   }
 
+  /**
+   * @description - Parse Related Videos via youtube video html
+   * @param {Cheerio} $ - Cheerio Loaded Obj
+   * @returns {Array} - Parsed Elements
+   */
   parseYoutubeHTML ($) {
     const relatedSongs = []
     const upnext = $('#watch7-sidebar-modules > div:nth-child(1) > div > div.watch-sidebar-body > ul > li > div.content-wrapper > a')
@@ -225,8 +234,24 @@ class Audio extends Shoukaku.Shoukaku {
     return relatedSongs
   }
 
-  async fetchRelated (vId) {
+  /**
+   * @description get Random UA with en-US
+   * @returns {String} - UserAgent
+   */
+  async getUA () {
     const ua = await randomUA.get()
+    this.client.logger.debug(`${this.defaultPrefix.getUA} Get UserAgent: ${ua}`)
+    if (!ua.toLowerCase().includes('en-us') || !ua.includes('en-US')) return this.getUA()
+    else return ua
+  }
+
+  /**
+   * @param {String} vId - video ID to Fetch related videos
+   * @returns {Array} - Fetched Results
+   */
+  async fetchRelated (vId) {
+    const ua = await this.getUA()
+    this.client.logger.debug(`${this.defaultPrefix.fetchRelated} Fetch ${vId} via UA: ${ua}`)
     const result = await fetch(`https://www.youtube.com/watch?v=${vId}`, { headers: { 'User-Agent': ua } })
       .then(async res => {
         return { body: res.text(), status: res.status }

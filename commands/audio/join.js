@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'join',
-      aliases: ['ㅓㅐㅑㅜ'],
+      aliases: ['접속', 'ㅓㅐㅑㅜ', 'j'],
       category: 'MUSIC_DJ',
       require_nodes: true,
       require_voice: false,
@@ -29,10 +29,10 @@ class Command {
       else if (err && (err !== 'A Player is already established in this channel')) message.channel.send(sendContent)
     }
     return (() => {
-      if (!this.client.audio.players.get(message.guild.id) || !this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID || !message.guild.me.voice.channelID) {
+      if (!message.guild.me.voice.channelID || !this.client.audio.players.get(message.guild.id)) {
         return this.client.audio.join(voiceChannelID, message.guild.id)
       } else if (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID !== message.member.voice.channelID) {
-        return this.client.audio.moveChannel(voiceChannelID, message.guild.id)
+        return this.client.audio.join(voiceChannelID, message.guild.id)
       } else {
         return Promise.resolve(true)
       }

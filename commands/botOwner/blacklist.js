@@ -27,7 +27,7 @@ class Command {
    */
   async run (compressed) {
     const { message, args } = compressed
-    if (args.length === 0) return message.channel.send(`> ${this.client._options.constructors.EMOJI_NO}  매개 변수를 정확히 입력해 주세요! ``->blacklist [추가|제거|확인] [유저 ID]``)`)
+    if (args.length === 0) return message.channel.send(`> ${this.client._options.constructors.EMOJI_NO}  매개 변수를 정확히 입력해 주세요! \`\`->blacklist [추가|제거|확인] [유저 ID]\`\``)
     if (!methods[args[0]]) return message.channel.send(`> ${this.client._options.constructors.EMOJI_NO}  올바르지 않은 작업이에요! [추가|제거|확인] 중 하나를 입력해 주세요!`)
     const user = this.client.users.cache.get(args[1])
     if (methods[args[0]] && !user) return message.channel.send(`> ${this.client._options.constructors.EMOJI_NO}  없는 유저 ID인거 같아요! 다시한번 확인해주세요!`)

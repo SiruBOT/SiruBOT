@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'volume',
-      aliases: ['볼륨', 'vol', 'qhffba', '패ㅣㅕㅡㄷ', '패ㅣ'],
+      aliases: ['볼륨', '볼륨설정', 'vol', 'v', '패ㅣ', 'ㅍ', 'qhffba', 'qhffbatjfwjd'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
       require_voice: false,
