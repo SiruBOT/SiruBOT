@@ -24,14 +24,7 @@ class LanguagePicker {
 
   get (lang, name, placeholder = {}) {
     this.client.logger.debug(`[LanguagePicker:Get] Lang: ${lang}, PATH: ${name}, Placeholders: ${Object.keys(placeholder)}`)
-    let language = this.locales.get(lang)[name]
-    if (!language) {
-      for (const locale of this.locales.array()) {
-        if (locale[name]) {
-          language = locale[name]
-        }
-      }
-    }
+    const language = this.locales.get(lang)[name]
     if (!language) {
       this.client.logger.error(`[LanguagePicker:Get] [Error] Language key is not exists! ${lang}.${name}`)
       return `${lang}.${name}`

@@ -26,7 +26,7 @@
     "DESC_MUSIC_GENERAL_SEARCH": "Search for songs on YouTube and play the songs you choose.",
     "DESC_MUSIC_GENERAL_SCSEARCH": "Search for songs in the Soundcloud and play the songs you choose.",
     "DESC_MUSIC_GENERAL_SHUFFLE": "Shuffles your queue. (shuffle).",
-    "DESC_MUSIC_GENERAL_QUUE": "Shows current song queue.",
+    "DESC_MUSIC_GENERAL_QUEUE": "Shows current song queue.",
 	"DESC_MUSIC_GENERAL_NOWPLAYING": "Shows information currently playing.",
     "DESC_MUSIC_GENERAL_NODEINFO": "Shows information the audio nodes.",
     "DESC_MUSIC_DJ_JOIN": "Connect to the voice channel.",
@@ -42,6 +42,12 @@
     "DESC_MODERATION_LANGUAGE": "Set up the server's language.",
 	"DESC_MODERATION_SETTINGS": "Shows settings of the server.",
 
+    "CATEGORY_MUSIC_DJ": "%EMOJI_SPEAKER%  DJ Commands",
+    "CATEGORY_MUSIC_GENERAL": "%EMOJI_HEADPHONES%  Music Commands",
+    "CATEGORY_BOT_OWNER": "%EMOJI_PIN%  BOT Owner Only Commands",
+    "CATEGORY_GENERAL_INFO": "%EMOJI_HASH%  Information Commands",
+    "CATEGORY_MODERATION": "%EMOJI_COP%  Moderator Commands",
+
     "REMARK_2": "// Strings",
     
     "COMMANDS_PING_PING": "%EMOJI_PINGPONG% Ping",
@@ -51,11 +57,6 @@
 
     "COMMANDS_UTILS_LYRICS_NOTFOUND": "%EMOJI_NO%  Lyrics not found..",
     "COMMANDS_UTILS_LYRICS_NOTCORRECT": "%EMOJI_BULB%  Search results are not correct! If result is not correct, try re-search with artist name!",
-
-    "COMMANDS_MONEY_BOT": "%EMOJI_MONEY%  I think this user is a bot!",
-    "COMMANDS_MONEY_UNREGI": "%EMOJI_MONEY% This user is not a registered user (not using %BOT_NAME%)!",
-    "COMMANDS_MONEY_BALANCE_OTHER": "%EMOJI_MONEY%  **%USER_TAG%**'s Balance: ``%MONEY%`` %MONET_NAME%",
-    "COMMANDS_MONEY_BALANCE_ME": "%EMOJI_MONEY%  Your balance: ``%MONEY%`` %MONET_NAME%",
 
     "GENERAL_INPUT_QUERY": "> %EMOJI_NO%  Enter item to search!",
     "GENERAL_NO_RESULT": "> %EMOJI_NO%  There's no search results!",
@@ -131,18 +132,21 @@
 
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  Developers have changed the log do not exist to commit! **(%COMMITSHA%)**",
 
-    "COMMANDS_HELP_TITLE": "> All Commands of me!",
-    "COMMANDS_HELP_FOOTER": "%PREFIX%help [Command] | Bugs, Error - Contact Sangoon_Is_Noob#1683",
-    "COMMANDS_HELP_INFO": "> Command information - %COMMAND%",
+    "COMMANDS_HELP_TITLE": "> All Commands of Me!  %EMOJI_PAPER%",
+    "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% Tip, %PREFIX%help [Command] | Contact - Sangoon_Is_Noob#1683, %PREFIX%support",
+    "COMMANDS_HELP_INFO": "> Command Information - %COMMAND%",
+    "COMMANDS_HELP_ALIASES": "**%EMOJI_HASH%  Command aliases**",
+    "COMMANDS_HELP_USAGE": "**%EMOJI_BULB%  Command Usage**",
+    "COMMANDS_HELP_USAGE_DESC": "```md\n%USAGE%```",
+    "COMMANDS_HELP_DESC": "**%EMOJI_PIN%  Command Description**",
 
     "COMMANDS_MODSETTINGS_FIELD_MOD": "Moaderation Settings",
     "COMMANDS_MODSETTINGS_FIELD_AUDIO": "Music Settings",
     "COMMANDS_MODSETTINGS_FIELD_DEFAULT": "Default Settings",
     
-    "COMMANDS_MODSETTINGS_DESC_TEST_MOD": "%EMOJI_LOCALES%  Locale: **%LOCALE%**\n%EMOJI_BIN%  Banwords: **%FILTER%**\n%EMOJI_WARN%  Max warning counts: **%WARNMAX%**",
-    "COMMANDS_MODSETTINGS_DESC_TEST_AUDIO": "%EMOJI_MUSIC%  Playback message: **%AUDIOPLAY%**\n%EMOJI_STAR%  Playing related songs: **%RELATED%**\n%REPEAT_EMOJI%  Repeat: **%REPEAT%**\n%SHUFFLE_EMOJI%  Shuffle: **%SHUFFLE%**",
-    "COMMANDS_MODSETTINGS_DESC_TEST_DEFAULT": "%EMOJI_HEADPHONES%  DJ Role: **%DJROLE%**\n%EMOJI_SPEAKER%  Default voice channel: **%VCH%**\n%EMOJI_HASH%  Default Text Channel: **%TCH%**",
-    "COMMANDS_MODSETTINGS_DESC": "%EMOJI_LOCALES%  Language: **%LOCALE%**\n%EMOJI_BIN%  Swear Filter: **%FILTER%**\n%EMOJI_WARN%  Max warning count: **%WARNMAX%**\n%EMOJI_MUSIC%  Audio Playing Notification: **%AUDIOPLAY%**\n%EMOJI_STAR%  Playing Related Videos: **%RELATED%**",
+    "COMMANDS_MODSETTINGS_DESC_MOD": "%EMOJI_LOCALES%  Locale: **%LOCALE%**\n%EMOJI_BIN%  Banwords: **%FILTER%**\n%EMOJI_WARN%  Max warning counts: **%WARNMAX%**",
+    "COMMANDS_MODSETTINGS_DESC_AUDIO": "%EMOJI_MUSIC%  Playback message: **%AUDIOPLAY%**\n%EMOJI_STAR%  Playing related songs: **%RELATED%**\n%REPEAT_EMOJI%  Repeat: **%REPEAT%**\n%SHUFFLE_EMOJI%  Shuffle: **%SHUFFLE%**",
+    "COMMANDS_MODSETTINGS_DESC_DEFAULT": "%EMOJI_HEADPHONES%  DJ Role: **%DJROLE%**\n%EMOJI_SPEAKER%  Default voice channel: **%VCH%**\n%EMOJI_HASH%  Default Text Channel: **%TCH%**",
     "COMMANDS_MODSETTINGS_EMBED_TITLE": "🔧  Settings of **%SERVER%**",
     "ENABLE": "Enable",
     "DISABLE": "Disable",
