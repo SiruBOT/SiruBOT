@@ -83,7 +83,7 @@ class Client extends Discord.Client {
    * @returns {Collection} - Command Collection
    */
   async LoadCommands () {
-    const CommandsFile = await this.utils.asyncFunc.globAsync('./commands/**/*.js')
+    const CommandsFile = await this.utils.async.globAsync('./commands/**/*.js')
     const reLoadOrLoad = `${this.commands_loaded ? '(re)' : ''}Load`
     const load = `${this.defaultPrefix.LoadCommands} [${reLoadOrLoad}]`
     this.logger.info(`${load} Loading Commands (${CommandsFile.length} Files)`)
@@ -122,7 +122,7 @@ class Client extends Discord.Client {
    */
   async registerEvents (reload = false) {
     this.logger.info(`${this.defaultPrefix.registerEvents} Registering Events...`)
-    const eventsFile = await this.utils.asyncFunc.globAsync('./events/**/*.js')
+    const eventsFile = await this.utils.async.globAsync('./events/**/*.js')
     this.logger.debug(`${this.defaultPrefix.registerEvents} Event Files: ${eventsFile.join(' | ')}`)
     for (const file of eventsFile) {
       const EventClass = require(file)

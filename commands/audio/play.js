@@ -55,7 +55,7 @@ class Command {
         if (searchResult.tracks.length === 0) return
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length })).then((m) => {
           const emojiList = ['📥', '🚫']
-          this.client.utils.massReact(m, emojiList)
+          this.client.utils.message.massReact(m, emojiList)
 
           const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
           const collector = m.createReactionCollector(filter, { time: 15000 })

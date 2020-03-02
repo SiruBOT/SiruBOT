@@ -1,9 +1,11 @@
 const Discord = require('discord.js')
-const arrayUtil = require('./arrayUtil')
+const arrayUtil = require('./array')
 const findElementRequiredOptions = ['filter', 'collection', 'message', 'formatter', 'locale', 'picker', 'title']
-const { massReact } = require('./safeEdit')
+const { massReact } = require('./message')
 const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const settings = require('../checker/getSettings')()
+
+module.exports.formatters = require('./findUtilFormatters')
 
 /**
  * Options For FindElement Function
@@ -64,8 +66,8 @@ module.exports.findElement = (options) => {
           collector.on('collect', r => {
             const index = emojiList.findIndex((el) => el === r.emoji.name)
             functionList[index](r).catch((e) => {
-				reject(e)
-			})
+              reject(e)
+            })
           })
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()

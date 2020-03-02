@@ -24,7 +24,7 @@ class Command {
     const embed = new Discord.MessageEmbed()
 
     embed.setTitle(picker.get(locale, 'COMMANDS_PING_PING'))
-    embed.setColor(this.client.utils.findUtil.getColor(message.member))
+    embed.setColor(this.client.utils.find.getColor(message.member))
     embed.setDescription(picker.get(locale, 'COMMANDS_PING_PINGING'))
 
     message.channel.send(message.author, embed).then((m) => {

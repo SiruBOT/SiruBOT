@@ -1,6 +1,5 @@
 const Lyrics = require('slyrics')
 const lyrics = new Lyrics()
-// const providers = ['melon', 'atoz']
 const Discord = require('discord.js')
 
 class Command {
@@ -25,11 +24,8 @@ class Command {
     const picker = this.client.utils.localePicker
     const { message, args } = compressed
     const embed = new Discord.MessageEmbed()
-      .setColor(this.client.utils.findUtil.getColor(message.guild.me))
+      .setColor(this.client.utils.find.getColor(message.guild.me))
     message.channel.startTyping(1)
-    // let index = 0
-    // for (const provider of providers) {
-    //   index++
     const result = await get('melon', args.join(' '))
     if (result === true) {
       message.channel.stopTyping(true)
@@ -37,9 +33,6 @@ class Command {
       message.channel.stopTyping(true)
       message.channel.send(picker.get(locale, 'COMMANDS_UTILS_LYRICS_NOTFOUND'))
     }
-    // if (index === providers.length) {
-    // }
-    // }
     async function get (provider, title) {
       const lyricsData = await lyrics.get(provider, title)
       lyricsData.result = lyricsData.result === null ? null : lyricsData.result.replace(/\n\n\n/g, '\n\n')

@@ -8,11 +8,3 @@ module.exports.chunkArray = (arr, chunkSize) => {
   for (let i = 0, len = arr.length; i < len; i += chunkSize) { array.push(arr.slice(i, i + chunkSize)) }
   return array
 }
-
-module.exports.MapToArray = (map) => {
-  const array = []
-  for (const item of map.keys()) {
-    array.push(map.get(item))
-  }
-  return array
-}

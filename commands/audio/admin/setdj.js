@@ -18,8 +18,8 @@ class Command {
   async run (compressed) {
     const picker = this.client.utils.localePicker
     const locale = compressed.guildData.locale
-    const { message, args } = compressed
-    if (!args[0]) return message.channel.send('No')
+    const { message, args, command } = compressed
+    if (!args[0]) return message.channel.send(picker.get(locale, 'INCORRECT_USAGE', { COMMAND_USAGE: picker.get(locale, `USAGE_${this.command.category}_${this.command.name.toUpperCase()}`, { COMMAND: command }) }))
     if (['none', '없음', 'null', 'remove', '지우기'].includes(args[0].toLowerCase())) {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { dj_role: '0' } })
@@ -35,7 +35,7 @@ class Command {
         locale: locale,
         picker: picker
       }
-      this.client.utils.findUtil.findElement(options).then(async (res) => {
+      this.client.utils.find.findElement(options).then(async (res) => {
         if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_SET', { DJNAME: res.name }))
         this.client.database.updateGuild(message.guild.id, { $set: { dj_role: res.id } })

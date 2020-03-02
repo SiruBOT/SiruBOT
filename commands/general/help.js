@@ -23,7 +23,7 @@ class Command {
     const picker = this.client.utils.localePicker
     const embed = new Discord.MessageEmbed()
       .setThumbnail(message.guild.me.user.displayAvatarURL({ format: 'png', size: 512 }))
-      .setColor(this.client.utils.findUtil.getColor(message.guild.me))
+      .setColor(this.client.utils.find.getColor(message.guild.me))
       .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }))
     const command = this.client.commands.get(args[0]) || this.client.commands.get(this.client.aliases.get(args[0]))
     if (!command || command.command.hide === true) {
@@ -46,7 +46,7 @@ class Command {
         },
         {
           name: picker.get(locale, 'COMMANDS_HELP_USAGE'),
-          value: `\`\`\`fix\n${picker.get(locale, `USAGE_${commandInfo.category.toUpperCase()}_${commandInfo.name.toUpperCase()}`)}\`\`\``
+          value: `\`\`\`fix\n${picker.get(locale, `USAGE_${commandInfo.category.toUpperCase()}_${commandInfo.name.toUpperCase()}`, { COMMAND: commandInfo.name })}\`\`\``
         },
         {
           name: picker.get(locale, 'COMMANDS_HELP_ALIASES'),

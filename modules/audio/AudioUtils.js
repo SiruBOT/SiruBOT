@@ -21,7 +21,7 @@ class AudioUtils {
   }
 
   formatTrack (trackInfo) {
-    return `**${Discord.Util.escapeMarkdown(trackInfo.title)} [${this.client.utils.timeUtil.toHHMMSS(trackInfo.length / 1000, trackInfo.isStream)}]**`
+    return `**${Discord.Util.escapeMarkdown(trackInfo.title)} [${this.client.utils.time.toHHMMSS(trackInfo.length / 1000, trackInfo.isStream)}]**`
   }
 
   /**
@@ -62,7 +62,7 @@ class AudioUtils {
     if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) {
       messageEmbed
         .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
-        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.cache.get(guildID).me))
+        .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
     } else {
       const request = this.client.users.cache.get(guildData.nowplaying.request)
       messageEmbed
@@ -70,7 +70,7 @@ class AudioUtils {
         .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
         .setURL(guildData.nowplaying.info.uri)
         .setDescription(this.getNowplayingText(guildID, guildData))
-        .setColor(this.client.utils.findUtil.getColor(this.client.guilds.cache.get(guildID).me))
+        .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
         .setThumbnail(this.validateYouTubeUrl(guildData.nowplaying.info.uri) ? `https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
     }
     return messageEmbed
@@ -119,8 +119,8 @@ class AudioUtils {
     Object.defineProperty(obj, 'repeatStatus', { value: this.client._options.constructors['EMOJI_' + this.getRepeatState(guildData.repeat)] })
     if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(this.client.audio.players.get(guildID).position / guildData.nowplaying.info.length) })
     else Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(0) })
-    if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.timeUtil.toHHMMSS(this.client.audio.players.get(guildID).position / 1000, false)}/${this.client.utils.timeUtil.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })
-    else Object.defineProperty(obj, 'time', { value: `[${this.client.utils.timeUtil.toHHMMSS(0, false)}/${this.client.utils.timeUtil.toHHMMSS(0, false)}]` })
+    if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(this.client.audio.players.get(guildID).position / 1000, false)}/${this.client.utils.time.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })
+    else Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(0, false)}/${this.client.utils.time.toHHMMSS(0, false)}]` })
     Object.defineProperty(obj, 'volume', { value: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**` })
     return obj
   }

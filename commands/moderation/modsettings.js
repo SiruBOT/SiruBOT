@@ -46,7 +46,7 @@ class Command {
       embed.addFields({ name: picker.get(locale, 'COMMANDS_MODSETTINGS_FIELD_' + item), value: picker.get(locale, 'COMMANDS_MODSETTINGS_DESC_' + item, obj[item]), inline: true })
     }
     embed.setTimestamp(new Date())
-    embed.setColor(this.client.utils.findUtil.getColor(message.guild.me))
+    embed.setColor(this.client.utils.find.getColor(message.guild.me))
     message.channel.send(picker.get(locale, 'COMMANDS_MODSETTINGS_EMBED_TITLE', { SERVER: message.guild.name }), embed)
   }
 

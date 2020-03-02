@@ -41,6 +41,7 @@ class Event {
         message: message,
         args: args,
         prefix: prefix,
+        command: command,
         userPermissions: userPermissions
       })
 

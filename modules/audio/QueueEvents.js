@@ -27,7 +27,7 @@ class QueueEvents {
   async trackStartedEvent (data) {
     const guildData = await this.client.database.getGuild(data.guildID)
     const { trackData } = data
-    this.client.audio.utils.sendMessage(data.guildID, this.client.utils.localePicker.get(guildData.locale, trackData.related ? 'AUDIO_NOWPLAYING_RELATED' : 'AUDIO_NOWPLAYING', { TRACK: Discord.Util.escapeMarkdown(trackData.info.title), DURATION: this.client.utils.timeUtil.toHHMMSS(trackData.info.length / 1000, trackData.info.isStream) }), trackData.related)
+    this.client.audio.utils.sendMessage(data.guildID, this.client.utils.localePicker.get(guildData.locale, trackData.related ? 'AUDIO_NOWPLAYING_RELATED' : 'AUDIO_NOWPLAYING', { TRACK: this.client.audio.utils.formatTrack(trackData) }), trackData.related)
   }
 
   async playBackEndedEvent (data) {

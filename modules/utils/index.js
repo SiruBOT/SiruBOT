@@ -1,11 +1,8 @@
 module.exports = {
-  safeEdit: require('./safeEdit'),
-  massReact: require('./safeEdit').massReact,
-  randmizer: require('./randmizer'),
-  findFormatters: require('./findUtilFormatters'),
-  findUtil: require('./findUtil'),
-  timeUtil: require('./time'),
-  arrayUtil: require('./arrayUtil'),
-  asyncFunc: require('./asyncFunc'),
+  message: require('./message'),
+  find: require('./findUtil'),
+  time: require('./time'),
+  array: require('./array'),
+  async: require('./async'),
   images: require('./images')
 }

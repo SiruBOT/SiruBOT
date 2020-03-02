@@ -19,20 +19,20 @@ class Command {
   async run (compressed) {
     const picker = this.client.utils.localePicker
     const locale = compressed.guildData.locale
-    const { message, args } = compressed
-    if (!args[0]) return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_TYPE_USER'))
+    const { message, args, command } = compressed
+    if (!args[0]) return message.channel.send(picker.get(locale, 'INCORRECT_USAGE', { COMMAND_USAGE: picker.get(locale, `USAGE_${this.command.category}_${this.command.name.toUpperCase()}`, { COMMAND: command }) }))
     const search = args.shift()
-    const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === (this.client.utils.findUtil.getUserFromMention(message.guild.members.cache, search) ? this.client.utils.findUtil.getUserFromMention(message.guild.members.cache, search).id : null) || a.user.username.toLowerCase() === search.toLowerCase() }
+    const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === (this.client.utils.find.getUserFromMention(message.guild.members.cache, search) ? this.client.utils.find.getUserFromMention(message.guild.members.cache, search).id : null) || a.user.username.toLowerCase() === search.toLowerCase() }
     const options = {
       title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
-      formatter: this.client.utils.findFormatters.guildMember,
+      formatter: this.client.utils.find.formatters.guildMember,
       collection: message.guild.members.cache,
       filter: filter,
       message: message,
       locale: locale,
       picker: picker
     }
-    this.client.utils.findUtil.findElement(options).then(async (res) => {
+    this.client.utils.find.findElement(options).then(async (res) => {
       if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
       const member = message.guild.members.cache.get(res.user ? res.user.id : null)
       if (member.user.bot === true) {

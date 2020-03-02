@@ -50,9 +50,9 @@ class Command {
     for (const index in slicedTracks) {
       string += `${Numbers[index]}  [${Discord.Util.escapeMarkdown(searchResult.tracks[index].info.title)}](${searchResult.tracks[index].info.uri})\n`
     }
-    embed.setDescription(string).setColor(this.client.utils.findUtil.getColor(message.guild.me))
+    embed.setDescription(string).setColor(this.client.utils.find.getColor(message.guild.me))
     message.channel.send(message.author, embed).then(m => {
-      this.client.utils.massReact(m, slicedNumberArray)
+      this.client.utils.message.massReact(m, slicedNumberArray)
       const filter = (reaction, user) => slicedNumberArray.includes(reaction.emoji.name) && user.id === message.author.id
       m.awaitReactions(filter, { time: 15000, errors: ['time'], max: 1 })
         .then(collected => {

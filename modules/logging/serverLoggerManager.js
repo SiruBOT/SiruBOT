@@ -25,7 +25,7 @@ class ServerLogger {
 
   async init () {
     this.client.logger.info('[GuildLoggerManager] Init GuildLoggerManager...')
-    const events = await this.client.utils.asyncFunc.globAsync('./modules/logging/loggerEvents/**/*.js')
+    const events = await this.client.utils.async.globAsync('./modules/logging/loggerEvents/**/*.js')
     this.client.logger.debug(`[GuildLoggerManager] Loading Events ${events}`)
     for (const item of events) {
       this.client.logger.debug(`[GuildLoggerManager] Loading Event ${item}`)
