@@ -32,15 +32,14 @@ class Command {
       locale: locale,
       picker: picker
     }
-    this.client.utils.find.findElement(options).then(async (res) => {
-      if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
-      const member = message.guild.members.cache.get(res.user ? res.user.id : null)
-      if (member.user.bot === true) {
-        return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_NO_BOT'))
-      } else if (member) {
-        this.ban({ member, args, picker, locale, message })
-      }
-    })
+    const res = this.client.utils.find.findElement(options)
+    if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
+    const member = message.guild.members.cache.get(res.user ? res.user.id : null)
+    if (member.user.bot === true) {
+      return message.channel.send(picker.get(locale, 'COMMANDS_MOD_WARN_NO_BOT'))
+    } else if (member) {
+      this.ban({ member, args, picker, locale, message })
+    }
   }
 
   ban ({ member, args, picker, locale, message }) {

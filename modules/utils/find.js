@@ -5,7 +5,7 @@ const { massReact } = require('./message')
 const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const settings = require('../checker/getSettings')()
 
-module.exports.formatters = require('./findUtilFormatters')
+module.exports.formatters = require('./findFormats')
 
 /**
  * Options For FindElement Function
@@ -34,38 +34,41 @@ module.exports.findElement = (options) => {
       const chunkedFormatted = arrayUtil.chunkArray(formattedData, 5)
       const chunked = arrayUtil.chunkArray(filteredArray, 5)
       let currentPage = 0
-      options.message.channel.send(getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member)).then(m => {
-        const emojiList = ['◀️', '⏹️', '▶️']
+      options.message.channel.send(this.getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member)).then(m => {
+        let emojiList = ['◀️', '⏹️', '▶️']
+        if (chunkedFormatted.length === 1) emojiList = ['⏹️']
         for (let i = 0; i < chunkedFormatted[0].length; i++) {
           emojiList.push(Numbers[i])
         }
         massReact(m, emojiList).then(() => {
           const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === options.message.author.id
           const collector = m.createReactionCollector(filter, { time: 60000 })
-          const functionList = [async (r) => {
-            r.users.remove(options.message.author)
-            if (currentPage === 0) currentPage = chunkedFormatted.length - 1
-            else currentPage--
-            m.edit(getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
-          }, async () => {
-            collector.stop()
-            return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_USER_STOP'))
-          }, async (r) => {
-            r.users.remove(options.message.author)
-            if (currentPage >= chunkedFormatted.length - 1) currentPage = 0
-            else currentPage++
-            m.edit(getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
-          }]
+          const funcs = {
+            '◀️': async (r) => {
+              r.users.remove(options.message.author)
+              if (currentPage === 0) currentPage = chunkedFormatted.length - 1
+              else currentPage--
+              m.edit(this.getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
+            },
+            '⏹️': async () => {
+              collector.stop()
+              return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_USER_STOP'))
+            },
+            '▶️': async (r) => {
+              r.users.remove(options.message.author)
+              if (currentPage >= chunkedFormatted.length - 1) currentPage = 0
+              else currentPage++
+              m.edit(this.getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
+            }
+          }
           for (let i = 0; i < chunkedFormatted[0].length; i++) {
-            functionList.push(async () => {
-              m.delete()
+            funcs[Numbers[i]] = async () => {
               collector.stop()
               return resolve(chunked[currentPage][i])
-            })
+            }
           }
           collector.on('collect', r => {
-            const index = emojiList.findIndex((el) => el === r.emoji.name)
-            functionList[index](r).catch((e) => {
+            funcs[r.emoji.name](r).catch((e) => {
               reject(e)
             })
           })
@@ -79,7 +82,15 @@ module.exports.findElement = (options) => {
   })
 }
 
-function getEmbed (pages, currentPage, picker, locale, title, member) {
+/**
+ * @param {Discord.GuildMember} member - Get Member's highest color, if 0 (black) returns Discord Blurple Color (#7289DA)
+ */
+module.exports.getColor = (member) => {
+  if (member.highestRole && member.highestRole.color !== 0) return member.highestRole.color
+  else return settings.others.embed_general
+}
+
+module.exports.getEmbed = (pages, currentPage, picker, locale, title, member) => {
   return new Discord.MessageEmbed()
     .setTitle(title)
     .setColor(this.getColor(member))
@@ -93,14 +104,6 @@ function getEmbed (pages, currentPage, picker, locale, title, member) {
 module.exports.getStatus = (presence) => {
   if (presence.activities[0]) return presence.activities[0].type === 'STREAMING' ? 'stream' : presence.status
   return presence.status
-}
-
-/**
- * @param {Discord.GuildMember} member - Get Member's highest color, if 0 (black) returns Discord Blurple Color (#7289DA)
- */
-module.exports.getColor = (member) => {
-  if (member.highestRole && member.highestRole.color !== 0) return member.highestRole.color
-  else return settings.others.embed_general
 }
 
 /**

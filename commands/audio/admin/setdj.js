@@ -24,22 +24,20 @@ class Command {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { dj_role: '0' } })
     } else {
-      const formatter = (role, number) => { return `[${number}] ${role.name} [${role.id}]` }
       const filter = (role) => { return role.name.toLowerCase() === args.join(' ').toLowerCase() || role.id === args.join(' ') || role.name.replace('@everyone', 'everyone') === args.join(' ').toLowerCase().replace('@', '') || role.id === (message.mentions.roles.array()[0] === undefined ? false : message.mentions.roles.array()[0].id) }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
-        formatter: formatter,
+        formatter: this.client.utils.find.formatters.role,
         collection: message.guild.roles.cache,
         filter: filter,
         message: message,
         locale: locale,
         picker: picker
       }
-      this.client.utils.find.findElement(options).then(async (res) => {
-        if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
-        message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_SET', { DJNAME: res.name }))
-        this.client.database.updateGuild(message.guild.id, { $set: { dj_role: res.id } })
-      })
+      const res = await this.client.utils.find.findElement(options)
+      if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
+      message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_SET', { DJNAME: res.name }))
+      this.client.database.updateGuild(message.guild.id, { $set: { dj_role: res.id } })
     }
   }
 }

@@ -90,14 +90,19 @@ class Client extends Discord.Client {
     this.logger.debug(`${load} (Commands: ${CommandsFile.join(', ')})`)
     for (const cmd of CommandsFile) {
       if (!cmd.split('/').slice(-1)[0].startsWith('!')) {
-        const Command = require(cmd)
-        const command = new Command(this)
-        this.logger.debug(`${load} Loading Command (${command.command.name})`)
-        for (const aliases of command.command.aliases) {
-          this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.command.name}`)
-          this.aliases.set(aliases, command.command.name)
+        try {
+          const Command = require(cmd)
+          const command = new Command(this)
+          this.logger.debug(`${load} Loading Command (${command.command.name})`)
+          for (const aliases of command.command.aliases) {
+            this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.command.name}`)
+            this.aliases.set(aliases, command.command.name)
+          }
+          this.commands.set(command.command.name, command)
+        } catch (e) {
+          this.logger.error(`${load} Command Load Error Ignore it...`)
+          this.logger.error(`${load} ${e.stack || e.message}`)
         }
-        this.commands.set(command.command.name, command)
         delete require.cache[require.resolve(cmd)]
       } else {
         this.logger.warn(`${load} Ignore file ${cmd} (Starts !)`)
