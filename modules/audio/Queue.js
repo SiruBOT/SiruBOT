@@ -112,15 +112,16 @@ class Queue extends EventEmitter {
    * @param {String} guildID - guild id to skips
    * @example - <Queue>.deQueue('672586746587774976'fgh)
    */
-  async deQueue (guildID, skip = false) {
+  async deQueue (guildID, skip = false, err = false) {
     const guildData = await this.client.database.getGuild(guildID)
+    if (err) return this.playNext(guildID)
     if (skip || (guildData.repeat !== 2 && skip)) {
       this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Shift Track`)
       await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
     } else {
       switch (guildData.repeat) {
         case 0:
-          if (guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
+          if (!err && guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
             this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Related Track (Repeat: ${guildData.repeat}, playingRelated: ${guildData.audioPlayrelated})`)
             return this.playRelated(guildID, this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri))
           } else {

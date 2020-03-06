@@ -1,9 +1,9 @@
 const Discord = require('discord.js')
-const arrayUtil = require('./array')
+const arrayUtil = require('../array')
 const findElementRequiredOptions = ['filter', 'collection', 'message', 'formatter', 'locale', 'picker', 'title']
-const { massReact } = require('./message')
+const { massReact } = require('../message')
 const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
-const settings = require('../checker/getSettings')()
+const settings = require('../../checker/getSettings')()
 
 module.exports.formatters = require('./findFormats')
 
@@ -86,7 +86,7 @@ module.exports.findElement = (options) => {
  * @param {Discord.GuildMember} member - Get Member's highest color, if 0 (black) returns Discord Blurple Color (#7289DA)
  */
 module.exports.getColor = (member) => {
-  if (member.highestRole && member.highestRole.color !== 0) return member.highestRole.color
+  if (member.roles.highest && member.roles.highest.color !== 0) return member.roles.highest.color
   else return settings.others.embed_general
 }
 

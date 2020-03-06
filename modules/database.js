@@ -26,7 +26,7 @@ class DataManager {
       checkGuild: `${this.classPrefix}:${this.methods.check}:${this.collections.guild}]`,
       removeGuild: `${this.classPrefix}:${this.methods.remove}:${this.collections.guild}]`,
       removeMember: `${this.classPrefix}:${this.methods.remove}:${this.collections.member}]`,
-      addErrorInfo: `${this.classPrefix}:${this.methods.add}:${this.collections.error}`
+      addErrorInfo: `${this.classPrefix}:${this.methods.add}:${this.collections.error}]`
     }
   }
 

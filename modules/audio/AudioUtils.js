@@ -142,7 +142,9 @@ class AudioUtils {
         this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send Message "${text}" to channel ${sendChannel.id}`)
         if (this.client.audio.textMessages.get(guildID) && this.client.audio.textMessages.get(guildID).deletable) {
           this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
-          this.client.audio.textMessages.get(guildID).delete()
+          this.client.audio.textMessages.get(guildID).delete().catch(() => {
+            this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete previous message..`)
+          })
         }
         if (forceSend || guildData.audioMessage) {
           sendChannel.send(text).then(m => this.client.audio.textMessages.set(guildID, m))

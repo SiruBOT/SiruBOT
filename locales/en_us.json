@@ -176,6 +176,8 @@
     "COMMANDS_HELP_USAGE": "**%EMOJI_BULB%  Command Usage**",
     "COMMANDS_HELP_USAGE_DESC": "```md\n%USAGE%```",
     "COMMANDS_HELP_DESC": "**%EMOJI_PIN%  Command Description**",
+    "COMMANDS_HELP_MORE": "**%EMOJI_PAPER%  More Information**",
+    "COMMANDS_HELP_MORE_DESC": "**[[Support Server]](https://discord.gg/wy6KsRf)  [[Official Webpage]](https://siru.moe)\n[[OpenSource Repository]](https://github.com/cotwo0139/SiruBOT_BOT)**",
 
     "COMMANDS_MODSETTINGS_FIELD_MOD": "Moaderation Settings",
     "COMMANDS_MODSETTINGS_FIELD_AUDIO": "Music Settings",

@@ -9,7 +9,7 @@ class Command {
       require_nodes: true,
       require_voice: false,
       hide: false,
-      aliases: ['벼뎓', '큐', '대기열', '재생목록', 'playlist', 'zb', 'eorlduf'],
+      aliases: ['벼뎓', '큐', '대기열', 'q', 'zb', 'eorlduf'],
       permissions: ['Everyone']
     }
   }

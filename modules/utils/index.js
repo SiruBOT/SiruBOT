@@ -1,8 +1,7 @@
 module.exports = {
   message: require('./message'),
-  find: require('./find'),
+  find: require('./find/find'),
   time: require('./time'),
   array: require('./array'),
-  async: require('./async'),
-  images: require('./images')
+  async: require('./async')
 }

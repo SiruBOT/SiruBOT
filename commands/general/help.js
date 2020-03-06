@@ -31,7 +31,7 @@ class Command {
       for (const item of this.client.categories.keyArray()) {
         for (const permission of userPermissions) {
           if (this.client.utils.permissionChecker.permissions.categories.filter(el => el.category === item)[0].requiredPermissions.includes(permission)) {
-            embed.addFields({ name: '**' + picker.get(locale, `CATEGORY_${item}`) + '**', value: this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '), inline: false })
+            embed.addField('**' + picker.get(locale, `CATEGORY_${item}`) + '**', this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '), false)
             continue
           }
         }
@@ -54,6 +54,7 @@ class Command {
         }
       )
     }
+    embed.addField(picker.get(locale, 'COMMANDS_HELP_MORE'), picker.get(locale, 'COMMANDS_HELP_MORE_DESC'))
     message.channel.send(message.author, embed)
   }
 }

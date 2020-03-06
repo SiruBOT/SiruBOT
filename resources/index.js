@@ -7,6 +7,13 @@ module.exports = {
     dnd: './statusIndicator/dnd.png'
   },
   fonts: {
-    DOHYEON: './fonts/BMDOHYEON.ttf'
+    DOHYEON: {
+      path: './fonts/BMDOHYEON.ttf',
+      family: 'Dohyun'
+    },
+    JUA: {
+      path: './fonts/BMJUA.ttf',
+      family: 'Jua'
+    }
   }
 }

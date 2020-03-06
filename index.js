@@ -1,10 +1,12 @@
 const Discord = require('discord.js')
 const LocalePicker = require('./locales/localePicker')
-const { PermissionChecker, DataBase, Audio, Logger } = require('./modules')
+const { PermissionChecker, DataBase, Audio, Logger, Image } = require('./modules')
 const settings = require('./modules/checker/getSettings')()
 const isTesting = require('./modules/checker/isTesting')()
 const ServerLoggingManager = require('./modules/logging/serverLoggerManager')
 const redis = require('redis')
+const fs = require('fs')
+const path = require('path')
 
 class Client extends Discord.Client {
   constructor (options) {
@@ -15,7 +17,8 @@ class Client extends Discord.Client {
       init: `${this.classPrefix}:init]`,
       LoadCommands: `${this.classPrefix}:LoadCommands]`,
       registerEvents: `${this.classPrefix}:registerEvents]`,
-      setActivity: `${this.classPrefix}:setActivity]`
+      setActivity: `${this.classPrefix}:setActivity]`,
+      reload: `${this.classPrefix}:reload]`
     }
 
     this._isTesting = isTesting
@@ -26,6 +29,7 @@ class Client extends Discord.Client {
     this.utils = require('./modules/utils')
     this.utils.localePicker = new LocalePicker(this)
     this.utils.permissionChecker = new PermissionChecker(this)
+    this.utils.image = new Image(this.logger)
 
     this.activityNum = 0
     this.initialized = false
@@ -36,11 +40,7 @@ class Client extends Discord.Client {
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
-    this.audio = new Audio(this,
-      this._options.audio.nodes,
-      {
-        restTimeout: 10000
-      })
+    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000 })
 
     this.redisClient = redis.createClient(this._options.db.redis)
 
@@ -203,18 +203,33 @@ class Client extends Discord.Client {
   }
 
   reload () {
-    delete require.cache[require.resolve('./settings.js')]
+    const removeCacheFolderRecursive = (dirPath) => {
+      const arr = []
+      if (fs.existsSync(dirPath)) {
+        fs.readdirSync(dirPath).forEach((file) => {
+          const curPath = path.join(dirPath, file)
+          if (fs.lstatSync(curPath).isDirectory()) { // recurse
+            removeCacheFolderRecursive(curPath)
+          } else { // delete file
+            this.logger.warn(`${this.defaultPrefix.reload} Deleted Cache ${process.cwd()}${curPath}`)
+            delete require.cache[require.resolve(path.join(process.cwd(), curPath))]
+          }
+        })
+      }
+      return arr
+    }
+    const arr = ['./locales', './commands', './events', './modules', './resources']
+    for (const item of arr) {
+      removeCacheFolderRecursive(item)
+    }
     this._options = require('./settings.js')
-    delete require.cache[require.resolve('./models')]
-    this.database.Models = require('./models')
-    delete require.cache[require.resolve('./modules/utils')]
     this.utils = require('./modules/utils')
-    delete require.cache[require.resolve('./locales/localePicker')]
-    delete require.cache[require.resolve('./modules')]
     const NewLocalePicker = require('./locales/localePicker')
-    const NewPermissionChecker = require('./modules').PermissionChecker
+    const NewPermissionChecker = require('./modules/utils/PermissionChecker')
+    const NewImage = require('./modules/image/images')
     this.utils.localePicker = new NewLocalePicker(this)
     this.utils.permissionChecker = new NewPermissionChecker(this)
+    this.utils.image = new NewImage(this.logger)
     this.utils.localePicker.init()
     this.loggerManager.init()
     this.commands = new Discord.Collection()

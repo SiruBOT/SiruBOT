@@ -26,10 +26,10 @@ class Command {
         this.client.audio.queue.skip(message.guild.id)
         return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
       } else {
-        const toSkip = message.member.voice.channel.members.filter(m => !m.user.bot).size
+        const toSkip = Math.round(message.member.voice.channel.members.filter(m => !m.user.bot).size / 2)
         const skipperSize = this.client.audio.utils.addSkipper(message.guild.id, message.author.id, toSkip).length
         message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIP_REQUESTED', { TITLE: this.client.audio.utils.formatTrack(guildData.nowplaying.info), CURRENT: skipperSize, TOSKIP: toSkip, REQUEST: message.guild.members.cache.get(guildData.nowplaying.request) ? message.guild.members.cache.get(guildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN') }))
-        if (this.client.audio.skippers.get(message.guild.id).size >= toSkip) {
+        if (this.client.audio.skippers.get(message.guild.id).length >= toSkip) {
           this.client.audio.queue.skip(message.guild.id)
           return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
         }

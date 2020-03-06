@@ -16,11 +16,8 @@ class PermissionChecker {
    * @param {Discord.Permissions} permissions[] - Permissions For Checking
    */
   checkChannelPermission (member, channel, permissions) {
-    if (channel instanceof Discord.Channel) {
-      return channel.permissionsFor(member).has(permissions)
-    } else {
-      return new Error('[PermissionChecker] Channel is only Discord.Channel Type.')
-    }
+    if (channel instanceof Discord.Channel) return channel.permissionsFor(member).has(permissions)
+    else return new Error('[PermissionChecker] Channel is only Discord.Channel Type.')
   }
 
   /**

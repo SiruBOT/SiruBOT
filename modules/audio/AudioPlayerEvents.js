@@ -61,12 +61,12 @@ class AudioPlayerEvents {
 
   TrackReplaced (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackReplaced} [${data.guildId}] Replaced Track [${data.track}]`)
-    this.client.audio.queue.deQueue(data.guildId, true)
+    this.client.audio.queue.deQueue(data.guildId)
   }
 
   TrackLoadFailed (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackLoadFailed} [${data.guildId}] Failed to load track [${data.track}]`)
-    this.client.audio.queue.deQueue(data.guildId, true)
+    this.client.audio.queue.deQueue(data.guildId, true, true)
   }
   /**
    * End of TrackEndEvents
