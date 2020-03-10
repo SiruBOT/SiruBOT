@@ -168,18 +168,20 @@
     "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  Repeat mode chaged to **%REPEAT_SINGLE%**",
 
     "COMMANDS_SHUFFLE_NO": "> %EMOJI_MUSIC%  There are no songs in the playlist to shuffle!",
+    "COMMANDS_SHUFFLE_YOUR": "> %EMOJI_MUSIC%  Successfully shuffled your **%NUM%** tracks.",
+    "COMMANDS_SHUFFLE_ALL": "> %EMOJI_MUSIC%  Successfully shuffled **%NUM%** tracks",
 
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  Developers have changed the log do not exist to commit! **(%COMMITSHA%)**",
 
     "COMMANDS_HELP_TITLE": "> All Commands of Me!  %EMOJI_PAPER%",
-    "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% Tip, %PREFIX%help [Command] | Contact - Sangoon_Is_Noob#1683, %PREFIX%support",
+    "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% Contact - Sangoon_Is_Noob#1683, %PREFIX%support",
     "COMMANDS_HELP_INFO": "> Command Information - %COMMAND%",
     "COMMANDS_HELP_ALIASES": "**%EMOJI_HASH%  Command aliases**",
     "COMMANDS_HELP_USAGE": "**%EMOJI_BULB%  Command Usage**",
     "COMMANDS_HELP_USAGE_DESC": "```md\n%USAGE%```",
     "COMMANDS_HELP_DESC": "**%EMOJI_PIN%  Command Description**",
     "COMMANDS_HELP_MORE": "**%EMOJI_PAPER%  More Information**",
-    "COMMANDS_HELP_MORE_DESC": "**[[Support Server]](https://discord.gg/wy6KsRf)  [[Official Webpage]](https://siru.moe)\n[[OpenSource Repository]](https://github.com/cotwo0139/SiruBOT_BOT)**",
+    "COMMANDS_HELP_MORE_DESC": "%PREFIX%help [Command] To More Information of Command\n**[[Support Server]](https://discord.gg/wy6KsRf)  [[Official Webpage]](https://siru.moe)  [[Github]](https://github.com/cotwo0139/SiruBOT_BOT)**",
 
     "COMMANDS_MODSETTINGS_FIELD_MOD": "Moaderation Settings",
     "COMMANDS_MODSETTINGS_FIELD_AUDIO": "Music Settings",

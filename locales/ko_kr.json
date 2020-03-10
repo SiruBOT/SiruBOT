@@ -174,14 +174,14 @@
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  개발자가 커밋한 변경 로그가 존재하지 않아요! **(%COMMITSHA%)**",
 
     "COMMANDS_HELP_TITLE": "> %BOT_NAME%의 명령어들  %EMOJI_PAPER%",
-    "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% Tip, %PREFIX%도움 [명령어] | 버그, 에러 제보는- Sangoon_Is_Noob#1683, %PREFIX%지원",
+    "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% 버그, 에러 제보 - Sangoon_Is_Noob#1683, %PREFIX%지원",
     "COMMANDS_HELP_INFO": "> 명령어 정보 - %COMMAND%",
     "COMMANDS_HELP_ALIASES": "**%EMOJI_HASH%  명령어의 다른 이름들**",
     "COMMANDS_HELP_USAGE": "**%EMOJI_BULB%  명령어 사용법**",
     "COMMANDS_HELP_USAGE_DESC": "```md\n%USAGE%```",
     "COMMANDS_HELP_DESC": "**%EMOJI_PIN%  명령어 설명**",
     "COMMANDS_HELP_MORE": "**%EMOJI_PAPER%  더 많은 정보**",
-    "COMMANDS_HELP_MORE_DESC": "**[[지원 서버]](https://discord.gg/wy6KsRf)  [[공식 웹페이지]](https://siru.moe)  [[오픈소스 프로젝트]](https://github.com/cotwo0139/SiruBOT_BOT)**",
+    "COMMANDS_HELP_MORE_DESC": "**%PREFIX%도움 [명령어]** 로 더 많은 명령어의 정보를 보실 수 있어요!\n[[지원 서버]](https://discord.gg/wy6KsRf)  [[공식 웹페이지]](https://siru.moe)  [[오픈소스 프로젝트]](https://github.com/cotwo0139/SiruBOT_BOT)",
 
     "COMMANDS_MODSETTINGS_FIELD_MOD": "관리 설정들",
     "COMMANDS_MODSETTINGS_FIELD_AUDIO": "음악 설정들",

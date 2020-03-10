@@ -22,16 +22,15 @@ class Command {
     const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
     const embed = new Discord.MessageEmbed()
-      .setThumbnail(message.guild.me.user.displayAvatarURL({ format: 'png', size: 512 }))
       .setColor(this.client.utils.find.getColor(message.guild.me))
-      .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }))
+      .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }), message.guild.me.user.displayAvatarURL({ format: 'png', size: 512 }))
     const command = this.client.commands.get(args[0]) || this.client.commands.get(this.client.aliases.get(args[0]))
     if (!command || command.command.hide === true) {
       embed.setTitle(picker.get(locale, 'COMMANDS_HELP_TITLE'))
       for (const item of this.client.categories.keyArray()) {
         for (const permission of userPermissions) {
           if (this.client.utils.permissionChecker.permissions.categories.filter(el => el.category === item)[0].requiredPermissions.includes(permission)) {
-            embed.addField('**' + picker.get(locale, `CATEGORY_${item}`) + '**', this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '), false)
+            embed.addField('**' + picker.get(locale, `CATEGORY_${item}`) + '**', this.client.categories.get(item).map(el => `\`\`${el}<${this.client.commands.get(el).command.aliases[0]}>\`\``).join(', '), false)
             break
           }
         }

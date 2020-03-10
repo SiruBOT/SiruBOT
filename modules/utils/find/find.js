@@ -124,3 +124,12 @@ module.exports.getUserFromMention = (users, mention) => {
     return false
   }
 }
+
+/**
+ * @param {Object} object - Object with key: value
+ * @param {String} value - value of match
+ * @returns {*} - if null, returns args(replace)
+ */
+module.exports.matchObj = (object, value, replace = null) => {
+  return !value ? replace : object[value.toLowerCase()] ? object[value.toLowerCase()] : replace
+}

@@ -17,10 +17,11 @@ class Command {
      * @param {Boolean} silent - if Send Message
      */
   async run (compressed) {
-    const { message } = compressed
-    const locale = compressed.guildData.locale
+    const { message, args, guildData } = compressed
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
-    switch (compressed.guildData.repeat) {
+    const filter = { all: 0, a: 0, 전체: 0, 켜기: 0, on: 0, single: 1, s: 1, 한곡: 1, none: 2, off: 2, 끄기: 2, 없음: 2 }
+    switch (this.client.utils.find.matchObj(filter, args[0], guildData.repeat)) {
       case 0:
         message.channel.send(picker.get(locale, 'COMMANDS_REPEAT_ALL'))
         this.client.database.updateGuild(message.guild.id, { $set: { repeat: 1 } })
