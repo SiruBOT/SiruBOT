@@ -167,6 +167,8 @@
     "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  Repeat mode changed to **%ALL%**",
     "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  Repeat mode chaged to **%REPEAT_SINGLE%**",
 
+    "COMMANDS_SHUFFLE_NO": "> %EMOJI_MUSIC%  There are no songs in the playlist to shuffle!",
+
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  Developers have changed the log do not exist to commit! **(%COMMITSHA%)**",
 
     "COMMANDS_HELP_TITLE": "> All Commands of Me!  %EMOJI_PAPER%",

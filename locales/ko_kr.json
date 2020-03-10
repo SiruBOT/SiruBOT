@@ -167,6 +167,10 @@
     "COMMANDS_REPEAT_ALL": "> %EMOJI_REPEAT_ALL%  반복 모드가 **%ALL%** 반복으로 변경되었어요!",
     "COMMANDS_REPEAT_SINGLE": "> %EMOJI_REPEAT_SINGLE%  반복 모드가 **%REPEAT_SINGLE%** 반복으로 변경되었어요!",
 
+    "COMMANDS_SHUFFLE_NO": "> %EMOJI_MUSIC%  셔플할 노래가 대기열에 없어요!",
+    "COMMANDS_SHUFFLE_YOUR": "> %EMOJI_MUSIC%  당신의 노래 **%NUM%** 개를 셔플했어요!",
+    "COMMANDS_SHUFFLE_ALL": "> %EMOJI_MUSIC%  대기열 전체 **%NUM%** 개를 셔플했어요!",
+
     "COMMANDS_CHANGELOG_NO": "> %EMOJI_NO%  개발자가 커밋한 변경 로그가 존재하지 않아요! **(%COMMITSHA%)**",
 
     "COMMANDS_HELP_TITLE": "> %BOT_NAME%의 명령어들  %EMOJI_PAPER%",

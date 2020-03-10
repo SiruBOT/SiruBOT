@@ -32,7 +32,7 @@ class Command {
         for (const permission of userPermissions) {
           if (this.client.utils.permissionChecker.permissions.categories.filter(el => el.category === item)[0].requiredPermissions.includes(permission)) {
             embed.addField('**' + picker.get(locale, `CATEGORY_${item}`) + '**', this.client.categories.get(item).map(el => `\`\`${el}\`\``).join(', '), false)
-            continue
+            break
           }
         }
       }
