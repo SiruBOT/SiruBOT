@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'settc',
-      aliases: ['ㄴㄷㅅㅅㅊ'],
+      aliases: ['채널설정', 'ㄴㄷㅅㅅㅊ'],
       category: 'MODERATION',
       require_voice: false,
       require_nodes: false,

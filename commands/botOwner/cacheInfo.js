@@ -4,7 +4,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'cacheinfo',
-      aliases: ['ㅊㅁ초댜ㅜ래'],
+      aliases: ['캐시정보', 'ㅊㅁ초댜ㅜ래'],
       category: 'BOT_OWNER',
       require_nodes: false,
       require_voice: false,

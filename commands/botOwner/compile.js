@@ -4,7 +4,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'compile',
-      aliases: ['eval'],
+      aliases: ['실행', 'eval'],
       category: 'BOT_OWNER',
       require_nodes: false,
       require_voice: false,

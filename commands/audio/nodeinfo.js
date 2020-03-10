@@ -18,7 +18,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'nodeinfo',
-      aliases: ['ㅜㅐㅇ댜ㅜ래'],
+      aliases: ['봇정보', 'ㅜㅐㅇ댜ㅜ래'],
       category: 'MUSIC_GENERAL',
       require_nodes: false,
       require_voice: false,

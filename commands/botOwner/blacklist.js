@@ -13,7 +13,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'blacklist',
-      aliases: ['블랙리스트'],
+      aliases: ['블랙', '블랙리스트'],
       category: 'BOT_OWNER',
       require_nodes: false,
       require_voice: false,

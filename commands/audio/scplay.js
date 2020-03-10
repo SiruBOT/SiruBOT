@@ -7,7 +7,7 @@ class Command {
       require_nodes: true,
       require_voice: true,
       hide: false,
-      aliases: ['사운드클라우드재생', '사클재생', 'ㄴㅊㅔㅣ묘', 'scp', 'tkzmfwotod'],
+      aliases: ['사클재생', 'ㄴㅊㅔㅣ묘', 'scp', 'tkzmfwotod'],
       permissions: ['Everyone']
     }
   }

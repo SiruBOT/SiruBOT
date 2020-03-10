@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'repeat',
-      aliases: ['리핏', '반복', 'flvlt', 'qksqhr', 'loop', 'ㅣㅐㅐㅔ', '루프'],
+      aliases: ['반복', 'flvlt', 'qksqhr', 'loop', 'ㅣㅐㅐㅔ', '루프'],
       category: 'MUSIC_DJ',
       require_nodes: false,
       require_voice: false,

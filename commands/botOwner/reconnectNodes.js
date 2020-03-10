@@ -3,7 +3,7 @@ class Command {
     this.client = client
     this.command = {
       name: 'connectnodes',
-      aliases: ['reconnectnodes', 'nodereconnect', 'nodeconnect', '채ㅜㅜㄷㅊ수ㅐㅇㄷㄴ'],
+      aliases: ['노드연결', 'reconnectnodes', 'nodereconnect', 'nodeconnect', '채ㅜㅜㄷㅊ수ㅐㅇㄷㄴ'],
       category: 'BOT_OWNER',
       require_nodes: false,
       require_voice: false,
