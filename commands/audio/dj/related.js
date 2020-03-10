@@ -21,7 +21,9 @@ class Command {
     const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
 
-    switch (this.client.utils.find.matchObj({ on: false, off: true, 켜기: false, 끄기: true }, args[0], compressed.guildData.audioPlayrelated)) {
+    const val = this.client.utils.find.matchObj({ on: false, off: true, 켜기: false, 끄기: true }, args[0], compressed.guildData.audioPlayrelated)
+    // console.log(val)
+    switch (val) {
       case true:
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_RELATED_OFF'))
         this.client.database.updateGuild(message.guild.id, { $set: { audioPlayrelated: false } })

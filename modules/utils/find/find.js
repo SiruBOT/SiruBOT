@@ -131,5 +131,8 @@ module.exports.getUserFromMention = (users, mention) => {
  * @returns {*} - if null, returns args(replace)
  */
 module.exports.matchObj = (object, value, replace = null) => {
-  return !value ? replace : object[value.toLowerCase()] ? object[value.toLowerCase()] : replace
+  if (!value) return replace
+  const result = object[value.toString().toLowerCase()]
+  if (result === undefined) return replace
+  else return result
 }
