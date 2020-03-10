@@ -48,7 +48,7 @@ class Command {
     slicedNumberArray.push(this.client._options.constructors.EMOJI_NO)
     const slicedTracks = searchResult.tracks.slice(0, maxres)
     for (const index in slicedTracks) {
-      string += `${Numbers[index]}  [${Discord.Util.escapeMarkdown(searchResult.tracks[index].info.title)}](${searchResult.tracks[index].info.uri})\n`
+      string += `${Numbers[index]}  [${this.client.audio.utils.formatTrack(searchResult.tracks[index].info)}](${searchResult.tracks[index].info.uri})\n`
     }
     embed.setDescription(string).setColor(this.client.utils.find.getColor(message.guild.me))
     message.channel.send(message.author, embed).then(m => {

@@ -133,7 +133,7 @@
     "NONE": "None",
     "UNKNOWN": "Unknown",
 
-    "COMMANDS_AUDIO_QUEUE_SONGS": "%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``\n%REPEATSTATUS% | %NUM% Items | ``[%TOTALTIME%]``",
+    "COMMANDS_AUDIO_QUEUE_SONGS": "%REPEATSTATUS% | %NUM% Items | ``[%TOTALTIME%]``\n%PLAYINGSTATUS% | **%NPTITLE%** ``%NOWPOSITION%``",
 
     "COMMANDS_AUDIO_STOP_OK": "> %EMOJI_MUSIC%  The player has stopped and the queue has been cleared.",
     
@@ -151,7 +151,7 @@
     "COMMANDS_AUDIO_LOAD": "> %EMOJI_SANDCLOCK%  Loading Track...",
     "COMMANDS_AUDIO_PLAY_LOAD_FAIL": "> %EMOJI_NO%  Failed to load track. \n> ```CSS\n> %ERROR%\n> ```",
     "COMMANDS_AUDIO_PLAY_ADDED_SINGLE": "> %EMOJI_MUSIC%  Added **%TRACK%** to the queue at position **%POSITION%**",
-    "COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY": "> %EMOJI_MUSIC%  Now Playing.. **%TRACK%**",
+    "COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY": "> %EMOJI_MUSIC%  **%TRACK%** will play soon!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST": "> %EMOJI_MUSIC%  Found playlist with **%NUM%** entries, added to the queue!",
     "COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST": "> %EMOJI_MUSIC%  This track has a playlist of **%NUM%** tracks attached. Will you load playlist?",
     "COMMANDS_AUDIO_PLAY_NO_VOICE_ME": "> %EMOJI_MUSIC%  First, please add me your voice channel!",

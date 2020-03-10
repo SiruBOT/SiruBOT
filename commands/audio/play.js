@@ -93,13 +93,15 @@ class Command {
   }
 
   async addQueue (message, trackInfo, picker, locale) {
-    const guildData = await this.client.database.getGuild(message.guild.id)
-    const npStatus = (guildData.nowplaying.track)
-    const status = (npStatus && !Array.isArray(trackInfo))
-    const { info } = trackInfo
-    const placeHolderWithTrackInfo = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info || trackInfo[0].info), POSITION: guildData.queue.length + 1 })
-    if (status || (guildData.queue.length > 0)) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE', placeHolderWithTrackInfo))
-    else if (!npStatus) message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY', placeHolderWithTrackInfo))
+    if (!Array.isArray(trackInfo)) {
+      const { nowplaying, queue } = await this.client.database.getGuild(message.guild.id)
+      let localeName
+      const { info } = trackInfo
+      const placeHolder = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info), POSITION: queue.length + 1 })
+      if (nowplaying.track && this.client.audio.players.get(message.guild.id).track) localeName = 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE'
+      else localeName = 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY'
+      message.channel.send(picker.get(locale, localeName, placeHolder))
+    }
     this.client.audio.queue.enQueue(message.guild.id, trackInfo, message.author.id)
   }
 

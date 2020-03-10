@@ -1,4 +1,5 @@
 const prefix = '->'
+const shardCount = 1
 module.exports = {
   bot: {
     token: 'SUPEEEEEEEEER SECRET Token',
@@ -6,14 +7,14 @@ module.exports = {
     games: ['%USERS% 명의 유저와 함께하고 있어요!', '봇 리라이트중!', '%GUILDS% 개의 길드에서 사용 중!', '>>도움 | %PING%ms', 'https://github.com/cotwo0139/CHINOBOT_BETA.git'],
     gamesInterval: 30000, // 1000ms = 1sec (ms)
     owners: [],
-    shards: 0
+    shards: shardCount
   },
   audio: {
     nodes: [
       { host: '192.168.0.11', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true },
       { host: '192.168.0.22', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true }
     ],
-    shards: 1
+    shards: shardCount
   },
   logger: {
     level: 'debug'
@@ -71,11 +72,11 @@ module.exports = {
     EMOJI_SWITCH_ON: '<:emoji_on:649622462765596683>',
     EMOJI_SWITCH_OFF: '<:emoji_off:649622462685773884>',
 
-    BOT_NAME_KR: '치노봇',
-    BOT_NAME_EN: 'ChinoBot',
+    BOT_NAME_KR: '시루봇',
+    BOT_NAME_EN: 'SiruBOT',
 
-    MONEY_NAME_KR: '치머니',
-    MONEY_NAME_EN: 'ChiMoney',
+    MONEY_NAME_KR: '원',
+    MONEY_NAME_EN: 'Won',
 
     PREFIX: prefix,
 

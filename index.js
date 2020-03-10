@@ -265,7 +265,3 @@ process.on('unhandledRejection', (reason, promise) => {
     client.logger.error(e.stack)
   })
 })
-
-process.on('message', (data) => {
-  if (data === 'spawned-all-shards') client.setActivity()
-})

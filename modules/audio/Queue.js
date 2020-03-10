@@ -38,6 +38,22 @@ class Queue extends EventEmitter {
   }
 
   /**
+   * @param {String} guildID - guildID
+   * @param {String} userID - userID
+   * @returns
+   */
+  async shuffle (guildID, userID, all = false) {
+    const { queue } = await this.client.database.getGuild(guildID)
+    const userIdMapped = queue.map(e => e.request)
+    if (!userIdMapped.includes(userID)) return null
+    else {
+      const { result, size } = this.client.utils.array.shuffle(queue, 'request', userID, all)
+      this.client.database.updateGuild(guildID, { $set: { queue: result } })
+      return size
+    }
+  }
+
+  /**
    * @param {String} guildID - GuildID
    * @param {Object|Array<Object>} track - Item(s) add Queue
    * @param {Object} message = Message
@@ -135,7 +151,9 @@ class Queue extends EventEmitter {
             this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
             return
           } else {
-            await this.client.database.updateGuild(guildID, { $push: { queue: guildData.nowplaying } })
+            const toRepeat = guildData.nowplaying
+            toRepeat.repeated = true
+            await this.client.database.updateGuild(guildID, { $push: { queue: toRepeat } })
           }
           break
       }
