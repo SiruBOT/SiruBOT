@@ -28,6 +28,10 @@ class Command {
       if ((loadMessage.editable && silent === false)) loadMessage.edit(sendContent)
       else if (err && (err !== 'A Player is already established in this channel')) message.channel.send(sendContent)
     }
+    if (message.member.voice.channelID && !message.member.voice.channel.joinable && !message.member.voice.channel.speakable) {
+      sendFunc(picker.get(locale, 'AUDIO_NOT_JOINABLE_OR_SPEAKABLE'), true)
+      return false
+    }
     return (() => {
       if (!message.guild.me.voice.channelID || !this.client.audio.players.get(message.guild.id)) {
         return this.client.audio.join(voiceChannelID, message.guild.id)

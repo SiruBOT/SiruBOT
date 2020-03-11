@@ -8,8 +8,7 @@ class Command {
       require_nodes: false,
       require_voice: false,
       hide: false,
-      permissions: ['Administrator'],
-      botPerm: ['ADD_REACTIONS'] // https://discordapp.com/developers/docs/topics/permissions
+      permissions: ['Administrator']
     }
   }
 
@@ -42,4 +41,5 @@ class Command {
     }
   }
 }
+
 module.exports = Command
