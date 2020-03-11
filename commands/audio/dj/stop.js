@@ -25,9 +25,9 @@ class Command {
       Audio.stop(message.guild.id)
       if (!Audio.players.get(message.guild.id)) {
         clearInterval(interval)
-        message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_STOP_OK'))
       }
     })
+    message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_STOP_OK'))
   }
 }
 
