@@ -13,9 +13,8 @@ class Command {
   }
 
   /**
-     * @param {Object} compressed - Compressed Object (In CBOT)
-     * @param {Boolean} silent - if Send Message
-     */
+   * @param {Object} compressed - Compressed Object
+   */
   async run (compressed) {
     const { message, args, guildData } = compressed
     const { locale } = guildData

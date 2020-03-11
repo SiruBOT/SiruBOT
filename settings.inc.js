@@ -37,7 +37,7 @@ module.exports = {
       ban: '#FF7575'
     },
     embed_general: '#7289DA',
-    changelog_url: 'https://*****/.github.io/' // https://*****/.github.io/[COMMITID.txt]
+    changelog_url: 'https://*****/.github.io/' // https://*****/.github.io/[COMMIT ID.txt]
   },
   constructors: {
     EMOJI_MUSIC: '🎵',

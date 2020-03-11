@@ -8,9 +8,9 @@ class Event {
   }
 
   /**
-     * Run Event
-     * @param message {Object} - Message
-     */
+   * Run Event
+   * @param message {Object} - Message
+   */
   async run (message) {
     this.handleCommand(message)
   }
@@ -19,6 +19,7 @@ class Event {
     if (message.author.bot) return
     if (message.channel.type === 'dm') return message.channel.send(`${this.client._options.constructors.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${this.client._options.constructors.EMOJI_NO}  You can\'t use commands on the DM.`)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
+    if (!message.channel.permissionsFor(message.guild.me).has('SEND_MESSAGES')) return
     // Test
     this.client.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     // End of Test
@@ -33,7 +34,11 @@ class Event {
       if (userData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
       const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
       const guildData = await this.client.database.getGuild(message.guild.id)
-      const userPermissions = this.client.utils.permissionChecker.getUserPerm(message.member, { userData, memberData, guildData })
+      const userPermissions = this.client.utils.permissionChecker.getUserPerm(message.member, {
+        userData,
+        memberData,
+        guildData
+      })
       const compressed = Object.assign({
         userData: userData,
         memberData: memberData,
@@ -62,34 +67,50 @@ class Event {
             if (this.client.audio.utils.getVoiceStatus(message.member).listen === false) return message.channel.send(picker.get(locale, 'AUDIO_LISTEN_PLEASE'))
             if ((message.guild.me.voice.channelID && message.guild.me.voice.channelID !== message.member.voice.channelID)) return message.channel.send(picker.get(locale, 'AUDIO_SAME_VOICE', { VOICECHANNEL: message.guild.me.voice.channelID }))
             if ((message.guild.me.voice.channelID && message.guild.me.voice.channelID !== message.member.voice.channelID) && !this.client.chkRightChannel(message.member.voice.channel, vch)) return message.channel.send(picker.get(locale, 'AUDIO_NOT_DEFAULT_CH', { VOICECHANNEL: vch }))
+            if (message.member.voice.channelID && !message.member.voice.channel.joinable && !message.member.voice.channel.speakable) return message.channel.send(picker.get(locale, 'AUDIO_NOT_JOINABLE_OR_SPEAKABLE'))
           }
           for (const userPerm of userPermissions) {
             if (Command.command.permissions.includes(userPerm)) {
               ablePermissions++
               this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${Command.command.name} at ${new Date().getTime()}`)
-              return Command.run(compressed).catch((e) => {
+              try {
+                await Command.run(compressed)
+              } catch (e) {
+                if (e instanceof this.client.utils.errors.PermError) return message.reply(`권한 오류: ${e.perms.join(', ')}`)
                 this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
-                message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))
-              })
+                await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))
+              }
             }
           }
           if (ablePermissions === 0) {
-            message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: Command.command.permissions.join(', ') }))
+            await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: Command.command.permissions.join(', ') }))
           }
         } else {
           if (this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['MANAGE_MESSAGES'])) {
-            message.delete()
+            await message.delete()
           }
-          message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', { SERVER: message.guild.name, CHANNEL: guildData.tch })).catch((e) => {
-            this.client.logger.debug(`${this.defaultPrefix.handleCommand} Author Send Fail.. ${message.author.tag}(${message.author.id})`)
-          })
+          try {
+            await message.author.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', {
+              SERVER: message.guild.name,
+              CHANNEL: guildData.tch
+            }))
+          } catch {
+            await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', {
+              SERVER: message.guild.name,
+              CHANNEL: guildData.tch
+            })).delete(3000)
+          }
         }
       }
     }
   }
 }
-module.exports = Event
 
-module.exports.info = {
+module
+  .exports = Event
+
+module
+  .exports
+  .info = {
   event: 'message'
 }

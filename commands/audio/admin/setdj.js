@@ -8,12 +8,13 @@ class Command {
       require_nodes: false,
       require_voice: false,
       hide: false,
-      permissions: ['Administrator']
+      permissions: ['Administrator'],
+      botPerm: ['ADD_REACTIONS'] // https://discordapp.com/developers/docs/topics/permissions
     }
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    */
   async run (compressed) {
     const picker = this.client.utils.localePicker

@@ -1,5 +1,4 @@
 /**
- *
  * @param {Array} arr - Array of chunk
  * @param {Number} chunkSize - Size of chunk
  */

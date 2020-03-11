@@ -1,9 +1,9 @@
-const Discord = require('discord.js')
 const arrayUtil = require('../array')
-const findElementRequiredOptions = ['filter', 'collection', 'message', 'formatter', 'locale', 'picker', 'title']
 const { massReact } = require('../message')
+const settings = require('../../getSettings')()
+const Discord = require('discord.js')
+const findElementRequiredOptions = ['filter', 'collection', 'message', 'formatter', 'locale', 'picker', 'title']
 const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
-const settings = require('../../checker/getSettings')()
 
 module.exports.formatters = require('./findFormats')
 
@@ -103,13 +103,13 @@ module.exports.getEmbed = (pages, currentPage, picker, locale, title, member) =>
  */
 module.exports.getStatus = (presence) => {
   if (presence.activities[0]) return presence.activities[0].type === 'STREAMING' ? 'stream' : presence.status
-  return presence.status
+  else return presence.status
 }
 
 /**
-* @param {Map} users - Bot's Users (Collection)
-* @param {String} mention - Discord Mention String
-*/
+ * @param {Map} users - Bot's Users (Collection)
+ * @param {String} mention - Discord Mention String
+ */
 module.exports.getUserFromMention = (users, mention) => {
   if (!mention) return false
 
@@ -128,6 +128,7 @@ module.exports.getUserFromMention = (users, mention) => {
 /**
  * @param {Object} object - Object with key: value
  * @param {String} value - value of match
+ * @param {*} replace - if value is null, undefined replace
  * @returns {*} - if null, returns args(replace)
  */
 module.exports.matchObj = (object, value, replace = null) => {

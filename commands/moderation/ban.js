@@ -14,7 +14,7 @@ class Command {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    */
   async run (compressed) {
     const picker = this.client.utils.localePicker
@@ -32,7 +32,7 @@ class Command {
       locale: locale,
       picker: picker
     }
-    const res = this.client.utils.find.findElement(options)
+    const res = await this.client.utils.find.findElement(options)
     if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
     const member = message.guild.members.cache.get(res.user ? res.user.id : null)
     if (member.user.bot === true) {

@@ -7,7 +7,7 @@ class Event {
    * Run Event
    */
   async run (oldMessage, newMessage) {
-    this.client.events.get('message')(newMessage) // Handles Message Edit
+    if (newMessage.editedAt) this.client.events.get('message')(newMessage) // Handles Message Edit
   }
 }
 

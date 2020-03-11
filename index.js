@@ -1,9 +1,6 @@
 const Discord = require('discord.js')
 const LocalePicker = require('./locales/localePicker')
-const { PermissionChecker, DataBase, Audio, Logger, Image } = require('./modules')
-const settings = require('./modules/checker/getSettings')()
-const isTesting = require('./modules/checker/isTesting')()
-const ServerLoggingManager = require('./modules/logging/serverLoggerManager')
+const { PermissionChecker, DataBase, Audio, Logger, Image, ServerLogger, getSettings } = require('./modules')
 const redis = require('redis')
 const fs = require('fs')
 const path = require('path')
@@ -21,7 +18,9 @@ class Client extends Discord.Client {
       reload: `${this.classPrefix}:reload]`
     }
 
-    this._isTesting = isTesting
+    this.announceActivity = null
+
+    this._isTesting = getSettings.isTesting()
     this._options = options
     this.logger = new Logger(this)
     this.database = new DataBase(this)
@@ -44,20 +43,20 @@ class Client extends Discord.Client {
 
     this.redisClient = redis.createClient(this._options.db.redis)
 
-    this.loggerManager = new ServerLoggingManager(this)
+    this.loggerManager = new ServerLogger.ServerLoggerManager(this)
   }
 
-  init () {
+  async init () {
     if (this.initialized) {
       this.logger.error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
-      return new Error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
+      throw new Error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
     }
-    if (!isTesting) { this.logger.info(`${this.defaultPrefix.init} Initializing Bot..`) }
-    this.utils.localePicker.init()
-    this.loggerManager.init()
+    if (!this._isTesting) { this.logger.info(`${this.defaultPrefix.init} Initializing Bot..`) }
+    await this.utils.localePicker.init()
+    await this.loggerManager.init()
     this.registerEvents()
     this.LoadCommands()
-    if (!isTesting) {
+    if (!this._isTesting) {
       this.database.init()
       this.login(this._options.bot.token)
     }
@@ -70,12 +69,8 @@ class Client extends Discord.Client {
   chkRightChannel (channel, id) {
     if (id === channel.id) return true
     if (id === '0') return true
-    if (this.channels.cache.get(id)) {
-      if (this.channels.cache.get(id).id === channel.id) return true
-      else return false
-    } else {
-      return true
-    }
+    if (this.channels.cache.get(id)) return this.channels.cache.get(id).id === channel.id
+    else return true
   }
 
   /**
@@ -100,7 +95,7 @@ class Client extends Discord.Client {
           }
           this.commands.set(command.command.name, command)
         } catch (e) {
-          this.logger.error(`${load} Command Load Error Ignore it...`)
+          this.logger.error(`${load} Command Load Error Ignore it... ${cmd}`)
           this.logger.error(`${load} ${e.stack || e.message}`)
         }
         delete require.cache[require.resolve(cmd)]
@@ -118,7 +113,7 @@ class Client extends Discord.Client {
       }
     }
     this.logger.info(`${this.defaultPrefix.LoadCommands} Successfully ${reLoadOrLoad}ed Commands!`)
-    if (isTesting) process.exit(0)
+    if (this._isTesting) process.exit(0)
     return this.commands
   }
 
@@ -148,15 +143,15 @@ class Client extends Discord.Client {
   async setActivity () {
     if (this.user) {
       if (this.announceActivity) {
-        this.user.setActivity(this.announceActivity.act || 'Errored', this.announceActivity.options || {})
-        this.user.setStatus(this.announceActivity.status || 'online')
+        await this.user.setActivity(this.announceActivity.act || 'Errored', this.announceActivity.options || {})
+        await this.user.setStatus(this.announceActivity.status || 'online')
         this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${this.announceActivity.act || 'Errored'}`)
       } else {
         this.activityNum++
         if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
         const activity = await this.getActivityMessage(this._options.bot.games[this.activityNum])
         this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${activity}`)
-        this.user.setActivity(activity, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
+        await this.user.setActivity(activity, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
       }
       setTimeout(() => this.setActivity(), this._options.bot.gamesInterval)
     }
@@ -179,15 +174,15 @@ class Client extends Discord.Client {
         return value
       case 'channels':
         value = await this.shard.fetchClientValues('channels.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
-        if (!value) value = this.channels.size
+        if (!value) value = this.channels.cache.size
         return value
       case 'guilds':
         value = await this.shard.fetchClientValues('guilds.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
-        if (!value) value = this.guilds.size
+        if (!value) value = this.guilds.cache.size
         return value
       case 'users':
         value = await this.shard.fetchClientValues('users.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
-        if (!value) value = this.users.size
+        if (!value) value = this.users.cache.size
         return value
     }
   }
@@ -204,19 +199,17 @@ class Client extends Discord.Client {
 
   reload () {
     const removeCacheFolderRecursive = (dirPath) => {
-      const arr = []
       if (fs.existsSync(dirPath)) {
         fs.readdirSync(dirPath).forEach((file) => {
           const curPath = path.join(dirPath, file)
           if (fs.lstatSync(curPath).isDirectory()) { // recurse
             removeCacheFolderRecursive(curPath)
-          } else { // delete file
+          } else { // Delete Cache
             this.logger.warn(`${this.defaultPrefix.reload} Deleted Cache ${process.cwd()}${curPath}`)
             delete require.cache[require.resolve(path.join(process.cwd(), curPath))]
           }
         })
       }
-      return arr
     }
     const arr = ['./locales', './commands', './events', './modules', './resources']
     for (const item of arr) {
@@ -252,8 +245,13 @@ class Client extends Discord.Client {
   }
 }
 
-const client = new Client(settings)
-client.init()
+const client = new Client(getSettings())
+client.init().then(() => {
+  client.logger.info('[BOT] Init Success')
+}).catch((e) => {
+  console.error(e.stack)
+  process.exit(1)
+})
 
 process.on('uncaughtException', (err) => {
   client.logger.error(err)

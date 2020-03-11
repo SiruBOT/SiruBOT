@@ -13,7 +13,7 @@ class Command {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    */
   async run (compressed) {
     this.client.commands.get('play').run(compressed, true)

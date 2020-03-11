@@ -8,6 +8,7 @@ const methods = {
   제거: '제거',
   확인: '확인'
 }
+
 class Command {
   constructor (client) {
     this.client = client
@@ -23,7 +24,7 @@ class Command {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    */
   async run (compressed) {
     const { message, args, guildData, command } = compressed

@@ -17,8 +17,8 @@ class Command {
   }
 
   /**
-     * @param {Object} compressed - Compressed Object (In CBOT)
-     */
+   * @param {Object} compressed - Compressed Object
+   */
   async run (compressed) {
     const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker
@@ -33,6 +33,7 @@ class Command {
       message.channel.stopTyping(true)
       message.channel.send(picker.get(locale, 'COMMANDS_UTILS_LYRICS_NOTFOUND'))
     }
+
     async function get (provider, title) {
       const lyricsData = await lyrics.get(provider, title)
       lyricsData.result = lyricsData.result === null ? null : lyricsData.result.replace(/\n\n\n/g, '\n\n')

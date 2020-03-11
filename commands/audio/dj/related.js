@@ -14,7 +14,7 @@ class Command {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    */
   async run (compressed) {
     const { message, args } = compressed

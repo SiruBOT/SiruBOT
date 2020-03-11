@@ -1,8 +1,6 @@
-const path = require('path')
 const { ShardingManager } = require('discord.js')
-const settings = require(path.join(process.cwd(), './modules/checker/getSettings'))()
-const Logger = require('./modules/logger')
-const logger = new Logger()
+const { Logger, getSettings } = require('./modules')
+const logger = new Logger(), settings = getSettings()
 const manager = new ShardingManager('./index.js', { token: settings.bot.token, totalShards: settings.bot.shards })
 
 manager.on('launch', shard => {

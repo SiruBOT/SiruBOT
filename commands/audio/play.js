@@ -13,7 +13,7 @@ class Command {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    * @param {Boolean} isSoundCloud - is Search Platform SoundCloud?
    */
   async run (compressed, isSoundCloud) {
@@ -41,7 +41,7 @@ class Command {
     })
     loadingMessage.delete()
 
-    if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return false
+    if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return
 
     if (searchResult.loadType === 'PLAYLIST_LOADED') {
       const playingList = searchResult.playlistInfo.selectedTrack !== -1
@@ -53,35 +53,20 @@ class Command {
         this.addQueue(message, searchResult.tracks[0], picker, locale)
         searchResult.tracks.shift()
         if (searchResult.tracks.length === 0) return
-        message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length })).then((m) => {
-          const emojiList = ['📥', '🚫']
-          this.client.utils.message.massReact(m, emojiList)
-
-          const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
-          const collector = m.createReactionCollector(filter, { time: 15000 })
-          const functionList = [() => {
-            collector.stop()
-            this.addQueue(message, searchResult.tracks, picker, locale)
-            message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST', { NUM: searchResult.tracks.length }))
-          }, () => {
-            collector.stop()
-            return message.channel.send(picker.get(locale, 'GENERAL_USER_STOP')).then(m => m.delete(5000))
-          }]
-
-          collector.on('collect', r => {
-            const index = emojiList.findIndex((el) => el === r.emoji.name)
-            functionList[index]()
-          })
-
-          collector.on('end', (...args) => {
-            if (m.deletable && m.deleted === false) m.delete()
-            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete(5000))
-          })
-        })
-      } else {
-        this.addQueue(message, searchResult.tracks, picker, locale)
-        message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST', { NUM: searchResult.tracks.length }))
+        const plistMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length }))
+        const emojiList = ['📥', '🚫']
+        this.client.utils.message.massReact(plistMessage, emojiList)
+        const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
+        const confirmResult = await plistMessage.awaitReactions(filter, {
+          time: 15000,
+          max: 1,
+          errors: ['time']
+        }).then(coll => coll.first().emoji.name === emojiList[0]).catch(() => true)
+        if (plistMessage.deletable && !plistMessage.deleted) plistMessage.delete()
+        if (!confirmResult) return
       }
+      this.addQueue(message, searchResult.tracks, picker, locale)
+      message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST', { NUM: searchResult.tracks.length }))
     }
 
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
@@ -97,7 +82,10 @@ class Command {
       const { nowplaying, queue } = await this.client.database.getGuild(message.guild.id)
       let localeName
       const { info } = trackInfo
-      const placeHolder = Object.assign({ TRACK: this.client.audio.utils.formatTrack(info), POSITION: queue.length + 1 })
+      const placeHolder = Object.assign({
+        TRACK: this.client.audio.utils.formatTrack(info),
+        POSITION: queue.length + 1
+      })
       if (nowplaying.track && this.client.audio.players.get(message.guild.id).track) localeName = 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE'
       else localeName = 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY'
       message.channel.send(picker.get(locale, localeName, placeHolder))

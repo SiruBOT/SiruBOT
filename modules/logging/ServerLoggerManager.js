@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const path = require('path')
+
 class ServerLogger {
   constructor (client) {
     this.client = client
@@ -9,7 +10,7 @@ class ServerLogger {
   /**
    * @description - Emits Event, args to server (ID)
    * @param {String} name - event name
-   * @param {Discord.Guild} guildId - guild object
+   * @param {Discord.Guild} guild - guild object
    * @param {Array} args - event's args
    */
   async send (name, guild, ...args) {

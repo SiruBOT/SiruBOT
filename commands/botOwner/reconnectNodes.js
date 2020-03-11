@@ -13,8 +13,8 @@ class Command {
   }
 
   /**
-     * @param {Object} compressed - Compressed Object (In CBOT)
-     */
+   * @param {Object} compressed - Compressed Object
+   */
   async run (compressed) {
     const { message } = compressed
     for (const node of this.client._options.audio.nodes) {

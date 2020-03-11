@@ -13,7 +13,7 @@ class Command {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object (In CBOT)
+   * @param {Object} compressed - Compressed Object
    * @param {Boolean} silent - if Send Message
    */
   async run (compressed, silent = false) {

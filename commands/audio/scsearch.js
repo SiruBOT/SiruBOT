@@ -13,8 +13,8 @@ class Command {
   }
 
   /**
-     * @param {Object} compressed - Compressed Object (In CBOT)
-     */
+   * @param {Object} compressed - Compressed Object
+   */
   async run (compressed) {
     return this.client.commands.get('search').run(compressed, true)
   }
