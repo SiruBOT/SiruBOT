@@ -1,6 +1,6 @@
 const { ShardingManager } = require('discord.js')
 const { Logger, getSettings } = require('./modules')
-const logger = new Logger(), settings = getSettings()
+const logger = new Logger(); const settings = getSettings()
 const manager = new ShardingManager('./index.js', { token: settings.bot.token, totalShards: settings.bot.shards })
 
 manager.on('launch', shard => {

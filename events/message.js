@@ -111,5 +111,5 @@ module
 module
   .exports
   .info = {
-  event: 'message'
-}
+    event: 'message'
+  }
