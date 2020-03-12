@@ -64,7 +64,7 @@ class Audio extends Shoukaku.Shoukaku {
    * @param {String} guildID - guildId for set
    * @param {Number} value - Karaoke Value
    */
-  async setKaraoke (guildID, level, monoLevel = 1, filterBand = 220, filterWidth = 100) {
+  async setKaraoke (guildID, level = 1, monoLevel = 1, filterBand = 220, filterWidth = 100) {
     if (!guildID) return new Error('guildId not provided')
     if (!this.players.get(guildID)) return new Error('player not found')
     const payload = {}
