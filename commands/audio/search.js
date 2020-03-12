@@ -36,16 +36,15 @@ class Command {
     }
 
     if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
-    if (validURL(searchStr)) {
+    if (this.client.utils.find.validURL(searchStr)) {
       return this.client.commands.get('play').run(compressed)
-    }
-    if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
+    } else searchStr = searchPlatForm + searchStr
 
     const searchResult = await Audio.getTrack(searchStr)
     if (this.client.commands.get('play').chkSearchResult(searchResult, picker, locale, message) !== true) return
     const embed = new Discord.MessageEmbed()
     let string = ''
-    const maxres = 5
+    const maxres = 10
     const slicedNumberArray = Numbers.slice(0, searchResult.tracks.slice(0, maxres).length)
     slicedNumberArray.push(this.client._options.constructors.EMOJI_NO)
     const slicedTracks = searchResult.tracks.slice(0, maxres)
@@ -53,31 +52,21 @@ class Command {
       string += `${Numbers[index]}  [${this.client.audio.utils.formatTrack(searchResult.tracks[index].info)}](${searchResult.tracks[index].info.uri})\n`
     }
     embed.setDescription(string).setColor(this.client.utils.find.getColor(message.guild.me))
-    message.channel.send(message.author, embed).then(m => {
-      this.client.utils.message.massReact(m, slicedNumberArray)
-      const filter = (reaction, user) => slicedNumberArray.includes(reaction.emoji.name) && user.id === message.author.id
-      m.awaitReactions(filter, { time: 15000, errors: ['time'], max: 1 })
-        .then(collected => {
-          if (m.deletable) m.delete()
-          if (collected.first().emoji.name === this.client._options.constructors.EMOJI_NO) return message.channel.send(picker.get(locale, 'GENERAL_USER_STOP'))
-          this.client.commands.get('play').addQueue(message, slicedTracks[slicedNumberArray.findIndex((el) => el === collected.first().emoji.name)], picker, locale, true)
-        })
-        .catch(() => {
-          if (m.deletable) m.delete()
-          message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT'))
-        })
-    })
+    const m = await message.channel.send(message.author, embed)
+    await this.client.utils.message.massReact(m, slicedNumberArray)
+    const filter = (reaction, user) => slicedNumberArray.includes(reaction.emoji.name) && user.id === message.author.id
+    const collected = await m.awaitReactions(filter, { time: 15000, errors: ['time'], max: 1 }).then(coll => coll).catch(() => null)
+    if (m.deletable) m.delete()
+    if (!collected) {
+      await message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).delete(5000)
+      return
+    }
+    if (collected.first().emoji.name === this.client._options.constructors.EMOJI_NO) {
+      await message.channel.send(picker.get(locale, 'GENERAL_USER_STOP')).delete(5000)
+      return
+    }
+    this.client.commands.get('play').addQueue(message, slicedTracks[slicedNumberArray.findIndex((el) => el === collected.first().emoji.name)], picker, locale, true)
   }
-}
-
-function validURL (str) {
-  const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-    '(\\#[-a-z\\d_]*)?$', 'i') // fragment locator
-  return !!pattern.test(str)
 }
 
 module.exports = Command

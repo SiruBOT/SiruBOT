@@ -1,19 +1,12 @@
 {
-  "name": "chinobot-rewrite",
-  "version": "1.7.8",
-  "description": "[![Build Status](https://travis-ci.org/cotwo0139/CHINOBOT_BETA.svg?branch=master)](https://travis-ci.org/cotwo0139/CHINOBOT_BETA)",
+  "name": "sirubot-bot",
+  "version": "1.8.0",
+  "description": "MusicBot With Andesite node, Moderation, some funny stuff",
   "main": "index.js",
-  "scripts": {
-    "test": "node index.js test",
-    "ci": "node index.js test"
-  },
-  "author": "Sangoon_Is_Noob",
-  "license": "GPL-3.0",
   "dependencies": {
     "@thesharks/jagtag-js": "^1.0.4",
     "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
-    "cyclic": "^0.2.1",
     "date-utils": "^1.2.21",
     "discord.js": "github:discordjs/discord.js",
     "git-repo-info": "^2.1.1",
@@ -23,28 +16,36 @@
     "mongoose": "^5.9.4",
     "node-cache": "^5.1.0",
     "node-fetch": "^2.6.0",
-    "node-opus": "^0.3.3",
     "node-uuid": "^1.4.8",
-    "opusscript": "0.0.7",
-    "qrcode-reader": "^1.0.4",
     "random-http-useragent": "^1.1.22",
     "redis": "^3.0.2",
-    "req-fast": "^0.2.19",
-    "saslprep": "^1.0.3",
     "shoukaku": "github:Deivu/Shoukaku",
     "slyrics": "^0.1.42",
     "string-placeholder": "^1.0.2",
-    "table": "^5.4.6",
+    "utf-8-validate": "^5.0.2",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.2"
   },
   "devDependencies": {},
+  "scripts": {
+    "test": "node index.js test",
+    "ci": "node index.js test"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cotwo0139/CHINOBOT_BETA.git"
+    "url": "git+https://github.com/cotwo0139/SiruBOT_BOT.git"
   },
+  "keywords": [
+    "discordbot",
+    "discord",
+    "chatbot",
+    "musicbot",
+    "moderation"
+  ],
+  "author": "Sangoon_Is_Noob#1683",
+  "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/cotwo0139/CHINOBOT_BETA/issues"
+    "url": "https://github.com/cotwo0139/SiruBOT_BOT/issues"
   },
-  "homepage": "https://github.com/cotwo0139/CHINOBOT_BETA#readme"
+  "homepage": "https://github.com/cotwo0139/SiruBOT_BOT#readme"
 }

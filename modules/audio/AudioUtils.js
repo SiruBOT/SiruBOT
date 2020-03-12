@@ -70,8 +70,9 @@ class AudioUtils {
         .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
         .setURL(guildData.nowplaying.info.uri)
         .setDescription(this.getNowplayingText(guildID, guildData))
+        .setFooter(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_FOOTER', { REMAIN: guildData.queue.length, SOURCE: Discord.Util.escapeMarkdown(guildData.nowplaying.info.author) }))
         .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
-        .setThumbnail(this.validateYouTubeUrl(guildData.nowplaying.info.uri) ? `https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg` : 'https://1001freedownloads.s3.amazonaws.com/icon/thumb/340/music-512.png')
+      if (this.validateYouTubeUrl(guildData.nowplaying.info.uri)) messageEmbed.setThumbnail(`https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg`)
     }
     return messageEmbed
   }

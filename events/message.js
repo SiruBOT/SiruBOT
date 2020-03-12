@@ -74,8 +74,9 @@ class Event {
               this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${Command.command.name} at ${new Date().getTime()}`)
               try {
                 await Command.run(compressed)
+                break
               } catch (e) {
-                if (e instanceof this.client.utils.errors.PermError) return message.reply(`권한 오류: ${e.perms.join(', ')}`)
+                if (e instanceof this.client.utils.errors.PermError) return message.channel.send(picker.get(locale, 'ERROR_PERMISSION', { PERMS: e.perms.join(', ') }))
                 this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
                 await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))
               }

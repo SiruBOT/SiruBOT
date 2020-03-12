@@ -61,6 +61,25 @@ class Audio extends Shoukaku.Shoukaku {
   }
 
   /**
+   * @param {String} guildID - guildId for set
+   * @param {Number} value - Karaoke Value
+   */
+  async setKaraoke (guildID, level, monoLevel = 1, filterBand = 220, filterWidth = 100) {
+    if (!guildID) return new Error('guildId not provided')
+    if (!this.players.get(guildID)) return new Error('player not found')
+    const payload = {}
+    Object.defineProperty(payload, 'op', { value: 'filters', enumerable: true })
+    Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })
+    const karaokeObject = {}
+    Object.defineProperty(karaokeObject, 'level', { value: level, enumerable: true })
+    Object.defineProperty(karaokeObject, 'monoLevel', { value: monoLevel, enumerable: true })
+    Object.defineProperty(karaokeObject, 'filterBand', { value: filterBand, enumerable: true })
+    Object.defineProperty(karaokeObject, 'filterWidth', { value: filterWidth, enumerable: true })
+    Object.defineProperty(payload, 'karaoke', { value: karaokeObject, enumerable: true })
+    await this.players.get(guildID).voiceConnection.node.send(payload)
+  }
+
+  /**
    * @param {String} voiceChannelID - voiceChannelId join for
    * @param {String} guildID - guildID of voiceChannel
    */

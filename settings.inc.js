@@ -11,8 +11,8 @@ module.exports = {
   },
   audio: {
     nodes: [
-      { host: '192.168.0.11', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true },
-      { host: '192.168.0.22', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true }
+      { host: '192.168.0.11', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true, andesite: false }, // If andesite node, true (Filters, karaoke, timescale(etc..))
+      { host: '192.168.0.22', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true, andesite: false } // If andesite node, true
     ],
     shards: shardCount
   },

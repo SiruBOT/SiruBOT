@@ -33,7 +33,7 @@ class Command {
     }
 
     if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
-    if (!validURL(searchStr)) searchStr = searchPlatForm + searchStr
+    if (!this.client.utils.find.validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
     const loadingMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_LOAD'))
     const searchResult = await Audio.getTrack(searchStr).catch((e) => {
@@ -57,11 +57,7 @@ class Command {
         const emojiList = ['📥', '🚫']
         this.client.utils.message.massReact(plistMessage, emojiList)
         const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
-        const confirmResult = await plistMessage.awaitReactions(filter, {
-          time: 15000,
-          max: 1,
-          errors: ['time']
-        }).then(coll => coll.first().emoji.name === emojiList[0]).catch(() => true)
+        const confirmResult = await plistMessage.awaitReactions(filter, { time: 15000, max: 1, errors: ['time'] }).then(coll => coll.first().emoji.name === emojiList[0]).catch(() => true)
         if (plistMessage.deletable && !plistMessage.deleted) plistMessage.delete()
         if (!confirmResult) return
       }
@@ -98,16 +94,6 @@ class Command {
     if (searchResult.loadType === 'NO_MATCHES' || !searchResult.tracks || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
     return true
   }
-}
-
-function validURL (str) {
-  const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-    '(\\#[-a-z\\d_]*)?$', 'i') // fragment locator
-  return !!pattern.test(str)
 }
 
 module.exports = Command
