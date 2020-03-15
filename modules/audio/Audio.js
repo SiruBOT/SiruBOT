@@ -1,13 +1,15 @@
 const Shoukaku = require('shoukaku')
 const NodeCache = require('node-cache')
-const Queue = require('./Queue')
-const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
-const AudioUtils = require('./AudioUtils')
-const QueueEvents = require('./QueueEvents')
 const { Collection } = require('discord.js')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const randomUA = require('random-http-useragent')
+
+const Filters = require('./AudioFilters')
+const Queue = require('./Queue')
+const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
+const AudioUtils = require('./AudioUtils')
+const QueueEvents = require('./QueueEvents')
 
 class Audio extends Shoukaku.Shoukaku {
   constructor (...args) {
@@ -31,7 +33,8 @@ class Audio extends Shoukaku.Shoukaku {
       getRelated: `${this.classPrefix}:getRelated]`,
       fetchRelated: `${this.classPrefix}:fetchRelated]`,
       getUA: `${this.classPrefix}:getUA]`,
-      parseYoutubeHTML: `${this.classPrefix}:parseYoutubeHTML]`
+      parseYoutubeHTML: `${this.classPrefix}:parseYoutubeHTML]`,
+      moveNode: `${this.classPrefix}:moveNode]`
     }
 
     this.queue = new Queue(this)
@@ -39,6 +42,8 @@ class Audio extends Shoukaku.Shoukaku {
     this.queue.on('queueEvent', (data) => {
       queueEvents.HandleEvents(data)
     })
+
+    this.filters = new Filters(this)
     this.textChannels = new Collection()
     this.textMessages = new Collection()
     this.nowplayingMessages = new Collection()
@@ -55,28 +60,7 @@ class Audio extends Shoukaku.Shoukaku {
     this.on('error', (name, error) => this.client.logger.error(`${this.lavalinkPrefix} Lavalink Node: ${name} emitted an error. ${error.stack}`))
     this.on('close', (name, code, reason) => this.client.logger.warn(`${this.lavalinkPrefix} Lavalink Node: ${name} closed with code ${code}. Reason: ${reason || 'No reason'}`))
     this.on('disconnected', (name, reason) => this.client.logger.warn(`${this.lavalinkPrefix} Lavalink Node: ${name} disconnected. Reason: ${reason || 'No reason'}`))
-    this.on('debug', (name, data) => {
-      this.client.logger.debug(`${this.lavalinkPrefix} Lavalink Node: ${name} - Data: ${JSON.stringify(data)}`)
-    })
-  }
-
-  /**
-   * @param {String} guildID - guildId for set
-   * @param {Number} value - Karaoke Value
-   */
-  async setKaraoke (guildID, level = 1, monoLevel = 1, filterBand = 220, filterWidth = 100) {
-    if (!guildID) return new Error('guildId not provided')
-    if (!this.players.get(guildID)) return new Error('player not found')
-    const payload = {}
-    Object.defineProperty(payload, 'op', { value: 'filters', enumerable: true })
-    Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })
-    const karaokeObject = {}
-    Object.defineProperty(karaokeObject, 'level', { value: level, enumerable: true })
-    Object.defineProperty(karaokeObject, 'monoLevel', { value: monoLevel, enumerable: true })
-    Object.defineProperty(karaokeObject, 'filterBand', { value: filterBand, enumerable: true })
-    Object.defineProperty(karaokeObject, 'filterWidth', { value: filterWidth, enumerable: true })
-    Object.defineProperty(payload, 'karaoke', { value: karaokeObject, enumerable: true })
-    await this.players.get(guildID).voiceConnection.node.send(payload)
+    this.on('debug', (name, data) => this.client.logger.debug(`${this.lavalinkPrefix} Lavalink Node: ${name} - Data: ${JSON.stringify(data)}`))
   }
 
   /**
@@ -110,6 +94,7 @@ class Audio extends Shoukaku.Shoukaku {
     if (!guildID) return new Error('no guildID Provied')
     const { volume } = await this.client.database.getGuild(guildID)
     this.client.logger.debug(`${this.defaultPrefix.setPlayerDefaultSetting} Set player volume for guild ${guildID} (${volume})`)
+    this.players.get(guildID).filters = Object.assign({})
     return this.players.get(guildID).setVolume(volume)
   }
 

@@ -39,7 +39,7 @@ class Client extends Discord.Client {
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
-    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000 })
+    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, moveOnDisconnect: 10, reconnectTries: 10 })
 
     this.redisClient = redis.createClient(this._options.db.redis)
 
@@ -215,6 +215,7 @@ class Client extends Discord.Client {
     for (const item of arr) {
       removeCacheFolderRecursive(item)
     }
+    delete require.cache[require.resolve(path.join(process.cwd(), './settings.js'))]
     this._options = require('./settings.js')
     this.utils = require('./modules/utils')
     const NewLocalePicker = require('./locales/localePicker')

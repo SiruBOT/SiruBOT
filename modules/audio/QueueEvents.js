@@ -26,7 +26,7 @@ class QueueEvents {
   async trackStartedEvent (data) {
     const guildData = await this.client.database.getGuild(data.guildID)
     const { trackData } = data
-    if (trackData.info.length <= 150000 && trackData.repeated) return
+    if (trackData.info.length <= 15000 && trackData.repeated) return
     this.client.audio.utils.sendMessage(data.guildID, this.client.utils.localePicker.get(guildData.locale, trackData.related ? 'AUDIO_NOWPLAYING_RELATED' : 'AUDIO_NOWPLAYING', { TRACK: this.client.audio.utils.formatTrack(trackData.info) }), trackData.related)
   }
 

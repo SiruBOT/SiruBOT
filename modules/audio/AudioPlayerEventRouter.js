@@ -50,14 +50,6 @@ class AudioPlayerEventRouter {
 
   RouteTrackExcepetionErrors (data) {
     switch (data.error) {
-      case 'The track was unexpectedly terminated.':
-        this.client.logger.error(`${this.defaultPrefix.registerEvents} Node Disconnect from ${data.guildId} , try to move other node...`)
-        if (this.client.audio.getUsableNodes()) {
-          const moveTo = this.client.audio.getNode()
-          this.client.audio.players.get(data.guildId).track = data.track
-          this.client.logger.warn(`${this.defaultPrefix.registerEvents} Other node is ready, move this player to ${moveTo.name}`)
-          this.client.audio.players.get(data.guildId).moveToNode(moveTo.name)
-        }
     }
   }
 

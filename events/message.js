@@ -19,7 +19,7 @@ class Event {
     if (message.author.bot) return
     if (message.channel.type === 'dm') return message.channel.send(`${this.client._options.constructors.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${this.client._options.constructors.EMOJI_NO}  You can\'t use commands on the DM.`)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
-    if (!message.channel.permissionsFor(message.guild.me).has('SEND_MESSAGES')) return
+    if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSSAGES'])) return
     // Test
     this.client.redisClient.publish('asdf', JSON.stringify({ message: message.content }))
     // End of Test
