@@ -17,7 +17,7 @@
     "node-cache": "^5.1.0",
     "node-fetch": "^2.6.0",
     "node-uuid": "^1.4.8",
-    "random-http-useragent": "^1.1.22",
+    "random-http-useragent": "^1.1.23",
     "redis": "^3.0.2",
     "shoukaku": "github:Deivu/Shoukaku",
     "slyrics": "^0.1.42",
