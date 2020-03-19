@@ -6,6 +6,7 @@ class Command {
       aliases: ['볼륨', '볼륨설정', 'vol', 'v', '패ㅣ', 'ㅍ', 'qhffba', 'qhffbatjfwjd'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

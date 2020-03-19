@@ -61,6 +61,9 @@ class Event {
             if (guildData.tch === '0') this.client.audio.textChannels.set(message.guild.id, message.channel.id)
             if (!this.client.audio.getNode()) return message.channel.send(picker.get(locale, 'AUDIO_NO_NODES'))
           }
+          if (Command.command.require_playing) {
+            if (!this.client.audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'AUDIO_REQUIRE_PLAYING'))
+          }
           if (Command.command.require_voice) {
             const vch = guildData.vch
             if (!message.member.voice.channel) return message.channel.send(picker.get(locale, 'AUDIO_JOIN_VOICE_FIRST'))
@@ -98,7 +101,7 @@ class Event {
             await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', {
               SERVER: message.guild.name,
               CHANNEL: guildData.tch
-            })).delete(3000)
+            })).then(m => m.delete({ timeout: 3000 }))
           }
         }
       }

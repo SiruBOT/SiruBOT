@@ -39,7 +39,7 @@ class Client extends Discord.Client {
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
-    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, moveOnDisconnect: 10, reconnectTries: 10 })
+    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, moveOnDisconnect: 10, reconnectTries: 10, resumable: true, resumableTimeout: 120 })
 
     this.redisClient = redis.createClient(this._options.db.redis)
 

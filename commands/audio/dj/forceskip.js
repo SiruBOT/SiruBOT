@@ -6,6 +6,7 @@ class Command {
       aliases: ['강제건너뛰기', 'fskip', 'ㄹ나ㅑㅔ'],
       category: 'MUSIC_DJ',
       require_nodes: true,
+      require_playing: true,
       require_voice: true,
       hide: false,
       permissions: ['DJ', 'Administrator']

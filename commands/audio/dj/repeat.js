@@ -6,6 +6,7 @@ class Command {
       aliases: ['반복', 'flvlt', 'qksqhr', 'loop', 'ㅣㅐㅐㅔ', '루프'],
       category: 'MUSIC_DJ',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['DJ', 'Administrator']

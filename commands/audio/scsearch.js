@@ -6,6 +6,7 @@ class Command {
       aliases: ['사클검색', 'ㄴㅊㄴㄷㅁㄱ초', 'tkzmfrjator'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: false,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

@@ -7,6 +7,7 @@ class Command {
       name: 'queue',
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: false,
       require_voice: false,
       hide: false,
       aliases: ['대기열', '벼뎓', '큐', '대기열', 'q', 'zb', 'eorlduf'],

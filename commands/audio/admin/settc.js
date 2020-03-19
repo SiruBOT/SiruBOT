@@ -6,6 +6,7 @@ class Command {
       aliases: ['채널설정', 'ㄴㄷㅅㅅㅊ'],
       category: 'MODERATION',
       require_voice: false,
+      require_playing: false,
       require_nodes: false,
       hide: false,
       permissions: ['Administrator']

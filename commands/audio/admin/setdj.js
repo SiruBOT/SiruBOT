@@ -6,6 +6,7 @@ class Command {
       aliases: ['dj설정', 'ㄴㄷㅅ어'],
       category: 'MODERATION',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

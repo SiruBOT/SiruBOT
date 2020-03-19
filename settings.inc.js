@@ -59,6 +59,7 @@ module.exports = {
     EMOJI_HAMMER: '🔨',
     EMOJI_SANDCLOCK: '⏳',
 
+    EMOJI_KNOBS: '🎛️',
     EMOJI_SPEAKER: '🔊',
     EMOJI_AUDIO_NONE: '⏹️',
     EMOJI_AUDIO_PAUSED: '⏸️',

@@ -12,15 +12,25 @@ class AudioFilters {
   }
 
   /**
-   *
+   * @param {String} guildID - guildId set to
+   * @param {String} filter - filter name
+   * @param {*} value - value
    */
   setPlayerFilter (guildID, filter, value) {
+    console.log(`${guildID}, ${filter}, ${value}`)
     if (!guildID) throw new Error('guildId not provided')
     if (!filter) throw new Error('filter not provided')
     if (!value) throw new Error('value not provided')
     if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
-    this.client.audio.players.get(guildID).filters[filter] = value
-    return this.client.audio.players.get(guildID).filters[filter]
+    this.client.audio.players.get(guildID)[filter] = value
+    return this.client.audio.players.get(guildID)[filter]
+  }
+
+  getFilterValue (guildID, value) {
+    if (!value) return null
+    if (!this.client.audio.players.get(guildID)) return null
+    if (this.client.audio.players.get(guildID)[value]) return this.client.audio.players.get(guildID)[value]
+    return null
   }
 
   /**
@@ -28,18 +38,8 @@ class AudioFilters {
    * @param {Number} percentage - percentage of multiplier
    */
   bassboost (guildID, percentage) {
-    // const levels = {
-    //   wtf: [1, 0.8, 0.6],
-    //   insane: [0.4, 0.26, 0.18],
-    //   strong: [0.2, 0.15, 0.11],
-    //   medium: [0.1, 0.08, 0.04],
-    //   weak: [0.03, 0.01, 0],
-    //   off: [0, 0, 0]
-    // }
     if (!guildID) throw new Error('guildId not provided')
     if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
-    // let i = 0
-    // const bands = levels[level].map(el => this.getBand(i++, el))
     const multiplier = percentage / 50
     const bands = []
     for (const [band, gain] of this.bassGains) {
@@ -47,8 +47,8 @@ class AudioFilters {
       else bands.push(this.getBand(band, gain * multiplier))
     }
     this.client.audio.players.get(guildID).setEqualizer(bands)
-    this.setPlayerFilter(guildID, 'bassboost', bands)
-    return bands
+    this.setPlayerFilter(guildID, 'bboost', { bands, percentage })
+    return { bands, percentage }
   }
 
   /**
@@ -84,7 +84,8 @@ class AudioFilters {
     Object.defineProperty(karaokeObject, 'filterWidth', { value: filterWidth, enumerable: true })
     Object.defineProperty(payload, 'karaoke', { value: karaokeObject, enumerable: true })
     this.setPlayerFilter(guildID, 'karaoke', karaokeObject)
-    return this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
+    this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
+    return karaokeObject
   }
 
   /**
@@ -110,7 +111,8 @@ class AudioFilters {
     else throw new Error('rate must be `value > 0`')
     Object.defineProperty(payload, 'timescale', { value: timeObject, enumerable: true })
     this.setPlayerFilter(guildID, 'timescale', timeObject)
-    return this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
+    this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
+    return timeObject
   }
 }
 

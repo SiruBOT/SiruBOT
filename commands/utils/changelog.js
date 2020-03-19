@@ -9,6 +9,7 @@ class Command {
       aliases: ['변경로그', '초뭏디ㅐㅎ'],
       category: 'GENERAL_INFO',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

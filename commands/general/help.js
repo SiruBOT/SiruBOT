@@ -8,6 +8,7 @@ class Command {
       aliases: ['도움', '명령어', 'ehdna', 'audfuddj', 'cmds', 'cmdlist'],
       category: 'GENERAL_INFO',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

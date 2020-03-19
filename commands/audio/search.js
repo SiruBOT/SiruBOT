@@ -9,6 +9,7 @@ class Command {
       aliases: ['검색', 'ㄴㄷㅁㄱ초', 'rjator'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: false,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']
@@ -44,7 +45,7 @@ class Command {
     if (this.client.commands.get('play').chkSearchResult(searchResult, picker, locale, message) !== true) return
     const embed = new Discord.MessageEmbed()
     let string = ''
-    const maxres = 10
+    const maxres = 5
     const slicedNumberArray = Numbers.slice(0, searchResult.tracks.slice(0, maxres).length)
     slicedNumberArray.push(this.client._options.constructors.EMOJI_NO)
     const slicedTracks = searchResult.tracks.slice(0, maxres)
@@ -58,11 +59,11 @@ class Command {
     const collected = await m.awaitReactions(filter, { time: 15000, errors: ['time'], max: 1 }).then(coll => coll).catch(() => null)
     if (m.deletable) m.delete()
     if (!collected) {
-      await message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).delete(5000)
+      await message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete({ timeout: 5000 }))
       return
     }
     if (collected.first().emoji.name === this.client._options.constructors.EMOJI_NO) {
-      await message.channel.send(picker.get(locale, 'GENERAL_USER_STOP')).delete(5000)
+      await message.channel.send(picker.get(locale, 'GENERAL_USER_STOP')).then(m => m.delete({ timeout: 5000 }))
       return
     }
     this.client.commands.get('play').addQueue(message, slicedTracks[slicedNumberArray.findIndex((el) => el === collected.first().emoji.name)], picker, locale, true)

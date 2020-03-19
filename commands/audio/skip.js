@@ -6,6 +6,7 @@ class Command {
       aliases: ['스킵', '건너뛰기', '나ㅑㅔ'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: true,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

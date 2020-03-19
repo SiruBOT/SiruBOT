@@ -10,6 +10,7 @@ class Command {
       aliases: ['가사', 'lyric', 'rktk'],
       category: 'MUSIC_GENERAL',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

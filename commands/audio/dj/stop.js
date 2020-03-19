@@ -6,6 +6,7 @@ class Command {
       aliases: ['종료', 'ㄴ새ㅔ', 'whdfy'],
       category: 'MUSIC_DJ',
       require_voice: false,
+      require_playing: true,
       require_nodes: true,
       hide: false,
       permissions: ['DJ', 'Administrator']

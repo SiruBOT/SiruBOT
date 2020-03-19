@@ -7,6 +7,7 @@ class Command {
       aliases: ['경고', 'ㅈㅁ구'],
       category: 'MODERATION',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

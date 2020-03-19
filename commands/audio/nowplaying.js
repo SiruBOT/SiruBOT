@@ -6,6 +6,7 @@ class Command {
       aliases: ['현', 'np', 'ㅞ'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

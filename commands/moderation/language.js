@@ -7,6 +7,7 @@ class Command {
       aliases: ['언어', 'ㅣㅐㅊ믿', 'ㅣ뭏', 'locale', 'lang', 'djsdj'],
       category: 'MODERATION',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']
@@ -48,7 +49,7 @@ class Command {
           })
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()
-            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then((m) => m.delete(5000))
+            if (args[1] === 'time') return message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then((m) => m.delete({ timeout: 5000 }))
           })
         })
       })

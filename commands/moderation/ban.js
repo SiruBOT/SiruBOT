@@ -7,6 +7,7 @@ class Command {
       aliases: ['밴', '차단', 'ㅠ무'],
       category: 'MODERATION',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']

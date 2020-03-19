@@ -6,6 +6,7 @@ class Command {
       aliases: ['노드연결', 'reconnectnodes', 'nodereconnect', 'nodeconnect', '채ㅜㅜㄷㅊ수ㅐㅇㄷㄴ'],
       category: 'BOT_OWNER',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['BotOwner']

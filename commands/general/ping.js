@@ -8,6 +8,7 @@ class Command {
       aliases: ['핑', 'ㅔㅑㅜㅎ'],
       category: 'GENERAL_INFO',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Everyone']

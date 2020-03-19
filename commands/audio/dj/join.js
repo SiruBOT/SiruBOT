@@ -6,6 +6,7 @@ class Command {
       aliases: ['접속', 'ㅓㅐㅑㅜ', 'j'],
       category: 'MUSIC_DJ',
       require_nodes: true,
+      require_playing: false,
       require_voice: true,
       hide: false,
       permissions: ['DJ', 'Administrator']

@@ -6,6 +6,7 @@ class Command {
       aliases: ['재생', 'ㅔㅣ묘', 'ㅔ', 'p', 'wotod'],
       category: 'MUSIC_GENERAL',
       require_nodes: true,
+      require_playing: false,
       require_voice: true,
       hide: false,
       permissions: ['Everyone']

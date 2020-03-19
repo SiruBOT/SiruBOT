@@ -17,6 +17,7 @@ class Command {
       aliases: ['블랙', '블랙리스트'],
       category: 'BOT_OWNER',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['BotOwner']

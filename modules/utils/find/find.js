@@ -84,7 +84,7 @@ module.exports.findElement = (options) => {
           })
           collector.on('end', (...args) => {
             if (m.deletable && m.deleted === false) m.delete()
-            if (args[1] === 'time') return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_TIMED_OUT').then((m) => m.delete(5000)))
+            if (args[1] === 'time') return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_TIMED_OUT').then((m) => m.delete({ timeout: 5000 })))
           })
         })
       })
@@ -146,4 +146,16 @@ module.exports.matchObj = (object, value, replace = null) => {
   const result = object[value.toString().toLowerCase()]
   if (result === undefined) return replace
   else return result
+}
+
+module.exports.checkAndQuestion = (value, channel, authorID, awaitMessage, awaitMessageOptions = { max: 1, time: 60000, errors: ['time'] }) => {
+  return new Promise((resolve, reject) => {
+    if (value) return resolve(value)
+    channel.send(awaitMessage).then((message) => {
+      const filter = (m) => m.author.id === authorID
+      message.channel.awaitMessages(filter, awaitMessageOptions)
+        .then(collected => resolve(collected.first()))
+        .catch(reject)
+    }).catch(reject)
+  })
 }

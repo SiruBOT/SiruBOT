@@ -7,6 +7,7 @@ class Command {
       aliases: ['서버설정', '설정', 'ㄴㄷㅅ샤ㅜㅎㄴ', 'ㄴㅍㄴㄷㅅ샤ㅜㅎㄴ', 'svsettings', 'tjfwjd'],
       category: 'MODERATION',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['Administrator']
@@ -32,9 +33,7 @@ class Command {
         AUDIOPLAY: audioMessage ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         RELATED: audioPlayrelated ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         REPEAT_EMOJI: this.client._options.constructors['EMOJI_' + this.client.audio.utils.getRepeatState(repeat)],
-        REPEAT: picker.get(locale, this.client.audio.utils.getRepeatState(guildData.repeat)),
-        SHUFFLE: shuffle ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
-        SHUFFLE_EMOJI: shuffle ? this.client._options.constructors.EMOJI_SHUFFLE : this.client._options.constructors.EMOJI_REPEAT_NONE
+        REPEAT: picker.get(locale, this.client.audio.utils.getRepeatState(guildData.repeat))
       },
       DEFAULT: {
         DJROLE: this.getName(djRole, message.guild.roles.cache, locale, picker),

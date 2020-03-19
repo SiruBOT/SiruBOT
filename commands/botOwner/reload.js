@@ -6,6 +6,7 @@ class Command {
       aliases: ['리로드', 'loadcommands', 'flfhem', 'ㄱ디ㅐㅁㅇ'],
       category: 'BOT_OWNER',
       require_nodes: false,
+      require_playing: false,
       require_voice: false,
       hide: false,
       permissions: ['BotOwner']

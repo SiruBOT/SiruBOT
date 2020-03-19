@@ -94,7 +94,6 @@ class Audio extends Shoukaku.Shoukaku {
     if (!guildID) return new Error('no guildID Provied')
     const { volume } = await this.client.database.getGuild(guildID)
     this.client.logger.debug(`${this.defaultPrefix.setPlayerDefaultSetting} Set player volume for guild ${guildID} (${volume})`)
-    this.players.get(guildID).filters = Object.assign({})
     return this.players.get(guildID).setVolume(volume)
   }
 
