@@ -1,6 +1,6 @@
 {
   "name": "sirubot-bot",
-  "version": "1.8.0",
+  "version": "1.8.2",
   "description": "MusicBot With Andesite node, Moderation, some funny stuff",
   "main": "index.js",
   "dependencies": {
