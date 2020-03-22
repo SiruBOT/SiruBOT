@@ -50,6 +50,7 @@ class Command {
   }
 
   getName (id, items, locale, picker) {
+    if (id === 'dm') return picker.get(locale, 'DM')
     if (items.get(id)) return items.get(id).name
     if (!items.get(id)) return picker.get(locale, 'NONE')
     if (id === '0') return picker.get(locale, 'NONE')

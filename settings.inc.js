@@ -58,6 +58,9 @@ module.exports = {
     EMOJI_PAPER: '📃',
     EMOJI_HAMMER: '🔨',
     EMOJI_SANDCLOCK: '⏳',
+    EMOJI_WAVE: '👋',
+    EMOJI_PAINT: '️🖼️',
+    EMOJI_LABEL: '🏷️',
 
     EMOJI_KNOBS: '🎛️',
     EMOJI_SPEAKER: '🔊',

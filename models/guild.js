@@ -4,8 +4,26 @@ const Schema = new mongo.Schema({
   _id: String,
 
   // Mod
-  welcome: { type: Object, default: { autoRoleEnabled: false, autoRoles: [], textEnabled: false, textContent: null, imageEnabled: false, imageBgURL: null, imageStyle: null, imageTextContent: 'Welcome!', channel: '0' } },
-  bye: { type: Object, default: { textEnabled: false, textContent: null, imageEnabled: false, imageBgURL: null, imageStyle: null, imageTextContent: 'See you again!', channel: '0' } },
+  welcome: {
+    autoRoleEnabled: { type: Boolean, default: false },
+    autoRoles: { type: Array, default: [] },
+    textEnabed: { type: Boolean, default: false },
+    textContent: { type: String, default: 'Welcome, {user}' },
+    imageEnabled: { type: Boolean, default: false },
+    imageBgURL: { type: String, default: null },
+    imageStyle: { type: Object, default: null },
+    imageTextContent: { type: String, default: 'Welcome!' },
+    channel: { type: String, default: '0' }
+  },
+  bye: {
+    textEnabed: { type: Boolean, default: false },
+    textContent: { type: String, default: 'See you again, {user}!' },
+    imageEnabled: { type: Boolean, default: false },
+    imageBgURL: { type: String, default: null },
+    imageStyle: { type: Object, default: null },
+    imageTextContent: { type: String, default: 'Goodbye :D' },
+    channel: { type: String, default: '0' }
+  },
 
   locale: { type: String, default: 'ko_kr' },
   filter: { type: Boolean, default: false },

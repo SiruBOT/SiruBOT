@@ -178,6 +178,7 @@
   "DISABLE": "Disable",
   "YES": "Yes",
   "NO": "No",
+  "DM": "DM (PM)",
   "COMMANDS_MOD_WARN_TYPE_USER": "> %EMOJI_NO%  Please Enter member to warn!\n> %EMOJI_WARN%  ``%PREFIX%warn <Member> [Reason]``",
   "COMMANDS_MOD_WARN_NO_BOT": "> %EMOJI_NO%  You can't warn bot!",
   "WARN_EMBED_ADDED_TITLE": "%EMOJI_PIN%  **Warn Point Added**",
