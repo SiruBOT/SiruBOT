@@ -168,7 +168,6 @@ class ImageUtil {
 
   async resolveObject (ctx, obj) {
     const { x, y, name } = obj
-    console.log(name)
     if (isNaN(x) || isNaN(y) || !name) return new Error('required property [x, y, name] or x, y is NaN')
     ctx.save()
     if (obj.display === false) return

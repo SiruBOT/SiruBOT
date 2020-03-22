@@ -15,25 +15,40 @@ class Event {
     await this.client.database.checkGuild(member.guild.id)
     await this.client.database.checkMember(member.id, member.guild.id)
     await this.client.database.checkUser(member.id)
-    const guildData = await this.client.database.getGuild(member.guild.id)
-    const guild = member.guild
-    if ((guildData.welcome.text || guildData.welcome.image) && guildData.welcomeChannel !== '0') {
-      const welcomeChannel = member.guild.channels.cache.get(guildData.welcomeChannel)
-      if (!welcomeChannel) return
-      if (!this.client.utils.permissionChecker.checkChannelPermission(guild.me, welcomeChannel, ['SEND_MESSSAGES', 'ATTACH_FILES'])) return
-      if (guildData.welcome.text && !guildData.welcome.image) return welcomeChannel.send(this.template(guildData, member, guild))
-      const params = [guild, member.user, guildData.welcome.image.text]
-      if (guildData.welcome.image.bgURL) params.push(guildData.welcome.image.bgURL)
-      if (guildData.welcome.image.style) params.push(guildData.welcome.image.style)
-      const imageCanvas = await this.client.utils.image.resolveInfo(this.client.utils.image.models.welcome(...params))
-      const attachment = new Discord.MessageAttachment(imageCanvas.toBuffer(), 'card.png')
-      if (guildData.welcome.text && guildData.welcome.image) return welcomeChannel.send(this.template(guildData, member, guild), attachment)
-      if (!guildData.welcome.text && guildData.welcome.image) return welcomeChannel.send(attachment)
-    }
+    this.sendWelcome('welcome', member)
   }
 
-  template (guildData, member, guild) {
-    const templateResult = template(guildData.welcomeMessage, { user: member.user, tag: member.user.tag, channels: guild.channels.cache.size, roles: guild.roles.cache.size, users: guild.memberCount }, { before: '{', after: '}' })
+  async sendWelcome (type, member) {
+    const guildData = await this.client.database.getGuild(member.guild.id)
+    const guild = member.guild
+    const sendData = guildData[type]
+    if (sendData.autoRoleEnabled && sendData.autoRoles && member.guild.me.permissions.has('MANAGE_ROLES')) {
+      const roles = sendData.autoRoles.map(el => {
+        const tempRole = member.guild.roles.cache.get(el)
+        if (tempRole.position < member.guild.me.roles.highest) return tempRole
+      })
+      member.roles.add(roles).catch(() => {})
+    }
+    if (sendData.channel === '0') return
+    const sendChannel = sendData.channel === 'dm' ? await member.user.createDM() : member.guild.channels.cache.get(sendData.channel)
+    if (sendChannel && sendChannel.type !== 'dm' && !this.client.utils.permissionChecker.checkChannelPermission(guild.me, sendChannel, ['SEND_MESSAGES', 'ATTACH_FILES'])) return
+    if (sendData.textEnabled && sendData.textContent && !sendData.imageEnabled) return this.send(sendChannel, this.template(sendData.textContent, member, guild))
+    const params = [guild, member.user, sendData.imageTextContent]
+    if (sendData.imageBgURL) params.push(sendData.imageBgURL)
+    if (sendData.imageStyle) params.push(sendData.imageStyle)
+    const imageCanvas = await this.client.utils.image.resolveInfo(this.client.utils.image.models.welcome(...params))
+    const attachment = new Discord.MessageAttachment(imageCanvas.toBuffer(), 'card.png')
+    if (sendData.textEnabled && sendData.imageEnabled) return this.send(sendChannel, this.template(sendData.textContent, member, guild), attachment)
+    if (!sendData.textEnabled && guildData.imageEnabled) return this.send(sendChannel, attachment)
+  }
+
+  send (channel, ...param) {
+    channel.send(...param)
+      .catch(() => {})
+  }
+
+  template (text, member, guild) {
+    const templateResult = template(text, { user: member.user, tag: member.user.tag, channels: guild.channels.cache.size, roles: guild.roles.cache.size, users: guild.memberCount }, { before: '{', after: '}' })
     return JagTagParser(templateResult)
   }
 }

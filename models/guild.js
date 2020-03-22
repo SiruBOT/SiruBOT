@@ -4,21 +4,17 @@ const Schema = new mongo.Schema({
   _id: String,
 
   // Mod
-  welcome: { type: Object, default: { text: false, image: false } },
-  welcomeChannel: { type: String, default: '0' },
-  welcomeMessage: { type: String, default: null },
-  byeMessage: { type: String, default: null },
-  byeChannel: { type: String, default: '0' },
-  bye: { type: Object, default: { text: false, image: false } },
+  welcome: { type: Object, default: { autoRoleEnabled: false, autoRoles: [], textEnabled: false, textContent: null, imageEnabled: false, imageBgURL: null, imageStyle: null, imageTextContent: 'Welcome!', channel: '0' } },
+  bye: { type: Object, default: { textEnabled: false, textContent: null, imageEnabled: false, imageBgURL: null, imageStyle: null, imageTextContent: 'See you again!', channel: '0' } },
 
   locale: { type: String, default: 'ko_kr' },
   filter: { type: Boolean, default: false },
-  customFilter: { type: Array, default: [] },
+  customFilter: { type: Object, default: {} },
 
   warningMax: { type: Number, default: 10 },
   announceChannel: { type: String, default: '0' },
 
-  enabledEvents: { type: Array, default: [] },
+  enabledEvents: { type: Object, default: {} },
 
   // Audio
   audioMessage: { type: Boolean, default: true },

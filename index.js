@@ -129,13 +129,13 @@ class Client extends Discord.Client {
       const Event = new EventClass(this)
       if (reload) {
         this.logger.warn(`${this.defaultPrefix.registerEvents} Removing Event Listener for event ${EventClass.info.event}`)
-        this.removeListener(EventClass.info.event, this.events.get(EventClass.info.event))
+        this.removeListener(EventClass.info.event, this.events.get(EventClass.info.event).Listener)
         this.events.delete(EventClass.info.event)
       }
       delete require.cache[require.resolve(file)]
       this.logger.info(`${this.defaultPrefix.registerEvents} AddedEvent Listener for event ${EventClass.info.event}`)
-      this.events.set(EventClass.info.event, (...args) => Event.run(...args))
-      this.on(EventClass.info.event, this.events.get(EventClass.info.event))
+      this.events.set(EventClass.info.event, { event: Event, Listener: (...args) => Event.run(...args) })
+      this.on(EventClass.info.event, this.events.get(EventClass.info.event).Listener)
     }
     this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)
   }
