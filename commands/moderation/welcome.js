@@ -34,16 +34,23 @@ class Command {
     const picker = this.client.utils.localePicker
     const locale = compressed.guildData.locale
     const { message, args, command, guildData } = compressed
+    const type = this.client.utils.find.matchObj({ 잘가: 'bye', 환영: 'welcome', 입장: 'welcome', 퇴장: 'bye', welcome: 'welcome', bye: 'bye' }, args.shift(), null)
     const method = this.client.utils.find.matchObj({ view: 'view', set: 'set', 보기: 'view', 설정: 'set' }, args.shift(), null)
     // Enter: 0, Leave: 1
-    const type = this.client.utils.find.matchObj({ 잘가: 'bye', 환영: 'welcome', 입장: 'welcome', 퇴장: 'bye', welcome: 'welcome', bye: 'bye' }, args.shift(), null)
     if (!method || !type) return message.channel.send('No Method or Type')
     else {
       const welcomeData = guildData[type]
       if (method === 'view') {
         await message.channel.send(await this.getViewEmbed(message, picker, locale, welcomeData, type))
       } else if (method === 'set') {
-
+        await message.channel.send(await this.getViewEmbed(message, picker, locale, welcomeData, type))
+        try {
+          const property = await this.client.utils.find.question(message.channel, message.author, picker.get(locale, 'COMMANDS_WELCOME_ASK_PROPERTY'))
+          await message.channel.send(property.content)
+        } catch (e) {
+          if (e.name !== 'timeout') throw e
+          else message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete({ timeout: 5000 }))
+        }
       }
     }
   }

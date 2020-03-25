@@ -148,17 +148,22 @@ module.exports.matchObj = (object, value, replace = null) => {
   else return result
 }
 
-module.exports.question = (channel, authorID, awaitMessage, awaitMessageOptions = { max: 1, time: 60000, errors: ['time'] }) => {
+module.exports.question = (channel, author, awaitMessage, awaitMessageOptions = { max: 1, time: 60000, errors: ['time'] }, filter) => {
+  author.awaitQuestion = true
+  if (!filter) filter = (m) => m.author.id === author.id
   return new Promise((resolve, reject) => {
     channel.send(awaitMessage).then((message) => {
-      const filter = (m) => m.author.id === authorID
       message.channel.awaitMessages(filter, awaitMessageOptions)
         .then(collected => {
           if (message.deletable) message.delete()
           if (collected.first().deletable) collected.first().delete()
           resolve(collected.first())
         })
-        .catch(reject)
-    }).catch(reject)
+        .catch(() => {
+          reject(new Error('timeout'))
+        })
+    }).catch((e) => {
+      reject(e)
+    })
   })
 }

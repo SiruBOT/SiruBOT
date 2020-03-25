@@ -28,12 +28,15 @@ class Event {
     await this.client.database.checkUser(message.author.id)
     const prefix = this.client._options.bot.prefix
     if (message.content.startsWith(prefix)) {
+      const guildData = await this.client.database.getGuild(message.guild.id)
+      const { locale } = guildData
+      const picker = this.client.utils.localePicker
+      if (message.author.awaitQuestion) return
       const userData = await this.client.database.getUser(message.author.id)
       const args = message.content.slice(prefix.length).trim().split(/ +/g)
       const command = args.shift().toLowerCase()
       if (userData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
       const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
-      const guildData = await this.client.database.getGuild(message.guild.id)
       const userPermissions = this.client.utils.permissionChecker.getUserPerm(message.member, {
         userData,
         memberData,
@@ -49,9 +52,6 @@ class Event {
         command: command,
         userPermissions: userPermissions
       })
-
-      const locale = compressed.guildData.locale
-      const picker = this.client.utils.localePicker
       const Command = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (Command) {
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))
@@ -77,8 +77,10 @@ class Event {
               this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${Command.command.name} at ${new Date().getTime()}`)
               try {
                 await Command.run(compressed)
+                message.author.awaitQuestion = false
                 break
               } catch (e) {
+                message.author.awaitQuestion = false
                 if (e instanceof this.client.utils.errors.PermError) return message.channel.send(picker.get(locale, 'ERROR_PERMISSION', { PERMS: e.perms.join(', ') }))
                 this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
                 await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, Command.command.name, args) }))

@@ -20,7 +20,7 @@ class Command {
   async run (compressed) {
     const picker = this.client.utils.localePicker
     const { message, guildData } = compressed
-    const { locale, filter, warningMax, audioMessage, audioPlayrelated, repeat, shuffle, tch, vch } = guildData
+    const { locale, filter, warningMax, audioMessage, audioPlayrelated, repeat, tch, vch } = guildData
     const djRole = guildData.dj_role
     const embed = new Discord.MessageEmbed()
     const obj = {

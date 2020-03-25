@@ -40,7 +40,7 @@ class WebhookLogger {
     const memStat = await osu.mem.info()
     const inOut = await osu.netstat.inOut()
     return `CPU Average: **${await osu.cpu.usage()}%**
-    Memory: **${memStat.usedMemMb}**/**${memStat.totalMemMb}**MB **${memStat.freeMemMb}MB (${memStat.freeMemPercentage}%] Free)**
+    Memory: **${memStat.usedMemMb}**/**${memStat.totalMemMb} MB**, **${memStat.freeMemPercentage}% (${memStat.freeMemMb}MB) Free**
     Network IO: **${inOut.total.inputMb}MB** / **${inOut.total.outputMb}MB**`
   }
 }
@@ -57,13 +57,13 @@ manager.on('shardCreate', shard => {
 manager.spawn()
 
 function setUpEvents (shard) {
-  shard.on('ready', () => hookLogger.warn(`[Shard: ${shard.id}] Shard Ready`))
+  shard.on('ready', () => hookLogger.warn(`[Shard ${shard.id}] Shard Ready`))
   shard.on('error', (error) => {
-    hookLogger.fatal(`[Shard: ${shard.id}] Shard Error`, `\`\`\`js\n${error.stack.substring(0, 1000) || error.message.substring(0, 1000)}\`\`\``)
+    hookLogger.fatal(`[Shard ${shard.id}] Shard Error`, `\`\`\`js\n${error.stack.substring(0, 1000) || error.message.substring(0, 1000)}\`\`\``)
     logger.error(error.stack || error.message)
   })
-  shard.on('reconnecting', () => hookLogger.warn(`[Shard: ${shard.id}] Shard reconnecting`))
-  shard.on('spawn', () => hookLogger.info(`[Shard: ${shard.id}] Shard spawned`))
-  shard.on('death', () => hookLogger.fatal(`[Shard: ${shard.id}] Shard death`))
-  shard.on('disconnect', () => hookLogger.fatal(`[Shard: ${shard.id}] Shard disconnected`))
+  shard.on('reconnecting', () => hookLogger.warn(`[Shard ${shard.id}] Shard reconnecting`))
+  shard.on('spawn', () => hookLogger.info(`[Shard ${shard.id}] Shard spawned`))
+  shard.on('death', () => hookLogger.fatal(`[Shard ${shard.id}] Shard death`))
+  shard.on('disconnect', () => hookLogger.fatal(`[Shard ${shard.id}] Shard disconnected`))
 }
