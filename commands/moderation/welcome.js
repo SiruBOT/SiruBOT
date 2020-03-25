@@ -5,8 +5,8 @@ const welcomeByeProperties = {
     사진: 'image',
     역할: 'role',
     message: 'message',
-    image: 'image',
-    
+    image: 'image'
+
   },
   bye: {
 
@@ -34,7 +34,6 @@ class Command {
     const picker = this.client.utils.localePicker
     const locale = compressed.guildData.locale
     const { message, args, command, guildData } = compressed
-    const responds = {}
     const method = this.client.utils.find.matchObj({ view: 'view', set: 'set', 보기: 'view', 설정: 'set' }, args.shift(), null)
     // Enter: 0, Leave: 1
     const type = this.client.utils.find.matchObj({ 잘가: 'bye', 환영: 'welcome', 입장: 'welcome', 퇴장: 'bye', welcome: 'welcome', bye: 'bye' }, args.shift(), null)
@@ -44,7 +43,7 @@ class Command {
       if (method === 'view') {
         await message.channel.send(await this.getViewEmbed(message, picker, locale, welcomeData, type))
       } else if (method === 'set') {
-        const property = this.client.utils.find.matchObj(, args.shift(), null)
+
       }
     }
   }

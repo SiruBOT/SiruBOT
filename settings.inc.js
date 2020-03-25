@@ -9,6 +9,12 @@ module.exports = {
     owners: [],
     shards: shardCount
   },
+  webhook: {
+    info: {
+      id: '123456789012345678',
+      token: 'TOKENTOKENTOKENTOKENTOKENTOKEN'
+    }
+  },
   audio: {
     nodes: [
       { host: '192.168.0.11', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true, andesite: false }, // If andesite node, true (Filters, karaoke, timescale(etc..))
@@ -30,13 +36,14 @@ module.exports = {
       port: 6379
     }
   },
+  embed: {
+    general: '#7289DA',
+    fatal: '#FF4D4D',
+    warn: '#FCFFBA',
+    good: '#DAFFDA',
+    ban: '#FF7575'
+  },
   others: {
-    modEmbeds: {
-      warn: '#FFDADA',
-      good: '#DAFFDA',
-      ban: '#FF7575'
-    },
-    embed_general: '#7289DA',
     changelog_url: 'https://*****/.github.io/' // https://*****/.github.io/[COMMIT ID.txt]
   },
   constructors: {

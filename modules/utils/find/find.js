@@ -97,7 +97,7 @@ module.exports.findElement = (options) => {
  */
 module.exports.getColor = (member) => {
   if (member.roles.highest && member.roles.highest.color !== 0) return member.roles.highest.color
-  else return settings.others.embed_general
+  else return settings.embed.general
 }
 
 module.exports.getEmbed = (pages, currentPage, picker, locale, title, member) => {
@@ -148,13 +148,16 @@ module.exports.matchObj = (object, value, replace = null) => {
   else return result
 }
 
-module.exports.checkAndQuestion = (value, channel, authorID, awaitMessage, awaitMessageOptions = { max: 1, time: 60000, errors: ['time'] }) => {
+module.exports.question = (channel, authorID, awaitMessage, awaitMessageOptions = { max: 1, time: 60000, errors: ['time'] }) => {
   return new Promise((resolve, reject) => {
-    if (value) return resolve(value)
     channel.send(awaitMessage).then((message) => {
       const filter = (m) => m.author.id === authorID
       message.channel.awaitMessages(filter, awaitMessageOptions)
-        .then(collected => resolve(collected.first()))
+        .then(collected => {
+          if (message.deletable) message.delete()
+          if (collected.first().deletable) collected.first().delete()
+          resolve(collected.first())
+        })
         .catch(reject)
     }).catch(reject)
   })
