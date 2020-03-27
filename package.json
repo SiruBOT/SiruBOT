@@ -11,6 +11,7 @@
     "discord.js": "github:discordjs/discord.js",
     "git-repo-info": "^2.1.1",
     "glob": "^7.1.6",
+    "minimist": "^1.2.5",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
     "mongoose": "^5.9.6",
