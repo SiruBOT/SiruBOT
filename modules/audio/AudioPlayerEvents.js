@@ -21,7 +21,6 @@ class AudioPlayerEvents {
   onPlayerUpdate (data) {
     this.client.logger.debug(`${this.defaultPrefix.onPlayerUpdate} [${data.guildID}] Update Database... { position: ${data.position} }`)
     this.client.database.updateGuild(data.guildID, { $set: { nowplayingPosition: data.position } })
-    this.client.redisClient.publish('audioEvent', JSON.stringify({ op: 'playerUpdate', guildID: data.guildID, position: data.position }))
     this.client.audio.utils.updateNowplayingMessage(data.guildID)
   }
 

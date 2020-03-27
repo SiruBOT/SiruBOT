@@ -1,16 +1,20 @@
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'join',
-      aliases: ['접속', 'ㅓㅐㅑㅜ', 'j'],
-      category: 'MUSIC_DJ',
-      require_nodes: true,
-      require_playing: false,
-      require_voice: true,
-      hide: false,
-      permissions: ['DJ', 'Administrator']
+    this.name = 'join'
+    this.aliases = ['접속', 'ㅓㅐㅑㅜ', 'j']
+    this.category = 'MUSIC_DJ'
+    this.requirements = {
+      audioNodes: true,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: true,
+        sameChannel: false,
+        voiceIn: true
+      }
     }
+    this.hide = false
+    this.permissions = ['DJ', 'Administrator']
   }
 
   /**
@@ -37,7 +41,7 @@ class Command {
       if (!message.guild.me.voice.channelID || !this.client.audio.players.get(message.guild.id)) {
         return this.client.audio.join(voiceChannelID, message.guild.id)
       } else if (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID !== message.member.voice.channelID) {
-        return this.client.audio.join(voiceChannelID, message.guild.id)
+        return this.client.audio.moveChannel(voiceChannelID, message.guild.id)
       } else {
         return Promise.resolve(true)
       }

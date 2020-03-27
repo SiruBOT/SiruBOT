@@ -1,30 +1,38 @@
 const Discord = require('discord.js')
-const welcomeByeProperties = {
+const respondMatches = {
   welcome: {
     메세지: 'message',
     사진: 'image',
     역할: 'role',
     message: 'message',
-    image: 'image'
-
+    image: 'image',
+    role: 'role',
+    roles: 'role'
   },
   bye: {
-
+    메세지: 'message',
+    사진: 'image',
+    message: 'message',
+    image: 'image'
   }
 }
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'welcome',
-      aliases: ['환영', 'ㅈ디채ㅡㄷ'],
-      category: 'MODERATION',
-      require_nodes: false,
-      require_playing: false,
-      require_voice: false,
-      hide: false,
-      permissions: ['Administrator']
+    this.name = 'welcome'
+    this.aliases = ['환영', 'ㅈ디채ㅡㄷ']
+    this.category = 'MODERATION'
+    this.requirements = {
+      audioNodes: false,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: false,
+        sameChannel: false,
+        voiceIn: false
+      }
     }
+    this.hide = false
+    this.permissions = ['Administrator']
   }
 
   /**
@@ -33,20 +41,29 @@ class Command {
   async run (compressed) {
     const picker = this.client.utils.localePicker
     const locale = compressed.guildData.locale
-    const { message, args, command, guildData } = compressed
+    const { message, command, guildData } = compressed
+    let { args } = compressed
     const type = this.client.utils.find.matchObj({ 잘가: 'bye', 환영: 'welcome', 입장: 'welcome', 퇴장: 'bye', welcome: 'welcome', bye: 'bye' }, args.shift(), null)
     const method = this.client.utils.find.matchObj({ view: 'view', set: 'set', 보기: 'view', 설정: 'set' }, args.shift(), null)
     // Enter: 0, Leave: 1
-    if (!method || !type) return message.channel.send('No Method or Type')
+    if (!method || !type) return message.channel.send(command)
     else {
       const welcomeData = guildData[type]
       if (method === 'view') {
         await message.channel.send(await this.getViewEmbed(message, picker, locale, welcomeData, type))
       } else if (method === 'set') {
-        await message.channel.send(await this.getViewEmbed(message, picker, locale, welcomeData, type))
+        const displayMessage = await message.channel.send(await this.getViewEmbed(message, picker, locale, welcomeData, type))
         try {
-          const property = await this.client.utils.find.question(message.channel, message.author, picker.get(locale, 'COMMANDS_WELCOME_ASK_PROPERTY'))
-          await message.channel.send(property.content)
+          let propertyRes
+          let data
+          if (args.length !== 0) propertyRes = this.client.utils.find.matchObj(respondMatches[type], args.shift(), null)
+          else {
+            const respond = await this.client.utils.find.question(message.channel, message.author, picker.get(locale, 'COMMANDS_WELCOME_ASK_PROPERTY'))
+            const propertyArgs = respond.content.trim().split(/ +/g)
+            propertyRes = this.client.utils.find.matchObj(respondMatches[type], propertyArgs.shift(), null)
+            if (args.length === 0) args = propertyArgs
+          }
+          if (!propertyRes) return await message.channel.send()
         } catch (e) {
           if (e.name !== 'timeout') throw e
           else message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete({ timeout: 5000 }))

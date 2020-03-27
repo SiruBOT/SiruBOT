@@ -1,16 +1,20 @@
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'scsearch',
-      aliases: ['사클검색', 'ㄴㅊㄴㄷㅁㄱ초', 'tkzmfrjator'],
-      category: 'MUSIC_GENERAL',
-      require_nodes: true,
-      require_playing: false,
-      require_voice: true,
-      hide: false,
-      permissions: ['Everyone']
+    this.name = 'scsearch'
+    this.aliases = ['사클검색', 'ㄴㅊㄴㄷㅁㄱ초', 'tkzmfrjator']
+    this.category = 'MUSIC_GENERAL'
+    this.requirements = {
+      audioNodes: true,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: true,
+        sameChannel: true,
+        voiceIn: true
+      }
     }
+    this.hide = false
+    this.permissions = ['Everyone']
   }
 
   /**

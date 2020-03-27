@@ -84,16 +84,16 @@ class Client extends Discord.Client {
     this.logger.info(`${load} Loading Commands (${CommandsFile.length} Files)`)
     this.logger.debug(`${load} (Commands: ${CommandsFile.join(', ')})`)
     for (const cmd of CommandsFile) {
-      if (!cmd.split('/').slice(-1)[0].startsWith('!')) {
+      if (!cmd.split('/').slice(-1).shift().startsWith('!')) {
         try {
           const Command = require(cmd)
           const command = new Command(this)
-          this.logger.debug(`${load} Loading Command (${command.command.name})`)
-          for (const aliases of command.command.aliases) {
-            this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.command.name}`)
-            this.aliases.set(aliases, command.command.name)
+          this.logger.debug(`${load} Loading Command (${command.name})`)
+          for (const aliases of command.aliases) {
+            this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.name}`)
+            this.aliases.set(aliases, command.name)
           }
-          this.commands.set(command.command.name, command)
+          this.commands.set(command.name, command)
         } catch (e) {
           this.logger.error(`${load} Command Load Error Ignore it... ${cmd}`)
           this.logger.error(`${load} ${e.stack || e.message}`)
@@ -104,7 +104,7 @@ class Client extends Discord.Client {
       }
     }
     this.commands_loaded = true
-    for (const item of this.commands.array().map(el => el.command).filter(el => el.hide === false)) {
+    for (const item of this.commands.array().filter(el => el.hide === false)) {
       if (!this.categories.keyArray().includes(item.category)) this.categories.set(item.category, [])
       if (this.categories.keyArray().includes(item.category) && this.categories.get(item.category).includes(item.name) === false) {
         const array = this.categories.get(item.category)
@@ -124,18 +124,19 @@ class Client extends Discord.Client {
     this.logger.info(`${this.defaultPrefix.registerEvents} Registering Events...`)
     const eventsFile = await this.utils.async.globAsync('./events/**/*.js')
     this.logger.debug(`${this.defaultPrefix.registerEvents} Event Files: ${eventsFile.join(' | ')}`)
-    for (const file of eventsFile) {
-      const EventClass = require(file)
-      const Event = new EventClass(this)
-      if (reload) {
-        this.logger.warn(`${this.defaultPrefix.registerEvents} Removing Event Listener for event ${EventClass.info.event}`)
-        this.removeListener(EventClass.info.event, this.events.get(EventClass.info.event).Listener)
-        this.events.delete(EventClass.info.event)
+    if (reload) {
+      for (const reloadEvent of this.events.array()) {
+        this.events.delete(reloadEvent.name)
+        this.removeListener(reloadEvent.name, reloadEvent.listener)
+        this.logger.debug(`${this.defaultPrefix.registerEvents} Remove Event ${reloadEvent.name}'s Listener`)
       }
-      delete require.cache[require.resolve(file)]
-      this.logger.info(`${this.defaultPrefix.registerEvents} AddedEvent Listener for event ${EventClass.info.event}`)
-      this.events.set(EventClass.info.event, { event: Event, Listener: (...args) => Event.run(...args) })
-      this.on(EventClass.info.event, this.events.get(EventClass.info.event).Listener)
+    }
+    for (const filePath of eventsFile) {
+      const Event = require(filePath)
+      const event = new Event(this)
+      this.on(event.name, event.listener)
+      this.events.set(event.name, event)
+      this.logger.debug(`${this.defaultPrefix.registerEvents} Registering Event Listener ${event.name}`)
     }
     this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)
   }

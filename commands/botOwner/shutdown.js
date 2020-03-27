@@ -1,16 +1,20 @@
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'shutdown',
-      aliases: ['셧다운'],
-      category: 'BOT_OWNER',
-      require_nodes: false,
-      require_playing: false,
-      require_voice: false,
-      hide: false,
-      permissions: ['BotOwner']
+    this.name = 'shutdown'
+    this.aliases = ['셧다운', '봇종료']
+    this.category = 'BOT_OWNER'
+    this.requirements = {
+      audioNodes: false,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: false,
+        sameChannel: false,
+        voiceIn: false
+      }
     }
+    this.hide = false
+    this.permissions = ['BotOwner']
   }
 
   /**

@@ -3,16 +3,20 @@ const Discord = require('discord.js')
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'queue',
-      category: 'MUSIC_GENERAL',
-      require_nodes: true,
-      require_playing: false,
-      require_voice: false,
-      hide: false,
-      aliases: ['대기열', '벼뎓', '큐', '대기열', 'q', 'zb', 'eorlduf'],
-      permissions: ['Everyone']
+    this.name = 'queue'
+    this.aliases = ['대기열', '벼뎓', '큐', '대기열', 'q', 'zb', 'eorlduf']
+    this.category = 'MUSIC_GENERAL'
+    this.requirements = {
+      audioNodes: true,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: false,
+        sameChannel: false,
+        voiceIn: false
+      }
     }
+    this.hide = false
+    this.permissions = ['Everyone']
   }
 
   /**

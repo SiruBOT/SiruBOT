@@ -43,12 +43,12 @@ class Queue extends EventEmitter {
    * @returns
    */
   async shuffle (guildID, userID, all = false) {
-    const { queue } = await this.client.database.getGuild(guildID)
+    const queue = await this.get(guildID)
     const userIdMapped = queue.map(e => e.request)
     if (!userIdMapped.includes(userID)) return null
     else {
       const { result, size } = this.client.utils.array.shuffle(queue, 'request', userID, all)
-      this.client.database.updateGuild(guildID, { $set: { queue: result } })
+      await this.client.database.updateGuild(guildID, { $set: { queue: result } })
       return size
     }
   }
@@ -82,9 +82,10 @@ class Queue extends EventEmitter {
    * @example - <Queue>.autoPlay('672586746587774976')
    */
   async autoPlay (guildID, deQueue = false) {
-    const queueData = await this.get(guildID)
+    const { queue, nowplayingPosition, nowplaying } = await this.client.database.getGuild(guildID)
+    // if (nowplayingPosition !== 0 && nowplaying)
     if (!this.audio.players.get(guildID) || !this.audio.players.get(guildID).track) {
-      if (queueData.length > 0) {
+      if (queue.length > 0) {
         this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Queue...`)
         await this.playNext(guildID)
       } else if (deQueue) {
@@ -154,7 +155,6 @@ class Queue extends EventEmitter {
         if (guildData.nowplaying.info && guildData.nowplaying.info.isStream) this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
         else {
           await this.client.database.updateGuild(guildID, { $push: { queue: this.getRepeatedObj(guildData.nowplaying) } })
-          console.log('push all')
         }
         return this.playNext(guildID)
       case 2:
@@ -162,7 +162,6 @@ class Queue extends EventEmitter {
         if (guildData.nowplaying.info && guildData.nowplaying.info.isStream) this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
         else {
           await this.client.database.updateGuild(guildID, { $push: { queue: { $each: [this.getRepeatedObj(guildData.nowplaying)], $position: 0 } } })
-          console.log('push torepeat')
         }
         return this.playNext(guildID)
     }
@@ -216,10 +215,13 @@ class Queue extends EventEmitter {
    * @param {String} trackData - base64 Track to play
    * @example - <Queue>.play('672586746587774976', 'QAAApgIAQ1vrqqnshozrpqzsmYAg6...')
    */
-  async play (guildID, trackData) {
+  async play (guildID, trackData, seekPosition = 0) {
     const { track } = trackData
     this.client.logger.debug(`${this.defaultPrefix.play} [${guildID}] Playing Item ${track}...`)
-    this.audio.players.get(guildID).playTrack(track, { noReplace: false }).then(async () => {
+    const playOptions = {}
+    Object.defineProperty(playOptions, 'noReplace', { value: false, enumerable: true })
+    if (seekPosition) Object.defineProperty(playOptions, 'startTime', { value: seekPosition, enumerable: true })
+    this.audio.players.get(guildID).playTrack(track, playOptions).then(async () => {
       if (!this.audio.playedTracks.get(guildID)) this.audio.playedTracks.set(guildID, [])
       await this.setNowPlaying(guildID, trackData)
       await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })

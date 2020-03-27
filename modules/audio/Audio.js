@@ -121,7 +121,7 @@ class Audio extends Shoukaku.Shoukaku {
     if (cleanQueue) this.client.database.updateGuild(guildID, { $set: { queue: [] } })
     this.queue.setNowPlaying(guildID, { track: null })
     this.client.database.updateGuild(guildID, { $set: { nowplayingPosition: 0 } })
-    this.client.audio.utils.updateNowplayingMessage(guildID)
+    this.utils.updateNowplayingMessage(guildID)
   }
 
   /**
@@ -143,7 +143,7 @@ class Audio extends Shoukaku.Shoukaku {
    */
   async handleDisconnect (data) {
     const guildData = await this.client.database.getGuild(data.guildId)
-    this.client.audio.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
+    this.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
     this.stop(data.guildId, false)
   }
 
@@ -182,14 +182,14 @@ class Audio extends Shoukaku.Shoukaku {
    * @description - Get Nodes sort by players.
    */
   getNode (name = undefined) {
-    if (!name || this.client.audio.nodes.get(name)) return this.getUsableNodes().sort((a, b) => { return a.players.size - b.players.size })[0]
+    if (!name || this.nodes.get(name)) return this.getUsableNodes().sort((a, b) => { return a.penalties - b.penalties }).shift()
     else {
-      this.client.audio.nodes.get(name)
+      this.nodes.get(name)
     }
   }
 
   getUsableNodes () {
-    return Array.from(this.client.audio.nodes.values()).filter(el => el.state === 'CONNECTED')
+    return Array.from(this.nodes.values()).filter(el => el.state === 'CONNECTED')
   }
 
   /**

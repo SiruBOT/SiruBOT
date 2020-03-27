@@ -1,16 +1,20 @@
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'bassboost',
-      aliases: ['베이스부스트', 'ㅠㅁㄴ뉴ㅐㅐㄴㅅ', 'bb'],
-      category: 'MUSIC_DJ',
-      require_voice: true,
-      require_playing: true,
-      require_nodes: true,
-      hide: false,
-      permissions: ['DJ', 'Administrator']
+    this.name = 'bassboost'
+    this.aliases = ['베이스부스트', 'ㅠㅁㄴ뉴ㅐㅐㄴㅅ', 'bb']
+    this.category = 'MUSIC_DJ'
+    this.requirements = {
+      audioNodes: true,
+      playingStatus: true,
+      voiceStatus: {
+        listenStatus: true,
+        sameChannel: true,
+        voiceIn: true
+      }
     }
+    this.hide = false
+    this.permissions = ['DJ', 'Administrator']
   }
 
   /**

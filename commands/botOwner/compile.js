@@ -2,16 +2,20 @@ const Discord = require('discord.js')
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'compile',
-      aliases: ['실행', 'eval'],
-      category: 'BOT_OWNER',
-      require_nodes: false,
-      require_playing: false,
-      require_voice: false,
-      hide: false,
-      permissions: ['BotOwner']
+    this.name = 'compile'
+    this.aliases = ['실행', 'eval']
+    this.category = 'BOT_OWNER'
+    this.requirements = {
+      audioNodes: false,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: false,
+        sameChannel: false,
+        voiceIn: false
+      }
     }
+    this.hide = false
+    this.permissions = ['BotOwner']
   }
 
   /**

@@ -1,6 +1,8 @@
 class Event {
   constructor (client) {
     this.client = client
+    this.name = 'shardReady'
+    this.listener = (...args) => this.run(...args)
   }
 
   /**
@@ -13,7 +15,3 @@ class Event {
   }
 }
 module.exports = Event
-
-module.exports.info = {
-  event: 'shardReady'
-}

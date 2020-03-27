@@ -4,16 +4,20 @@ const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣',
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'search',
-      aliases: ['검색', 'ㄴㄷㅁㄱ초', 'rjator'],
-      category: 'MUSIC_GENERAL',
-      require_nodes: true,
-      require_playing: false,
-      require_voice: true,
-      hide: false,
-      permissions: ['Everyone']
+    this.name = 'search'
+    this.aliases = ['검색', 'ㄴㄷㅁㄱ초', 'rjator']
+    this.category = 'MUSIC_GENERAL'
+    this.requirements = {
+      audioNodes: true,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: true,
+        sameChannel: true,
+        voiceIn: true
+      }
     }
+    this.hide = false
+    this.permissions = ['Everyone']
   }
 
   /**

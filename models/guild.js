@@ -35,7 +35,7 @@ const Schema = new mongo.Schema({
   enabledEvents: { type: Object, default: {} },
 
   // Audio
-  audioMessage: { type: Boolean, default: true },
+  audioMessage: { type: Boolean, default: false },
   audioPlayrelated: { type: Boolean, default: false },
   repeat: { type: Number, default: 0 },
   shuffle: { type: Boolean, default: false },

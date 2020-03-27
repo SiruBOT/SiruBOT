@@ -12,16 +12,20 @@ const methods = {
 class Command {
   constructor (client) {
     this.client = client
-    this.command = {
-      name: 'blacklist',
-      aliases: ['블랙', '블랙리스트'],
-      category: 'BOT_OWNER',
-      require_nodes: false,
-      require_playing: false,
-      require_voice: false,
-      hide: false,
-      permissions: ['BotOwner']
+    this.name = 'blacklist'
+    this.aliases = ['블랙', '블랙리스트']
+    this.category = 'BOT_OWNER'
+    this.requirements = {
+      audioNodes: false,
+      playingStatus: false,
+      voiceStatus: {
+        listenStatus: false,
+        sameChannel: false,
+        voiceIn: false
+      }
     }
+    this.hide = false
+    this.permissions = ['BotOwner']
   }
 
   /**
