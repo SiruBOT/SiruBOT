@@ -1,9 +1,10 @@
 const { ShardingManager, WebhookClient, MessageEmbed } = require('discord.js')
-const { Logger, getSettings } = require('./modules')
-const settings = getSettings()
-const manager = new ShardingManager('./index.js', { token: settings.bot.token, totalShards: settings.bot.shards, respawn: true })
-const logger = new Logger()
 const osu = require('node-os-utils')
+const { getSettings } = require('./src/utils')
+const { Logger } = require('./src/structures')
+const settings = getSettings()
+const manager = new ShardingManager('./src/index.js', { token: settings.bot.token, totalShards: settings.bot.shards, respawn: true })
+const logger = new Logger()
 class WebhookLogger {
   constructor (id, token) {
     this.webhookClient = new WebhookClient(id, token)
@@ -40,9 +41,9 @@ class WebhookLogger {
     const memStat = await osu.mem.info()
     const inOut = await osu.netstat.inOut()
     return `CPU Average: **${await osu.cpu.usage()}%**
-    Memory: **${memStat.usedMemMb}**/**${memStat.totalMemMb} MB**, **${memStat.freeMemPercentage}% (${memStat.freeMemMb}MB) Free**
-    Network IO: **${inOut.total.inputMb}MB** / **${inOut.total.outputMb}MB**`
+    Memory: **${memStat.usedMemMb}**/**${memStat.totalMemMb} MB**, **${memStat.freeMemPercentage}% (${memStat.freeMemMb}MB) Free**`
   }
+  // Network IO: **${inOut.total.inputMb}MB** / **${inOut.total.outputMb}MB**`
 }
 const hookLogger = new WebhookLogger(settings.webhook.info.id, settings.webhook.info.token)
 
