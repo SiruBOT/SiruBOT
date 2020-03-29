@@ -47,7 +47,7 @@ node_modules/
 jspm_packages/
 web/node_modules/
 
-#Privacy
+# Privacy
 settings.js
 
 # TypeScript v1 declaration files

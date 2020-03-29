@@ -1,6 +1,6 @@
 {
   "name": "sirubot-bot",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "MusicBot With Andesite node, Moderation, some funny stuff",
   "main": "index.js",
   "dependencies": {
@@ -30,8 +30,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "node index.js test",
-    "ci": "node index.js test"
+    "test": "node ./src/index.js test",
+    "ci": "node ./src/index.js test"
   },
   "repository": {
     "type": "git",
