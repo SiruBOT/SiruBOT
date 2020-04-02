@@ -85,8 +85,7 @@ class Queue extends EventEmitter {
     this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] autoPlay Started`)
     const { queue, nowplayingPosition, nowplaying } = await this.client.database.getGuild(guildID)
     if (this.audio.players.get(guildID)) {
-      const { length } = nowplaying.info
-      if (!error && nowplaying.track !== null && !this.audio.players.get(guildID).track && nowplayingPosition !== length) {
+      if (!error && nowplaying.track !== null && !this.audio.players.get(guildID).track && nowplayingPosition !== nowplaying.info.length) {
         this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Nowplaying...`)
         this.audio.players.get(guildID).track = nowplaying.track
         await this.play(guildID, nowplaying, nowplayingPosition)

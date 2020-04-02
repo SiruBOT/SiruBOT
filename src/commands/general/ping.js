@@ -4,8 +4,8 @@ const { BaseCommand } = require('../../structures')
 class Command extends BaseCommand {
   constructor (client) {
     super(client,
-      'help',
-      ['도움', '명령어', 'ehdna', 'audfuddj', 'cmds', 'cmdlist'],
+      'ping',
+      ['핑', 'ㅔㅑㅜㅎ'],
       ['Everyone'],
       'GENERAL_INFO',
       {
