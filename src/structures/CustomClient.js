@@ -197,8 +197,9 @@ class CustomClient extends Discord.Client {
     const players = this.audio.players
     this.logger.info(`[Shutdown] Disconnect All Players.... (${players.size} Players)`)
     for (const player of this.audio.players.values()) {
-      this.logger.debug(`[Shutdown] Stopping player of guild: ${player.guild}`)
-      this.audio.stop(player.voiceConnection.guildID, false)
+      const { voiceConnection } = player
+      this.logger.debug(`[Shutdown] Stopping player of guild: ${voiceConnection.guildID}`)
+      this.audio.stop(voiceConnection.guildID, false)
     }
     return true
   }
