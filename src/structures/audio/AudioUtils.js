@@ -148,6 +148,7 @@ class AudioUtils {
             this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete previous message..`)
           })
         }
+        sendChannel.send(text).then(m => this.client.audio.textMessages.set(guildID, m))
       }
     }
   }
