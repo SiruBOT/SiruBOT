@@ -1,23 +1,25 @@
 const fetch = require('node-fetch')
 const Discord = require('discord.js')
+const { BaseCommand } = require('../../structures')
 
-class Command {
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'changelog'
-    this.aliases = ['변경로그', '초뭏디ㅐㅎ']
-    this.category = 'GENERAL_INFO'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['Everyone']
+    super(client,
+      'changelog',
+      ['변경로그', '초뭏디ㅐㅎ'],
+      ['Everyone'],
+      'GENERAL_INFO',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+const { BaseCommand } = require('../../structures')
 const respondMatches = {
   welcome: {
     메세지: 'message',
@@ -16,23 +17,25 @@ const respondMatches = {
     image: 'image'
   }
 }
-class Command {
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'welcome'
-    this.aliases = ['환영', 'ㅈ디채ㅡㄷ']
-    this.category = 'MODERATION'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['Administrator']
+    super(client,
+      'welcome',
+      ['환영', 'ㅈ디채ㅡㄷ'],
+      ['Administrator'],
+      'MODERATION',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

@@ -1,22 +1,24 @@
+const { BaseCommand } = require('../../structures')
 const Discord = require('discord.js')
 
-class Command {
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'queue'
-    this.aliases = ['대기열', '벼뎓', '큐', '대기열', 'q', 'zb', 'eorlduf']
-    this.category = 'MUSIC_GENERAL'
-    this.requirements = {
-      audioNodes: true,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['Everyone']
+    super(client,
+      'queue',
+      ['대기열', '벼뎓', '큐', '대기열', 'q', 'zb', 'eorlduf'],
+      ['Everyone'],
+      'MUSIC_GENERAL',
+      {
+        audioNodes: true,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

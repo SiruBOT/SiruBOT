@@ -1,21 +1,24 @@
 const { placeHolderConstructors } = require('../../constructors')
-class Command {
+const { BaseCommand } = require('../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'shutdown'
-    this.aliases = ['셧다운', '봇종료']
-    this.category = 'BOT_OWNER'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['BotOwner']
+    super(client,
+      'shutdown',
+      ['셧다운', '봇종료'],
+      ['BotOwner'],
+      'BOT_OWNER',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

@@ -58,7 +58,7 @@ class Queue extends EventEmitter {
    * @param {Object|Array<Object>} track - Item(s) add Queue
    * @param {Object} message = Message
    */
-  async enQueue (guildID, track, requestID) {
+  async enQueue (guildID, track, requestID, related) {
     if (Array.isArray(track)) {
       const result = track.map(el => {
         el.request = requestID
@@ -73,7 +73,7 @@ class Queue extends EventEmitter {
       track.related = requestID === this.client.user.id
       await this.client.database.updateGuild(guildID, { $push: { queue: track } })
     }
-    this.autoPlay(guildID)
+    this.autoPlay(guildID, related)
   }
 
   /**
@@ -81,15 +81,20 @@ class Queue extends EventEmitter {
    * @param {String} guildID - guild id to autoPlaying
    * @example - <Queue>.autoPlay('672586746587774976')
    */
-  async autoPlay (guildID) {
+  async autoPlay (guildID, error = false) {
+    this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] autoPlay Started`)
     const { queue, nowplayingPosition, nowplaying } = await this.client.database.getGuild(guildID)
-    if (nowplaying.track && !this.audio.players.get(guildID).track) {
-      this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Nowplaying...`)
-      this.audio.players.get(guildID).track = nowplaying.track
-      await this.play(guildID, nowplaying, nowplayingPosition)
-    } else if (queue.length > 0 && this.audio.players.get(guildID) && !this.audio.players.get(guildID).track) {
-      this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Queue...`)
-      await this.playNext(guildID)
+    if (this.audio.players.get(guildID)) {
+      if (!error && nowplaying.track !== null && !this.audio.players.get(guildID).track) {
+        this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Nowplaying...`)
+        this.audio.players.get(guildID).track = nowplaying.track
+        await this.play(guildID, nowplaying, nowplayingPosition)
+        return
+      }
+      if (error || (queue.length > 0 && !this.audio.players.get(guildID).track)) {
+        this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Autoplaying Next Queue...`)
+        await this.playNext(guildID)
+      }
     }
   }
 
@@ -114,10 +119,11 @@ class Queue extends EventEmitter {
       }
     }
     const lavaLinktracks = await this.audio.getTrack(`https://youtube.com/watch?v=${relatedTracks[number].identifier}`)
+    const toPlay = lavaLinktracks.shift()
     if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType)) return this.playNext(guildID)
-    this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${lavaLinktracks.tracks[0].info.title} (${lavaLinktracks.tracks[0].info.identifier})`)
+    this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
     if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort addqueue. Player is not exists!`)
-    this.enQueue(guildID, lavaLinktracks.tracks[0], this.client.user.id)
+    this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
   }
 
   getRepeatedObj (obj) {

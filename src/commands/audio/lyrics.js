@@ -2,23 +2,26 @@ const Lyrics = require('slyrics')
 const lyrics = new Lyrics()
 const Discord = require('discord.js')
 
-class Command {
+const { BaseCommand } = require('../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'lyrics'
-    this.aliases = ['가사', 'lyric', 'rktk']
-    this.category = 'MUSIC_GENERAL'
-    this.requirements = {
-      audioNodes: true,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['Everyone']
+    super(client,
+      'lyrics',
+      ['가사', 'lyric', 'rktk'],
+      ['Everyone'],
+      'MUSIC_GENERAL',
+      {
+        audioNodes: true,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

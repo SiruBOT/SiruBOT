@@ -13,23 +13,26 @@ function niceBytes (x) {
 }
 
 const Discord = require('discord.js')
-class Command {
+const { BaseCommand } = require('../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'nodeinfo'
-    this.aliases = ['봇정보', 'ㅜㅐㅇ댜ㅜ래']
-    this.category = 'MUSIC_GENERAL'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['Everyone']
+    super(client,
+      'nodeinfo',
+      ['봇정보', 'ㅜㅐㅇ댜ㅜ래'],
+      ['Everyone'],
+      'MUSIC_GENERAL',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

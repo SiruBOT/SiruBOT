@@ -1,25 +1,28 @@
-class Command {
+const { BaseCommand } = require('../../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'karaoke'
-    this.aliases = ['노래방', 'ㅏㅁㄱ매ㅏㄷ', 'kara']
-    this.category = 'MUSIC_DJ'
-    this.requirements = {
-      audioNodes: true,
-      playingStatus: true,
-      voiceStatus: {
-        listenStatus: true,
-        sameChannel: true,
-        voiceIn: true
-      }
-    }
-    this.hide = false
-    this.permissions = ['DJ', 'Administrator']
+    super(client,
+      'karaoke',
+      ['노래방', 'ㅏㅁㄱ매ㅏㄷ', 'kara'],
+      ['DJ', 'Administrator'],
+      'MUSIC_DJ',
+      {
+        audioNodes: true,
+        playingStatus: true,
+        voiceStatus: {
+          listenStatus: true,
+          sameChannel: true,
+          voiceIn: true
+        }
+      },
+      false
+    )
   }
 
   /**
-       * @param {Object} compressed - Compressed Object
-       */
+   * @param {Object} compressed - Compressed Object
+   */
   async run (compressed) {
     const locale = compressed.guildData.locale
     const picker = this.client.utils.localePicker

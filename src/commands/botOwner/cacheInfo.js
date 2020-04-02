@@ -1,21 +1,24 @@
 const util = require('util')
-class Command {
+const { BaseCommand } = require('../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'cacheinfo'
-    this.aliases = ['캐시정보', 'ㅊㅁ초댜ㅜ래']
-    this.category = 'BOT_OWNER'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['BotOwner']
+    super(client,
+      'cacheinfo',
+      ['캐시정보', 'ㅊㅁ초댜ㅜ래'],
+      ['BotOwner'],
+      'BOT_OWNER',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

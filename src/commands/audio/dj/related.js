@@ -1,21 +1,23 @@
+const { BaseCommand } = require('../../../structures')
 
-class Command {
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'related'
-    this.aliases = ['추천', '추천영상', 'ㄱ딤ㅅㄷㅇ']
-    this.category = 'MUSIC_DJ'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['DJ', 'Administrator']
+    super(client,
+      'related',
+      ['추천', '추천영상', 'ㄱ밈ㅅㄷㅇ'],
+      ['DJ', 'Administrator'],
+      'MUSIC_DJ',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

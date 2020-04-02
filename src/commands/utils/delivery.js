@@ -4,26 +4,27 @@ const fetch = require('node-fetch')
 const moment = require('moment-timezone')
 const Discord = require('discord.js')
 const { placeHolderConstructors } = require('../../constructors')
-
+const { BaseCommand } = require('../../structures')
 // https://apis.tracker.delivery/carriers/Carrier_ID/tracks/Track_No
 
-class Command {
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'delivery'
-    this.aliases = ['택배', '택배조회']
-    this.category = 'GENERAL_INFO'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['Everyone']
+    super(client,
+      'delivery',
+      ['택배', '택배조회'],
+      ['Everyone'],
+      'GENERAL_INFO',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

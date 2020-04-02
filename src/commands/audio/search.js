@@ -2,23 +2,26 @@ const Discord = require('discord.js')
 const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
 const { placeHolderConstructors } = require('../../constructors')
 
-class Command {
+const { BaseCommand } = require('../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'search'
-    this.aliases = ['검색', 'ㄴㄷㅁㄱ초', 'rjator']
-    this.category = 'MUSIC_GENERAL'
-    this.requirements = {
-      audioNodes: true,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: true,
-        sameChannel: true,
-        voiceIn: true
-      }
-    }
-    this.hide = false
-    this.permissions = ['Everyone']
+    super(client,
+      'search',
+      ['검색', 'ㄴㄷㅁㄱ초', 'rjator'],
+      ['Everyone'],
+      'MUSIC_GENERAL',
+      {
+        audioNodes: true,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: true,
+          sameChannel: true,
+          voiceIn: true
+        }
+      },
+      false
+    )
   }
 
   /**

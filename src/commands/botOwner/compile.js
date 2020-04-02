@@ -1,22 +1,25 @@
 const Discord = require('discord.js')
 const { placeHolderConstructors } = require('../../constructors')
-class Command {
+const { BaseCommand } = require('../../structures')
+
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'compile'
-    this.aliases = ['실행', 'eval']
-    this.category = 'BOT_OWNER'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['BotOwner']
+    super(client,
+      'compile',
+      ['실행', 'eval'],
+      ['BotOwner'],
+      'BOT_OWNER',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**

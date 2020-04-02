@@ -137,7 +137,7 @@ class AudioUtils {
   async sendMessage (guildID, text, forceSend = false) {
     const guildData = await this.client.database.getGuild(guildID)
     const { audioMessage, tch } = guildData
-    if (audioMessage) {
+    if (forceSend || audioMessage) {
       const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)
       if (!sendChannel || sendChannel.deleted) return this.client.logger.error(`${this.defaultPrefix.sendMessage} Channel Not Found... Please check database or audio TextChannels!`)
       if (this.client.utils.permissionChecker.checkChannelPermission(this.client.guilds.cache.get(guildID).me, sendChannel, ['SEND_MESSSAGES', 'ATTACH_FILES'])) {
@@ -147,9 +147,6 @@ class AudioUtils {
           this.client.audio.textMessages.get(guildID).delete().catch(() => {
             this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete previous message..`)
           })
-        }
-        if (forceSend || guildData.audioMessage) {
-          sendChannel.send(text).then(m => this.client.audio.textMessages.set(guildID, m))
         }
       }
     }

@@ -9,24 +9,26 @@ const methods = {
   확인: '확인'
 }
 const { placeHolderConstructors } = require('../../constructors')
+const { BaseCommand } = require('../../structures')
 
-class Command {
+class Command extends BaseCommand {
   constructor (client) {
-    this.client = client
-    this.name = 'blacklist'
-    this.aliases = ['블랙', '블랙리스트']
-    this.category = 'BOT_OWNER'
-    this.requirements = {
-      audioNodes: false,
-      playingStatus: false,
-      voiceStatus: {
-        listenStatus: false,
-        sameChannel: false,
-        voiceIn: false
-      }
-    }
-    this.hide = false
-    this.permissions = ['BotOwner']
+    super(client,
+      'blacklist',
+      ['블랙', '블랙리스트'],
+      ['BotOwner'],
+      'BOT_OWNER',
+      {
+        audioNodes: false,
+        playingStatus: false,
+        voiceStatus: {
+          listenStatus: false,
+          sameChannel: false,
+          voiceIn: false
+        }
+      },
+      false
+    )
   }
 
   /**
