@@ -11,7 +11,7 @@ class Event {
    */
   async run (member) {
     this.client.logger.debug(`[GuildMemberRemove] Send Bye Message ${member.guild.id}, ${member.id}`)
-    await this.client.events.get('guildMemberAdd').event.sendWelcome('bye', member)
+    await this.client.events.get('guildMemberAdd').sendWelcome('bye', member)
   }
 }
 module.exports = Event

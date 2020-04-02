@@ -246,7 +246,7 @@ class Audio extends Shoukaku.Shoukaku {
   async getUA () {
     const ua = await randomUA.get()
     this.client.logger.debug(`${this.defaultPrefix.getUA} Get UserAgent: ${ua}`)
-    if (!ua.toLowerCase().includes('en-us') || !ua.includes('en-US')) return this.getUA()
+    if (!ua || !ua.toLowerCase().includes('en-us') || !ua.includes('en-US')) return this.getUA()
     else return ua
   }
 
