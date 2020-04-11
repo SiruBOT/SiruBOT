@@ -38,6 +38,9 @@ class DataManager {
     const { _options, logger } = this.client
     logger.info(`${this.defaultPrefix.init} Connecting URL (${_options.db.mongo.mongoURL})`)
     Mongo.connect(_options.db.mongo.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: _options.db.mongo.user, pass: _options.db.mongo.password })
+      .catch(e => {
+        logger.error('[DB] Failed To Initialize Database.')
+      })
   }
 
   /**

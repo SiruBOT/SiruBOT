@@ -3,15 +3,18 @@ class BaseCommand {
   /**
    * @description - Constructors of BaseCommand
    * @typedef {{listenStatus: Boolean, sameChannel: Boolean, voiceIn: Boolean}} voiceStatus
-   * @param {CustomClient} client - Your Client
+   * @typedef {{types: String, required: Boolean, }} argument
+   * @typedef {{audioNodes: Boolean, playingStatus: Boolean, voiceStatus: voiceStatus}} Requirements
+   * @param {DiscordClient} client - Your Client
    * @param {String} name - Command Name
    * @param {Array<String>} aliases - Command Aliases
    * @param {Array<String>} permissions - Command Permissions
    * @param {String} category - Command Category
-   * @param {{audioNodes: Boolean, playingStatus: Boolean, voiceStatus: voiceStatus}} requirements - Requirements Object
+   * @param {Requirements} requirements - Requirements Object
+   * @param {Array<argument>} args - Command Arguments
    * @param {Boolean} [hide=false] - Command hide status
    */
-  constructor (client, name, aliases, permissions, category, requirements, hide = false) {
+  constructor (client, name, aliases, permissions, category, requirements, args = [], hide = false) {
     if ((client instanceof DiscordClient) === false) throw new Error('supplied constructor `client` is must be instance of Discord.Client')
     this.client = client
     if (typeof name !== 'string') throw new Error('supplied constructor `name` is must be String')
@@ -38,6 +41,10 @@ class BaseCommand {
     if (typeof voiceIn !== 'boolean') throw new Error('supplied constructor `requirements.voiceStatus.voiceIn` is must be Boolean')
     Object.defineProperty(voiceStatus, 'voiceIn', { value: voiceIn, enumerable: true })
     Object.defineProperty(this.requirements, 'voiceStatus', { value: voiceStatus, enumerable: true })
+    if (!Array.isArray(args)) throw new Error('supplied constructor `args` is must be Array')
+    const filteredArgs = args.filter(el => typeof el === 'object').filter(el => Array.isArray(el.types))
+    if (!Array.isArray(filteredArgs)) throw new Error('supplied constructor `args` is must be array')
+    this.arguments = filteredArgs
     if (typeof hide !== 'boolean') throw new Error('supplied constructor `hide` is must be Boolean')
     this.hide = hide
   }
@@ -47,6 +54,10 @@ class BaseCommand {
    * @returns {Promise<*>} - Returns Any Values (includes void)
    */
   async run () {
+
+  }
+
+  parseArgs (message) {
 
   }
 }

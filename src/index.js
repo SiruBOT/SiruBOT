@@ -1,5 +1,5 @@
 const { CustomClient } = require('./structures')
-const { getSettings } = require('./utils')
+const getSettings = require('./utils/getSettings')
 const Client = new CustomClient(getSettings())
 Client.init().then(() => {
   Client.logger.info('[BOT] Init Success')

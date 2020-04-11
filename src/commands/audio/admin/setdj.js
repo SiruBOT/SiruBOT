@@ -17,6 +17,16 @@ class Command extends BaseCommand {
           voiceIn: false
         }
       },
+      [
+        {
+          types: ['role', 'string'],
+          required: true,
+          attachment: {
+            enabled: false,
+            path: 'url'
+          }
+        }
+      ],
       false
     )
   }

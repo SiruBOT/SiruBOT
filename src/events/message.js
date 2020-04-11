@@ -1,5 +1,5 @@
 const placeHolderConstructors = require('../constructors').placeHolderConstructors
-
+const Errors = require('../errors')
 class Event {
   constructor (client) {
     this.client = client
@@ -77,13 +77,14 @@ class Event {
             // Requirements.voiceStatus - sameChannel
             if (message.member.voice.channel && sameChannel && (message.guild.me.voice.channelID && message.guild.me.voice.channelID !== message.member.voice.channelID)) return message.channel.send(picker.get(locale, 'AUDIO_SAME_VOICE', { VOICECHANNEL: message.guild.me.voice.channelID }))
           }
+
           const havePermissions = commandClass.permissions.filter(el => userPermissions.includes(el))
           this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${commandClass.name} at ${new Date().getTime()}`)
           if (havePermissions.length === 0) return message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: commandClass.permissions.join(', ') }))
           try {
             await commandClass.run(compressed)
           } catch (e) {
-            if (e instanceof this.client.utils.errors.PermError) return message.channel.send(picker.get(locale, 'ERROR_PERMISSION', { PERMS: e.perms.join(', ') }))
+            if (e instanceof Errors.PermissionError) return message.channel.send(picker.get(locale, 'ERROR_PERMISSION', { PERMS: e.perms.join(', ') }))
             this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
             await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, commandClass.name, args) }))
           }

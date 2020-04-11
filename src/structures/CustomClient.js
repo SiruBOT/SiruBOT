@@ -7,8 +7,6 @@ const Image = require('./image/Image')
 const utils = require('../utils')
 const { getSettings, PermissionChecker } = utils
 const ServerLoggerManager = require('./logging/ServerLoggerManager')
-// const LocalePicker = require('./locales/localePicker')
-// const { PermissionChecker, DataBase, Audio, Logger, Image, ServerLogger, getSettings } = require('./')
 const fs = require('fs')
 const path = require('path')
 
@@ -176,19 +174,19 @@ class CustomClient extends Discord.Client {
     switch (type) {
       case 'ping':
         if (!this.shard) value = this.ping
-        else value = await this.shard.fetchClientValues('ws.ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1))
+        else value = await this.shard.fetchClientValues('ws.ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1)).catch(0)
         return value
       case 'channels':
         if (!this.shard) value = this.channels.cache.size
-        else value = await this.shard.fetchClientValues('channels.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        else value = await this.shard.fetchClientValues('channels.cache.size').then(res => res.reduce((prev, val) => prev + val, 0)).catch(0)
         return value
       case 'guilds':
         if (!this.shard) value = this.guilds.cache.size
-        else value = await this.shard.fetchClientValues('guilds.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        else value = await this.shard.fetchClientValues('guilds.cache.size').then(res => res.reduce((prev, val) => prev + val, 0)).catch(0)
         return value
       case 'users':
         if (!this.shard) value = this.users.cache.size
-        else value = await this.shard.fetchClientValues('users.cache.size').then(res => res.reduce((prev, val) => prev + val, 0))
+        else value = await this.shard.fetchClientValues('users.cache.size').then(res => res.reduce((prev, val) => prev + val, 0)).catch(0)
         return value
     }
   }
@@ -245,7 +243,7 @@ class CustomClient extends Discord.Client {
     this.categories = new Discord.Collection()
     this.LoadCommands()
     this.registerEvents(true)
-    return this.shard.ids
+    return this.shard ? this.shard.ids : 0
   }
 
   shutdown () {
@@ -256,7 +254,7 @@ class CustomClient extends Discord.Client {
         process.exit(0)
       }, 10000)
     })
-    return this.shard.ids
+    return this.shard ? this.shard.ids : 0
   }
 }
 

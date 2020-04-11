@@ -16,6 +16,7 @@ class Command extends BaseCommand {
           voiceIn: true
         }
       },
+      [],
       false
     )
   }
@@ -58,12 +59,11 @@ class Command extends BaseCommand {
         for (let i = 0; i < searchResult.playlistInfo.selectedTrack; i++) {
           searchResult.tracks.shift()
         }
-        this.addQueue(message, searchResult.tracks[0], picker, locale)
-        searchResult.tracks.shift()
+        this.addQueue(message, searchResult.tracks.shift(), picker, locale)
         if (searchResult.tracks.length === 0) return
         const plistMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length }))
         const emojiList = ['📥', '🚫']
-        this.client.utils.message.massReact(plistMessage, emojiList)
+        await this.client.utils.message.massReact(plistMessage, emojiList)
         const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
         const confirmResult = await plistMessage.awaitReactions(filter, { time: 15000, max: 1, errors: ['time'] }).then(coll => coll.first().emoji.name === emojiList[0]).catch(() => true)
         if (plistMessage.deletable && !plistMessage.deleted) plistMessage.delete()

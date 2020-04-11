@@ -4,7 +4,6 @@ module.exports = {
   time: require('./time'),
   array: require('./array'),
   async: require('./async'),
-  errors: require('./errors'),
   getSettings: require('./getSettings'),
   PermissionChecker: require('./PermissionChecker')
 }
