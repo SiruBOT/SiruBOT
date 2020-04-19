@@ -24,7 +24,6 @@ class Audio extends Shoukaku.Shoukaku {
     this.defaultPrefix = {
       getTrack: `${this.classPrefix}:getTrack]`,
       join: `${this.classPrefix}:join]`,
-      moveChannel: `${this.classPrefix}:moveChannel]`,
       leave: `${this.classPrefix}:leave]`,
       stop: `${this.classPrefix}:stop]`,
       handleDisconnect: `${this.classPrefix}:handleDisconnect]`,
@@ -67,7 +66,7 @@ class Audio extends Shoukaku.Shoukaku {
    * @param {String} voiceChannelID - voiceChannelId join for
    * @param {String} guildID - guildID of voiceChannel
    */
-  join (voiceChannelID, guildID, moveChannel = false) {
+  join (voiceChannelID, guildID) {
     return new Promise((resolve, reject) => {
       this.getNode().joinVoiceChannel({
         guildID: guildID,
@@ -76,7 +75,6 @@ class Audio extends Shoukaku.Shoukaku {
         this.audioRouter.registerEvents(player)
         this.setPlayersDefaultSetting(guildID)
         this.client.logger.debug(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Successfully joined voiceChannel.`)
-        if (!moveChannel) this.queue.autoPlay(guildID)
         resolve(true)
       }).catch(e => {
         this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)
@@ -136,7 +134,7 @@ class Audio extends Shoukaku.Shoukaku {
     this.client.database.updateGuild(guildID, { $set: { volume: vol } })
     if (!this.players.get(guildID)) return Promise.resolve(false)
     else {
-      this.players.get(guildID).setVolume(vol)
+      return this.players.get(guildID).setVolume(vol)
     }
   }
 
@@ -147,37 +145,6 @@ class Audio extends Shoukaku.Shoukaku {
     const guildData = await this.client.database.getGuild(data.guildId)
     this.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
     this.stop(data.guildId, false)
-  }
-
-  /**
-   * @param {String} guildID - guild Id of voicechannel for move
-   * @param {String} channelID - channelID to moving
-   * @returns {Promise<true|Error>}
-   */
-  moveChannel (voiceChannelID, guildID) {
-    return new Promise((resolve, reject) => {
-      if (!this.players.get(guildID)) return resolve(this.join(voiceChannelID, guildID))
-      const beforePlayer = this.players.get(guildID)
-      const beforeObject = clone({
-        voiceChannel: (!beforePlayer.voiceConnection ? null : beforePlayer.voiceConnection.voiceChannelID),
-        volume: (!beforePlayer ? 100 : beforePlayer.volume),
-        track: (!beforePlayer ? null : beforePlayer.track),
-        position: (!beforePlayer ? 0 : beforePlayer.position),
-        paused: (!beforePlayer ? false : beforePlayer.paused)
-      })
-      if (beforeObject.voiceChannel === voiceChannelID) return reject(new Error('voiceChannel cannot be the same as the player\'s voiceChannel.'))
-      // this.leave(guildID)
-      this.join(voiceChannelID, guildID, true).then(async () => {
-        if (beforeObject.track) await this.players.get(guildID).playTrack(beforeObject.track, { noReplace: false, startTime: beforeObject.position })
-        if (beforeObject.volume) this.players.get(guildID).setVolume(beforeObject.volume)
-        if (beforeObject.paused) await this.players.get(guildID).setPaused(beforeObject.paused)
-        this.client.logger.debug(`${this.defaultPrefix.moveChannel} [${guildID}] [${beforeObject.voiceChannel}] -> [${voiceChannelID}] Successfully moved voiceChannel.`)
-        resolve(true)
-      }).catch(e => {
-        this.client.logger.error(`${this.defaultPrefix.moveChannel} [${guildID}] [${beforeObject.voiceChannel}] -> [${voiceChannelID}] Failed move to voiceChannel [${e.name}: ${e.message}]`)
-        reject(e)
-      })
-    })
   }
 
   /**
@@ -283,6 +250,7 @@ class Audio extends Shoukaku.Shoukaku {
       this.client.logger.debug(`[AudioManager] Cache not found. registring cache... (${query})`)
       this.trackCache.set(query, resultFetch)
       resultFetch.tracks.map(el => {
+        if (query === el.info.identifier) return
         this.client.logger.debug(`[AudioManager] Registring Identifier: ${el.info.identifier}`)
         this.trackCache.set(el.info.identifier, el)
       })
@@ -305,17 +273,3 @@ class Audio extends Shoukaku.Shoukaku {
 }
 
 module.exports = Audio
-
-function clone (obj) {
-  if (obj === null || typeof (obj) !== 'object') { return obj }
-
-  var copy = obj.constructor()
-
-  for (var attr in obj) {
-    if (obj.hasOwnProperty(attr)) {
-      copy[attr] = clone(obj[attr])
-    }
-  }
-
-  return copy
-}

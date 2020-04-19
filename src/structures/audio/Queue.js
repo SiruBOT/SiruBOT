@@ -140,9 +140,7 @@ class Queue extends EventEmitter {
   async deQueue (guildID, skip = false, err = false) {
     const guildData = await this.client.database.getGuild(guildID)
     if (err) return this.playNext(guildID)
-    if (skip) {
-      await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
-    }
+    if (skip) return this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
     switch (guildData.repeat) {
       case 0:
         if (!err && guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
@@ -227,6 +225,7 @@ class Queue extends EventEmitter {
     try {
       await this.audio.players.get(guildID).playTrack(track, playOptions)
       if (!this.audio.playedTracks.get(guildID)) this.audio.playedTracks.set(guildID, [])
+      await this.audio.setPlayersDefaultSetting(guildID)
       await this.setNowPlaying(guildID, trackData)
       await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
       this.audio.utils.updateNowplayingMessage(guildID)

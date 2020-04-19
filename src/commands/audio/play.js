@@ -35,13 +35,12 @@ class Command extends BaseCommand {
     const Audio = this.client.audio
     let searchStr = message.attachments.map(el => el.url)[0] ? message.attachments.map(el => el.url)[0] : args.join(' ')
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
-
+    if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!Audio.players.get(message.guild.id) || (this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
       const voiceJoinSuccess = await this.client.commands.get('join').run(compressed, true)
       if (voiceJoinSuccess !== true) return
     }
 
-    if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!this.client.utils.find.validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
     const loadingMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_LOAD'))
@@ -74,9 +73,8 @@ class Command extends BaseCommand {
     }
 
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
-      const info = searchResult.tracks[0].info
-      const track = searchResult.tracks[0]
-      if (info.title.length === 0) track.info.title = searchStr.split('/').slice(-1)[0]
+      const track = searchResult.tracks.shift()
+      if (track.info.title.length === 0) track.info.title = searchStr.split('/').slice(-1).shift()
       this.addQueue(message, track, picker, locale)
     }
   }

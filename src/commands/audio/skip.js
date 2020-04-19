@@ -35,7 +35,7 @@ class Command extends BaseCommand {
         REQUEST: message.guild.members.cache.get(guildData.nowplaying.request) ? message.guild.members.cache.get(guildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN')
       }
       if (guildData.nowplaying.request === message.author.id) {
-        this.client.audio.queue.skip(message.guild.id)
+        await this.skip(message.guild.id)
         return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
       } else {
         const toSkip = Math.round(message.member.voice.channel.members.filter(m => !m.user.bot).size / 2)
@@ -47,13 +47,21 @@ class Command extends BaseCommand {
           REQUEST: message.guild.members.cache.get(guildData.nowplaying.request) ? message.guild.members.cache.get(guildData.nowplaying.request).displayName : picker.get(locale, 'UNKNOWN')
         }))
         if (this.client.audio.skippers.get(message.guild.id).length >= toSkip) {
-          this.client.audio.queue.skip(message.guild.id)
+          await this.skip(message.guild.id)
           return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
         }
       }
     } else {
       return message.channel.send(picker.get(locale, 'AUDIO_NOPLAYER'))
     }
+  }
+
+  async skip (guildID) {
+    return this.client.audio.players.get(guildID).setVolume(1).then(() => {
+      setTimeout(() => {
+        this.client.audio.queue.skip(guildID)
+      }, 1000)
+    })
   }
 }
 

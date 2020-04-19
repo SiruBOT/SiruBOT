@@ -44,13 +44,8 @@ class Command extends BaseCommand {
     }
     try {
       await (() => {
-        // if (!message.guild.me.voice.channelID || !this.client.audio.players.get(message.guild.id)) {
-        return this.client.audio.join(voiceChannelID, message.guild.id)
-        // } else if (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID !== message.member.voice.channelID) {
-        // return this.client.audio.moveChannel(voiceChannelID, message.guild.id)
-        // } else {
-        //   return Promise.resolve(true)
-        // }
+        if (this.client.audio.players.get(message.guild.id) && this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID !== message.member.voice.channelID) return message.guild.me.voice.setChannel(message.member.voice.channelID)
+        else return this.client.audio.join(voiceChannelID, message.guild.id)
       })()
       sendFunc(picker.get(locale, 'COMMANDS_AUDIO_JOIN_OK', { VOICECHANNEL: voiceChannelID }))
       return true
