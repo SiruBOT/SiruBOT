@@ -20,7 +20,6 @@
     "node-os-utils": "^1.2.2",
     "node-uuid": "^1.4.8",
     "random-http-useragent": "^1.1.23",
-    "redis": "^3.0.2",
     "shoukaku": "github:Deivu/Shoukaku",
     "slyrics": "^0.1.42",
     "string-placeholder": "^1.0.2",
