@@ -6,8 +6,8 @@ class Event {
   }
 
   /**
-     * Run Event
-     */
+   * Run Event
+   */
   async run (oldState, newState) {
     this.client.audio.audioTimer.chkTimer(oldState, newState)
   }

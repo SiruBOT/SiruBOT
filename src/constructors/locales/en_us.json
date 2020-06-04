@@ -102,6 +102,7 @@
   "COMMANDS_AUDIO_VOLUME_HIGH_HDF": "> %EMOJI_NO%  Volume is not excess **150%**!",
   "NOWPLAYING_NOTRACK": "Currently nothing playing!",
   "NOWPLAYING_FOOTER": "%REMAIN% Tracks Remaining | Source: %SOURCE%",
+  "AUDIO_PAUSED_INACTIVE": "> %EMOJI_WARN%  There was no activity on the voice channel, so I paused song!",
   "AUDIO_DISCONNECTED": "> %EMOJI_WARN% Unexpected disconnect occurred. \n> %EMOJI_WARN%  Use the ``%PREFIX%join`` command or the ``%PREFIX%play`` command to play again.",
   "AUDIO_NO_NODES": "> %EMOJI_BULB%  Currently available nodes do not exist!",
   "AUDIO_REQUIRE_PLAYING": "> %EMOJI_NO%  This command can only be used while playing a song.",

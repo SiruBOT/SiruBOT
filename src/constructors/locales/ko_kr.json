@@ -97,6 +97,7 @@
   "HANDLE_COMMANDS_NO_PERMISSIONS": "%EMOJI_NO%  이 명령어는 다음 권한이 필요해요. ``%REQUIRED%``",
   "NOWPLAYING_FOOTER": "%REMAIN% 곡 남음 | 노래 출처: %SOURCE%",
   "NOWPLAYING_NOTRACK": "아무 노래도 재생중이지 않아요!",
+  "AUDIO_PAUSED_INACTIVE": "> %EMOJI_WARN%  음성 채널에 아무 활동이 없어 잠시 음악을 멈췄어요!",
   "AUDIO_DISCONNECTED": "> %EMOJI_WARN%  예상하지 못한 방법으로 오디오 연결이 끊어졌어요, \n> %EMOJI_WARN%  대기열을 다시 재생하시려면 ``%PREFIX%join`` 명령어나 ``%PREFIX%play`` 명령어를 사용하여 다시 재생해주세요!",
   "AUDIO_NO_NODES": "> %EMOJI_BULB%  현재 노래를 재생 할 수 있는 노드가 존재하지 않아요!",
   "AUDIO_REQUIRE_PLAYING": "> %EMOJI_NO%  이 명령어는 노래 재생 중에만 사용이 가능한 명령어에요.",

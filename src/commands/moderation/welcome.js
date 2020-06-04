@@ -67,7 +67,7 @@ class Command extends BaseCommand {
             propertyRes = this.client.utils.find.matchObj(respondMatches[type], propertyArgs.shift(), null)
             if (args.length === 0) args = propertyArgs
           }
-          if (!propertyRes) return await message.channel.send()
+          if (!propertyRes) return await message.channel.send('Hello')
         } catch (e) {
           if (e.name !== 'timeout') throw e
           else message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete({ timeout: 5000 }))
