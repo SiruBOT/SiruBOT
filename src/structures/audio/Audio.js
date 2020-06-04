@@ -4,7 +4,7 @@ const { Collection } = require('discord.js')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const randomUA = require('random-http-useragent')
-
+const AudioTimer = require('./AudioTimer')
 const Filters = require('./AudioFilters')
 const Queue = require('./Queue')
 const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
@@ -42,6 +42,7 @@ class Audio extends Shoukaku.Shoukaku {
       queueEvents.HandleEvents(data)
     })
 
+    this.audioTimer = new AudioTimer(this.client, this.client._options.audio.timeout)
     this.filters = new Filters(this)
     this.textChannels = new Collection()
     this.textMessages = new Collection()

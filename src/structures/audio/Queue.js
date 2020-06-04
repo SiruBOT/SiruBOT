@@ -88,7 +88,7 @@ class Queue extends EventEmitter {
       if (!error && nowplaying.track !== null && !this.audio.players.get(guildID).track && nowplayingPosition !== nowplaying.info.length) {
         this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Nowplaying...`)
         this.audio.players.get(guildID).track = nowplaying.track
-        await this.play(guildID, nowplaying, nowplayingPosition)
+        await this.play(guildID, nowplaying, nowplayingPosition, true)
         return
       }
       if (error || (queue.length > 0 && !this.audio.players.get(guildID).track)) {
@@ -216,7 +216,7 @@ class Queue extends EventEmitter {
    * @param {String} trackData - base64 Track to play
    * @example - <Queue>.play('672586746587774976', 'QAAApgIAQ1vrqqnshozrpqzsmYAg6...')
    */
-  async play (guildID, trackData, seekPosition = 0) {
+  async play (guildID, trackData, seekPosition = 0, nowplaying = false) {
     const { track } = trackData
     this.client.logger.debug(`${this.defaultPrefix.play} [${guildID}] Playing Item ${track}...`)
     const playOptions = {}
@@ -227,7 +227,7 @@ class Queue extends EventEmitter {
       if (!this.audio.playedTracks.get(guildID)) this.audio.playedTracks.set(guildID, [])
       await this.audio.setPlayersDefaultSetting(guildID)
       await this.setNowPlaying(guildID, trackData)
-      await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
+      if (!nowplaying) await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
       this.audio.utils.updateNowplayingMessage(guildID)
       this.audio.playedTracks.get(guildID).push(trackData.info.identifier)
       this.emit('queueEvent', { guildID, trackData, op: 'trackStarted' })
