@@ -29,7 +29,7 @@ class Command extends BaseCommand {
     const { message, guildData } = compressed
     const { locale } = guildData
     const picker = this.client.utils.localePicker
-    if (!guildData.queue.shift() || !guildData.nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
+    if (!guildData.queue[0] || !guildData.nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
     if (guildData.nowplaying.track && this.client.audio.players.get(message.guild.id)) {
       const placeHolder = {
         TITLE: this.client.audio.utils.formatTrack(guildData.nowplaying.info),

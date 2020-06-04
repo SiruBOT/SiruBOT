@@ -196,12 +196,12 @@ class Queue extends EventEmitter {
         await this.play(guildID, guildData.nowplaying)
         this.client.logger.debug(`${this.defaultPrefix.playNext} Play Next Song... (Song: ${guildData.nowplaying.track}) (Single Repeat)`)
       } else if (guildData.queue.length !== 0) {
-        const playTo = queue.shift()
+        const playTo = queue[0]
         this.client.logger.debug(`${this.defaultPrefix.playNext} Play Next Song... (Song: ${playTo.track})`)
         await this.play(guildID, playTo)
       }
     } else {
-      if (!queue.shift()) {
+      if (!queue[0]) {
         await this.setNowPlaying(guildID, { track: null })
         this.client.logger.debug(`${this.defaultPrefix.playNext} [${guildID}] Nothing items to playing next!`)
         this.emit('queueEvent', { guildID, op: 'playBackEnded' })

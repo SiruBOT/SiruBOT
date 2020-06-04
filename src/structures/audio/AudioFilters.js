@@ -71,8 +71,6 @@ class AudioFilters {
   setKaraoke (guildID, level = 1, monoLevel = 1, filterBand = 220, filterWidth = 100) {
     if (!guildID) throw new Error('guildId not provided')
     if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
-    const nodeOpts = this.client._options.audio.nodes.filter(el => el.name === this.client.audio.players.get(guildID).voiceConnection.node.name)[0]
-    if (!nodeOpts.andesite) throw new Error('only support anesite node')
     const payload = {}
     Object.defineProperty(payload, 'op', { value: 'filters', enumerable: true })
     Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })
@@ -96,8 +94,6 @@ class AudioFilters {
   setTimescale (guildID, speed = 1, pitch = 1, rate = 1) {
     if (!guildID) throw new Error('guildId not provided')
     if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
-    const nodeOpts = this.client._options.audio.nodes.filter(el => el.name === this.client.audio.players.get(guildID).voiceConnection.node.name)[0]
-    if (!nodeOpts.andesite) throw new Error('only support anesite node')
     const payload = {}
     Object.defineProperty(payload, 'op', { value: 'filters', enumerable: true })
     Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })

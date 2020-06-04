@@ -38,8 +38,8 @@ class Command extends BaseCommand {
       embed.setTitle(picker.get(locale, 'COMMANDS_HELP_TITLE'))
       for (const item of this.client.categories.keyArray()) {
         for (const permission of userPermissions) {
-          if (this.client.utils.permissionChecker.categories.filter(el => el.category === item).shift().requiredPermissions.includes(permission)) {
-            embed.addField('**' + picker.get(locale, `CATEGORY_${item}`) + '**', this.client.categories.get(item).map(el => `\`\`${el}<${this.client.commands.get(el).aliases.shift()}>\`\``).join(' '), false)
+          if (this.client.utils.permissionChecker.categories.filter(el => el.category === item)[0].requiredPermissions.includes(permission)) {
+            embed.addField('**' + picker.get(locale, `CATEGORY_${item}`) + '**', this.client.categories.get(item).map(el => `\`\`${el}<${this.client.commands.get(el).aliases[0]}>\`\``).join(' '), false)
             break
           }
         }

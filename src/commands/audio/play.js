@@ -88,7 +88,7 @@ class Command extends BaseCommand {
         TRACK: this.client.audio.utils.formatTrack(info),
         POSITION: queue.length + 1
       })
-      if (nowplaying.track && this.client.audio.players.get(message.guild.id).track) localeName = 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE'
+      if (nowplaying.track) localeName = 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE'
       else localeName = 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY'
       message.channel.send(picker.get(locale, localeName, placeHolder))
     }
