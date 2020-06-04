@@ -18,7 +18,8 @@ class AudioTimer {
             this.client.utils.localePicker.get(
               await this.client.database.getGuild(newState.guild.id || oldState.guild.id).locale,
               'AUDIO_PAUSED_INACTIVE', { CHANNEL: newState.channelId || oldState.channelId }
-            )
+            ),
+            true
           )
           this.client.logger.debug(`[AudioTimer] Timer Ended ${this.timeout}ms ${newState.guild.id}`)
         } else {
