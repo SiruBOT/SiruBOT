@@ -5,7 +5,7 @@ module.exports = {
     // Prefix: /src/constructors/placeHolderConstructors.js[PREFIX]
     games: ['%USERS% 명의 유저와 함께하고 있어요!', '봇 리라이트중!', '%GUILDS% 개의 길드에서 사용 중!', '>>도움 | %PING%ms', 'https://github.com/cotwo0139/CHINOBOT_BETA.git'],
     gamesInterval: 30000, // 1000ms = 1sec (ms)
-    owners: [],
+    owners: ['12345678'],
     shards: shardCount
   },
   webhook: {
@@ -16,8 +16,8 @@ module.exports = {
   },
   audio: {
     nodes: [
-      { host: '192.168.0.11', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true, andesite: false }, // If andesite node, true (Filters, karaoke, timescale(etc..))
-      { host: '192.168.0.22', port: 2333, password: 'youshallnotpass', reconnectInterval: '1000', reconnect: true, andesite: false } // If andesite node, true
+      { host: '192.168.0.11', port: 2333, auth: 'youshallnotpass', name: 'Container-1' },
+      { host: '192.168.0.22', port: 2333, auth: 'youshallnotpass', name: 'Container-2' }
     ],
     shards: shardCount
   },
@@ -29,10 +29,6 @@ module.exports = {
       mongoURL: 'mongodb://mongodbIP:27017/DBNAME?authSource=admin',
       user: 'yourmongodbuser',
       password: 'yourmongodbpassword'
-    },
-    redis: {
-      host: '127.0.0.1',
-      port: 6379
     }
   },
   embed: {
