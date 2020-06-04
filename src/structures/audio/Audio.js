@@ -76,6 +76,7 @@ class Audio extends Shoukaku.Shoukaku {
         this.audioRouter.registerEvents(player)
         this.setPlayersDefaultSetting(guildID)
         this.client.logger.debug(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Successfully joined voiceChannel.`)
+        this.queue.autoPlay(guildID)
         resolve(true)
       }).catch(e => {
         this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)

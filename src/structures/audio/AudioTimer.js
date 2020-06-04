@@ -12,7 +12,7 @@ class AudioTimer {
       const timer = setTimeout(() => {
         this.timers.delete(newState.guild.id)
         if (newState.channel.members.has(this.client.user.id) && newState.channel.members.size === 1) {
-          this.client.channels.cache.get('710151147503222855').send('Timer Ended' + this.timeout)
+          this.client.channels.cache.get('710151147503222855').send('Timer Ended ' + this.timeout)
           this.client.audio.stop(newState.guild.id, false)
         } else {
           this.chkTimer(oldState, newState)
