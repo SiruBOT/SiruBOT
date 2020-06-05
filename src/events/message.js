@@ -97,10 +97,11 @@ class Event {
               CHANNEL: guildData.tch
             }))
           } catch {
-            await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', {
+            const m = await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_DEFAULT_TEXT', {
               SERVER: message.guild.name,
               CHANNEL: guildData.tch
-            })).then(m => m.delete({ timeout: 3000 }))
+            }))
+            m.delete({ timeout: 3000 })
           }
         }
       }

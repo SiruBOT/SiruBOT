@@ -119,6 +119,8 @@ class Audio extends Shoukaku.Shoukaku {
     this.playedTracks.set(guildID, [])
     this.leave(guildID)
     clearTimeout(this.audioTimer.timers.get(guildID))
+    this.textChannels.delete(guildID)
+    this.textMessages.delete(guildID)
     if (cleanQueue) {
       this.client.database.updateGuild(guildID, { $set: { queue: [] } })
       this.queue.setNowPlaying(guildID, { track: null })
