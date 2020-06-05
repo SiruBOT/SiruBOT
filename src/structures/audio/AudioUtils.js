@@ -141,14 +141,30 @@ class AudioUtils {
       const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)
       if (!sendChannel || sendChannel.deleted) return this.client.logger.error(`${this.defaultPrefix.sendMessage} Channel Not Found... Please check database or audio TextChannels!`)
       if (this.client.utils.permissionChecker.checkChannelPermission(this.client.guilds.cache.get(guildID).me, sendChannel, ['SEND_MESSSAGES', 'ATTACH_FILES'])) {
-        this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send Message "${text}" to channel ${sendChannel.id}`)
-        if (this.client.audio.textMessages.get(guildID) && this.client.audio.textMessages.get(guildID).deletable) {
-          this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
-          this.client.audio.textMessages.get(guildID).delete().catch(() => {
-            this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete previous message..`)
-          })
+        this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send (or) edit Message "${text}" to channel ${sendChannel.id}`)
+        const lastTextMessage = this.client.audio.textMessages.get(guildID)
+        const sendToChannel = async (channel, text) => {
+          if (lastTextMessage.deletable) {
+            this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
+            try {
+              await lastTextMessage.delete()
+            } catch {
+              this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete previous message..`)
+            }
+          }
+          const m = await channel.send(text)
+          this.client.audio.textMessages.set(guildID, m)
+          return m
         }
-        sendChannel.send(text).then(m => this.client.audio.textMessages.set(guildID, m))
+        if (!lastTextMessage.deleted && sendChannel.lastMessageID === lastTextMessage.id) {
+          try {
+            await sendChannel.edit(text)
+          } catch (e) {
+            await sendToChannel(sendChannel, text)
+          }
+        } else {
+          await sendToChannel(sendChannel, text)
+        }
       }
     }
   }
