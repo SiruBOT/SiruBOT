@@ -50,15 +50,18 @@ const hookLogger = new WebhookLogger(settings.webhook.info.id, settings.webhook.
 manager.on('shardCreate', shard => {
   setUpEvents(shard)
   logger.warn(`[Sharding] Successfully Launched Shard of ${shard.id}!`)
-  if (settings.bot.shards - 1 === shard.id) {
-    logger.warn(`[Sharding] Successfully Launched all shards! (${settings.bot.shards} shards)`)
-  }
 })
 
 manager.spawn()
 
 function setUpEvents (shard) {
-  shard.on('ready', () => hookLogger.warn(`[Shard ${shard.id}] Shard Ready`))
+  shard.on('ready', () => {
+    if (manager.totalShards - 1 === shard.id) {
+      manager.broadcastEval('this.setActivity()')
+      logger.warn(`[Sharding] Successfully Launched all shards! (${settings.bot.shards} shards)`)
+    }
+    hookLogger.warn(`[Shard ${shard.id}] Shard Ready`)
+  })
   shard.on('error', (error) => {
     hookLogger.fatal(`[Shard ${shard.id}] Shard Error`, `\`\`\`js\n${error.stack.substring(0, 1000) || error.message.substring(0, 1000)}\`\`\``)
     logger.error(error.stack || error.message)
