@@ -158,7 +158,7 @@ class AudioUtils {
         }
         if (lastTextMessage && !lastTextMessage.deleted && sendChannel.lastMessageID === lastTextMessage.id) {
           try {
-            await sendChannel.edit(text)
+            await lastTextMessage.edit(text)
           } catch (e) {
             await sendToChannel(sendChannel, text)
           }
