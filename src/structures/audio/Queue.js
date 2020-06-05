@@ -205,7 +205,7 @@ class Queue extends EventEmitter {
         await this.setNowPlaying(guildID, { track: null })
         this.client.logger.debug(`${this.defaultPrefix.playNext} [${guildID}] Nothing items to playing next!`)
         this.emit('queueEvent', { guildID, op: 'playBackEnded' })
-        this.client.audio.leave(guildID)
+        this.client.audio.stop(guildID)
       }
     }
   }
