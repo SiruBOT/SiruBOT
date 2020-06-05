@@ -4,6 +4,7 @@
   "description": "MusicBot With Andesite node, Moderation, some funny stuff",
   "main": "index.js",
   "dependencies": {
+    "@sentry/node": "^5.16.1",
     "@thesharks/jagtag-js": "^1.0.4",
     "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",

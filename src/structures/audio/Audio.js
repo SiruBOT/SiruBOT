@@ -118,6 +118,7 @@ class Audio extends Shoukaku.Shoukaku {
     if (!guildID) return new Error('guildID is not provied')
     this.playedTracks.set(guildID, [])
     this.leave(guildID)
+    clearTimeout(this.audioTimer.timers.get(guildID))
     if (cleanQueue) {
       this.client.database.updateGuild(guildID, { $set: { queue: [] } })
       this.queue.setNowPlaying(guildID, { track: null })
