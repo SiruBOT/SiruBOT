@@ -11,13 +11,14 @@ class AudioTimer {
       this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${newState.guild.id}`)
       const timer = setTimeout(async () => {
         this.timers.delete(newState.guild.id)
-        if (newState.channel && newState.channel.members && newState.channel.members.filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size) {
+        if (newState.channel && newState.channel.members && newState.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
           this.client.audio.stop(newState.guild.id, false)
+          const guildData = await this.client.database.getGuild(newState.guild.id || oldState.guild.id)
           this.client.audio.utils.sendMessage(
             newState.guild.id || oldState.guild.id,
             this.client.utils.localePicker.get(
-              await this.client.database.getGuild(newState.guild.id || oldState.guild.id).locale,
-              'AUDIO_PAUSED_INACTIVE', { CHANNEL: newState.channelId || oldState.channelId }
+              guildData.locale,
+              'AUDIO_PAUSED_INACTIVE'
             ),
             true
           )
