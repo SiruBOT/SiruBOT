@@ -156,7 +156,7 @@ class AudioUtils {
           this.client.audio.textMessages.set(guildID, m)
           return m
         }
-        if (!lastTextMessage.deleted && sendChannel.lastMessageID === lastTextMessage.id) {
+        if (lastTextMessage && !lastTextMessage.deleted && sendChannel.lastMessageID === lastTextMessage.id) {
           try {
             await sendChannel.edit(text)
           } catch (e) {
