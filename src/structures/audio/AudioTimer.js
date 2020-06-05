@@ -11,7 +11,7 @@ class AudioTimer {
       this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${newState.guild.id}`)
       const timer = setTimeout(async () => {
         this.timers.delete(newState.guild.id)
-        if (newState.channel.members.has(this.client.user.id) && newState.channel.members.size === 1) {
+        if (newState.channel && newState.channel.members && newState.channel.members.filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size) {
           this.client.audio.stop(newState.guild.id, false)
           this.client.audio.utils.sendMessage(
             newState.guild.id || oldState.guild.id,

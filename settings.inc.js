@@ -1,5 +1,6 @@
 const shardCount = 1
 module.exports = {
+  sentry: null, // Your Sentry DSN URL
   bot: {
     token: 'SUPEEEEEEEEER SECRET Token',
     // Prefix: /src/constructors/placeHolderConstructors.js[PREFIX]

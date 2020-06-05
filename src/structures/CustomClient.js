@@ -6,6 +6,7 @@ const Logger = require('./Logger')
 const Image = require('./image/Image')
 const utils = require('../utils')
 const { getSettings, PermissionChecker } = utils
+const Sentry = require('@sentry/node')
 const ServerLoggerManager = require('./logging/ServerLoggerManager')
 const fs = require('fs')
 const path = require('path')
@@ -37,7 +38,7 @@ class CustomClient extends Discord.Client {
 
     this.activityNum = 0
     this.initialized = false
-
+    if (this._options.sentry) Sentry.init({ dsn: this._options.sentry })
     this.commands_loaded = false
     this.commands = new Discord.Collection()
     this.events = new Discord.Collection()
