@@ -12,16 +12,20 @@ class AudioTimer {
       const timer = setTimeout(async () => {
         this.timers.delete(newState.guild.id)
         if (newState.channel && newState.channel.members && newState.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
-          this.client.audio.stop(newState.guild.id, false)
           const guildData = await this.client.database.getGuild(newState.guild.id || oldState.guild.id)
-          this.client.audio.utils.sendMessage(
-            newState.guild.id || oldState.guild.id,
-            this.client.utils.localePicker.get(
-              guildData.locale,
-              'AUDIO_PAUSED_INACTIVE'
-            ),
-            true
-          )
+          try {
+            await this.client.audio.utils.sendMessage(
+              newState.guild.id || oldState.guild.id,
+              this.client.utils.localePicker.get(
+                guildData.locale,
+                'AUDIO_PAUSED_INACTIVE'
+              ),
+              true
+            )
+          } catch {
+            this.client.logger.warn(`[AudioTimer] Failed to send TimerEndedMessage ${newState.guild.id} is channel is invalid?`)
+          }
+          this.client.audio.stop(newState.guild.id, false)
           this.client.logger.debug(`[AudioTimer] Timer Ended ${this.timeout}ms ${newState.guild.id}`)
         } else {
           clearTimeout(this.timers.get(newState.guild.id))
