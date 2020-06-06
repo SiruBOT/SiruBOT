@@ -1,7 +1,6 @@
-const Discord = require('discord.js')
 const util = require('util')
 const sleep = util.promisify(setTimeout)
-const evalPromise = util.promisify(eval)
+const evalPromise = (code) => new Promise((resolve) => resolve(eval(code)))
 const { placeHolderConstructors } = require('../../constructors')
 const { BaseCommand } = require('../../structures')
 
