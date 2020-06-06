@@ -40,7 +40,7 @@ class Command extends BaseCommand {
       await message.react(placeHolderConstructors.EMOJI_YES)
       await this.sendOver2000(util.inspect(result, { depth: 0 }), message, { code: 'js' })
     } catch (e) {
-      await message.react(placeHolderConstructors.EMOJI_NO)
+      await message.react(placeHolderConstructors.EMOJI_X)
       await this.sendOver2000(e, message, { code: 'js' })
     } finally {
       try {
@@ -50,7 +50,7 @@ class Command extends BaseCommand {
   }
 
   async sendOver2000 (content, message, options = {}) {
-    if (!content.length > 1990) return message.channel.send(content, options)
+    if (content.length < 1990) return message.channel.send(content, options)
     const messagesList = []
     while (content.length > 1990) {
       let index = content.lastIndexOf('\n\n', 1990)

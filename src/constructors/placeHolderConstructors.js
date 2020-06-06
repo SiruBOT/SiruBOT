@@ -1,6 +1,7 @@
 module.exports = {
   EMOJI_MUSIC: '🎵',
   EMOJI_NO: '❎',
+  EMOJI_X: '❌',
   EMOJI_YES: '✅',
   EMOJI_PINGPONG: '🏓',
   EMOJI_MONEY: '💸',
