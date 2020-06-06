@@ -33,6 +33,10 @@ class Command extends BaseCommand {
     else {
       if (Number(args[0]) < 0) return message.channel.send(picker.get(locale, 'LOWERTHANX', { NUM: '0' }))
       if (Number(args[0]) > 10) return message.channel.send(picker.get(locale, 'HIGHERTHANX', { NUM: '10' }))
+      if (Number(args[0]) === 1) {
+        this.client.audio.filters.clearFilters(message.guild.id)
+        return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_KARAOKE_BASE', { VAL: 1, DESC: picker.get(locale, 'COMMANDS_AUDIO_KARAOKE_UNSTABLE') }))
+      }
       return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_KARAOKE_BASE', { VAL: this.client.audio.filters.setKaraoke(message.guild.id, Number(args[0])).level, DESC: picker.get(locale, 'COMMANDS_AUDIO_KARAOKE_UNSTABLE') }))
     }
   }

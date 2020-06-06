@@ -33,6 +33,24 @@ class AudioFilters {
   }
 
   /**
+   * @description clear all filters guildId
+   * @param {String} guildId guildID of guild
+   */
+  clearFilters (guildID) {
+      if (!guildID) throw new Error('guildId not provided')
+      if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
+      const payload = {}
+      Object.defineProperty(payload, 'op', { value: 'clearfilter', enumerable: true })
+      Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })
+      delete this.client.audio.players.get(guildID)['bboost']
+      delete this.client.audio.players.get(guildID)['karaoke']
+      delete this.client.audio.players.get(guildID)['timescale']
+      this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
+      return payload
+    }
+  }
+
+  /**
    * @param {String} guildID - guildId for set
    * @param {Number} percentage - percentage of multiplier
    */
