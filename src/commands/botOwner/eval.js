@@ -1,12 +1,5 @@
 const util = require('util')
 const sleep = util.promisify(setTimeout)
-const evalPromise = (code) => new Promise((resolve, reject) => {
-  try {
-    resolve(eval(code))
-  } catch (e) {
-    reject(e)
-  }
-})
 const { placeHolderConstructors } = require('../../constructors')
 const { BaseCommand } = require('../../structures')
 
@@ -39,6 +32,13 @@ class Command extends BaseCommand {
     const waitReaction = await message.react(placeHolderConstructors.EMOJI_SANDCLOCK)
     const codeToRun = args.join(' ')
     try {
+      const evalPromise = (code) => new Promise((resolve, reject) => {
+        try {
+          resolve(eval(code))
+        } catch (e) {
+          reject(e)
+        }
+      })
       const result = await Promise.race([
         this.timeout(30000),
         evalPromise(codeToRun)
