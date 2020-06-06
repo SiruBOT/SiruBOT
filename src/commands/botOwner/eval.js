@@ -1,6 +1,12 @@
 const util = require('util')
 const sleep = util.promisify(setTimeout)
-const evalPromise = (code) => new Promise((resolve) => resolve(eval(code)))
+const evalPromise = (code) => new Promise((resolve, reject) => {
+  try {
+    resolve(eval(code))
+  } catch (e) {
+    reject(e)
+  }
+})
 const { placeHolderConstructors } = require('../../constructors')
 const { BaseCommand } = require('../../structures')
 
@@ -41,7 +47,7 @@ class Command extends BaseCommand {
       await this.sendOver2000(util.inspect(result, { depth: 0 }), message, { code: 'js' })
     } catch (e) {
       await message.react(placeHolderConstructors.EMOJI_X)
-      await this.sendOver2000(e, message, { code: 'js' })
+      await this.sendOver2000(e.stack || e.message || e.name || e, message, { code: 'js' })
     } finally {
       try {
         await waitReaction.remove()
