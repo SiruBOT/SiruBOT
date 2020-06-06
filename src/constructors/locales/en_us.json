@@ -4,7 +4,7 @@
   "BOT_NAME": "SiruBOT",
   "REMARK_1": "// Command HELP",
   "ONLY_BOTOWNERS": "(Bot Owners Only)",
-  "DESC_BOT_OWNER_COMPILE": "Evaluate JS code. %ONLY_BOTOWNERS%",
+  "DESC_BOT_OWNER_EVAL": "Evaluate JS code. %ONLY_BOTOWNERS%",
   "DESC_BOT_OWNER_CONNECTNODES": "Reconnects audio nodes %ONLY_BOTOWNERS%",
   "DESC_BOT_OWNER_BLACKLIST": "Manages Blacklist Users %ONLY_BOTOWNERS%",
   "DESC_BOT_OWNER_CACHEINFO": "View or manage your audio cache! %ONLY_BOTOWNERS%",
