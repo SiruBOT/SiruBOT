@@ -20,7 +20,7 @@ class AudioTimer {
             ),
             true
           )
-          this.client.audio.stop(guildId)
+          this.client.audio.stop(guildId, false)
           this.client.logger.debug(`[AudioTimer] Timer Ended ${this.timeout}ms ${guildId}`)
         } catch {
           this.client.logger.warn(`[AudioTimer] Failed to send TimerEndedMessage ${guildId} is channel is invalid?`)
