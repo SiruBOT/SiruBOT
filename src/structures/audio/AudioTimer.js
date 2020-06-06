@@ -24,6 +24,8 @@ class AudioTimer {
         } catch {
           this.client.logger.warn(`[AudioTimer] Failed to send TimerEndedMessage ${guildId} is channel is invalid?`)
         }
+      } else {
+        this.clearTimer(guildId)
       }
     }, this.timeout)
     this.timers.set(guildId, timer)
@@ -39,8 +41,6 @@ class AudioTimer {
     if (!this.timers.get(guildId) && guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
       this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${guildId}`)
       this.createTimer(guildId)
-    } else {
-      this.clearTimer(guildId)
     }
   }
 }
