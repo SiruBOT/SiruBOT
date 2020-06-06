@@ -20,6 +20,7 @@ class AudioPlayerEvents {
    */
   onPlayerUpdate (data) {
     this.client.logger.debug(`${this.defaultPrefix.onPlayerUpdate} [${data.guildID}] Update Database... { position: ${data.position} }`)
+    this.client.audio.audioTimer.chkTimer(data.guildID)
     this.client.database.updateGuild(data.guildID, { $set: { nowplayingPosition: data.position || 0 } })
     this.client.audio.utils.updateNowplayingMessage(data.guildID)
   }

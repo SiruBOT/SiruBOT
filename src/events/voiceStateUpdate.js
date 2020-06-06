@@ -6,10 +6,10 @@ class Event {
   }
 
   /**
-   * Run Event
-   */
+     * Run Event
+     */
   async run (oldState, newState) {
-    this.client.audio.audioTimer.chkTimer(oldState, newState)
+    this.client.audio.audioTimer.chkTimer(oldState.guild.id || newState.guild.id)
   }
 }
 module.exports = Event

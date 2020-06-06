@@ -6,33 +6,41 @@ class AudioTimer {
     this.timeout = timeout
   }
 
-  chkTimer (oldState, newState) {
-    if (!this.timers.get(newState.guild.id) && newState.channel && newState.member.id === this.client.user.id) {
-      this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${newState.guild.id}`)
-      const timer = setTimeout(async () => {
-        this.timers.delete(newState.guild.id)
-        if (newState.channel && newState.channel.members && newState.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
-          const guildData = await this.client.database.getGuild(newState.guild.id || oldState.guild.id)
-          try {
-            await this.client.audio.utils.sendMessage(
-              newState.guild.id || oldState.guild.id,
-              this.client.utils.localePicker.get(
-                guildData.locale,
-                'AUDIO_PAUSED_INACTIVE'
-              ),
-              true
-            )
-          } catch {
-            this.client.logger.warn(`[AudioTimer] Failed to send TimerEndedMessage ${newState.guild.id} is channel is invalid?`)
-          }
-          this.client.audio.stop(newState.guild.id, false)
-          this.client.logger.debug(`[AudioTimer] Timer Ended ${this.timeout}ms ${newState.guild.id}`)
-        } else {
-          clearTimeout(this.timers.get(newState.guild.id))
-          this.chkTimer(oldState, newState)
+  createTimer (guildId) {
+    const timer = setTimeout(async () => {
+      const guild = this.client.guilds.cache.get(guildId)
+      if (guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
+        const guildData = await this.client.database.getGuild(guildId || guildId)
+        try {
+          await this.client.audio.utils.sendMessage(
+            guildId,
+            this.client.utils.localePicker.get(
+              guildData.locale,
+              'AUDIO_PAUSED_INACTIVE'
+            ),
+            true
+          )
+          this.client.logger.debug(`[AudioTimer] Timer Ended ${this.timeout}ms ${guildId}`)
+        } catch {
+          this.client.logger.warn(`[AudioTimer] Failed to send TimerEndedMessage ${guildId} is channel is invalid?`)
         }
-      }, this.timeout)
-      this.timers.set(newState.guild.id, timer)
+      }
+    }, this.timeout)
+    this.timers.set(guildId, timer)
+  }
+
+  clearTimer (guildId) {
+    clearTimeout(this.timers.get(guildId))
+    this.timers.delete(guildId)
+  }
+
+  chkTimer (guildId) {
+    const guild = this.client.guilds.cache.get(guildId)
+    if (!this.timers.get(guildId) && guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size > 0) {
+      this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${guildId}`)
+      this.createTimer(guildId)
+    } else {
+      this.clearTimer(guildId)
     }
   }
 }

@@ -35,11 +35,11 @@ class Command extends BaseCommand {
     const Audio = this.client.audio
     let searchStr = message.attachments.map(el => el.url)[0] ? message.attachments.map(el => el.url)[0] : args.join(' ')
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
-    if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (!Audio.players.get(message.guild.id) || (this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
       const voiceJoinSuccess = await this.client.commands.get('join').run(compressed, true)
       if (voiceJoinSuccess !== true) return
     }
+    if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
 
     if (!this.client.utils.find.validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
