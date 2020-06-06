@@ -72,14 +72,14 @@ class AudioFilters {
     if (!guildID) throw new Error('guildId not provided')
     if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
     const payload = {}
-    Object.defineProperty(payload, 'op', { value: 'filters', enumerable: true })
+    Object.defineProperty(payload, 'op', { value: 'karaoke', enumerable: true })
     Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })
     const karaokeObject = {}
     Object.defineProperty(karaokeObject, 'level', { value: level, enumerable: true })
     Object.defineProperty(karaokeObject, 'monoLevel', { value: monoLevel, enumerable: true })
     Object.defineProperty(karaokeObject, 'filterBand', { value: filterBand, enumerable: true })
     Object.defineProperty(karaokeObject, 'filterWidth', { value: filterWidth, enumerable: true })
-    Object.defineProperty(payload, 'karaoke', { value: karaokeObject, enumerable: true })
+    Object.assign(payload, karaokeObject)
     this.setPlayerFilter(guildID, 'karaoke', karaokeObject)
     this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
     return karaokeObject
@@ -95,7 +95,7 @@ class AudioFilters {
     if (!guildID) throw new Error('guildId not provided')
     if (!this.client.audio.players.get(guildID)) throw new Error('player not found')
     const payload = {}
-    Object.defineProperty(payload, 'op', { value: 'filters', enumerable: true })
+    Object.defineProperty(payload, 'op', { value: 'timescale', enumerable: true })
     Object.defineProperty(payload, 'guildId', { value: guildID, enumerable: true })
     const timeObject = {}
     if (speed > 0) Object.defineProperty(timeObject, 'speed', { value: speed, enumerable: true })
@@ -104,7 +104,7 @@ class AudioFilters {
     else throw new Error('pitch must be `value > 0`')
     if (rate > 0) Object.defineProperty(timeObject, 'rate', { value: rate, enumerable: true })
     else throw new Error('rate must be `value > 0`')
-    Object.defineProperty(payload, 'timescale', { value: timeObject, enumerable: true })
+    Object.assign(payload, timeObject)
     this.setPlayerFilter(guildID, 'timescale', timeObject)
     this.client.audio.players.get(guildID).voiceConnection.node.send(payload)
     return timeObject

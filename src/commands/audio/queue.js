@@ -61,7 +61,9 @@ class Command extends BaseCommand {
     const collector = m.createReactionCollector(filter, { time: 60000 })
     const funcs = {
       [emojiList[0]]: async (r) => {
-        r.users.remove(message.author)
+        try {
+          await r.users.remove(message.author)
+        } catch {}
         if (page === 0) page = data.chunkedDescriptionArray.length - 1
         else page--
         const res = await getData()
@@ -69,10 +71,14 @@ class Command extends BaseCommand {
       },
       [emojiList[1]]: async () => {
         collector.stop()
-        m.reactions.asdf.removeAll()
+        try {
+          m.reactions.removeAll()
+        } catch {}
       },
       [emojiList[2]]: async (r) => {
-        r.users.remove(message.author)
+        try {
+          await r.users.remove(message.author)
+        } catch {}
         if (page >= data.chunkedDescriptionArray.length - 1) page = 0
         else page++
         const res = await getData()
