@@ -20,12 +20,11 @@ class AudioTimer {
             ),
             true
           )
+          this.client.audio.stop(guildId)
           this.client.logger.debug(`[AudioTimer] Timer Ended ${this.timeout}ms ${guildId}`)
         } catch {
           this.client.logger.warn(`[AudioTimer] Failed to send TimerEndedMessage ${guildId} is channel is invalid?`)
         }
-      } else {
-        this.clearTimer(guildId)
       }
     }, this.timeout)
     this.timers.set(guildId, timer)
@@ -38,7 +37,8 @@ class AudioTimer {
 
   chkTimer (guildId) {
     const guild = this.client.guilds.cache.get(guildId)
-    if (!this.timers.get(guildId) && guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
+    if (!guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
+      if (this.timers.get(guildId)) this.clearTimer(guildId)
       this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${guildId}`)
       this.createTimer(guildId)
     }
