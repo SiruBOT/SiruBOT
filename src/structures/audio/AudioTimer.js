@@ -36,7 +36,7 @@ class AudioTimer {
 
   chkTimer (guildId) {
     const guild = this.client.guilds.cache.get(guildId)
-    if (!this.timers.get(guildId) && guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size > 0) {
+    if (!this.timers.get(guildId) && guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
       this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${guildId}`)
       this.createTimer(guildId)
     } else {
