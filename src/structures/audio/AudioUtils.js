@@ -144,7 +144,7 @@ class AudioUtils {
         this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send (or) edit Message "${text}" to channel ${sendChannel.id}`)
         const lastTextMessage = this.client.audio.textMessages.get(guildID)
         const sendToChannel = async (channel, text) => {
-          if (lastTextMessage && lastTextMessage.deletable) {
+          if (forceSend || (lastTextMessage && lastTextMessage.deletable)) {
             this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
             try {
               await lastTextMessage.delete()
