@@ -40,7 +40,7 @@ class Command extends BaseCommand {
         }
       })
       const result = await Promise.race([
-        this.timeout(30000),
+        this.timeout(15000),
         evalPromise(codeToRun)
       ])
       await message.react(placeHolderConstructors.EMOJI_YES)
@@ -65,8 +65,8 @@ class Command extends BaseCommand {
       if (index === -1) { index = 1990 }
       messagesList.push(await message.channel.send(content.substring(0, index), options))
       content = content.substring(index).trim()
-      messagesList.push(await message.channel.send(content, options))
     }
+    messagesList.push(await message.channel.send(content, options))
     return messagesList
   }
 
