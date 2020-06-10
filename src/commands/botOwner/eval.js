@@ -1,6 +1,6 @@
 const util = require('util')
 const sleep = util.promisify(setTimeout)
-const { placeHolderConstructors } = require('../../constructors')
+const { placeHolderConstant } = require('../../constant')
 const { BaseCommand } = require('../../structures')
 
 class Command extends BaseCommand {
@@ -29,7 +29,7 @@ class Command extends BaseCommand {
    */
   async run (compressed) {
     const { message, args } = compressed
-    const waitReaction = await message.react(placeHolderConstructors.EMOJI_SANDCLOCK)
+    const waitReaction = await message.react(placeHolderConstant.EMOJI_SANDCLOCK)
     const codeToRun = args.join(' ')
     try {
       const evalPromise = (code) => new Promise((resolve, reject) => {
@@ -43,10 +43,10 @@ class Command extends BaseCommand {
         this.timeout(15000),
         evalPromise(codeToRun)
       ])
-      await message.react(placeHolderConstructors.EMOJI_YES)
-      await this.sendOver2000(util.inspect(result, { depth: 0 }), message, { code: 'js' })
+      await message.react(placeHolderConstant.EMOJI_YES)
+      await this.sendOver2000(util.inspect(result, { depth: 1 }), message, { code: 'js' })
     } catch (e) {
-      await message.react(placeHolderConstructors.EMOJI_X)
+      await message.react(placeHolderConstant.EMOJI_X)
       await this.sendOver2000(e.stack || e.message || e.name || e, message, { code: 'js' })
     } finally {
       try {

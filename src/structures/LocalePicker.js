@@ -1,6 +1,6 @@
 const { Collection } = require('discord.js')
 const template = require('string-placeholder')
-const { placeHolderConstructors, locales } = require('../constructors/')
+const { placeHolderConstant, locales } = require('../constant')
 
 class LanguagePicker {
   constructor (client) {
@@ -29,7 +29,7 @@ class LanguagePicker {
     const settings = { before: '%', after: '%' }
     const userPlaceholder = template(language, placeholder, settings)
     const localesKeys = template(userPlaceholder, this.locales.get(lang), settings)
-    const result = template(localesKeys, placeHolderConstructors, settings)
+    const result = template(localesKeys, placeHolderConstant, settings)
     this.client.logger.debug(`[LanguagePicker:Get] Result: ${result}`)
 
     return result

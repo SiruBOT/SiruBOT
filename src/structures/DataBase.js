@@ -1,6 +1,6 @@
 const Mongo = require('mongoose')
 const uuid = require('node-uuid')
-const models = require('../constructors/models')
+const models = require('../constant/models')
 
 class DataManager {
   constructor (client) {

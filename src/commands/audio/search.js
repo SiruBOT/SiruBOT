@@ -1,6 +1,6 @@
 const Discord = require('discord.js')
 const Numbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟']
-const { placeHolderConstructors } = require('../../constructors')
+const { placeHolderConstant } = require('../../constant')
 
 const { BaseCommand } = require('../../structures')
 
@@ -56,7 +56,7 @@ class Command extends BaseCommand {
     let string = ''
     const maxres = 5
     const slicedNumberArray = Numbers.slice(0, searchResult.tracks.slice(0, maxres).length)
-    slicedNumberArray.push(placeHolderConstructors.EMOJI_NO)
+    slicedNumberArray.push(placeHolderConstant.EMOJI_NO)
     const slicedTracks = searchResult.tracks.slice(0, maxres)
     for (const index in slicedTracks) {
       string += `${Numbers[index]}  [${this.client.audio.utils.formatTrack(searchResult.tracks[index].info)}](${searchResult.tracks[index].info.uri})\n`
@@ -71,7 +71,7 @@ class Command extends BaseCommand {
       await message.channel.send(picker.get(locale, 'GENERAL_TIMED_OUT')).then(m => m.delete({ timeout: 5000 }))
       return
     }
-    if (collected.first().emoji.name === placeHolderConstructors.EMOJI_NO) {
+    if (collected.first().emoji.name === placeHolderConstant.EMOJI_NO) {
       await message.channel.send(picker.get(locale, 'GENERAL_USER_STOP')).then(m => m.delete({ timeout: 5000 }))
       return
     }

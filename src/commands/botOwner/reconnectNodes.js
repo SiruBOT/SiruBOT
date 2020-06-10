@@ -1,4 +1,4 @@
-const { placeHolderConstructors } = require('../../constructors')
+const { placeHolderConstant } = require('../../constant')
 const { BaseCommand } = require('../../structures')
 
 class Command extends BaseCommand {
@@ -29,10 +29,10 @@ class Command extends BaseCommand {
     const { message } = compressed
     for (const node of this.client._options.audio.nodes) {
       if (!this.client.audio.getNode(node.name)) {
-        message.channel.send(`${placeHolderConstructors.EMOJI_SANDCLOCK}  Reconnecting ${node.name}`)
+        message.channel.send(`${placeHolderConstant.EMOJI_SANDCLOCK}  Reconnecting ${node.name}`)
         this.client.audio.addNode(node)
       } else {
-        message.channel.send(`${placeHolderConstructors.EMOJI_YES}  Already Connected ${node.name}`)
+        message.channel.send(`${placeHolderConstant.EMOJI_YES}  Already Connected ${node.name}`)
       }
     }
   }

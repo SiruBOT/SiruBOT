@@ -3,7 +3,7 @@ const carriers = require('./carriers.json')
 const fetch = require('node-fetch')
 const moment = require('moment-timezone')
 const Discord = require('discord.js')
-const { placeHolderConstructors } = require('../../constructors')
+const { placeHolderConstant } = require('../../constant')
 const { BaseCommand } = require('../../structures')
 // https://apis.tracker.delivery/carriers/Carrier_ID/tracks/Track_No
 
@@ -33,13 +33,13 @@ class Command extends BaseCommand {
    */
   async run (compressed) {
     const { message, args } = compressed
-    if (args.length === 0) return message.channel.send(`> ${placeHolderConstructors.EMOJI_NO}  사용법이 올바르지 않아요. [택배사 이름] [송장번호] 가 필요해요.`)
-    if (!args[1]) return message.channel.send(`> ${placeHolderConstructors.EMOJI_NO}  운송장 번호를 입력해주세요! [택배사 이름] [송장번호]`)
+    if (args.length === 0) return message.channel.send(`> ${placeHolderConstant.EMOJI_NO}  사용법이 올바르지 않아요. [택배사 이름] [송장번호] 가 필요해요.`)
+    if (!args[1]) return message.channel.send(`> ${placeHolderConstant.EMOJI_NO}  운송장 번호를 입력해주세요! [택배사 이름] [송장번호]`)
 
     const carrierCode = carriers[args[0].toUpperCase()]
-    if (!carrierCode) return message.channel.send(`> ${placeHolderConstructors.EMOJI_NO}  택배사가 올바르지 않아요..\n> 사용 가능한 택배사 이름들\n> \`\`\`JS\n> ${Object.keys(carriers).join(', ')}\n> \`\`\``)
+    if (!carrierCode) return message.channel.send(`> ${placeHolderConstant.EMOJI_NO}  택배사가 올바르지 않아요..\n> 사용 가능한 택배사 이름들\n> \`\`\`JS\n> ${Object.keys(carriers).join(', ')}\n> \`\`\``)
     const fetchResult = await fetch(`https://apis.tracker.delivery/carriers/${carrierCode}/tracks/${encodeURI(args[1])}`).then(res => res.json())
-    if (fetchResult.message) return message.channel.send(`> ${placeHolderConstructors.EMOJI_NO}  ${fetchResult.message}`)
+    if (fetchResult.message) return message.channel.send(`> ${placeHolderConstant.EMOJI_NO}  ${fetchResult.message}`)
     const MappedResult = fetchResult.progresses.map(el => { return { message: el.description, time: moment(el.time).tz('Asia/Seoul').format('YYYYMMDD'), timeFormat: el.time, location: el.location } })
     const Result = {}
     Result.raw = fetchResult

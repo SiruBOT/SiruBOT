@@ -2,6 +2,6 @@ module.exports = {
   permissions: require('./permissions'),
   categories: require('./categories'),
   models: require('./models'),
-  placeHolderConstructors: require('./placeHolderConstructors'),
+  placeHolderConstant: require('./placeHolderConstant'),
   locales: require('./locales')
 }

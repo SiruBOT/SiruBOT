@@ -56,10 +56,6 @@ class BaseCommand {
   async run () {
 
   }
-
-  parseArgs (message) {
-
-  }
 }
 
 module.exports = BaseCommand

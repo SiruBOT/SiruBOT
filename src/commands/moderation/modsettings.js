@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { placeHolderConstructors } = require('../../constructors')
+const { placeHolderConstant } = require('../../constant')
 const { BaseCommand } = require('../../structures')
 
 class Command extends BaseCommand {
@@ -41,7 +41,7 @@ class Command extends BaseCommand {
       AUDIO: {
         AUDIOPLAY: audioMessage ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
         RELATED: audioPlayrelated ? picker.get(locale, 'YES') : picker.get(locale, 'NO'),
-        REPEAT_EMOJI: placeHolderConstructors['EMOJI_' + this.client.audio.utils.getRepeatState(repeat)],
+        REPEAT_EMOJI: placeHolderConstant['EMOJI_' + this.client.audio.utils.getRepeatState(repeat)],
         REPEAT: picker.get(locale, this.client.audio.utils.getRepeatState(guildData.repeat))
       },
       DEFAULT: {

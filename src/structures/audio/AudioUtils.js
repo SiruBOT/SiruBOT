@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { placeHolderConstructors } = require('../../constructors')
+const { placeHolderConstant } = require('../../constant')
 class AudioUtils {
   constructor (client) {
     this.client = client
@@ -117,8 +117,8 @@ class AudioUtils {
    */
   getNowplayingObject (guildID, guildData) {
     const obj = Object.assign({})
-    Object.defineProperty(obj, 'playingStatus', { value: placeHolderConstructors['EMOJI_AUDIO_' + this.getPlayingState(guildID)] })
-    Object.defineProperty(obj, 'repeatStatus', { value: placeHolderConstructors['EMOJI_' + this.getRepeatState(guildData.repeat)] })
+    Object.defineProperty(obj, 'playingStatus', { value: placeHolderConstant['EMOJI_AUDIO_' + this.getPlayingState(guildID)] })
+    Object.defineProperty(obj, 'repeatStatus', { value: placeHolderConstant['EMOJI_' + this.getRepeatState(guildData.repeat)] })
     if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(this.client.audio.players.get(guildID).position / guildData.nowplaying.info.length) })
     else Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(0) })
     if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(this.client.audio.players.get(guildID).position / 1000, false)}/${this.client.utils.time.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })

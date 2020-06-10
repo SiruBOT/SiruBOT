@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { permissions, categories } = require('../constructors')
+const { permissions, categories } = require('../constant')
 
 class PermissionChecker {
   constructor () {

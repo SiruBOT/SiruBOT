@@ -1,4 +1,4 @@
-const placeHolderConstructors = require('../constructors').placeHolderConstructors
+const placeHolderConstant = require('../constant').placeHolderConstant
 const Errors = require('../errors')
 class Event {
   constructor (client) {
@@ -21,13 +21,13 @@ class Event {
 
   async handleCommand (message) {
     if (message.author.bot) return
-    if (message.channel.type === 'dm') return message.channel.send(`${placeHolderConstructors.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${placeHolderConstructors.EMOJI_NO}  You can\'t use commands on the DM.`)
+    if (message.channel.type === 'dm') return message.channel.send(`${placeHolderConstant.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${placeHolderConstant.EMOJI_NO}  You can\'t use commands on the DM.`)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
     if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
     await this.client.database.checkGuild(message.guild.id)
     await this.client.database.checkMember(message.member.id, message.guild.id)
     await this.client.database.checkUser(message.author.id)
-    const prefix = placeHolderConstructors.PREFIX
+    const prefix = placeHolderConstant.PREFIX
     if (message.content.startsWith(prefix)) {
       if (message.author.awaitQuestion) return
       const picker = this.client.utils.localePicker
