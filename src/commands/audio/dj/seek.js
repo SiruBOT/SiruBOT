@@ -58,10 +58,11 @@ class Command extends BaseCommand {
   }
 
   parseTime (input) {
-    if (typeof input !== 'string' || typeof input !== 'number') return NaN // Input type check
+    if (typeof input === 'number') input = input.toString()
+    if (typeof input !== 'string') return NaN // Input type check
     let sec = 0
     const splitter = ':'
-    const tokenized = typeof input === 'number' ? `${input}`.split(splitter) : input.split(splitter)
+    const tokenized = input.split(splitter)
     try { // Split items filter, If includes not number, returns NaN
       tokenized.map((num) => {
         if (isNaN(num)) throw new Error('Unknown Time Format')
