@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'seek',
-      ['점프', 'jump'],
+      ['점프', '탐색', 'jump', 'ㄴㄷ다', 'ㅓㅕㅡㅔ'],
       ['DJ', 'Administrator'],
       'MUSIC_DJ',
       {
@@ -28,7 +28,7 @@ class Command extends BaseCommand {
     const starter = timeString.charAt(0)
     if (nowplaying &&
       nowplaying.info &&
-      nowplaying.info.isSeekable) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_CANT_SEEKABLE'))
+      !nowplaying.info.isSeekable) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_CANT_SEEKABLE'))
     if (!timeString) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_STRING_NOT_FOUND'))
     if (this.isStarter(starter)) timeString = timeString.substring(1)
     if (this.isStarter(timeString.charAt(0))) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_MULTIPLE_STARTER'))

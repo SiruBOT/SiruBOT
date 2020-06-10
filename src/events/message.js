@@ -43,6 +43,9 @@ class Event {
         memberData,
         guildData
       })
+      const memberVoice = message.member.voice.channel
+      const filteredVoice = memberVoice.members.filter(e => !e.user.bot && !(e.voice.serverDeaf || e.voice.selfDeaf))
+      if (memberVoice && memberVoice.members && filteredVoice.has(message.member.id) && filteredVoice.size === 1 && !userPermissions.includes('DJ')) userPermissions.push('DJ')
       const compressed = Object.assign({
         userData: userData,
         memberData: memberData,
