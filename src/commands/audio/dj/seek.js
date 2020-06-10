@@ -83,7 +83,8 @@ class Command extends BaseCommand {
      * 3. ['SS']
      */
     // Math.floor -> Ignore 12.3:45:6
-    if (tokenized[0] && (Math.floor(tokenized[0] > 60) || Math.floor(tokenized[0]) < 0)) return NaN
+    if (tokenized.length === 1 && tokenized[0]) sec += Math.floor(+tokenized[0]) // Make working (sec) 120, 72.. etc
+    else if (tokenized[0] && (Math.floor(tokenized[0] > 60) || Math.floor(tokenized[0]) < 0)) return NaN
     else if (tokenized[0]) sec += Math.floor(+tokenized[0])
     if (tokenized[1] && (Math.floor(tokenized[1]) > 60 || Math.floor(tokenized[1]) < 0)) return NaN
     else if (tokenized[1]) sec += Math.floor(+tokenized[1]) * 60
