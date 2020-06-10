@@ -22,13 +22,13 @@ class Command extends BaseCommand {
   }
 
   async run ({ message, args, guildData }) {
-    const { locale } = guildData
+    const { locale, nowplaying } = guildData
     const picker = this.client.utils.localePicker
     let timeString = args.join('')
     const starter = timeString.charAt(0)
-    if (guildData.nowplaying &&
-      guildData.nowplaying.info &&
-      guildData.nowplaying.info.isSeekable) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_CANT_SEEKABLE'))
+    if (nowplaying &&
+      nowplaying.info &&
+      nowplaying.info.isSeekable) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_CANT_SEEKABLE'))
     if (!timeString) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_STRING_NOT_FOUND'))
     if (this.isStarter(starter)) timeString = timeString.substring(1)
     if (this.isStarter(timeString.charAt(0))) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_MULTIPLE_STARTER'))
@@ -46,10 +46,11 @@ class Command extends BaseCommand {
         playerPosition = timeMs
         break
     }
-    if (playerPosition > guildData.nowplaying.info.length) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NO_LONGER_TRACK'))
-    if (playerPosition < 0) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NO_SHORTER_TRACK'))
-    this.client.audio.players.get(message.guild.id).seekTo(playerPosition)
-    message.channel.send(picker.get(locale, 'COMMANDS_SEEK_SUCCESS', { TIME: this.client.utils.time.toHHMSS(playerPosition), TRACK:  }))
+    if (playerPosition > guildData.nowplaying.info.length) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NO_LONGER_THAN_TRACK'))
+    if (playerPosition < 0) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NO_SHORTER_THAN_TRACK'))
+    const seekResult = await this.client.audio.players.get(message.guild.id).seekTo(playerPosition)
+    if (!seekResult) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_FAIL'))
+    message.channel.send(picker.get(locale, 'COMMANDS_SEEK_SUCCESS', { TIME: this.client.utils.time.toHHMSS(playerPosition), TITLE: Discord.Util.escapeMarkdown(nowplaying.info.title) }))
   }
 
   isStarter (divider) {
