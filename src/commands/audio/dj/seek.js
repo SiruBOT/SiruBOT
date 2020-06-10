@@ -50,7 +50,7 @@ class Command extends BaseCommand {
     if (playerPosition < 0) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NO_SHORTER_THAN_TRACK'))
     const seekResult = await this.client.audio.players.get(message.guild.id).seekTo(playerPosition)
     if (!seekResult) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_FAIL'))
-    message.channel.send(picker.get(locale, 'COMMANDS_SEEK_SUCCESS', { TIME: this.client.utils.time.toHHMSS(playerPosition), TITLE: Discord.Util.escapeMarkdown(nowplaying.info.title) }))
+    message.channel.send(picker.get(locale, 'COMMANDS_SEEK_SUCCESS', { TIME: this.client.utils.time.toHHMMSS(playerPosition), TITLE: Discord.Util.escapeMarkdown(nowplaying.info.title) }))
   }
 
   isStarter (divider) {
