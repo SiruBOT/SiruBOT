@@ -17,7 +17,6 @@ class Command extends BaseCommand {
           voiceIn: true
         }
       },
-      [],
       false
     )
   }

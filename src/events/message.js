@@ -59,7 +59,7 @@ class Event {
       const commandClass = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (commandClass) {
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))
-        if (this.client.chkRightChannel(message.channel, guildData.tch)) {
+        if (this.client.chkRightChannel(message.channel, guildData.tch) || message.member.permissions.has('ADMINISTRATOR')) {
           /**
            * Requirements
            */

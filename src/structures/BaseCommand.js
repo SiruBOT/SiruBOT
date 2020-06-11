@@ -14,7 +14,7 @@ class BaseCommand {
    * @param {Array<argument>} args - Command Arguments
    * @param {Boolean} [hide=false] - Command hide status
    */
-  constructor (client, name, aliases, permissions, category, requirements, args = [], hide = false) {
+  constructor (client, name, aliases, permissions, category, requirements, hide = false) {
     if ((client instanceof DiscordClient) === false) throw new Error('supplied constructor `client` is must be instance of Discord.Client')
     this.client = client
     if (typeof name !== 'string') throw new Error('supplied constructor `name` is must be String')
@@ -41,10 +41,6 @@ class BaseCommand {
     if (typeof voiceIn !== 'boolean') throw new Error('supplied constructor `requirements.voiceStatus.voiceIn` is must be Boolean')
     Object.defineProperty(voiceStatus, 'voiceIn', { value: voiceIn, enumerable: true })
     Object.defineProperty(this.requirements, 'voiceStatus', { value: voiceStatus, enumerable: true })
-    if (!Array.isArray(args)) throw new Error('supplied constructor `args` is must be Array')
-    const filteredArgs = args.filter(el => typeof el === 'object').filter(el => Array.isArray(el.types))
-    if (!Array.isArray(filteredArgs)) throw new Error('supplied constructor `args` is must be array')
-    this.arguments = filteredArgs
     if (typeof hide !== 'boolean') throw new Error('supplied constructor `hide` is must be Boolean')
     this.hide = hide
   }
