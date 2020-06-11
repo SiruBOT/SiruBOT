@@ -139,7 +139,11 @@ class AudioUtils {
     const { audioMessage, tch } = guildData
     if (forceSend || audioMessage) {
       const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)
-      if (!sendChannel || sendChannel.deleted) return this.client.logger.error(`${this.defaultPrefix.sendMessage} Channel Not Found... Please check database or audio TextChannels!`)
+      if (!sendChannel || sendChannel.deleted) {
+        this.client.audio.textChannels.delete(guildID)
+        this.client.audio.textMessages.delete(guildID)
+        return this.client.logger.error(`${this.defaultPrefix.sendMessage} Channel Not Found... Please check database or audio TextChannels!`)
+      }
       if (this.client.utils.permissionChecker.checkChannelPermission(this.client.guilds.cache.get(guildID).me, sendChannel, ['SEND_MESSSAGES', 'ATTACH_FILES'])) {
         this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send (or) edit Message "${text}" to channel ${sendChannel.id}`)
         const lastTextMessage = this.client.audio.textMessages.get(guildID)
