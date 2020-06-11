@@ -87,6 +87,7 @@ class Event {
           try {
             await commandClass.run(compressed)
           } catch (e) {
+            if (e instanceof Errors.UsageFailedError) return message.channel.send('Command Usage Error ' + e.commandName) // TODO
             if (e instanceof Errors.PermissionError) return message.channel.send(picker.get(locale, 'ERROR_PERMISSION', { PERMS: e.perms.join(', ') }))
             this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
             await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, commandClass.name, args) }))

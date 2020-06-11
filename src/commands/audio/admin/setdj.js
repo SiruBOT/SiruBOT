@@ -1,4 +1,5 @@
 const { BaseCommand } = require('../../../structures')
+const { UsageFailedError } = require('../../../errors')
 
 class Command extends BaseCommand {
   constructor (client) {
@@ -21,18 +22,20 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
+  async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const locale = compressed.guildData.locale
-    const { message, args } = compressed
+    const { locale } = guildData
+    if (args.length <= 0) throw new UsageFailedError(this.name)
     if (['none', '없음', 'null', 'remove', '지우기'].includes(args.shift().toLowerCase())) {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { dj_role: '0' } })
     } else {
-      const filter = (role) => { return role.name.toLowerCase() === args.join(' ').toLowerCase() || role.id === args.join(' ') || role.name.replace('@everyone', 'everyone') === args.join(' ').toLowerCase().replace('@', '') || role.id === (message.mentions.roles.array()[0] === undefined ? false : message.mentions.roles.array()[0].id) }
+      const findToString = args.join(' ').toLowerCase()
+      const filter = (role) => {
+        return role.name.toLowerCase() === findToString ||
+        role.name.replace('@everyone', 'everyone') === findToString.replace('@everyone', 'everyone') ||
+        role.id === message.mentions.roles.first().id
+      }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
         formatter: this.client.utils.find.formatters.role,

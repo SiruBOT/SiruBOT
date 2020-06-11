@@ -1,4 +1,5 @@
 const { BaseCommand } = require('../../../structures')
+const { UsageFailedError } = require('../../../errors')
 
 class Command extends BaseCommand {
   constructor (client) {
@@ -24,10 +25,10 @@ class Command extends BaseCommand {
   /**
    * @param {Object} compressed - Compressed Object
    */
-  async run (compressed) {
+  async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const locale = compressed.guildData.locale
-    const { message, args } = compressed
+    const { locale } = guildData
+    if (args.length <= 0) throw new UsageFailedError(this.name)
     if (['none', '없음', 'null', 'remove', '지우기'].includes(args.join(' ').toLowerCase())) {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETVC_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { vch: '0' } })

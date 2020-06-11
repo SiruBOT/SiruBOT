@@ -1,4 +1,4 @@
 module.exports = {
-  ArgsNotFoundError: require('./ArgsNotFoundError'),
+  UsageFailedError: require('./UsageFailedError'),
   PermissionError: require('./PermissionError')
 }
