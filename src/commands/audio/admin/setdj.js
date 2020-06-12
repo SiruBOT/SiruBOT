@@ -26,11 +26,11 @@ class Command extends BaseCommand {
     const picker = this.client.utils.localePicker
     const { locale } = guildData
     if (args.length <= 0) throw new UsageFailedError(this.name)
-    if (['none', '없음', 'null', 'remove', '지우기'].includes(args.shift().toLowerCase())) {
+    const findToString = args.join(' ').toLowerCase()
+    if (['none', '없음', 'null', 'remove', '지우기'].includes(findToString.toLowerCase())) {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETDJ_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { dj_role: '0' } })
     } else {
-      const findToString = args.join(' ').toLowerCase()
       const filter = (role) => {
         return role.name.toLowerCase() === findToString ||
         role.name.replace('@everyone', 'everyone') === findToString.replace('@everyone', 'everyone') ||
