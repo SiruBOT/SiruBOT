@@ -34,7 +34,7 @@ class Command extends BaseCommand {
       const filter = (channel) => {
         return channel.name.toLowerCase() === findToString.toLowerCase() ||
         channel.id === findToString ||
-        channel.id === message.mentions.channels.first() ? message.mentions.channels.first().id : null
+        channel.id === (message.mentions.channels.first() ? message.mentions.channels.first().id : null)
       }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
