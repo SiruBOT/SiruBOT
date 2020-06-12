@@ -34,7 +34,7 @@ class Command extends BaseCommand {
       const filter = (role) => {
         return role.name.toLowerCase() === findToString ||
         role.name.replace('@everyone', 'everyone') === findToString.replace('@everyone', 'everyone') ||
-        role.id === message.mentions.roles.first().id
+        role.id === message.mentions.roles.first() ? message.mentions.roles.first().id : null
       }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),

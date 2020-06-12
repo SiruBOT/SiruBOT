@@ -31,7 +31,11 @@ class Command extends BaseCommand {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETTC_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { tch: '0' } })
     } else {
-      const filter = (channel) => { return channel.name.toLowerCase() === findToString.toLowerCase() || channel.id === findToString || channel.id === message.mentions.channels.first().id }
+      const filter = (channel) => {
+        return channel.name.toLowerCase() === findToString.toLowerCase() ||
+        channel.id === findToString ||
+        channel.id === message.mentions.channels.first() ? message.mentions.channels.first().id : null
+      }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
         formatter: this.client.utils.find.formatters.channel,

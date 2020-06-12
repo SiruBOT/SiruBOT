@@ -34,7 +34,10 @@ class Command extends BaseCommand {
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETVC_NONE'))
       this.client.database.updateGuild(message.guild.id, { $set: { vch: '0' } })
     } else {
-      const filter = (channel) => { return channel.name.toLowerCase() === findToString.toLowerCase() || channel.id === findToString }
+      const filter = (channel) => {
+        return channel.name.toLowerCase() === findToString.toLowerCase() ||
+        channel.id === findToString
+      }
       const options = {
         title: picker.get(locale, 'PAGER_MULTIPLE_ITEMS'),
         formatter: this.client.utils.find.formatters.channel,
