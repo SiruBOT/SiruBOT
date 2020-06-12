@@ -1,5 +1,6 @@
 const arrayUtil = require('../array')
 const { massReact } = require('../message')
+const { placeHolderConstant } = require('../../constant/')
 const settings = require('../../utils/getSettings')()
 const Discord = require('discord.js')
 const findElementRequiredOptions = ['filter', 'collection', 'message', 'formatter', 'locale', 'picker', 'title']
@@ -45,8 +46,8 @@ module.exports.findElement = (options) => {
       const chunked = arrayUtil.chunkArray(filteredArray, 5)
       let currentPage = 0
       options.message.channel.send(this.getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member)).then(m => {
-        let emojiList = ['◀️', '⏹️', '▶️']
-        if (chunkedFormatted.length === 1) emojiList = ['⏹️']
+        let emojiList = ['◀️', placeHolderConstant.EMOJI_X, '▶️']
+        if (chunkedFormatted.length === 1) emojiList = [placeHolderConstant.EMOJI_X]
         for (let i = 0; i < chunkedFormatted[0].length; i++) {
           emojiList.push(Numbers[i])
         }
@@ -60,7 +61,7 @@ module.exports.findElement = (options) => {
               else currentPage--
               m.edit(this.getEmbed(chunkedFormatted, currentPage, options.picker, options.locale, options.title, options.message.member))
             },
-            '⏹️': async () => {
+            [placeHolderConstant.EMOJI_X]: async () => {
               collector.stop()
               return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_USER_STOP'))
             },
