@@ -47,7 +47,7 @@ class Command extends BaseCommand {
         locale: locale,
         picker: picker
       }
-      const res = this.client.utils.find.findElement(options)
+      const res = await this.client.utils.find.findElement(options)
       if (!res) return options.message.channel.send(options.picker.get(options.locale, 'GENERAL_NO_RESULT'))
       message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_SETVC_SET', { CHANNEL: `<#${res.id}>` }))
       this.client.database.updateGuild(message.guild.id, { $set: { vch: res.id } })
