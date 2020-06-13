@@ -10,6 +10,8 @@ const Sentry = require('@sentry/node')
 const ServerLoggerManager = require('./logging/ServerLoggerManager')
 const fs = require('fs')
 const path = require('path')
+const Inko = require('inko')
+const inko = new Inko()
 
 class CustomClient extends Discord.Client {
   constructor (options) {
@@ -93,6 +95,18 @@ class CustomClient extends Discord.Client {
           const Command = require(cmd)
           const command = new Command(this)
           this.logger.debug(`${load} Loading Command (${command.name})`)
+          for (const aliases of command.aliases) {
+            const ko2enResult = inko.ko2en(aliases)
+            const en2koResult = inko.en2ko(aliases)
+            if (!command.aliases.includes(ko2enResult)) {
+              this.logger.debug(`${load} Added Aliases command [${command.name}] ${aliases} -> ${ko2enResult}`)
+              command.aliases.push(ko2enResult)
+            }
+            if (!command.aliases.includes(en2koResult)) {
+              this.logger.debug(`${load} Added Aliases command [${command.name}] ${aliases} -> ${en2koResult}`)
+              command.aliases.push(en2koResult)
+            }
+          }
           for (const aliases of command.aliases) {
             this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.name}`)
             this.aliases.set(aliases, command.name)
