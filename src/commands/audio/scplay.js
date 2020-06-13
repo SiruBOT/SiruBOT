@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'scplay',
-      ['사클재생', 'ㄴㅊㅔㅣ묘', 'scp', 'tkzmfwotod'],
+      ['사클재생', 'soundcloudplay'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

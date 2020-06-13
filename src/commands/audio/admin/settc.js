@@ -6,7 +6,7 @@ class Command extends BaseCommand {
     super(
       client,
       'settc',
-      ['채널설정', 'ㄴㄷㅅㅅㅊ'],
+      ['채널설정'],
       ['Administrator'],
       'MODERATION',
       {

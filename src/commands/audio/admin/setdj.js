@@ -6,7 +6,7 @@ class Command extends BaseCommand {
     super(
       client,
       'setdj',
-      ['dj설정', 'ㄴㄷㅅ어'],
+      ['dj설정'],
       ['Administrator'],
       'MODERATION',
       {

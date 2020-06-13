@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'connectnodes',
-      ['노드연결', 'reconnectnodes', 'nodereconnect', 'nodeconnect', '채ㅜㅜㄷㅊ수ㅐㅇㄷㄴ'],
+      ['노드연결', 'reconnectnodes', 'nodereconnect', 'nodeconnect'],
       ['BotOwner'],
       'BOT_OWNER',
       {

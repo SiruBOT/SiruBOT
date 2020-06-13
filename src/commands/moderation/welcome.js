@@ -22,7 +22,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'welcome',
-      ['환영', 'ㅈ디채ㅡㄷ'],
+      ['환영'],
       ['Administrator'],
       'MODERATION',
       {

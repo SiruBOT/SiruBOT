@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'cacheinfo',
-      ['캐시정보', 'ㅊㅁ초댜ㅜ래'],
+      ['캐시정보'],
       ['BotOwner'],
       'BOT_OWNER',
       {

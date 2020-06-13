@@ -5,7 +5,7 @@ class Command extends BaseCommand {
     super(
       client,
       'bassboost',
-      ['베이스부스트', 'ㅠㅁㄴ뉴ㅐㅐㄴㅅ', 'bb'],
+      ['베이스부스트', 'bb'],
       ['DJ', 'Administrator'],
       'MUSIC_DJ',
       {

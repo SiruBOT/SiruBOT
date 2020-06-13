@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'ping',
-      ['핑', 'ㅔㅑㅜㅎ'],
+      ['핑'],
       ['Everyone'],
       'GENERAL_INFO',
       {

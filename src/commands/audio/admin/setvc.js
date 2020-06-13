@@ -6,7 +6,7 @@ class Command extends BaseCommand {
     super(
       client,
       'setvc',
-      ['음성채널설정', 'ㄴㄷㅅㅍㅊ'],
+      ['음성채널설정'],
       ['Administrator'],
       'MODERATION',
       {

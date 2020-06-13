@@ -6,7 +6,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'docs',
-      ['앷ㄴ', 'djsdocs', 'djs'],
+      ['도큐'],
       ['Everyone'],
       'GENERAL_INFO',
       {

@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'skip',
-      ['스킵', '건너뛰기', '나ㅑㅔ'],
+      ['스킵', '건너뛰기'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

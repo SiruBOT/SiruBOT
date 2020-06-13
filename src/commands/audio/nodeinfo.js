@@ -19,7 +19,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'nodeinfo',
-      ['봇정보', 'ㅜㅐㅇ댜ㅜ래'],
+      ['봇정보'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

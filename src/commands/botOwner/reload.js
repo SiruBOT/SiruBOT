@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'reload',
-      ['리로드', 'loadcommands', 'flfhem', 'ㄱ디ㅐㅁㅇ'],
+      ['리로드', 'loadcommands'],
       ['BotOwner'],
       'BOT_OWNER',
       {

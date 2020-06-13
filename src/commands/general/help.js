@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'help',
-      ['도움', '명령어', 'ehdna', 'audfuddj', 'cmds', 'cmdlist'],
+      ['도움', '명령어', 'cmds', 'cmdlist'],
       ['Everyone'],
       'GENERAL_INFO',
       {

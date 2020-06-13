@@ -8,7 +8,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'lyrics',
-      ['가사', 'lyric', 'rktk'],
+      ['가사', 'lyric'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

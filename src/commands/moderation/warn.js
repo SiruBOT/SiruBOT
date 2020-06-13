@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'warn',
-      ['경고', 'ㅈㅁ구'],
+      ['경고'],
       ['Administrator'],
       'MODERATION',
       {

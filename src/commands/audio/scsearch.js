@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'scsearch',
-      ['사클검색', 'ㄴㅊㄴㄷㅁㄱ초', 'tkzmfrjator'],
+      ['사클검색'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

@@ -5,7 +5,7 @@ class Command extends BaseCommand {
     super(
       client,
       'forceskip',
-      ['강제건너뛰기', 'fskip', 'ㄹ나ㅑㅔ'],
+      ['강제건너뛰기', 'fskip'],
       ['DJ', 'Administrator'],
       'MUSIC_DJ',
       {

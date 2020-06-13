@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'play',
-      ['재생', 'ㅔㅣ묘', 'ㅔ', 'p', 'wotod'],
+      ['재생', 'p'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

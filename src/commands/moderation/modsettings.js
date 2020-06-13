@@ -6,7 +6,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'settings',
-      ['서버설정', '설정', 'ㄴㄷㅅ샤ㅜㅎㄴ', 'ㄴㅍㄴㄷㅅ샤ㅜㅎㄴ', 'svsettings', 'tjfwjd'],
+      ['서버설정', '설정', 'svsettings'],
       ['Administrator'],
       'MODERATION',
       {

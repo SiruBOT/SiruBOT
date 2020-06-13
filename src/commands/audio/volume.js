@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'volume',
-      ['볼륨', '볼륨설정', 'vol', 'v', '패ㅣ', 'ㅍ', 'qhffba', 'qhffbatjfwjd'],
+      ['볼륨', '볼륨설정', 'vol', 'v'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {

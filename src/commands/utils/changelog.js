@@ -6,7 +6,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'changelog',
-      ['변경로그', '초뭏디ㅐㅎ'],
+      ['변경로그'],
       ['Everyone'],
       'GENERAL_INFO',
       {

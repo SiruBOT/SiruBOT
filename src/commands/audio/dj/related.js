@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'related',
-      ['추천', '추천영상', 'ㄱ밈ㅅㄷㅇ'],
+      ['추천', '추천영상'],
       ['DJ', 'Administrator'],
       'MUSIC_DJ',
       {
