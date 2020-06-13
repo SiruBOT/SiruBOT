@@ -20,6 +20,8 @@ module.exports = {
   EMOJI_WAVE: '👋',
   EMOJI_PAINT: '️🖼️',
   EMOJI_LABEL: '🏷️',
+  EMOJI_ARROW_BACKWARD: '◀️',
+  EMOJI_ARROW_TORWARD: '▶️',
 
   EMOJI_KNOBS: '🎛️',
   EMOJI_MIC: '🎙️',
