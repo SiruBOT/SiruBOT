@@ -142,42 +142,40 @@ class AudioUtils {
       if (!sendChannel || sendChannel.deleted) {
         this.client.audio.textChannels.delete(guildID)
         this.client.audio.textMessages.delete(guildID)
-        return this.client.logger.error(`${this.defaultPrefix.sendMessage} Channel Not Found... Please check database or audio TextChannels!`)
+        return this.client.logger.warn(`${this.defaultPrefix.sendMessage} [${guildID}] Channel Not Found... Please check database or audio TextChannels!`)
       }
-      if (this.client.utils.permissionChecker.checkChannelPermission(this.client.guilds.cache.get(guildID).me, sendChannel, ['SEND_MESSSAGES', 'ATTACH_FILES'])) {
-        this.client.logger.debug(`${this.defaultPrefix.sendMessage} Send (or) edit Message "${text}" to channel ${sendChannel.id}`)
-        const lastTextMessage = this.client.audio.textMessages.get(guildID)
-        const sendToChannel = async (channel, text) => {
-          if (forceSend || (lastTextMessage && lastTextMessage.deletable)) {
-            this.client.logger.debug(`${this.defaultPrefix.sendMessage} [${guildID}] Deletable previous message, delete previous message...`)
-            try {
-              await lastTextMessage.delete()
-            } catch {
-              this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete previous message..`)
-            }
-          }
-          const m = await channel.send(text)
-          this.client.audio.textMessages.set(guildID, m)
-          return m
-        }
-        if (lastTextMessage && !lastTextMessage.deleted && sendChannel.lastMessageID === lastTextMessage.id) {
+      if (!sendChannel.permissionsFor(sendChannel.guild.me).has('SEND_MESSAGES')) {
+        this.client.audio.textChannels.delete(guildID)
+        this.client.audio.textMessages.delete(guildID)
+        return this.client.logger.warn(`${this.defaultPrefix.sendMessage} [${guildID}] Channel Permission Not Found, Please Check Channel Permissions`)
+      }
+      const lastMessage = this.client.audio.textMessages.get(guildID)
+      try {
+        if (!lastMessage && sendChannel) throw new Error(null)
+        if (sendChannel.lastMessageID === lastMessage.id) {
+          await lastMessage.edit(text)
+        } else throw new Error(null)
+      } catch {
+        try {
           try {
-            await lastTextMessage.edit(text)
-          } catch (e) {
-            await sendToChannel(sendChannel, text)
+            if (!lastMessage.deleted) await lastMessage.delete()
+          } catch {
+            this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete Previous Message`)
           }
-        } else {
-          await sendToChannel(sendChannel, text)
+          const m = await sendChannel.send(text)
+          this.client.audio.textMessages.set(guildID, m)
+        } catch (e) {
+          this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Send Message ${e.stack}`)
         }
       }
     }
   }
 
   /**
-   * @description - Compares channelID1, channelID2
-   * @param {*} channelID1 - last command channel Id
-   * @param {*} channelID2 - Database's channel Id
-   */
+ * @description - Compares channelID1, channelID2
+ * @param {*} channelID1 - last command channel Id
+ * @param {*} channelID2 - Database's channel Id
+ */
   getChannel (channelID1, channelID2) {
     if (channelID1 === channelID2) return this.client.channels.cache.get(channelID2)
     if (this.client.channels.cache.get(channelID2)) return this.client.channels.cache.get(channelID2)
@@ -185,12 +183,12 @@ class AudioUtils {
   }
 
   /**
-   * @param {Number} volume - Volume of get emoji
-   * @returns {String} - Emojis (🔇, 🔉, 🔊)
-   * @description 아래의 코드는 jagrosh/MusicBot 의
-   * @description https://github.com/jagrosh/MusicBot/blob/master/src/main/java/com/jagrosh/jmusicbot/utils/FormatUtil.java
-   * @description 라인 53 ~ 61 을 사용 (수정) 하였음을 명시합니다.
-   */
+ * @param {Number} volume - Volume of get emoji
+ * @returns {String} - Emojis (🔇, 🔉, 🔊)
+ * @description 아래의 코드는 jagrosh/MusicBot 의
+ * @description https://github.com/jagrosh/MusicBot/blob/master/src/main/java/com/jagrosh/jmusicbot/utils/FormatUtil.java
+ * @description 라인 53 ~ 61 을 사용 (수정) 하였음을 명시합니다.
+ */
   getVolumeEmoji (volume) {
     if (volume === 0) { return '🔇' }
     if (volume < 30) { return '🔉' }
@@ -199,9 +197,9 @@ class AudioUtils {
   }
 
   /**
-   * @description Checking is member listenable
-   * @param {Discord.Member} member - Member to checking
-   */
+ * @description Checking is member listenable
+ * @param {Discord.Member} member - Member to checking
+ */
   getVoiceStatus (member) {
     return Object.assign({
       listen: this.getListenStatus(member),
@@ -210,10 +208,10 @@ class AudioUtils {
   }
 
   /**
-   * @description Get VoiceMute Status
-   * @param {Discord.Member} member - Member to check
-   * @returns {Boolean} - false, true
-   */
+ * @description Get VoiceMute Status
+ * @param {Discord.Member} member - Member to check
+ * @returns {Boolean} - false, true
+ */
   getVoiceMuteStatus (member) {
     if (member.selfMute) return false
     if (member.serverMute) return false
@@ -221,19 +219,19 @@ class AudioUtils {
   }
 
   /**
-   * @param {String} userID
-   * @param {String} guildID
-   */
+ * @param {String} userID
+ * @param {String} guildID
+ */
   async getMembersQueue (userID, guildID) {
     const queueData = await this.client.audio.queue.get(guildID)
     return queueData.filter((Track) => Track.request === userID)
   }
 
   /**
-   * @description Get Listen Status
-   * @param {Discord.Member} member - Member to check
-   * @returns {Boolean} - false, true
-   */
+ * @description Get Listen Status
+ * @param {Discord.Member} member - Member to check
+ * @returns {Boolean} - false, true
+ */
   getListenStatus (member) {
     if (member.serverDeaf) return false
     if (member.selfDeaf) return false
@@ -241,9 +239,9 @@ class AudioUtils {
   }
 
   /**
-   * @param {Number} number - 0, 1, 2 (Repeat Stats)
-   * @returns {String} - 'REPEAT_NONE', 'REPEAT_ALL', 'REPEAT_SINGLE'
-   */
+ * @param {Number} number - 0, 1, 2 (Repeat Stats)
+ * @returns {String} - 'REPEAT_NONE', 'REPEAT_ALL', 'REPEAT_SINGLE'
+ */
   getRepeatState (number) {
     switch (number) {
       case 0:
@@ -256,12 +254,12 @@ class AudioUtils {
   }
 
   /**
-   * @param {Number} percent - Player's Position / Track Duration (miliseconds)
-   * @returns {String} - 🔘▬▬▬▬▬▬▬▬▬▬▬
-   * @description 아래의 코드는 jagrosh/MusicBot 의
-   * @description https://github.com/jagrosh/MusicBot/blob/master/src/main/java/com/jagrosh/jmusicbot/utils/FormatUtil.java
-   * @description 라인 40 ~ 50 을 사용 (수정) 하였음을 명시합니다.
-   */
+ * @param {Number} percent - Player's Position / Track Duration (miliseconds)
+ * @returns {String} - 🔘▬▬▬▬▬▬▬▬▬▬▬
+ * @description 아래의 코드는 jagrosh/MusicBot 의
+ * @description https://github.com/jagrosh/MusicBot/blob/master/src/main/java/com/jagrosh/jmusicbot/utils/FormatUtil.java
+ * @description 라인 40 ~ 50 을 사용 (수정) 하였음을 명시합니다.
+ */
   getProgressBar (percent) {
     let str = ''
     for (let i = 0; i < 12; i++) {

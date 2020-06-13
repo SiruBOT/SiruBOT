@@ -69,7 +69,7 @@ class Event {
           const { audioNodes, playingStatus, voiceStatus } = requirements
           // Requirements - audioNodes, playingStatus
           if (audioNodes && !this.client.audio.getNode()) return message.channel.send(picker.get(locale, 'AUDIO_NO_NODES'))
-          if (audioNodes && guildData.tch === '0' && (!this.client.audio.textChannels.get(message.guild.id) || (this.client.audio.textChannels.get(message.guild.id) && this.client.audio.textChannels.get(message.guild.id).deleted))) this.client.audio.textChannels.set(message.guild.id, message.channel.id)
+          if (audioNodes && (guildData.tch === '0' || !message.guild.channels.cache.get(guildData.tch)) && !this.client.audio.textChannels.get(message.guild.id)) this.client.audio.textChannels.set(message.guild.id, message.channel.id)
           if (playingStatus && !this.client.audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'AUDIO_REQUIRE_PLAYING'))
           // Requirements.voiceStatus
           if (voiceStatus) {
