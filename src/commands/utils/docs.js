@@ -34,7 +34,7 @@ class Command extends BaseCommand {
     if (!result) return message.channel.send(message.author + '\n' + picker.get(locale, 'GENERAL_NO_RESULT'))
     const embed = new Discord.MessageEmbed(result)
     embed.setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png', size: 512 }))
-    message.channel.send(embed)
+    return message.channel.send(embed)
   }
 }
 

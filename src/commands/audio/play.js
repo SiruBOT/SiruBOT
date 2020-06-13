@@ -20,16 +20,11 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   * @param {Boolean} isSoundCloud - is Search Platform SoundCloud?
-   */
   async run (compressed, isSoundCloud) {
     // Default Variables
-    const { message, args } = compressed
-    const locale = compressed.guildData.locale
+    const { message, args, guildData } = compressed
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
-
     // If Conditions True
     const Audio = this.client.audio
     let searchStr = message.attachments.map(el => el.url)[0] ? message.attachments.map(el => el.url)[0] : args.join(' ')
