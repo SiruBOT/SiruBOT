@@ -25,10 +25,9 @@ class Command extends BaseCommand {
   /**
    * @param {Object} compressed - Compressed Object
    */
-  async run (compressed) {
-    const locale = compressed.guildData.locale
+  async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const { message, args } = compressed
+    const { locale } = guildData
     if (args.length === 0) return message.channel.send(message.author + '\n' + picker.get(locale, 'GENERAL_INPUT_QUERY'))
     const result = await fetch(`https://djsdocs.sorta.moe/v2/embed?src=https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json&q=${args.join()}`).then(res => res.json())
     if (!result) return message.channel.send(message.author + '\n' + picker.get(locale, 'GENERAL_NO_RESULT'))
