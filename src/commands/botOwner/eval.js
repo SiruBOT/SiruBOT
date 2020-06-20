@@ -44,15 +44,15 @@ class Command extends BaseCommand {
         this.timeout(15000),
         evalPromise(codeToRun)
       ])
-      await message.react(placeHolderConstant.EMOJI_YES)
       endTime = this.getNanoSecTime() - startTime
+      await message.react(placeHolderConstant.EMOJI_YES)
       await this.sendOver2000(util.inspect(result, { depth: 1 }), message, { code: 'js' })
     } catch (e) {
-      await message.react(placeHolderConstant.EMOJI_X)
       endTime = this.getNanoSecTime() - startTime
+      await message.react(placeHolderConstant.EMOJI_X)
       await this.sendOver2000(e.stack || e.message || e.name || e, message, { code: 'js' })
     } finally {
-      await message.channel.send(`Processing Time: ${endTime}ns, ${endTime / 1000000}ms`)
+      await message.channel.send(`Processing Time: ${endTime}ns, ${endTime / 1000000}ms`, { code: 'js' })
       try {
         await waitReaction.remove()
       } catch {}
