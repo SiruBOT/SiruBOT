@@ -23,8 +23,8 @@ class Command extends BaseCommand {
     )
   }
 
-  async run (compressed) {
-    const { message, args, guildData } = compressed
+  async run ({ message, args, guildData }) {
+
   }
 }
 
