@@ -30,6 +30,8 @@ class Command extends BaseCommand {
     const { message, args } = compressed
     const waitReaction = await message.react(placeHolderConstant.EMOJI_SANDCLOCK)
     const codeToRun = args.join(' ')
+    const startTime = this.getNanoSecTime()
+    let endTime
     try {
       const evalPromise = (code) => new Promise((resolve, reject) => {
         try {
@@ -43,11 +45,14 @@ class Command extends BaseCommand {
         evalPromise(codeToRun)
       ])
       await message.react(placeHolderConstant.EMOJI_YES)
+      endTime = this.getNanoSecTime() - startTime
       await this.sendOver2000(util.inspect(result, { depth: 1 }), message, { code: 'js' })
     } catch (e) {
       await message.react(placeHolderConstant.EMOJI_X)
+      endTime = this.getNanoSecTime() - startTime
       await this.sendOver2000(e.stack || e.message || e.name || e, message, { code: 'js' })
     } finally {
+      await message.channel.send(`Processing Time: ${endTime}ns, ${endTime / 1000000}ms`)
       try {
         await waitReaction.remove()
       } catch {}
@@ -72,6 +77,11 @@ class Command extends BaseCommand {
   async timeout (time) {
     await sleep(time)
     throw new Error('Execution Timed out.')
+  }
+
+  getNanoSecTime () {
+    const hrTime = process.hrtime()
+    return hrTime[0] * 1000000000 + hrTime[1]
   }
 }
 
