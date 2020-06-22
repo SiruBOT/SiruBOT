@@ -49,7 +49,7 @@ class Command extends BaseCommand {
       })
     }
     embed.setTitle('Lavalink Nodes Info')
-    embed.aetFooter('Powered by npmjs.org/shoukaku')
+    embed.setFooter('Powered by npmjs.org/shoukaku')
     embed.setColor('#7289DA')
     message.channel.send(embed)
   }
