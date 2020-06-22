@@ -50,7 +50,7 @@ class DataManager {
    * @returns {void}
    */
   async checkMember (memberID, guildID) {
-    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    if (!memberID || !guildID) throw new Error('memberID or guildID is not provided.')
     const formattedMemberID = this.getMemberID(memberID, guildID)
     this.client.logger.debug(`${this.defaultPrefix.checkMember} (${formattedMemberID}) Checking Member`)
     const mongoResult = await this.connection.collection('guildMember').findOne({ _id: formattedMemberID })
@@ -69,7 +69,7 @@ class DataManager {
    * @returns {void}
    */
   async checkUser (userID) {
-    if (!userID) return new Error('userID is not provided')
+    if (!userID) throw new Error('userID is not provided')
     this.client.logger.debug(`${this.defaultPrefix.checkUser} (${userID}) Checking GlobalMember`)
     const mongoResult = await this.connection.collection('globalUser').findOne({ _id: userID })
     if (!mongoResult) {
@@ -87,7 +87,7 @@ class DataManager {
    * @returns {void}
    */
   async checkGuild (guildID) {
-    if (!guildID) return new Error('guildID is not provided')
+    if (!guildID) throw new Error('guildID is not provided')
     this.client.logger.debug(`${this.defaultPrefix.checkGuild} (${guildID}) Checking Guild`)
     const mongoGuild = await this.connection.collection('guild').findOne({ _id: guildID })
     if (!mongoGuild) {
@@ -106,7 +106,7 @@ class DataManager {
    * @returns {void}
    */
   async removeGuild (guildID) {
-    if (!guildID) return new Error('guildID is not provided')
+    if (!guildID) throw new Error('guildID is not provided')
     this.client.logger.debug(`${this.defaultPrefix.removeGuild} (${guildID}) Removing Guild From Database..`)
     const res = await this.connection.collection('guild').deleteOne({ _id: guildID })
     this.client.logger.debug(`${this.defaultPrefix.removeGuild} (${guildID}) Removed Guild From DataBase. (${JSON.stringify(res)}`)
@@ -119,7 +119,7 @@ class DataManager {
    * @returns {void}
    */
   async removeMember (memberID, guildID) {
-    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    if (!memberID || !guildID) throw new Error('memberID or guildID is not provided.')
     const formattedMemberID = this.getMemberID(memberID, guildID)
     this.client.logger.debug(`${this.defaultPrefix.removeMember} (${formattedMemberID}) Removing GlobalMember from Database..`)
     const res = await this.connection.collection('guildMember').deleteOne({ _id: formattedMemberID })
@@ -158,7 +158,7 @@ class DataManager {
    * @param {String} guildID - guilldID to get data
    */
   async getGuild (guildID) {
-    if (!guildID) return new Error('guildID is not provided')
+    if (!guildID) throw new Error('guildID is not provided')
     return this.connection.collection('guild').findOne({ _id: guildID })
   }
 
@@ -166,7 +166,7 @@ class DataManager {
    * @param {String} userID - userID to get data
    */
   async getUser (userID) {
-    if (!userID) return new Error('userID is not provided')
+    if (!userID) throw new Error('userID is not provided')
     return this.connection.collection('globalUser').findOne({ _id: userID })
   }
 
@@ -175,7 +175,7 @@ class DataManager {
    * @param {String} guildID - guildID to get guildMemberData
    */
   async getMember (memberID, guildID) {
-    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    if (!memberID || !guildID) throw new Error('memberID or guildID is not provided.')
     return this.connection.collection('guildMember').findOne({ _id: this.getMemberID(memberID, guildID) })
   }
 
@@ -184,7 +184,7 @@ class DataManager {
    * @param {Object} query - mongodb Query
    */
   async updateGuild (guildID, query) {
-    if (!guildID) return new Error('guildID is not provided')
+    if (!guildID) throw new Error('guildID is not provided')
     return this.connection.collection('guild').updateOne({ _id: guildID }, query)
   }
 
@@ -193,7 +193,7 @@ class DataManager {
    * @param {Object} query - mongodb Query
    */
   async updateUser (userID, query) {
-    if (!userID) return new Error('userID is not provided')
+    if (!userID) throw new Error('userID is not provided')
     return this.connection.collection('globalUser').updateOne({ _id: userID }, query)
   }
 
@@ -203,8 +203,13 @@ class DataManager {
    * @param {Object} query - mongodb Query
    */
   async updateMember (memberID, guildID, query) {
-    if (!memberID || !guildID) return new Error('memberID or guildID is not provided.')
+    if (!memberID || !guildID) throw new Error('memberID or guildID is not provided.')
     return this.connection.collection('guildMember').updateOne({ _id: this.getMemberID(memberID, guildID) }, query)
+  }
+
+  // TODO
+  async getPlaylistByAuthorID (authorId) {
+    if (!authorId) throw new Error('AuthorID Required')
   }
 
   getMemberID (userID, guildID) {
