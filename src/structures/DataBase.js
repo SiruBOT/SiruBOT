@@ -207,9 +207,28 @@ class DataManager {
     return this.connection.collection('guildMember').updateOne({ _id: this.getMemberID(memberID, guildID) }, query)
   }
 
-  // TODO
-  async getPlaylistByAuthorID (authorId) {
+  /**
+   * @param {String} authorId - Author ID
+   */
+  async getPlaylistsByAuthorID (authorId) {
     if (!authorId) throw new Error('AuthorID Required')
+    return this.models.UserPlaylist.find({ authorID: authorId })
+  }
+
+  /**
+   * @param {String} name - Playlist Name
+   * @param {String} author Author ID
+   * @param {Array} tracks Tracks
+   */
+  async createPlaylist (name, author, tracks = []) {
+    if (!name) throw new Error('Name is required')
+    if (!author) throw new Error('Author Id is required')
+    if (!Array.isArray(tracks)) throw new Error('Tracks is must be a Array')
+    const playListID = makeID(5)
+    if (await this.models.UserPlaylist.find({ _id: playListID }).length > 0) return this.createPlaylist(name, author, tracks)
+    const Model = new this.models.ErrorInfo({
+    })
+    Model.save()
   }
 
   getMemberID (userID, guildID) {
@@ -217,3 +236,12 @@ class DataManager {
   }
 }
 module.exports = DataManager
+
+function makeID (length) {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length))
+  }
+  return result
+}

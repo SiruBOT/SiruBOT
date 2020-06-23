@@ -39,7 +39,7 @@ class AudioPlayerEvents {
   onEnd (data) {
     this.client.logger.debug(`${this.defaultPrefix.onEnd} ${JSON.stringify(data)} -> RouteEndEvents`)
     this.client.logger.debug(`${this.defaultPrefix.onEnd} Update [${data.guildId}]'s nowplaying '0'`)
-    this.client.database.updateGuild(data.guildID, { $set: { nowplayingPosition: 0 } })
+    this.client.database.updateGuild(data.guildId, { $set: { nowplayingPosition: 0 } })
     this.router.RouteEndEvents(data)
   }
 
