@@ -14,9 +14,9 @@ class Event {
    */
   async run (member) {
     this.client.logger.debug(`[GuildMemberAdd] Check Guild Member, Check Guild ${member.guild.id}`)
-    await this.client.database.checkGuild(member.guild.id)
-    await this.client.database.checkMember(member.id, member.guild.id)
-    await this.client.database.checkUser(member.id)
+    await this.client.database.getGuild(member.guild.id)
+    await this.client.database.getMember(member.id, member.guild.id)
+    await this.client.database.getUser(member.id)
     await this.sendWelcome('welcome', member)
   }
 
