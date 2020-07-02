@@ -139,7 +139,10 @@ class Queue extends EventEmitter {
    */
   async deQueue (guildID, skip = false, err = false) {
     const guildData = await this.client.database.getGuild(guildID)
-    if (err) return this.playNext(guildID)
+    if (err) { // Remove Last Element
+      await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
+      return this.playNext(guildID)
+    }
     if (skip) return this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
     switch (guildData.repeat) {
       case 0:
