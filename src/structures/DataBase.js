@@ -101,7 +101,6 @@ class DataBase {
    * @param {String} guildId - guild id to get
    */
   async getMember (memberId, guildId) {
-    console.log(typeof memberId)
     if (!memberId) throw new Error(`${this.defaultPrefix.getMember} Member Id Required`)
     if (!guildId) throw new Error(`${this.defaultPrefix.getMember} Guild Id Required`)
     if (typeof memberId !== 'string') throw new Error(`${this.defaultPrefix.getMember} Member Id is must be a string`)
