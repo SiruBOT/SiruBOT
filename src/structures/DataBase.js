@@ -51,18 +51,18 @@ class DataBase {
 
   /**
    * @description Get Guild via guildId, Is guild is not exists, create one
-   * @param {String} guildID - guild id to get
+   * @param {String} guildId - guild id to get
    */
-  async getGuild (guildID) {
-    if (!guildID) throw new Error(`${this.defaultPrefix.getGuild} Guild ID Required`)
-    if (typeof guildID !== 'string') throw new Error(`${this.defaultPrefix.getGuild} Guild ID is must be a string`)
-    this.client.logger.debug(`${this.defaultPrefix.getGuild} Get guild via guildID: ${guildID}`)
-    let data = await this.connection.collection('guild').findOne({ _id: guildID })
+  async getGuild (guildId) {
+    if (!guildId) throw new Error(`${this.defaultPrefix.getGuild} Guild Id Required`)
+    if (typeof guildId !== 'string') throw new Error(`${this.defaultPrefix.getGuild} Guild Id is must be a string`)
+    this.client.logger.debug(`${this.defaultPrefix.getGuild} Get guild via guildId: ${guildId}`)
+    let data = await this.connection.collection('guild').findOne({ _id: guildId })
     if (!data) {
       try {
-        this.client.logger.debug(`${this.defaultPrefix.getGuild} Get guild via guildID: ${guildID}, but guild is not exists, create one.`)
+        this.client.logger.debug(`${this.defaultPrefix.getGuild} Get guild via guildId: ${guildId}, but guild is not exists, create one.`)
         data = await new Models.Guild({
-          _id: guildID
+          _id: guildId
         }).save()
       } catch (e) {
         this.client.logger.error(`${this.defaultPrefix.getGuild} Failed to create guild data, ${e.stack}`)
@@ -74,18 +74,18 @@ class DataBase {
 
   /**
    * @description - Get User via userId, Is userId is not exists, create one
-   * @param {String} userID - user id to get
+   * @param {String} userId - user id to get
    */
-  async getUser (userID) {
-    if (!userID) throw new Error(`${this.defaultPrefix.getUser} User ID Required`)
-    if (typeof userID !== 'string') throw new Error(`${this.defaultPrefix.getUser} User ID is must be a string`)
-    this.client.logger.debug(`${this.defaultPrefix.getUser} Get user via userID: ${userID}`)
-    let data = await this.connection.collection('globalUser').findOne({ _id: userID })
+  async getUser (userId) {
+    if (!userId) throw new Error(`${this.defaultPrefix.getUser} User Id Required`)
+    if (typeof userId !== 'string') throw new Error(`${this.defaultPrefix.getUser} User Id is must be a string`)
+    this.client.logger.debug(`${this.defaultPrefix.getUser} Get user via userId: ${userId}`)
+    let data = await this.connection.collection('globalUser').findOne({ _id: userId })
     if (!data) {
       try {
-        this.client.logger.debug(`${this.defaultPrefix.getUser} Get user via userID: ${userID}, but user is not exists, create one.`)
+        this.client.logger.debug(`${this.defaultPrefix.getUser} Get user via userId: ${userId}, but user is not exists, create one.`)
         data = await new Models.User({
-          _id: userID
+          _id: userId
         }).save()
       } catch (e) {
         this.client.logger.error(`${this.defaultPrefix.getUser} Failed to create user data, ${e.stack}`)
@@ -97,22 +97,23 @@ class DataBase {
 
   /**
    * @description - get Member via memberId, guildId
-   * @param {String} memberID - member id to get
-   * @param {String} guildID - guild id to get
+   * @param {String} memberId - member id to get
+   * @param {String} guildId - guild id to get
    */
-  async getMember (memberID, guildID) {
-    if (!memberID) throw new Error(`${this.defaultPrefix.getMember} Member ID Required`)
-    if (!guildID) throw new Error(`${this.defaultPrefix.getMember} Guild Id Required`)
-    if (typeof memberId !== 'string') throw new Error(`${this.defaultPrefix.getMember} Member ID is must be a string`)
-    if (typeof guildID !== 'string') throw new Error(`${this.defaultPrefix.getMember} Guild ID is must be a string`)
-    this.client.logger.debug(`${this.defaultPrefix.getMember} Get member via memberID: ${memberID} & guildID: ${guildID}`)
-    const formattedMemberID = this._getMemberID(memberID, guildID)
-    let data = await this.connection.collection('guildMember').findOne({ _id: formattedMemberID })
+  async getMember (memberId, guildId) {
+    console.log(typeof memberId)
+    if (!memberId) throw new Error(`${this.defaultPrefix.getMember} Member Id Required`)
+    if (!guildId) throw new Error(`${this.defaultPrefix.getMember} Guild Id Required`)
+    if (typeof memberId !== 'string') throw new Error(`${this.defaultPrefix.getMember} Member Id is must be a string`)
+    if (typeof guildId !== 'string') throw new Error(`${this.defaultPrefix.getMember} Guild Id is must be a string`)
+    this.client.logger.debug(`${this.defaultPrefix.getMember} Get member via memberId: ${memberId} & guildId: ${guildId}`)
+    const formattedMemberId = this._getMemberId(memberId, guildId)
+    let data = await this.connection.collection('guildMember').findOne({ _id: formattedMemberId })
     if (!data) {
       try {
-        this.client.logger.debug(`${this.defaultPrefix.getMember} Get member via memberID: ${memberID} & guildID: ${guildID}, but member is not exists, create one.`)
+        this.client.logger.debug(`${this.defaultPrefix.getMember} Get member via memberId: ${memberId} & guildId: ${guildId}, but member is not exists, create one.`)
         data = await new Models.Member({
-          _id: formattedMemberID
+          _id: formattedMemberId
         }).save()
       } catch (e) {
         this.client.logger.error(`${this.defaultPrefix.getMember} Failed to create member data, ${e.stack}`)
@@ -123,85 +124,85 @@ class DataBase {
 
   /**
    * @description Update Guild Document via query
-   * @param {String} guildID - guild id to update
+   * @param {String} guildId - guild id to update
    * @param {Object} query - query to update
    */
-  async updateGuild (guildID, query) {
-    if (!guildID) throw new Error(`${this.defaultPrefix.updateGuild} Guild ID Required`)
+  async updateGuild (guildId, query) {
+    if (!guildId) throw new Error(`${this.defaultPrefix.updateGuild} Guild Id Required`)
     if (!query) throw new Error(`${this.defaultPrefix.updateGuild} Query Required`)
-    if (typeof guildID !== 'string') throw new Error(`${this.defaultPrefix.updateGuild} Guild ID is must be a string`)
+    if (typeof guildId !== 'string') throw new Error(`${this.defaultPrefix.updateGuild} Guild Id is must be a string`)
     if (typeof query !== 'object') throw new Error(`${this.defaultPrefix.updateGuild} Query is must be a object`)
-    this.client.logger.debug(`${this.defaultPrefix.updateGuild} Update Guild: ${guildID}, Query: ${JSON.stringify(query)}`)
-    return this.connection.collection('guild').updateOne({ _id: guildID }, query)
+    this.client.logger.debug(`${this.defaultPrefix.updateGuild} Update Guild: ${guildId}, Query: ${JSON.stringify(query)}`)
+    return this.connection.collection('guild').updateOne({ _id: guildId }, query)
   }
 
   /**
    * @description Update User Document via query
-   * @param {String} userID - user id to update
+   * @param {String} userId - user id to update
    * @param {Object} query - query to update
    */
-  async updateUser (userID, query) {
-    if (!userID) throw new Error(`${this.defaultPrefix.updateUser} User ID Required`)
+  async updateUser (userId, query) {
+    if (!userId) throw new Error(`${this.defaultPrefix.updateUser} User Id Required`)
     if (!query) throw new Error(`${this.defaultPrefix.updateUser} Query Required`)
-    if (typeof userID !== 'string') throw new Error(`${this.defaultPrefix.updateUser} User ID is must be a string`)
+    if (typeof userId !== 'string') throw new Error(`${this.defaultPrefix.updateUser} User Id is must be a string`)
     if (typeof query !== 'object') throw new Error(`${this.defaultPrefix.updateUser} Query is must be a object`)
-    this.client.logger.debug(`${this.defaultPrefix.updateUser} Update User: ${userID}, Query: ${JSON.stringify(query)}`)
-    return this.connection.collection('globalUser').updateOne({ _id: userID }, query)
+    this.client.logger.debug(`${this.defaultPrefix.updateUser} Update User: ${userId}, Query: ${JSON.stringify(query)}`)
+    return this.connection.collection('globalUser').updateOne({ _id: userId }, query)
   }
 
   /**
    * @description Update User Document via query
-   * @param {String} userID - user id to update
+   * @param {String} userId - user id to update
    * @param {Object} query - query to update
    */
-  async updateMember (memberID, guildID, query) {
-    if (!memberID) throw new Error(`${this.defaultPrefix.updateMember} Member ID Required`)
-    if (!guildID) throw new Error(`${this.defaultPrefix.updateMember} Guild ID Required`)
+  async updateMember (memberId, guildId, query) {
+    if (!memberId) throw new Error(`${this.defaultPrefix.updateMember} Member Id Required`)
+    if (!guildId) throw new Error(`${this.defaultPrefix.updateMember} Guild Id Required`)
     if (!query) throw new Error(`${this.defaultPrefix.updateUser} Query Required`)
-    if (typeof memberID !== 'string') throw new Error(`${this.defaultPrefix.updateMember} Member ID is must be a string`)
-    if (typeof guildID !== 'string') throw new Error(`${this.defaultPrefix.updateMember} Guild ID is must be a string`)
+    if (typeof memberId !== 'string') throw new Error(`${this.defaultPrefix.updateMember} Member Id is must be a string`)
+    if (typeof guildId !== 'string') throw new Error(`${this.defaultPrefix.updateMember} Guild Id is must be a string`)
     if (typeof query !== 'object') throw new Error(`${this.defaultPrefix.updateMember} Query is must be a object`)
-    this.client.logger.debug(`${this.defaultPrefix.updateMember} Update Member: ${this._getMemberID(memberID, guildID)}, Query: ${JSON.stringify(query)}`)
-    return this.connection.collection('guildMember').updateOne({ _id: this._getMemberID(memberID, guildID) }, query)
+    this.client.logger.debug(`${this.defaultPrefix.updateMember} Update Member: ${this._getMemberId(memberId, guildId)}, Query: ${JSON.stringify(query)}`)
+    return this.connection.collection('guildMember').updateOne({ _id: this._getMemberId(memberId, guildId) }, query)
   }
 
   /**
    * @description Removes guild document from db
-   * @param {String} guildID guild id to remove
+   * @param {String} guildId guild id to remove
    */
-  async removeGuild (guildID) {
-    if (!guildID) throw new Error(`${this.defaultPrefix.removeGuild} Guild ID Required`)
-    if (typeof guildID !== 'string') throw new Error(`${this.defaultPrefix.removeGuild} Guild ID is must be a string`)
-    this.client.logger.debug(`${this.defaultPrefix.removeGuild} Removed Guild: ${guildID}`)
-    return this.connection.collection('guild').findOneAndDelete({ _id: guildID })
+  async removeGuild (guildId) {
+    if (!guildId) throw new Error(`${this.defaultPrefix.removeGuild} Guild Id Required`)
+    if (typeof guildId !== 'string') throw new Error(`${this.defaultPrefix.removeGuild} Guild Id is must be a string`)
+    this.client.logger.debug(`${this.defaultPrefix.removeGuild} Removed Guild: ${guildId}`)
+    return this.connection.collection('guild').findOneAndDelete({ _id: guildId })
   }
 
   /**
    * @description Removes playlist document from db
-   * @param {String} playlistID
+   * @param {String} playlistId
    */
-  async removeUserPlayList (playlistID) {
-    if (!playlistID) throw new Error(`${this.defaultPrefix.removeUserPlayList} playlist ID Required`)
-    if (typeof playlistID !== 'string') throw new Error(`${this.defaultPrefix.removeUserPlayList} playlist ID is must be a string`)
-    this.client.logger.debug(`${this.defaultPrefix.removeUserPlayList} Removed Guild: ${playlistID}`)
-    return this.connection.collection('userPlayList').findOneAndDelete({ _id: playlistID })
+  async removeUserPlayList (playlistId) {
+    if (!playlistId) throw new Error(`${this.defaultPrefix.removeUserPlayList} playlist Id Required`)
+    if (typeof playlistId !== 'string') throw new Error(`${this.defaultPrefix.removeUserPlayList} playlist Id is must be a string`)
+    this.client.logger.debug(`${this.defaultPrefix.removeUserPlayList} Removed Guild: ${playlistId}`)
+    return this.connection.collection('userPlayList').findOneAndDelete({ _id: playlistId })
   }
 
   /**
    * @param {String} type - Error Type (default, audioError, commandError)
    * @param {String} name - Error message
    * @param {String} stack - Error Stack Trace
-   * @param {String} author - Error Author (Command Message Author ID)
-   * @param {String} guild - Error Guild (Command Message's guildID)
+   * @param {String} author - Error Author (Command Message Author Id)
+   * @param {String} guild - Error Guild (Command Message's guildId)
    * @param {String} command - Command Name (In Command Message)
    * @param {Array} args - Command Args
-   * @returns {String} - UUID of ErrorInformation
+   * @returns {String} - UUId of ErrorInformation
    */
   addErrorInfo (type = 'default', name, stack, author, guild, command, args) {
-    const createdUUID = uuid.v4()
-    this.client.logger.info(`${this.defaultPrefix.addErrorInfo} Added ErrorInfo UUID: ${createdUUID}`)
+    const createdUUId = uuid.v4()
+    this.client.logger.info(`${this.defaultPrefix.addErrorInfo} Added ErrorInfo UUId: ${createdUUId}`)
     new Models.ErrorInfo({
-      _id: createdUUID,
+      _id: createdUUId,
       type,
       name,
       stack,
@@ -210,20 +211,20 @@ class DataBase {
       command,
       args
     }).save()
-    return createdUUID
+    return createdUUId
   }
 
   /**
-   * @param {String} authorId - Author ID
+   * @param {String} authorId - Author Id
    */
-  async getPlaylistsByAuthorID (authorId) {
-    if (!authorId) throw new Error('AuthorID Required')
-    return Models.UserPlayList.find({ authorID: authorId })
+  async getPlaylistsByAuthorId (authorId) {
+    if (!authorId) throw new Error('AuthorId Required')
+    return Models.UserPlayList.find({ authorId: authorId })
   }
 
   /**
    * @param {String} name - Playlist Name
-   * @param {String} author Author ID
+   * @param {String} author Author Id
    * @param {Array} tracks Tracks
    */
   async addUserPlayList (name, author, tracks = []) {
@@ -231,32 +232,32 @@ class DataBase {
     if (name.length > 32) throw new Error(`${this.defaultPrefix.addUserPlayList} Name can't longer than 32 char`)
     if (!author) throw new Error(`${this.defaultPrefix.addUserPlayList} Author Id is required`)
     if (!Array.isArray(tracks)) throw new Error(`${this.defaultPrefix.addUserPlayList} Tracks is must be a Array`)
-    const playListID = this._makeID(5)
-    if (await Models.UserPlayList.find({ _id: playListID }).length > 0) return this.addUserPlayList(name, author, tracks) // Avoid Duplicated _id property
-    this.client.logger.debug(`${this.defaultPrefix.addUserPlayList} Added User Playlist, ID: ${playListID}`)
+    const playListId = this._makeId(5)
+    if (await Models.UserPlayList.find({ _id: playListId }).length > 0) return this.addUserPlayList(name, author, tracks) // Avoid Duplicated _id property
+    this.client.logger.debug(`${this.defaultPrefix.addUserPlayList} Added User Playlist, Id: ${playListId}`)
     const Model = new Models.UserPlaylist({
-      _id: playListID,
+      _id: playListId,
       name: name,
-      authorID: author,
+      authorId: author,
       tracks: tracks
     })
     return Model.save()
   }
 
   /**
-   * @description returns Member ID Formatted like `userID-guildID`
-   * @param {String} userID - userId to get memberID
-   * @param {String} guildID - guildId to get memberID
+   * @description returns Member Id Formatted like `userId-guildId`
+   * @param {String} userId - userId to get memberId
+   * @param {String} guildId - guildId to get memberId
    */
-  _getMemberID (userID, guildID) {
-    return `${userID}-${guildID}`
+  _getMemberId (userId, guildId) {
+    return `${userId}-${guildId}`
   }
 
   /**
    * @description make random id
    * @param {Number} length - length to make id
    */
-  _makeID (length) {
+  _makeId (length) {
     let result = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     for (var i = 0; i < length; i++) {
