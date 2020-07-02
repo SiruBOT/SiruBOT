@@ -19,9 +19,9 @@ class AudioPlayerEventRouter {
     player.on('trackException', (data) => this.AudioPlayerEvents.onEnd(data))
     player.on('error', (error) => {
       this.client.logger.error(`${this.defaultPrefix.registerEvents} Error on player ${error.stack || error.message}`)
-      this.client.database.addErrorinfo('audioError', error.message, error.stack, 'bot', player.voiceConnection.guildID)
+      this.client.database.addErrorInfo('audioError', error.message, error.stack, 'bot', player.voiceConnection.guildID)
     })
-    player.on('closed', (reason) => this.RouteWebSocketClosedEvents(reason))
+    player.on('closed', this.RouteWebSocketClosedEvents)
     player.on('playerUpdate', (data) => {
       data.guildID = player.voiceConnection.guildID
       this.AudioPlayerEvents.onPlayerUpdate(data)
