@@ -4,5 +4,5 @@ module.exports = {
   User: require('./User'),
   ErrorInfo: require('./ErrorInfo'),
   CustomCommand: require('./CustomCommand'),
-  UserPlaylist: require('./UserPlayList')
+  UserPlayList: require('./UserPlayList')
 }
