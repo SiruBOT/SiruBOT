@@ -138,7 +138,7 @@ class AudioUtils {
     const guildData = await this.client.database.getGuild(guildID)
     const { audioMessage, tch } = guildData
     if (forceSend || audioMessage) {
-      const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)
+      const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID) ? this.client.audio.textChannels.get(guildID).id : null, tch)
       if (!sendChannel || sendChannel.deleted) {
         this.client.audio.textChannels.delete(guildID)
         this.client.audio.textMessages.delete(guildID)
