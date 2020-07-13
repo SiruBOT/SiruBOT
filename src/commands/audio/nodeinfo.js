@@ -42,16 +42,19 @@ class Command extends BaseCommand {
     const { message } = compressed
     const embed = new Discord.MessageEmbed()
     for (const item of this.client.audio.nodes.values()) {
-      embed.addFields({
-        name: `**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.players.size} Players)` : `, ${item.state}`}`,
-        value: `**${niceBytes(item.stats.memory.used)}** Used\n**${item.stats.cpu.cores}** Cores\n**${Number(item.stats.cpu.systemLoad).toFixed(2) * 100}%** System Loads\n**${Number(item.stats.cpu.lavalinkLoad).toFixed(2) * 100}%** Lavalink Loads`,
-        inline: true
-      })
+      embed.addField(`**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.players.size} Players)` : `, ${item.state}`}`, `**${niceBytes(item.stats.memory.used)}** Used
+**${item.stats.cpu.cores}** Cores
+**${this.toFixed(item.stats.cpu.systemLoad)}%** System Loads
+**${this.toFixed(item.stats.cpu.lavalinkLoad)}%** Lavalink Loads`)
     }
     embed.setTitle('Lavalink Nodes Info')
     embed.setFooter('Powered by npmjs.org/shoukaku')
     embed.setColor('#7289DA')
-    message.channel.send(embed)
+    await message.channel.send(embed)
+  }
+
+  toFixed (load) {
+    return Number(load * 100).toFixed(2)
   }
 }
 
