@@ -55,6 +55,28 @@ class AudioUtils {
   }
 
   /**
+   * @description - get video id from youtube url
+   * @param {String} url - youtube url
+   */
+  getvIdfromUrl (url) {
+    if (!url) return undefined
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+    const match = url.match(regExp)
+    return (match && match[7].length === 11) ? match[7] : undefined
+  }
+
+  /**
+   * @param {String} url - Url to check validate
+   * @return {Boolean} - If url is youtube url, returns true, else returns false
+   */
+  validateYouTubeUrl (url) {
+    const regExp = new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/)
+    const match = url.match(regExp)
+    if (match && match[2].length === 11) return true
+    else return false
+  }
+
+  /**
    * @param {String} guild - Guild Id to get nowplaying Embed
    */
   async getNowplayingEmbed (guildID) {
@@ -79,28 +101,6 @@ class AudioUtils {
   }
 
   /**
-   * @description - get video id from youtube url
-   * @param {String} url - youtube url
-   */
-  getvIdfromUrl (url) {
-    if (!url) return undefined
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-    const match = url.match(regExp)
-    return (match && match[7].length === 11) ? match[7] : undefined
-  }
-
-  /**
-   * @param {String} url - Url to check validate
-   * @return {Boolean} - If url is youtube url, returns true, else returns false
-   */
-  validateYouTubeUrl (url) {
-    const regExp = new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/)
-    const match = url.match(regExp)
-    if (match && match[2].length === 11) return true
-    else return false
-  }
-
-  /**
    * @description Get Formatted(Nowplaying) Text with informations
    * @param {String} guildID - guildIDId to formatting
    * @param {Object} guildData - Database Object
@@ -108,7 +108,7 @@ class AudioUtils {
   getNowplayingText (guildID, guildData) {
     if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
     const nowPlayingObject = this.getNowplayingObject(guildID, guildData)
-    return `${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
+    return `${this.client.utils.localePicker.get(guildData.locale, 'HOSTEDBY', { NAME: `${this.client.audio.players.get(guildID).voiceConnection ? this.client.audio.players.get(guildID).voiceConnection.node.name : this.client.utils.localePicker.get(guildData.locale, 'NONE')}` })}\n${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
   }
 
   /**
