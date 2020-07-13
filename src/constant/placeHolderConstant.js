@@ -3,6 +3,7 @@ module.exports = {
   EMOJI_NO: '❎',
   EMOJI_X: '❌',
   EMOJI_YES: '✅',
+  EMOJI_HEART: '❤️',
   EMOJI_PINGPONG: '🏓',
   EMOJI_MONEY: '💸',
   EMOJI_STAR: '🌟',
