@@ -47,7 +47,7 @@ class CustomClient extends Discord.Client {
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()
 
-    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, moveOnDisconnect: 10, reconnectTries: 10, noReplace: false })
+    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, moveOnDisconnect: true, reconnectTries: 10, noReplace: false })
 
     this.loggerManager = new ServerLoggerManager(this)
   }
