@@ -5,7 +5,8 @@ class AudioPlayerEventRouter {
     this.client = this.audio.client
     this.classPrefix = this.audio.classPrefix + ':AudioPlayerEventRouter'
     this.defaultPrefix = {
-      registerEvents: `${this.classPrefix}:registerEvents]`
+      registerEvents: `${this.classPrefix}:registerEvents]`,
+      RouteWebSocketClosedEvents: `${this.classPrefix}:RouteWebSocketClosedEvents]`
     }
     this.AudioPlayerEvents = new AudioPlayerEvents(this)
   }
@@ -21,25 +22,19 @@ class AudioPlayerEventRouter {
       this.client.logger.error(`${this.defaultPrefix.registerEvents} Error on player ${error.stack || error.message}`)
       this.client.database.addErrorInfo('audioError', error.message, error.stack, 'bot', player.voiceConnection.guildID)
     })
-    player.on('closed', this.RouteWebSocketClosedEvents)
+    player.on('closed', (data) => this.RouteWebSocketClosedEvents(player, data))
     player.on('playerUpdate', (data) => {
       data.guildID = player.voiceConnection.guildID
       this.AudioPlayerEvents.onPlayerUpdate(data)
     })
   }
 
-  /**
-   * @param {Object} data - Socket Data
-   */
-  async handleDisconnect (data) {
-    const guildData = await this.client.database.getGuild(data.guildId)
-    this.client.audio.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
-    this.client.audio.stop(data.guildId, false)
-  }
-
-  RouteWebSocketClosedEvents (reason) {
-    if (reason.code === 4014 && reason.byRemote === true && reason.reason === 'Disconnected.') {
-      return this.handleDisconnect(reason)
+  RouteWebSocketClosedEvents (player, data) {
+    if (data.code === 4014 && data.byRemote === true && data.reason === 'Disconnected.') {
+      this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} Disconnected from websocket, reconnecting...`)
+      const voiceConnection = player.voiceConnection
+      const { guildID, voiceChannelID, selfMute, selfDeaf } = voiceConnection
+      voiceConnection._sendDiscordWS({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })
     }
   }
 
@@ -58,6 +53,7 @@ class AudioPlayerEventRouter {
 
   RouteTrackExcepetionErrors (data) {
     switch (data.error) {
+      // TODO: Handle Error
     }
   }
 
