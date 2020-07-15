@@ -114,6 +114,7 @@
   "AUDIO_ALL_SONGS_FINISHED": "> %EMOJI_MUSIC%  대기열의 모든 노래를 재생했어요!",
   "AUDIO_NOWPLAYING": "> %EMOJI_MUSIC%  현재 재생 중: **%TRACK%**",
   "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_STAR%  추천 영상 재생 중: **%TRACK%**",
+  "AUDIO_RELATED_NOT_FOUND": "> %EMOJI_STAR%  추천 영상을 찾을 수 없어요!, 재생을 중지할게요..",
   "ALL": "전체",
   "REPEAT_ALL": "%ALL%",
   "REPEAT_SINGLE": "한곡",

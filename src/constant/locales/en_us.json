@@ -121,6 +121,7 @@
   "AUDIO_NOWPLAYING_RELATED": "> %EMOJI_STAR%  Playing related video now... **%TRACK%**",
   "REPEAT_ALL": "%ALL%",
   "REPEAT_NONE": "%NONE%",
+  "AUDIO_RELATED_NOT_FOUND": "> %EMOJI_STAR%  Failed to get related videos! I'll stop playback...",
   "ALL": "All",
   "REPEAT_SINGLE": "Single",
   "NONE": "None",
