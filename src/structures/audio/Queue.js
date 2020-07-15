@@ -73,7 +73,7 @@ class Queue extends EventEmitter {
       track.related = requestID === this.client.user.id
       await this.client.database.updateGuild(guildID, { $push: { queue: track } })
     }
-    this.autoPlay(guildID, related)
+    await this.autoPlay(guildID, related)
   }
 
   /**
@@ -123,7 +123,7 @@ class Queue extends EventEmitter {
       if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) return this.playNext(guildID)
       this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
       if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort enQueue. Player is not exists!`)
-      this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
+      await this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
     } catch {
       const guildData = await this.client.database.getGuild(guildID)
       this.client.audio.utils.sendMessage(guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_RELATED_NOT_FOUND'), true)
