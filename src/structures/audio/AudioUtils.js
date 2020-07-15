@@ -119,9 +119,9 @@ class AudioUtils {
     const obj = Object.assign({})
     Object.defineProperty(obj, 'playingStatus', { value: placeHolderConstant['EMOJI_AUDIO_' + this.getPlayingState(guildID)] })
     Object.defineProperty(obj, 'repeatStatus', { value: placeHolderConstant['EMOJI_' + this.getRepeatState(guildData.repeat)] })
-    if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(this.client.audio.players.get(guildID).position / guildData.nowplaying.info.length) })
+    if (this.client.audio.players.get(guildID) && guildData.nowplaying && guildData.nowplaying.track) Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(this.client.audio.players.get(guildID).position / guildData.nowplaying.info.length) })
     else Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(0) })
-    if (this.client.audio.players.get(guildID) && this.client.audio.players.get(guildID).track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(this.client.audio.players.get(guildID).position / 1000, false)}/${this.client.utils.time.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })
+    if (this.client.audio.players.get(guildID) && guildData.nowplaying && guildData.nowplaying.track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(this.client.audio.players.get(guildID).position / 1000, false)}/${this.client.utils.time.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })
     else Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(0, false)}/${this.client.utils.time.toHHMMSS(0, false)}]` })
     Object.defineProperty(obj, 'volume', { value: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**` })
     return obj
@@ -139,14 +139,10 @@ class AudioUtils {
     const { audioMessage, tch } = guildData
     if (forceSend || audioMessage) {
       const sendChannel = this.getChannel(this.client.audio.textChannels.get(guildID), tch)
-      if (!sendChannel || sendChannel.deleted) {
-        this.client.audio.textChannels.delete(guildID)
-        this.client.audio.textMessages.delete(guildID)
+      if (!sendChannel) {
         return this.client.logger.warn(`${this.defaultPrefix.sendMessage} [${guildID}] Channel Not Found... Please check database or audio TextChannels!`)
       }
       if (!sendChannel.permissionsFor(sendChannel.guild.me).has('SEND_MESSAGES')) {
-        this.client.audio.textChannels.delete(guildID)
-        this.client.audio.textMessages.delete(guildID)
         return this.client.logger.warn(`${this.defaultPrefix.sendMessage} [${guildID}] Channel Permission Not Found, Please Check Channel Permissions`)
       }
       const lastMessage = this.client.audio.textMessages.get(guildID)
