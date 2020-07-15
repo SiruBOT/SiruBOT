@@ -103,27 +103,32 @@ class Queue extends EventEmitter {
    * @param {String} originVideoId - video id
    */
   async playRelated (guildID, originVideoId) {
-    const relatedTracks = await this.audio.getRelated(originVideoId)
-    if (relatedTracks.length === 0) return this.playNext(guildID)
-    let number = 0
-    for (const item of relatedTracks) {
-      if (this.audio.playedTracks.get(guildID).includes(item.identifier)) {
-        number += 1
-        break
-      } else if (originVideoId === item.identifier) {
-        number = 0
-        this.audio.playedTracks.set(guildID, [])
-        break
-      } else {
-        break
+    try {
+      const relatedTracks = await this.audio.getRelated(originVideoId)
+      let number = 0
+      for (const item of relatedTracks) {
+        if (this.audio.playedTracks.get(guildID).includes(item.identifier)) {
+          number += 1
+          break
+        } else if (originVideoId === item.identifier) {
+          number = 0
+          this.audio.playedTracks.set(guildID, [])
+          break
+        } else {
+          break
+        }
       }
+      const lavaLinktracks = await this.audio.getTrack(`https://youtube.com/watch?v=${relatedTracks[number].identifier}`)
+      const toPlay = lavaLinktracks.tracks.shift()
+      if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) return this.playNext(guildID)
+      this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
+      if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort enQueue. Player is not exists!`)
+      this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
+    } catch {
+      const guildData = await this.client.database.getGuild(guildID)
+      this.client.audio.utils.sendMessage(guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_RELATED_NOT_FOUND'), true)
+      this.audio.stop(guildID, true)
     }
-    const lavaLinktracks = await this.audio.getTrack(`https://youtube.com/watch?v=${relatedTracks[number].identifier}`)
-    const toPlay = lavaLinktracks.tracks.shift()
-    if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) return this.playNext(guildID)
-    this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
-    if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort enQueue. Player is not exists!`)
-    this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
   }
 
   getRepeatedObj (obj) {
