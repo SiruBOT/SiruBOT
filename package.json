@@ -1,7 +1,7 @@
 {
   "name": "sirubot-bot",
-  "version": "1.9.0",
-  "description": "MusicBot With Andesite node, Moderation, some funny stuff",
+  "version": "3.1.0",
+  "description": "MusicBot With Lavalink, Moderation, some funny stuff",
   "main": "index.js",
   "dependencies": {
     "@sentry/node": "^5.19.2",
