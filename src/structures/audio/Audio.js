@@ -142,15 +142,6 @@ class Audio extends Shoukaku.Shoukaku {
   }
 
   /**
-   * @param {Object} data - Socket Data
-   */
-  async handleDisconnect (data) {
-    const guildData = await this.client.database.getGuild(data.guildId)
-    this.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
-    this.stop(data.guildId, false)
-  }
-
-  /**
    * @description - Get Nodes sort by players.
    */
   getNode (name = undefined) {

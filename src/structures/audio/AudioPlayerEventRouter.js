@@ -23,14 +23,22 @@ class AudioPlayerEventRouter {
     })
     player.on('closed', this.RouteWebSocketClosedEvents)
     player.on('playerUpdate', (data) => {
-      data.guildID = player.voiceConnection.guildID
       this.AudioPlayerEvents.onPlayerUpdate(data)
     })
   }
 
+  /**
+   * @param {Object} data - Socket Data
+   */
+  async handleDisconnect (data) {
+    const guildData = await this.client.database.getGuild(data.guildId)
+    this.client.audio.utils.sendMessage(data.guildId, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_DISCONNECTED'), true)
+    this.client.audio.stop(data.guildId, false)
+  }
+
   RouteWebSocketClosedEvents (reason) {
     if (reason.code === 4014 && reason.byRemote === true && reason.reason === 'Disconnected.') {
-      return this.audio.handleDisconnect(reason)
+      return this.handleDisconnect(reason)
     }
   }
 
