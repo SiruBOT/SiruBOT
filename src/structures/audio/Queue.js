@@ -104,11 +104,10 @@ class Queue extends EventEmitter {
   async playRelated (guildID, originVideoId) {
     try {
       const relatedTracks = await this.audio.getRelated(originVideoId)
-      for (const relatedTrack of relatedTracks) {
-        if (relatedTracks.length === 0 && originVideoId === relatedTrack.videoId) return this.audio.playedTracks.set(guildID, [])
-        if ([...new Set(this.audio.playedTracks.get(guildID))].includes(relatedTrack.videoId)) relatedTracks.shift()
-      }
-      const lavaLinktracks = await this.audio.getTrack(relatedTracks.shift().uri)
+      const uniquePlayedTracks = [...new Set(this.audio.playedTracks.get(guildID))]
+      const filteredTracks = relatedTracks.filter(relatedTrack => !uniquePlayedTracks.includes(relatedTrack.videoId))
+      if (filteredTracks.length === 0) this.audio.playedTracks.set(guildID, [])
+      const lavaLinktracks = await this.audio.getTrack(filteredTracks.shift().uri)
       const toPlay = lavaLinktracks.tracks.shift()
       if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) return this.playNext(guildID)
       this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
