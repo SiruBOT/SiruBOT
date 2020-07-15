@@ -87,7 +87,6 @@ class Queue extends EventEmitter {
     if (this.audio.players.get(guildID)) {
       if (!error && nowplaying.track !== null && !this.audio.players.get(guildID).track && nowplayingPosition !== nowplaying.info.length) {
         this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Nowplaying...`)
-        this.audio.players.get(guildID).track = nowplaying.track
         await this.play(guildID, nowplaying, nowplayingPosition, true)
         return
       }
@@ -105,20 +104,11 @@ class Queue extends EventEmitter {
   async playRelated (guildID, originVideoId) {
     try {
       const relatedTracks = await this.audio.getRelated(originVideoId)
-      let number = 0
-      for (const item of relatedTracks) {
-        if (this.audio.playedTracks.get(guildID).includes(item.videoId)) {
-          number += 1
-          break
-        } else if (originVideoId === item.videoId) {
-          number = 0
-          this.audio.playedTracks.set(guildID, [])
-          break
-        } else {
-          break
-        }
+      for (const relatedTrack of relatedTracks) {
+        if (relatedTracks.length === 0 && originVideoId === relatedTrack.videoId) return this.audio.playedTracks.set(guildID, [])
+        if ([...new Set(this.audio.playedTracks.get(guildID))].includes(relatedTrack.videoId)) relatedTracks.shift()
       }
-      const lavaLinktracks = await this.audio.getTrack(relatedTracks[number].uri)
+      const lavaLinktracks = await this.audio.getTrack(relatedTracks.shift().uri)
       const toPlay = lavaLinktracks.tracks.shift()
       if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) return this.playNext(guildID)
       this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
@@ -255,7 +245,6 @@ class Queue extends EventEmitter {
    */
   setNowPlaying (guildID, item) {
     this.client.logger.debug(`${this.defaultPrefix.setNowPlaying} [${guildID}] Updating Nowplaying to ${!item ? null : item.track}...`)
-    if (this.audio.players.get(guildID)) this.audio.players.get(guildID).track = item.track
     return this.client.database.updateGuild(guildID, { $set: { nowplaying: item } })
   }
 }
