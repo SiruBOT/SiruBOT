@@ -45,7 +45,7 @@ class Command extends BaseCommand {
       embed.addField(`**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.players.size} Players)` : `, ${item.state}`}`, `**${niceBytes(item.stats.memory.used)}** Used
 **${item.stats.cpu.cores}** Cores
 **${this.toFixed(item.stats.cpu.systemLoad)}%** System Loads
-**${this.toFixed(item.stats.cpu.lavalinkLoad)}%** Lavalink Loads`)
+**${this.toFixed(item.stats.cpu.lavalinkLoad)}%** Lavalink Loads`, true)
     }
     embed.setTitle('Lavalink Nodes Info')
     embed.setFooter('Powered by npmjs.org/shoukaku')
