@@ -23,6 +23,7 @@ class AudioPlayerEventRouter {
     })
     player.on('closed', this.RouteWebSocketClosedEvents)
     player.on('playerUpdate', (data) => {
+      data.guildID = player.voiceConnection.guildID
       this.AudioPlayerEvents.onPlayerUpdate(data)
     })
   }
