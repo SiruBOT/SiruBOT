@@ -23,7 +23,7 @@ class Command extends BaseCommand {
 
   async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const locale = guildData
+    const { locale } = guildData
     const search = args.shift()
     const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === (this.client.utils.find.getUserFromMention(message.guild.members.cache, search) ? this.client.utils.find.getUserFromMention(message.guild.members.cache, search).id : null) || a.user.username.toLowerCase() === search.toLowerCase() }
     const options = {

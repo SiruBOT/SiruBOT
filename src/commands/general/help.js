@@ -23,7 +23,7 @@ class Command extends BaseCommand {
 
   async run ({ message, args, prefix, userPermissions, guildData }) {
     const picker = this.client.utils.localePicker
-    const locale = guildData
+    const { locale } = guildData
     const [commandName] = args
     const embed = new Discord.MessageEmbed()
       .setColor(this.client.utils.find.getColor(message.guild.me))

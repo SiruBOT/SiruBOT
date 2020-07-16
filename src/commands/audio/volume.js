@@ -21,7 +21,7 @@ class Command extends BaseCommand {
   }
 
   async run ({ message, args, guildData, userPermissions }) {
-    const locale = guildData.locale
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
     if ((userPermissions.includes('Administrator') || userPermissions.includes('DJ')) && args.length > 0) {
       if (isNaN(args[0])) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_STRING'))
