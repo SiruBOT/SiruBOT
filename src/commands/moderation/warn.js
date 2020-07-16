@@ -52,8 +52,8 @@ class Command extends BaseCommand {
         admin: message.author.id
       })
       await this.client.database.updateMember(member.id, member.guild.id, { $inc: { warningCount: 1 }, $push: { warningArray: obj } })
-      const guildData = await this.client.database.getGuild(message.guild.id)
       const updatedUserData = await this.client.database.getMember(member.id, member.guild.id)
+      const guildData = await this.client.database.getGuild(message.guild.id)
       const embed = new Discord.MessageEmbed()
         .setTitle(picker.get(locale, 'WARN_EMBED_ADDED_TITLE'))
         .addFields({ name: picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'), value: picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), inline: true })

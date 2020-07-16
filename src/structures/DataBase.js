@@ -119,6 +119,7 @@ class DataBase {
         throw new Error('Failed to create member data')
       }
     }
+    return data
   }
 
   /**
