@@ -25,7 +25,6 @@ class Command extends BaseCommand {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object
    * @param {Boolean} isSoundCloud - search Platform (SoundCloud: true, Youtube: False)
    */
   async run (compressed, isSoundCloud) {

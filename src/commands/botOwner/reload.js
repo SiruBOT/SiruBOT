@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'reload',
-      ['리로드', 'loadcommands'],
+      ['리로드', 'reloadcommands'],
       ['BotOwner'],
       'BOT_OWNER',
       {
@@ -21,11 +21,7 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message } = compressed
+  async run ({ message }) {
     await message.channel.send(`${placeHolderConstant.EMOJI_YES}  모든 샤드 ${this.client.shard.count} 개에 리로드 신호를 보냅니다...`)
     await this.client.shard.broadcastEval('this.reload()')
   }

@@ -26,8 +26,7 @@ class Command extends BaseCommand {
   /**
    * @param {Object} compressed - Compressed Object
    */
-  async run (compressed) {
-    const { message, args } = compressed
+  async run ({ message, args }) {
     const waitReaction = await message.react(placeHolderConstant.EMOJI_SANDCLOCK)
     const codeToRun = args.join(' ')
     const startTime = this.getNanoSecTime()

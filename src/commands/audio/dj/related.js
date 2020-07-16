@@ -20,15 +20,10 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message, args } = compressed
-    const locale = compressed.guildData.locale
+  async run ({ message, args, guildData }) {
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
-
-    switch (this.client.utils.find.matchObj({ on: false, off: true, 켜기: false, 끄기: true }, args[0], compressed.guildData.audioPlayrelated)) {
+    switch (this.client.utils.find.matchObj({ on: false, off: true, 켜기: false, 끄기: true }, args[0], guildData.audioPlayrelated)) {
       case true:
         message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_RELATED_OFF'))
         this.client.database.updateGuild(message.guild.id, { $set: { audioPlayrelated: false } })

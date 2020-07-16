@@ -20,9 +20,6 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
   async run (compressed) {
     this.client.commands.get('play').run(compressed, true)
   }

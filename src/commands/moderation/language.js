@@ -21,12 +21,8 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
+  async run ({ message, guildData, args }) {
     const picker = this.client.utils.localePicker
-    const { message, guildData, args } = compressed
     const { locale } = guildData
     const embed = new Discord.MessageEmbed()
     if (args[0] && picker.locales.keyArray().includes(args[0].toLowerCase())) {

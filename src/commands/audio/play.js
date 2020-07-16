@@ -21,7 +21,6 @@ class Command extends BaseCommand {
   }
 
   async run (compressed, isSoundCloud) {
-    // Default Variables
     const { message, args, guildData } = compressed
     const { locale } = guildData
     const picker = this.client.utils.localePicker

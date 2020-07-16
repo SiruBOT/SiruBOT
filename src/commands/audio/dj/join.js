@@ -22,12 +22,10 @@ class Command extends BaseCommand {
   }
 
   /**
-   * @param {Object} compressed - Compressed Object
    * @param {Boolean} silent - if Send Message
    */
-  async run (compressed, silent = false) {
-    const { message } = compressed
-    const locale = compressed.guildData.locale
+  async run ({ message, guildData }, silent = false) {
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
     const voiceChannelID = message.member.voice.channelID
 

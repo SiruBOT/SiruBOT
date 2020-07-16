@@ -24,8 +24,7 @@ class Command extends BaseCommand {
   /**
    * @param {Object} compressed - Compressed Object
    */
-  async run (compressed) {
-    const { message, args } = compressed
+  async run ({ message, args }) {
     const usedMemory = Object.entries(process.memoryUsage()).map(el => `${el[0].replace(/^\w/, c => c.toUpperCase())}: **${Math.round(el[1] / 1024 / 1024 * 100) / 100}**MB`)
     const string = `> **Tracks Cache Info**\n> ${this.getStats(this.client.audio.trackCache.getStats())}\n> \n> **Related Tracks Cache Info**\n> ${this.getStats(this.client.audio.relatedCache.getStats())}\n> \n> **Memory Usage**\n> ${usedMemory.join(', ')}`
     message.channel.send(string)

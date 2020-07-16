@@ -21,11 +21,7 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message } = compressed
+  async run ({ message }) {
     const embed = await this.client.audio.utils.getNowplayingEmbed(message.guild.id)
     const nowPlayingMessage = await message.channel.send(embed)
     if (this.client._options.bot.owners.includes(message.author.id) && message.channel.permissionsFor(message.guild.me).has('ADD_REACTIONS')) await nowPlayingMessage.react(EMOJI_STAR)

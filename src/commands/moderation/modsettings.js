@@ -22,14 +22,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
+  async run ({ message, guildData }) {
     const picker = this.client.utils.localePicker
-    const { message, guildData } = compressed
-    const { locale, filter, warningMax, audioMessage, audioPlayrelated, repeat, tch, vch } = guildData
-    const djRole = guildData.dj_role
+    const { locale, filter, warningMax, audioMessage, audioPlayrelated, repeat, tch, vch, dj_role: djRole } = guildData
     const embed = new Discord.MessageEmbed()
     const obj = {
       MOD: {
@@ -49,9 +44,13 @@ class Command extends BaseCommand {
         VCH: this.getName(vch, message.guild.channels.cache, locale, picker)
       }
     }
-    for (const item of ['MOD', 'AUDIO', 'DEFAULT']) {
-      embed.addFields({ name: picker.get(locale, 'COMMANDS_MODSETTINGS_FIELD_' + item), value: picker.get(locale, 'COMMANDS_MODSETTINGS_DESC_' + item, obj[item]), inline: true })
-    }
+    Object.keys(obj).map(item =>
+      embed.addField(
+        picker.get(locale, 'COMMANDS_MODSETTINGS_FIELD_' + item),
+        picker.get(locale, 'COMMANDS_MODSETTINGS_DESC_' + item, obj[item]),
+        true
+      )
+    )
     embed.setTimestamp(new Date())
     embed.setColor(this.client.utils.find.getColor(message.guild.me))
     message.channel.send(picker.get(locale, 'COMMANDS_MODSETTINGS_EMBED_TITLE', { SERVER: message.guild.name }), embed)

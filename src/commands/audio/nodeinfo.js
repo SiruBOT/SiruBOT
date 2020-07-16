@@ -35,11 +35,7 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message } = compressed
+  async run ({ message }) {
     const embed = new Discord.MessageEmbed()
     for (const item of this.client.audio.nodes.values()) {
       embed.addField(`**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.players.size} Players)` : `, ${item.state}`}`, `**${niceBytes(item.stats.memory.used)}** Used

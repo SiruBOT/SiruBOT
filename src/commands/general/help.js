@@ -21,13 +21,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message, args, prefix, userPermissions } = compressed
-    const locale = compressed.guildData.locale
+  async run ({ message, args, prefix, userPermissions, guildData }) {
     const picker = this.client.utils.localePicker
+    const locale = guildData
     const [commandName] = args
     const embed = new Discord.MessageEmbed()
       .setColor(this.client.utils.find.getColor(message.guild.me))
@@ -45,19 +41,18 @@ class Command extends BaseCommand {
       }
     } else {
       embed.setTitle(picker.get(locale, 'COMMANDS_HELP_INFO', { COMMAND: command.name.toUpperCase() }), message.guild.me.user.displayAvatarURL({ format: 'png', size: 512 }))
-      embed.addFields(
-        {
-          name: picker.get(locale, 'COMMANDS_HELP_DESC'),
-          value: `\`\`\`fix\n${picker.get(locale, `DESC_${command.category.toUpperCase()}_${command.name.toUpperCase()}`)}\`\`\``
-        },
-        {
-          name: picker.get(locale, 'COMMANDS_HELP_USAGE'),
-          value: `\`\`\`fix\n${picker.get(locale, `USAGE_${command.category.toUpperCase()}_${command.name.toUpperCase()}`, { COMMAND: command.name })}\`\`\``
-        },
-        {
-          name: picker.get(locale, 'COMMANDS_HELP_ALIASES'),
-          value: command.aliases.length === 0 ? picker.get(locale, 'NONE') : command.aliases.map(el => `\`\`${el}\`\``).join(', ')
-        }
+      embed.addField(
+        picker.get(
+          locale, 'COMMANDS_HELP_DESC'),
+        `\`\`\`fix\n${picker.get(locale, `DESC_${command.category.toUpperCase()}_${command.name.toUpperCase()}`)}\`\`\``
+      )
+      embed.addField(
+        picker.get(locale, 'COMMANDS_HELP_USAGE'),
+          `\`\`\`fix\n${picker.get(locale, `USAGE_${command.category.toUpperCase()}_${command.name.toUpperCase()}`, { COMMAND: command.name })}\`\`\``
+      )
+      embed.addField(
+        picker.get(locale, 'COMMANDS_HELP_ALIASES'),
+        command.aliases.length === 0 ? picker.get(locale, 'NONE') : command.aliases.map(el => `\`\`${el}\`\``).join(', ')
       )
     }
     embed.addField(picker.get(locale, 'COMMANDS_HELP_MORE'), picker.get(locale, 'COMMANDS_HELP_MORE_DESC'))

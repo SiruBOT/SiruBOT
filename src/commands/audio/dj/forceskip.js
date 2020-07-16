@@ -21,11 +21,7 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message, guildData } = compressed
+  async run ({ message, guildData }) {
     const { locale } = guildData
     const picker = this.client.utils.localePicker
     if (!guildData.queue[0] || !guildData.nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))

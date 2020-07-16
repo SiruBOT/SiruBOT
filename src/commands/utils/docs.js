@@ -22,9 +22,6 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
   async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
     const { locale } = guildData

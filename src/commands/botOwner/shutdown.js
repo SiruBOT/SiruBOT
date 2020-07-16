@@ -21,11 +21,7 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message } = compressed
+  async run ({ message }) {
     message.channel.send(`📫  모든 샤드 ${this.client.shard.count} 개에 종료 신호를 보냅니다...`)
     this.client.shard.broadcastEval('this.shutdown()').then(results => {
       for (const shardID of results) {

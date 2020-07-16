@@ -23,8 +23,7 @@ class Command extends BaseCommand {
   /**
    * @param {Object} compressed - Compressed Object
    */
-  async run (compressed) {
-    const { message, args, guildData } = compressed
+  async run ({ message, args, guildData }) {
     const { locale } = guildData
     const picker = this.client.utils.localePicker
     const filter = { all: 0, a: 0, 전체: 0, 켜기: 0, on: 0, single: 1, s: 1, 한곡: 1, none: 2, off: 2, 끄기: 2, 없음: 2 }

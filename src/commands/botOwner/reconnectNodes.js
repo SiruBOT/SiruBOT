@@ -5,7 +5,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'connectnodes',
-      ['노드연결', 'reconnectnodes', 'nodereconnect', 'nodeconnect'],
+      ['connectnode'],
       ['BotOwner'],
       'BOT_OWNER',
       {
@@ -21,14 +21,10 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const { message } = compressed
+  async run ({ message }) {
     for (const node of this.client._options.audio.nodes) {
       if (!this.client.audio.getNode(node.name)) {
-        message.channel.send(`${placeHolderConstant.EMOJI_SANDCLOCK}  Reconnecting ${node.name}`)
+        message.channel.send(`${placeHolderConstant.EMOJI_SANDCLOCK}  Connecting ${node.name}`)
         this.client.audio.addNode(node)
       } else {
         message.channel.send(`${placeHolderConstant.EMOJI_YES}  Already Connected ${node.name}`)

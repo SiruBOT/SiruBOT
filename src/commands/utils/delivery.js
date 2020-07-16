@@ -27,9 +27,6 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
   async run (compressed) {
     const { message, args } = compressed
     if (args.length === 0) return message.channel.send(`> ${placeHolderConstant.EMOJI_NO}  사용법이 올바르지 않아요. [택배사 이름] [송장번호] 가 필요해요.`)

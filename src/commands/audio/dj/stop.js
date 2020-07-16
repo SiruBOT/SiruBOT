@@ -20,13 +20,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const locale = compressed.guildData.locale
+  async run ({ message, guildData }) {
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
-    const { message } = compressed
     const Audio = this.client.audio
     if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'AUDIO_NOPLAYER'))
     const interval = setInterval(() => {

@@ -21,13 +21,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
+  async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const { locale, audioMessage } = compressed.guildData
-    const { message, args } = compressed
+    const { locale, audioMessage } = guildData
     const filter = { 끄기: false, 켜기: true, on: true, off: false, enable: true, disable: false }
     switch (this.client.utils.find.matchObj(filter, args.shift(), audioMessage)) {
       case true:

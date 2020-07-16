@@ -21,13 +21,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
+  async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const locale = compressed.guildData.locale
-    const { message, args } = compressed
+    const { locale } = guildData
     const search = args.shift()
     const filter = (a) => { return a.displayName.toLowerCase() === search.toLowerCase() || a.id === search || a.id === (this.client.utils.find.getUserFromMention(message.guild.members.cache, search) ? this.client.utils.find.getUserFromMention(message.guild.members.cache, search).id : null) || a.user.username.toLowerCase() === search.toLowerCase() }
     const options = {
@@ -56,9 +52,21 @@ class Command extends BaseCommand {
       const guildData = await this.client.database.getGuild(message.guild.id)
       const embed = new Discord.MessageEmbed()
         .setTitle(picker.get(locale, 'WARN_EMBED_ADDED_TITLE'))
-        .addFields({ name: picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'), value: picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }), inline: true })
-        .addFields({ name: picker.get(locale, 'WARN_EMBED_ADDED_PRISONER_TITLE'), value: picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }), inline: true })
-        .addFields({ name: picker.get(locale, 'WARN_EMBED_INFO_TITLE'), value: picker.get(locale, 'WARN_EMBED_INFO_DESC', { MAX: guildData.warningMax, CURRENT: updatedUserData.warningCount, REASON: why }), inline: true })
+        .addField(
+          picker.get(locale, 'WARN_EMBED_ADDED_COP_TITLE'),
+          picker.get(locale, 'WARN_EMBED_ADMIN_DESC', { USER: message.author, TAG: message.author.tag, ID: message.author.id }),
+          true
+        )
+        .addField(
+          picker.get(locale, 'WARN_EMBED_ADDED_PRISONER_TITLE'),
+          picker.get(locale, 'WARN_EMBED_USER_DESC', { USER: member, TAG: member.user.tag, ID: member.id }),
+          true
+        )
+        .addField(
+          picker.get(locale, 'WARN_EMBED_INFO_TITLE'),
+          picker.get(locale, 'WARN_EMBED_INFO_DESC', { MAX: guildData.warningMax, CURRENT: updatedUserData.warningCount, REASON: why }),
+          true
+        )
         .setColor(this.client._options.embed.warn)
         .setFooter(picker.get(locale, 'WARN_EMBED_ADDED_FOOTER'))
         .setTimestamp(obj.date)

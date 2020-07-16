@@ -20,14 +20,10 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const locale = compressed.guildData.locale
+  async run ({ message, args, guildData, userPermissions }) {
+    const locale = guildData.locale
     const picker = this.client.utils.localePicker
-    const { message, args } = compressed
-    if ((compressed.userPermissions.includes('Administrator') || compressed.userPermissions.includes('DJ')) && args.length > 0) {
+    if ((userPermissions.includes('Administrator') || userPermissions.includes('DJ')) && args.length > 0) {
       if (isNaN(args[0])) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_STRING'))
       if (Number(args[0]) < 1) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_UNDER_ONE'))
       if (Number(args[0]) > 150) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_HIGH_HDF'))

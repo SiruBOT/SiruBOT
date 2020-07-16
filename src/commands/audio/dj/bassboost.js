@@ -21,13 +21,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-     * @param {Object} compressed - Compressed Object
-     */
-  async run (compressed) {
-    const locale = compressed.guildData.locale
+  async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
-    const { message, args } = compressed
+    const { locale } = guildData
     const filterVal = this.client.audio.filters.getFilterValue(message.guild.id, 'bboost')
     if (args.length === 0) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_BASSBOOST_BASE', { VAL: filterVal ? filterVal.percentage + '%' : picker.get(locale, 'UNSET'), DESC: '' }))
     else {

@@ -23,14 +23,11 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
   async run (compressed) {
-    if (!this.client.audio.players.get(compressed.message.guild.id)) return this.client.commands.get('nowplaying').run(compressed)
-    if (compressed.guildData.queue.length === 0) return this.client.commands.get('nowplaying').run(compressed)
+    const { message, guildData } = compressed
+    if (!this.client.audio.players.get(message.guild.id)) return this.client.commands.get('nowplaying').run(compressed)
+    if (guildData.queue.length === 0) return this.client.commands.get('nowplaying').run(compressed)
     let page = 0
-    const { message } = compressed
     const data = await this.getQueueEmbed(message.guild, page)
     const m = await message.channel.send(data.nowplaying, data.embed)
     if (data.chunkedDescriptionArray.length === 1) return

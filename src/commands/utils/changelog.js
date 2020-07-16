@@ -22,9 +22,6 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
   async run (compressed) {
     const { message } = compressed
     const picker = this.client.utils.localePicker

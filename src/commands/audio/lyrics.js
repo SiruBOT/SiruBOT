@@ -24,13 +24,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
-    const locale = compressed.guildData.locale
+  async run ({ message, args, guildData }) {
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
-    const { message, args } = compressed
     const embed = new Discord.MessageEmbed()
       .setColor(this.client.utils.find.getColor(message.guild.me))
     message.channel.startTyping(1)

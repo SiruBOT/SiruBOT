@@ -38,14 +38,9 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run (compressed) {
+  async run ({ args, message, command, guildData }) {
     const picker = this.client.utils.localePicker
-    const { message, command, guildData } = compressed
     const { locale } = guildData
-    let { args } = compressed
     const type = this.client.utils.find.matchObj({ 잘가: 'bye', 환영: 'welcome', 입장: 'welcome', 퇴장: 'bye', welcome: 'welcome', bye: 'bye' }, args.shift(), null)
     const method = this.client.utils.find.matchObj({ view: 'view', set: 'set', 보기: 'view', 설정: 'set' }, args.shift(), null)
     // Enter: 0, Leave: 1
