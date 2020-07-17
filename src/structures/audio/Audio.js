@@ -206,7 +206,7 @@ class Audio extends Shoukaku.Shoukaku {
       node.rest._getFetch(`/loadtracks?${new URLSearchParams({ identifier: query }).toString()}`)
         .then(data => {
           this.client.logger.debug(`${this.defaultPrefix.getTrack} Resolve Track ${query} Node #${node.name} Result ${data}`)
-          resolve(data)fltmx
+          resolve(data)
         })
         .catch(err => {
           this.client.logger.error(`${this.defaultPrefix.getTrack} Query Keyword: ${query} ${err.name}: ${err.message}`)
