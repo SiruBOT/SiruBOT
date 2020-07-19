@@ -23,7 +23,7 @@ class Command extends BaseCommand {
 
   async run ({ message }) {
     for (const node of this.client._options.audio.nodes) {
-      if (!this.client.audio.getNode(node.name)) {
+      if (!await this.client.audio.getNode(node.name)) {
         message.channel.send(`${placeHolderConstant.EMOJI_SANDCLOCK}  Connecting ${node.name}`)
         this.client.audio.addNode(node)
       } else {
