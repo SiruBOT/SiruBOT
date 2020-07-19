@@ -1,6 +1,8 @@
 const Shoukaku = require('shoukaku')
 const NodeCache = require('node-cache')
 const { Collection } = require('discord.js')
+const fetch = require('node-fetch')
+const path = require('path')
 const AudioTimer = require('./AudioTimer')
 const Filters = require('./AudioFilters')
 const Queue = require('./Queue')
@@ -8,7 +10,8 @@ const relatedScraper = require('@sirubot/yt-related-scraper').Client
 const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
 const AudioUtils = require('./AudioUtils')
 const QueueEvents = require('./QueueEvents')
-
+const ONE_HOUR_SEC = 3600
+const HALF_HOUR_SEC = ONE_HOUR_SEC * 12
 class Audio extends Shoukaku.Shoukaku {
   constructor (...args) {
     super(...args)
@@ -28,9 +31,9 @@ class Audio extends Shoukaku.Shoukaku {
       setPlayerDefaultSetting: `${this.classPrefix}:setPlayerDefaultSetting]`,
       setVolume: `${this.classPrefix}:setVolume]`,
       getRelated: `${this.classPrefix}:getRelated]`,
-      fetchRelated: `${this.classPrefix}:fetchRelated]`,
-      getUA: `${this.classPrefix}:getUA]`,
-      parseYoutubeHTML: `${this.classPrefix}:parseYoutubeHTML]`,
+      getUsableNodes: `${this.classPrefix}:getUsableNodes]`,
+      is429: `${this.classPrefix}:is429]`,
+      checkAndunmarkFailedAddresses: `${this.classPrefix}:checkAndunmarkFailedAddresses]`,
       moveNode: `${this.classPrefix}:moveNode]`
     }
 
@@ -51,8 +54,9 @@ class Audio extends Shoukaku.Shoukaku {
     this.audioRouter = new AudioPlayerEventRouter(this)
 
     this.client.logger.info(`${this.classPrefix}] Init Audio..`)
-    this.trackCache = new NodeCache({ ttl: 3600 })
-    this.relatedCache = new NodeCache({ ttl: 43200 })
+    this.trackCache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
+    this.relatedCache = new NodeCache({ ttl: HALF_HOUR_SEC })
+    this.node429Cache = new NodeCache({ ttl: HALF_HOUR_SEC })
 
     this.on('ready', (name, resumed) => this.client.logger.info(`${this.lavalinkPrefix} Lavalink Node: ${name} is now connected. This connection is ${resumed ? 'resumed' : 'a new connection'}`))
     this.on('error', (name, error) => this.client.logger.error(`${this.lavalinkPrefix} Lavalink Node: ${name} emitted an error. ${error.stack}`))
@@ -67,16 +71,21 @@ class Audio extends Shoukaku.Shoukaku {
    */
   join (voiceChannelID, guildID) {
     return new Promise((resolve, reject) => {
-      this.getNode().joinVoiceChannel({
-        guildID: guildID,
-        voiceChannelID: voiceChannelID
-      }).then((player) => {
-        this.audioRouter.registerEvents(player)
-        this.setPlayersDefaultSetting(guildID)
-        this.client.logger.debug(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Successfully joined voiceChannel.`)
-        this.queue.autoPlay(guildID)
-        resolve(true)
-      }).catch(e => {
+      this.getNode().then(node => {
+        node.joinVoiceChannel({
+          guildID: guildID,
+          voiceChannelID: voiceChannelID
+        }).then((player) => {
+          this.audioRouter.registerEvents(player)
+          this.setPlayersDefaultSetting(guildID)
+          this.client.logger.debug(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Successfully joined voiceChannel.`)
+          this.queue.autoPlay(guildID)
+          resolve(true)
+        }).catch(e => {
+          this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)
+          reject(e)
+        })
+      }).catch((e) => {
         this.client.logger.error(`${this.defaultPrefix.join} [${guildID}] [${voiceChannelID}] Failed to join voiceChannel [${e.name}: ${e.message}]`)
         reject(e)
       })
@@ -144,15 +153,74 @@ class Audio extends Shoukaku.Shoukaku {
   /**
    * @description - Get Nodes sort by players.
    */
-  getNode (name = undefined) {
-    if (!name || this.nodes.get(name)) return this.getUsableNodes().sort((a, b) => { return a.penalties - b.penalties }).shift()
+  async getNode (name = undefined) {
+    if (!name || this.nodes.get(name)) return (await this.getUsableNodes()).sort((a, b) => { return a.penalties - b.penalties }).shift()
     else {
       this.nodes.get(name)
     }
   }
 
-  getUsableNodes () {
-    return Array.from(this.nodes.values()).filter(el => el.state === 'CONNECTED')
+  async getUsableNodes () {
+    const connectedNodes = Array.from(this.nodes.values()).filter(el => el.state === 'CONNECTED')
+    const result = []
+    for (const node of connectedNodes) {
+      try {
+        if (!await this.is429(node)) result.push(node)
+      } catch (e) {
+        this.client.logger.error(`${this.defaultPrefix.getUsableNodes} Failed to check is node blocked from youtube ${e}`)
+      }
+    }
+    return result
+  }
+
+  is429 (node) {
+    this.client.logger.debug(`${this.defaultPrefix.is429} Check Is Node 429 [${node.name}]`)
+    return new Promise((resolve, reject) => {
+      if (this.node429Cache.get(node.name)) {
+        this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache Hit, ${this.node429Cache.get(node.name)}`)
+        return resolve(this.node429Cache.get(node.name))
+      } else this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache not found, Requesting to Node..`)
+      node.rest._getFetch('/routeplanner/status')
+        .then((json) => {
+          json.nodeName = node.name
+          let node429Status
+          if (!json.class && !json.details) node429Status = false
+          else {
+            const { ipBlock, failingAddresses } = json.details
+            if (ipBlock.size <= failingAddresses.length) node429Status = true
+            this.checkAndunmarkFailedAddresses(node, failingAddresses)
+          }
+          this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] 429 Status: ${node429Status}, Routeplanner: ${json.class}, ${json.details ? json.details.ipBlock.type : json.details}`)
+          this.node429Cache.set(json.nodeName, node429Status)
+          resolve(node429Status)
+        })
+        .catch(reject)
+    })
+  }
+
+  /**
+   * @param {ShoukakuSocket} node ShoukakuSocket Instance
+   * @param {Object} failingAddresses - Address Info Object
+   * @returns {void}
+   */
+  checkAndunmarkFailedAddresses (node, failingAddresses) {
+    this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Checking FailedAddresses Expired Date..`)
+    const HALF_HOUR_MILLISEC = HALF_HOUR_SEC * 1000
+    const overHalfHour = failingAddresses.filter(el => el.failingTimestamp + HALF_HOUR_MILLISEC <= new Date().getTime())
+    if (overHalfHour.length === 0) return this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed Addresses Not Found.`)
+    this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Target to unmark addresses ${overHalfHour.length}`)
+    Promise.all(overHalfHour.map(el => {
+      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Unmark Address ${el.address} Failed at: ${el.failingTimestamp} (${el.failingTime})`)
+      return fetch(path.join(node.rest.url, '/routeplanner/free/address'), { method: 'POST', headers: { Authorization: node.rest.auth }, body: { address: el.address } })
+        .then((res) => {
+          this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Unmark ${el.address} ${res.status}`)
+          return res.status
+        }).catch(() => {
+          this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed To Unmark ${el.address}`)
+        })
+    })).then((arr) => {
+      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Successfully unmark ${arr.length} Addresses`)
+    })
   }
 
   /**
@@ -182,7 +250,7 @@ class Audio extends Shoukaku.Shoukaku {
    */
   async getTrack (query, cache = true) {
     if (!query) return new Error(`${this.defaultPrefix.getTrack} Query is not provied`)
-    const node = this.getNode()
+    const node = await this.getNode()
     if (this.trackCache.get(query) && cache) {
       this.client.logger.debug(`${this.defaultPrefix.getTrack} Query Keyword: ${query} Cache Available (${this.trackCache.get(query)}) returns Data`)
       return this.trackCache.get(query)
