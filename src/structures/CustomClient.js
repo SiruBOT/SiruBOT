@@ -190,7 +190,7 @@ class CustomClient extends Discord.Client {
     let value
     switch (type) {
       case 'ping':
-        if (!this.shard) value = this.ping
+        if (!this.shard) value = this.ws.ping
         else value = await this.shard.fetchClientValues('ws.ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1)).catch(0)
         return value
       case 'channels':
