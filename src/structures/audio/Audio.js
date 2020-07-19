@@ -10,7 +10,8 @@ const relatedScraper = require('@sirubot/yt-related-scraper').Client
 const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
 const AudioUtils = require('./AudioUtils')
 const QueueEvents = require('./QueueEvents')
-const ONE_HOUR_SEC = 3600
+const ONE_MIN_SEC = 60
+const ONE_HOUR_SEC = ONE_MIN_SEC * 60
 const HALF_HOUR_SEC = ONE_HOUR_SEC * 12
 class Audio extends Shoukaku.Shoukaku {
   constructor (...args) {
@@ -55,8 +56,8 @@ class Audio extends Shoukaku.Shoukaku {
 
     this.client.logger.info(`${this.classPrefix}] Init Audio..`)
     this.trackCache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
-    this.relatedCache = new NodeCache({ ttl: HALF_HOUR_SEC })
-    this.node429Cache = new NodeCache({ ttl: HALF_HOUR_SEC })
+    this.relatedCache = new NodeCache({ stdTTL: HALF_HOUR_SEC })
+    this.node429Cache = new NodeCache({ stdTTL: ONE_MIN_SEC * 2 })
 
     this.on('ready', (name, resumed) => this.client.logger.info(`${this.lavalinkPrefix} Lavalink Node: ${name} is now connected. This connection is ${resumed ? 'resumed' : 'a new connection'}`))
     this.on('error', (name, error) => this.client.logger.error(`${this.lavalinkPrefix} Lavalink Node: ${name} emitted an error. ${error.stack}`))
