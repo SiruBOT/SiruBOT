@@ -1,3 +1,4 @@
+const Sentry = require('@sentry/node')
 const placeHolderConstant = require('../constant').placeHolderConstant
 const Errors = require('../errors')
 class Event {
@@ -98,6 +99,7 @@ class Event {
             if (e instanceof Errors.PermissionError) return message.channel.send(picker.get(locale, 'ERROR_PERMISSION', { PERMS: e.perms.join(', ') }))
             this.client.logger.error(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Unexpected Error: ${e.name}: ${e.stack}`)
             await message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_ERROR', { UUID: this.client.database.addErrorInfo('commandError', e.name, e.stack, message.author.id, message.guild.id, commandClass.name, args) }))
+            Sentry.captureException(e)
           }
           message.author.awaitQuestion = false
         } else {
