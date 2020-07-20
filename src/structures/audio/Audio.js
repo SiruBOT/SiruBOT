@@ -2,7 +2,6 @@ const Shoukaku = require('shoukaku')
 const NodeCache = require('node-cache')
 const { Collection } = require('discord.js')
 const fetch = require('node-fetch')
-const path = require('path')
 const AudioTimer = require('./AudioTimer')
 const Filters = require('./AudioFilters')
 const Queue = require('./Queue')
@@ -168,59 +167,68 @@ class Audio extends Shoukaku.Shoukaku {
       try {
         if (!await this.is429(node)) result.push(node)
       } catch (e) {
-        this.client.logger.error(`${this.defaultPrefix.getUsableNodes} Failed to check is node blocked from youtube ${e}`)
+        this.client.logger.error(`${this.defaultPrefix.getUsableNodes} Failed to check is node blocked from youtube ${e.stack}`)
       }
     }
     return result
   }
 
-  is429 (node) {
+  async is429 (node) {
     this.client.logger.debug(`${this.defaultPrefix.is429} Check Is Node 429 [${node.name}]`)
-    return new Promise((resolve, reject) => {
-      if (this.node429Cache.get(node.name)) {
-        this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache Hit, ${this.node429Cache.get(node.name)}`)
-        return resolve(this.node429Cache.get(node.name))
-      } else this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache not found, Requesting to Node..`)
-      node.rest._getFetch('/routeplanner/status')
-        .then((json) => {
-          json.nodeName = node.name
-          let node429Status
-          if (!json.class && !json.details) node429Status = false
-          else {
-            const { ipBlock, failingAddresses } = json.details
-            if (ipBlock.size <= failingAddresses.length) node429Status = true
-            this.checkAndunmarkFailedAddresses(node, failingAddresses)
-          }
-          this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] 429 Status: ${node429Status}, Routeplanner: ${json.class}, ${json.details ? json.details.ipBlock.type : json.details}`)
-          this.node429Cache.set(json.nodeName, node429Status)
-          resolve(node429Status)
-        })
-        .catch(reject)
-    })
+    if (this.node429Cache.get(node.name) !== undefined) {
+      this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache Hit, ${this.node429Cache.get(node.name)}`)
+      return this.node429Cache.get(node.name)
+    } else this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache not found, Requesting to Node..`)
+    const json = await node.rest.getRoutePlannerStatus()
+    json.nodeName = node.name
+    let node429Status
+    if (!json.class && !json.details) node429Status = false
+    else {
+      const { ipBlock, failingAddresses } = json.details
+      const unmarkStatus = await this.checkAndunmarkFailedAddresses(node, failingAddresses)
+      if (unmarkStatus) return this.is429(node)
+      else if (ipBlock.size <= failingAddresses.length) node429Status = true
+      else node429Status = false
+    }
+    this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] 429 Status: ${node429Status}, Routeplanner: ${json.class}, ${json.details ? `${json.details.ipBlock.type} (${json.details.ipBlock.size} Addresses)` : json.details}`)
+    this.node429Cache.set(json.nodeName, node429Status)
+    return node429Status
   }
 
   /**
    * @param {ShoukakuSocket} node ShoukakuSocket Instance
    * @param {Object} failingAddresses - Address Info Object
-   * @returns {void}
+   * @returns {Promise<Boolean>} 429 Status
    */
   checkAndunmarkFailedAddresses (node, failingAddresses) {
-    this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Checking FailedAddresses Expired Date..`)
-    const HALF_HOUR_MILLISEC = HALF_HOUR_SEC * 1000
-    const overHalfHour = failingAddresses.filter(el => el.failingTimestamp + HALF_HOUR_MILLISEC <= new Date().getTime())
-    if (overHalfHour.length === 0) return this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed Addresses Not Found.`)
-    this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Target to unmark addresses ${overHalfHour.length}`)
-    Promise.all(overHalfHour.map(el => {
-      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Unmark Address ${el.address} Failed at: ${el.failingTimestamp} (${el.failingTime})`)
-      return fetch(path.join(node.rest.url, '/routeplanner/free/address'), { method: 'POST', headers: { Authorization: node.rest.auth }, body: { address: el.address } })
-        .then((res) => {
-          this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Unmark ${el.address} ${res.status}`)
-          return res.status
-        }).catch(() => {
-          this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed To Unmark ${el.address}`)
+    return new Promise((resolve, reject) => {
+      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Checking FailedAddresses Expired Date..`)
+      const HALF_HOUR_MILLISEC = HALF_HOUR_SEC * 1000
+      const overHalfHour = failingAddresses.filter(el => el.failingTimestamp + HALF_HOUR_MILLISEC <= new Date().getTime())
+      if (overHalfHour.length === 0) {
+        this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed Addresses Not Found.`)
+        return resolve(false)
+      }
+      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] ${overHalfHour.length} Unmarkable addresses`)
+      Promise.all(overHalfHour.map(el => {
+        this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark Address ${el.failingAddress} Failed at: ${el.failingTimestamp} (${el.failingTime})`)
+        return new Promise((resolve, reject) => {
+          // node.rest.unmarkFailedAddress(el.failingAddress)
+          node.rest.unmarkAllFailedAddress()
+            .then((status) => {
+              this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark ${el.failingAddress} (Response Code: ${status})`)
+              if (![204, 200].includes(status)) {
+                reject(new Error(`Unexpected Server response ${status}`))
+              } else resolve(status)
+            }).catch((e) => {
+              this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Failed To Unmark ${el.failingAddress}`)
+              reject(e)
+            })
         })
-    })).then((arr) => {
-      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Successfully unmark ${arr.length} Addresses`)
+      })).then((arr) => {
+        this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] [${node.name}] Successfully unmark ${arr.length} Addresses`)
+        return resolve(true)
+      }).catch(reject)
     })
   }
 
