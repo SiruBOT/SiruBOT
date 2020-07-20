@@ -22,12 +22,16 @@ class Command extends BaseCommand {
   }
 
   async run ({ message }) {
-    message.channel.send(`📫  모든 샤드 ${this.client.shard.count} 개에 종료 신호를 보냅니다...`)
-    this.client.shard.broadcastEval('this.shutdown()').then(results => {
+    if (this.client.shard) {
+      await message.channel.send(`📫  모든 샤드 ${this.client.shard.count} 개에 종료 신호를 보냅니다...`)
+      const results = await this.client.shard.broadcastEval('this.shutdown()')
       for (const shardID of results) {
-        message.channel.send(`${placeHolderConstant.EMOJI_YES}  샤드 ${shardID} 번의 종료가 시작되었습니다.`)
+        await message.channel.send(`${placeHolderConstant.EMOJI_YES}  샤드 ${shardID} 번의 종료가 시작되었습니다.`)
       }
-    })
+    } else {
+      await message.channel.send('📫 종료 중...')
+      this.client.shutdown()
+    }
   }
 }
 
