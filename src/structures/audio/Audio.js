@@ -175,7 +175,7 @@ class Audio extends Shoukaku.Shoukaku {
 
   async is429 (node) {
     this.client.logger.debug(`${this.defaultPrefix.is429} Check Is Node 429 [${node.name}]`)
-    if (this.node429Cache.get(node.name) !== undefined) {
+    if (this.node429Cache.get(node.name)) {
       this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache Hit, ${this.node429Cache.get(node.name)}`)
       return this.node429Cache.get(node.name)
     } else this.client.logger.debug(`${this.defaultPrefix.is429} [${node.name}] Cache not found, Requesting to Node..`)
