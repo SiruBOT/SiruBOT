@@ -203,8 +203,8 @@ class Audio extends Shoukaku.Shoukaku {
   checkAndunmarkFailedAddresses (node, failingAddresses) {
     return new Promise((resolve, reject) => {
       this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Checking FailedAddresses Expired Date..`)
-      const HALF_HOUR_MILLISEC = HALF_HOUR_SEC * 1000
-      const overHalfHour = failingAddresses.filter(el => el.failingTimestamp + HALF_HOUR_MILLISEC <= new Date().getTime())
+      const TWO_DAY_MILLISEC = (HALF_HOUR_SEC * 2) * 2 * 1000
+      const overHalfHour = failingAddresses.filter(el => el.failingTimestamp + TWO_DAY_MILLISEC <= new Date().getTime())
       if (overHalfHour.length === 0) {
         this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed Addresses Not Found.`)
         return resolve(false)
