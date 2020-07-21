@@ -213,8 +213,7 @@ class Audio extends Shoukaku.Shoukaku {
       Promise.all(overHalfHour.map(el => {
         this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark Address ${el.failingAddress} Failed at: ${el.failingTimestamp} (${el.failingTime})`)
         return new Promise((resolve, reject) => {
-          // node.rest.unmarkFailedAddress(el.failingAddress)
-          node.rest.unmarkAllFailedAddress()
+          node.rest.unmarkFailedAddress(el.failingAddress)
             .then((status) => {
               this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark ${el.failingAddress} (Response Code: ${status})`)
               if (![204, 200].includes(status)) {
