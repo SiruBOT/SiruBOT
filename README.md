@@ -2,6 +2,7 @@
 > ### Support Server, Invite BOT
 > [![Discord](https://discordapp.com/api/guilds/562920560955228176/embed.png?style=banner2)](https://discord.gg/ucDCPAY)<br>
 > [![Discord Bots](https://top.gg/api/widget/426722888293548032.svg)](https://top.gg/bot/426722888293548032)
+
 ## Status
 > [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)   
 > ![Language](https://img.shields.io/badge/language-Javascript,%20Node.js-brightgreen)   
@@ -13,17 +14,17 @@
 ## Creator: Sangoon_Is_Noob#1683
 > ![Sangoon_Profile_SRC](https://chinobot.ga/author_profile.png)
 
-# Installation
+## Installation
 
-## Clone this repository
-> ### Using Git CLI
+### Clone this repository
+> * Using Git CLI
 > ```
 > git clone https://github.com/cotwo0139/CHINOBOT_BETA.git
 > cd ./CHINOBOT_BETA.git
 > ```
-> ### Or Download This Repository
+> * Or Download This Repository
 
-## Install Node.js
+### Install Node.js
 > [Download For Windows / Macos](https://nodejs.org/en/download/)
 
 > Download For Linux Using apt
@@ -32,11 +33,11 @@
 > apt-get install nodejs -y
 > ```
 
-## Install MongoDB
+### Install MongoDB
 
 > [Click Here (Redirect To MongoDB Web)](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials)
 
-## Install Java(JDK 11) and Lavalink for Audio Feature
+### Install Java(JDK 11) and Lavalink for Audio Feature
 
 > [Click Here (Java)](https://www.oracle.com/java/technologies/javase-downloads.html)
 
