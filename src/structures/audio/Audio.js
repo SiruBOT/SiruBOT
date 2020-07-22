@@ -1,7 +1,6 @@
 const Shoukaku = require('shoukaku')
 const NodeCache = require('node-cache')
 const { Collection } = require('discord.js')
-const fetch = require('node-fetch')
 const AudioTimer = require('./AudioTimer')
 const Filters = require('./AudioFilters')
 const Queue = require('./Queue')
