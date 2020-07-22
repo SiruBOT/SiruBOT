@@ -22,7 +22,7 @@ class Command extends BaseCommand {
   }
 
   async run ({ message, guildData }) {
-  const { locale } = guildData
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
     const embed = new Discord.MessageEmbed()
 
