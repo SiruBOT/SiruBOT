@@ -179,11 +179,11 @@ class CustomClient extends Discord.Client {
   }
 
   async getActivityMessage (message) {
-    const ping = await this.getvalue('ping')
-    const guilds = await this.getvalue('guilds')
-    const users = await this.getvalue('users')
-    const channels = await this.getvalue('channels')
-    return message.replace('%PING%', ping).replace('%GUILDS%', guilds).replace('%USERS%', users).replace('%CHANNELS%', channels)
+    return message.replace('%PING%', await this.getvalue('ping'))
+      .replace('%GUILDS%', await this.getvalue('guilds'))
+      .replace('%USERS%', await this.getvalue('users'))
+      .replace('%CHANNELS%', await this.getvalue('channels'))
+      .replace('%SHARDCOUNT%', await this.getvalue('shards'))
   }
 
   async getvalue (type) {
@@ -191,7 +191,7 @@ class CustomClient extends Discord.Client {
     switch (type) {
       case 'ping':
         if (!this.shard) value = this.ws.ping
-        else value = await this.shard.fetchClientValues('ws.ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shards).toFixed(1)).catch(0)
+        else value = await this.shard.fetchClientValues('ws.ping').then(res => (res.reduce((prev, val) => prev + val, 0) / this._options.bot.shard.count).toFixed(1)).catch(0)
         return value
       case 'channels':
         if (!this.shard) value = this.channels.cache.size
@@ -205,6 +205,9 @@ class CustomClient extends Discord.Client {
         if (!this.shard) value = this.users.cache.size
         else value = await this.shard.fetchClientValues('users.cache.size').then(res => res.reduce((prev, val) => prev + val, 0)).catch(0)
         return value
+      case 'shards':
+        if (!this.shard) value = 1
+        else value = this.shard.count
     }
   }
 
