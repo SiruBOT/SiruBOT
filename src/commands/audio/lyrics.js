@@ -12,7 +12,7 @@ class Command extends BaseCommand {
       ['Everyone'],
       'MUSIC_GENERAL',
       {
-        audioNodes: true,
+        audioNodes: false,
         playingStatus: false,
         voiceStatus: {
           listenStatus: false,
