@@ -11,7 +11,7 @@
 > [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2cdd776e20b043eabaacbf321d63cad7)](https://www.codacy.com/manual/cotwo0139/Siru-stable?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sannoob/Siru-stable&amp;utm_campaign=Badge_Grade)   
 > [![Dependencies Status](https://david-dm.org/sannoob/Siru-stable.svg)](https://github.com/sannoob/Siru-stable)   
 > [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsannoob%2FSiru-stable.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsannoob%2FSiru-stable?ref=badge_large)
-## Creator: Sangoon_Is_Noob#1683
+## Creator: Sannoob#0001
 > [![Sangoon_Profile_SRC](https://chinobot.ga/author_profile.png)](https://sannoob.cf)
 
 ## Installation
