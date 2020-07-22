@@ -1,4 +1,4 @@
-# 📃 SiruBOT Development Version
+# 📃 SiruBOT
 > ### Support Server, Invite BOT
 > [![Discord](https://discordapp.com/api/guilds/562920560955228176/embed.png?style=banner2)](https://discord.gg/ucDCPAY)<br>
 [![Discord Bots](https://top.gg/api/widget/426722888293548032.svg)](https://top.gg/bot/426722888293548032)
