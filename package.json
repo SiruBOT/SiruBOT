@@ -16,7 +16,7 @@
     "minimist": "^1.2.5",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
-    "mongoose": "^5.9.24",
+    "mongoose": "^5.9.25",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.6.0",
     "node-os-utils": "^1.3.0",
