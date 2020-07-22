@@ -1,15 +1,17 @@
 const { BaseEvent } = require('../structures')
 
-class Event {
+class Event extends BaseEvent {
   constructor (client) {
-    this.client = client
-    this.name = 'debug'
-    this.listener = (...args) => this.run(...args)
+    super(
+      client,
+      'debug',
+      (...args) => this.run(...args)
+    )
   }
 
   /**
    * Run Event
-   * @param message {String} - Debug Message of Client
+   * @param {String} message - Debug Message of Client
    */
   async run (message) {
     this.client.logger.debug(message)

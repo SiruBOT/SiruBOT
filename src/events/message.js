@@ -1,11 +1,15 @@
 const Sentry = require('@sentry/node')
 const placeHolderConstant = require('../constant').placeHolderConstant
 const Errors = require('../errors')
-class Event {
+const { BaseEvent } = require('../structures')
+
+class Event extends BaseEvent {
   constructor (client) {
-    this.client = client
-    this.name = 'message'
-    this.listener = (...args) => this.run(...args)
+    super(
+      client,
+      'message',
+      (...args) => this.run(...args)
+    )
     this.classPrefix = '[Events:onMessage'
     this.defaultPrefix = {
       handleCommand: `${this.classPrefix}:handleCommand]`
@@ -14,7 +18,7 @@ class Event {
 
   /**
    * Run Event
-   * @param message {Object} - Message
+   * @param {Object} message - Message
    */
   async run (message) {
     this.handleCommand(message)

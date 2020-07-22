@@ -1,8 +1,12 @@
-class Event {
+const { BaseEvent } = require('../structures')
+
+class Event extends BaseEvent {
   constructor (client) {
-    this.client = client
-    this.name = 'shardReady'
-    this.listener = (...args) => this.run(...args)
+    super(
+      client,
+      'shardReady',
+      (...args) => this.run(...args)
+    )
   }
 
   /**

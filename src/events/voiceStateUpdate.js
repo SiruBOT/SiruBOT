@@ -1,13 +1,17 @@
-class Event {
+const { BaseEvent } = require('../structures')
+
+class Event extends BaseEvent {
   constructor (client) {
-    this.client = client
-    this.name = 'voiceStateUpdate'
-    this.listener = (...args) => this.run(...args)
+    super(
+      client,
+      'voiceStateUpdate',
+      (...args) => this.run(...args)
+    )
   }
 
   /**
-     * Run Event
-     */
+   * Run Event
+   */
   async run (oldState, newState) {
     this.client.audio.audioTimer.chkTimer(oldState.guild.id || newState.guild.id)
   }

@@ -1,13 +1,17 @@
-class Event {
+const { BaseEvent } = require('../structures')
+
+class Event extends BaseEvent {
   constructor (client) {
-    this.client = client
-    this.name = 'guildMemberRemove'
-    this.listener = (...args) => this.run(...args)
+    super(
+      client,
+      'guildMemberRemove',
+      (...args) => this.run(...args)
+    )
   }
 
   /**
    * Run Event
-   * @param member {Object} - GuildMember
+   * @param {Object} member - GuildMember
    */
   async run (member) {
     this.client.logger.debug(`[GuildMemberRemove] Send Bye Message ${member.guild.id}, ${member.id}`)

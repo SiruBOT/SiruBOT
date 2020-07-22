@@ -1,16 +1,20 @@
 const JagTagParser = require('@thesharks/jagtag-js')
 const template = require('string-placeholder')
 const Discord = require('discord.js')
-class Event {
+const { BaseEvent } = require('../structures')
+
+class Event extends BaseEvent {
   constructor (client) {
-    this.client = client
-    this.name = 'guildMemberAdd'
-    this.listener = (...args) => this.run(...args)
+    super(
+      client,
+      'guildMemberAdd',
+      (...args) => this.run(...args)
+    )
   }
 
   /**
    * Run Event
-   * @param member {Object} - GuildMember
+   * @param {Object} member - GuildMember
    */
   async run (member) {
     this.client.logger.debug(`[GuildMemberAdd] Check Guild Member, Check Guild ${member.guild.id}`)
