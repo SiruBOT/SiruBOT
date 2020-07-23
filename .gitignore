@@ -95,3 +95,8 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Unnecessary files
+package-lock.json
+workspace.code-workspace
+.vscode/
