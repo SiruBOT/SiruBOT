@@ -42,7 +42,7 @@ class WebhookLogger {
     const inOut = await osu.netstat.inOut().catch(null)
     return `CPU Average: **${await osu.cpu.usage()}%**
     Memory: **${memStat.usedMemMb}**/**${memStat.totalMemMb} MB**, **${memStat.freeMemPercentage}% (${memStat.freeMemMb}MB) Free**
-    ${!inOut ? '' : `Network IO: **${inOut.total.inputMb}MB** / **${inOut.total.outputMb}MB**`}`
+    ${!inOut ? '' : inOut.total ? `Network IO: **${inOut.total.inputMb}MB** / **${inOut.total.outputMb}MB**` : ''}`
   }
 }
 const hookLogger = new WebhookLogger(settings.webhook.info.id, settings.webhook.info.token)
