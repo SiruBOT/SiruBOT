@@ -1,3 +1,14 @@
 {
-  "extends": ["standard"]
+  "parserOptions": {
+    "ecmaVersion": 2016,
+    "sourceType": "script"
+  },
+  "extends": ["standard"],
+  "env": {
+    "node": true,
+    "browser": false,
+    "commonjs": true,
+    "mocha": true,
+    "es6": true
+  }
 }
