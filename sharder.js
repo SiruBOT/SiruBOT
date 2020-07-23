@@ -3,7 +3,7 @@ const osu = require('node-os-utils')
 const { getSettings } = require('./src/utils')
 const { Logger } = require('./src/structures')
 const settings = getSettings()
-const manager = new ShardingManager('./src/index.js', { token: settings.bot.token, totalShards: settings.bot.shards, respawn: true, shardArgs: settings.shardArgs })
+const manager = new ShardingManager('./src/index.js', { token: settings.bot.token, totalShards: settings.shard.count, respawn: true, shardArgs: settings.shardArgs })
 const logger = new Logger()
 class WebhookLogger {
   constructor (id, token) {
@@ -58,7 +58,7 @@ function setUpEvents (shard) {
   shard.on('ready', () => {
     if (manager.totalShards - 1 === shard.id) {
       manager.broadcastEval('this.setActivity()')
-      logger.warn(`[Sharding] Successfully Launched all shards! (${settings.bot.shards} shards)`)
+      logger.warn(`[Sharding] Successfully Launched all shards! (${settings.shard.count} shards)`)
     }
     hookLogger.warn(`[Shard ${shard.id}] Shard Ready`)
   })
