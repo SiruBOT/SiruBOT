@@ -13,6 +13,7 @@
     "git-repo-info": "^2.1.1",
     "glob": "^7.1.6",
     "inko": "^1.1.1",
+    "melon-chart-api": "^1.1.4",
     "minimist": "^1.2.5",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
@@ -36,6 +37,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cotwo0139/SiruBOT_BOT.git"
+  },
+  "standard": {
+    "env": "node"
   },
   "keywords": [
     "discordbot",
