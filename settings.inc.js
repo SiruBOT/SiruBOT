@@ -4,7 +4,8 @@ module.exports = {
   shard: {
     count: shardCount,
     respawn: true,
-    shardArgs: [] // ['--expose-gc', '--experimental-worker']
+    shardArgs: [], // Args to next script file (node index.js [args])
+    execArgv: [] // Args to next node excutable file (node [args] index.js)
   },
   bot: {
     token: 'SUPEEEEEEEEER SECRET Token',

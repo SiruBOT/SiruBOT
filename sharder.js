@@ -7,7 +7,8 @@ const manager = new ShardingManager('./src/index.js', {
   token: settings.bot.token,
   totalShards: settings.shard.count,
   respawn: settings.shard.respawn,
-  shardArgs: settings.shard.shardArgs
+  shardArgs: settings.shard.shardArgs,
+  execArgv: settings.shard.execArgv
 })
 const logger = new Logger()
 class WebhookLogger {
