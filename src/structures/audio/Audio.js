@@ -55,7 +55,7 @@ class Audio extends Shoukaku.Shoukaku {
     this.client.logger.info(`${this.classPrefix}] Init Audio..`)
     this.trackCache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
     this.relatedCache = new NodeCache({ stdTTL: HALF_HOUR_SEC })
-    this.node429Cache = new NodeCache({ stdTTL: ONE_MIN_SEC * 2 })
+    this.node429Cache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
 
     this.on('ready', (name, resumed) => this.client.logger.info(`${this.lavalinkPrefix} Lavalink Node: ${name} is now connected. This connection is ${resumed ? 'resumed' : 'a new connection'}`))
     this.on('error', (name, error) => this.client.logger.error(`${this.lavalinkPrefix} Lavalink Node: ${name} emitted an error. ${error.stack}`))
