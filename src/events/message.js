@@ -28,17 +28,27 @@ class Event extends BaseEvent {
     if (message.author.bot) return
     if (message.channel.type === 'dm') return message.channel.send(`${placeHolderConstant.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${placeHolderConstant.EMOJI_NO}  You can't use commands on the DM.`)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
+    const prefix = placeHolderConstant.PREFIX
+    const args = message.content.slice(prefix.length).trim().split(/ +/g)
+    const command = args.shift().toLowerCase()
+    const commandClass = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
+    const badConnectionCodes = [0, 2, 3]
+    const ownerName = this.client.shard ? await this.client.shard.broadcastEval(`this.users.cache.get("${this.client._options.bot.owners[0]}").tag`) : this.client.users.cache.get(this.client._options.bot.owners[0]).tag
+    if (badConnectionCodes.includes(this.client.database.connection.readyState) && message.content.startsWith(prefix) && commandClass) {
+      await message.channel.send(
+      `> ${placeHolderConstant.EMOJI_WARN}  봇이 DB와 연결이 끊어져 사용 불가능한 상태인것 같네요, 개발자에게 연락해주세요!
+       > ${placeHolderConstant.EMOJI_WARN}  It seems disconnected from database server, please contact developer! (**${ownerName}**)`
+      )
+      return
+    }
     const guildData = await this.client.database.getGuild(message.guild.id)
     const userData = await this.client.database.getUser(message.author.id)
     const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
     if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
-    const prefix = placeHolderConstant.PREFIX
     if (message.content.startsWith(prefix)) {
       if (message.author.awaitQuestion) return
       const picker = this.client.utils.localePicker
       const { locale } = guildData
-      const args = message.content.slice(prefix.length).trim().split(/ +/g)
-      const command = args.shift().toLowerCase()
       if (userData.blacklisted && !this.client._options.bot.owners.includes(message.author.id)) return this.client.logger.warn(`${this.defaultPrefix.handleCommand} Blacklisted User Issued Command ${command}, [${args.join(', ')}]`)
       const userPermissions = this.client.utils.permissionChecker.getUserPerm(message.member, {
         userData,
@@ -60,7 +70,6 @@ class Event extends BaseEvent {
         command: command,
         userPermissions: userPermissions
       })
-      const commandClass = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
       if (commandClass) {
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))
         if (this.client.chkRightChannel(message.channel, guildData.tch) || message.member.permissions.has('ADMINISTRATOR')) {
@@ -118,7 +127,7 @@ class Event extends BaseEvent {
               SERVER: message.guild.name,
               CHANNEL: guildData.tch
             }))
-            m.delete({ timeout: 3000 })
+            await m.delete({ timeout: 3000 })
           }
         }
       }
