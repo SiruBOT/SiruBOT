@@ -27,7 +27,7 @@ class Command extends BaseCommand {
   }
 
   getMelonEmbed (page, entires) {
-  };
+  }
 
   parseDate (string) {
     const time = moment().tz('Asia/Seoul')
