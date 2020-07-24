@@ -23,10 +23,19 @@ class Command extends BaseCommand {
     )
   }
 
-  async run ({ message, args }) {
+  async run ({ message, args, guildData }) {
+    const { locale } = guildData
+    const time = this.parseDate(args.join(' '))
   }
 
   getMelonEmbed (page, entires) {
+  }
+
+  parseMelonDate (string) {
+    return {
+      date: new Date(`${string.substring(0, 4)}-${string.substring(4, 6)}-${string.substring(6, 8)}`),
+      time: string.substring(8, 10)
+    }
   }
 
   parseDate (string) {
