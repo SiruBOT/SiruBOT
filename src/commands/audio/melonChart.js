@@ -25,10 +25,21 @@ class Command extends BaseCommand {
 
   async run ({ message, args, guildData }) {
     const { locale } = guildData
-    const time = this.parseDate(args.join(' '))
-  }
-
-  getMelonEmbed (page, entires) {
+    const date = moment(this.parseDate(args.join(' ')))
+    try {
+      const melonData = await Melon(date.format('YYYY/MM/DD'), { cutLine: 100 }).realtime()
+      const getMelonEmbed = () => {
+        // this.client.utils.array.chunkArray(melonData.data, 10) Entries
+        // this.parseMelonDate(melonData.dates.start) Melon date
+        const embed = new Discord.MessageEmbed()
+        embed.setTitle(0)
+      }
+      let page = 0
+      getMelonEmbed(page, melonData)
+      page++
+    } catch {
+      await message.channel.send('Failed to retrive data from melon')
+    }
   }
 
   parseMelonDate (string) {
