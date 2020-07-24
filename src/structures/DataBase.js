@@ -7,6 +7,9 @@ class DataBase {
     this.client = client
     this.connection = Mongo.connection
     // Constants
+    this.reconnectTime = 5000
+    this.reconnectTries = 0
+    this.maxReconnectTries = 10
     this.collections = {
       guild: 'Guild',
       user: 'User',
@@ -41,12 +44,27 @@ class DataBase {
    */
   init () {
     const { _options, logger } = this.client
+    const startMs = new Date().getTime()
     logger.info(`${this.defaultPrefix.init} Connecting URL (${_options.db.mongo.mongoURL})`)
-    Mongo.connect(_options.db.mongo.mongoURL, { useNewUrlParser: true, useUnifiedTopology: true, user: _options.db.mongo.user, pass: _options.db.mongo.password })
-      .catch(e => {
-        logger.error(e)
-        logger.error('[DB] Failed To Initialize Database.')
-      })
+    Mongo.connect(_options.db.mongo.mongoURL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      user: _options.db.mongo.user,
+      pass: _options.db.mongo.password
+    }).then(() => {
+      logger.info(`[DB] Connected to database ${new Date().getTime() - startMs}`)
+    }).catch(e => {
+      logger.error(`[DB] Failed To Initialize Database. (${new Date().getTime() - startMs}) \n${e.stack}`)
+      if (this.maxReconnectTries <= this.reconnectTries) {
+        throw new Error(`Failed to connect database (${this.reconnectTries} Tries)`)
+      }
+      const calculatedReconnectTime = this.reconnectTime * (!this.reconnectTries ? 1 : this.reconnectTries)
+      logger.info(`[DB] Trying to reconnect in ${calculatedReconnectTime}ms, (${this.reconnectTries} Tries)`)
+      setTimeout(() => {
+        this.init()
+        this.reconnectTries++
+      }, calculatedReconnectTime)
+    })
   }
 
   /**
