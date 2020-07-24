@@ -1,13 +1,17 @@
-const shardCount = 1
+const shardCount = 1 // Shard Count
 module.exports = {
   sentry: null, // Your Sentry DSN URL
+  shard: {
+    count: shardCount,
+    respawn: true,
+    shardArgs: [] // ['--expose-gc', '--experimental-worker']
+  },
   bot: {
     token: 'SUPEEEEEEEEER SECRET Token',
     // Prefix: /src/constructors/placeHolderConstructors.js[PREFIX]
     games: ['%USERS% 명의 유저와 함께하고 있어요!', '%GUILDS% 개의 서버에서 사용 중!', '>>도움 | %PING%ms', '%SHARDCOUNT% 샤드 | %GUILDS% 서버', 'Open source: github.com/sannoob/Siru-stable'],
     gamesInterval: 30000, // 1000ms = 1sec (ms)
-    owners: ['12345678'],
-    shards: shardCount
+    owners: ['12345678']
   },
   webhook: {
     info: {

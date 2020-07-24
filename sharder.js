@@ -3,7 +3,12 @@ const osu = require('node-os-utils')
 const { getSettings } = require('./src/utils')
 const { Logger } = require('./src/structures')
 const settings = getSettings()
-const manager = new ShardingManager('./src/index.js', { token: settings.bot.token, totalShards: settings.shard.count, respawn: true, shardArgs: settings.shardArgs })
+const manager = new ShardingManager('./src/index.js', {
+  token: settings.bot.token,
+  totalShards: settings.shard.count,
+  respawn: settings.shard.respawn,
+  shardArgs: settings.shard.shardArgs
+})
 const logger = new Logger()
 class WebhookLogger {
   constructor (id, token) {
