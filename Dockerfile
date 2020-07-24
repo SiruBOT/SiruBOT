@@ -5,4 +5,4 @@ COPY package*.json ./
 COPY ./settings.js ./settings.js
 COPY . .
 RUN npm install
-CMD [ "node", "--expose-gc", "sharder.js" ]
+CMD [ "node", "sharder.js" ]
