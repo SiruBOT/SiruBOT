@@ -52,9 +52,9 @@ class DataBase {
       user: _options.db.mongo.user,
       pass: _options.db.mongo.password
     }).then(() => {
-      logger.info(`[DB] Connected to database ${new Date().getTime() - startMs}`)
+      logger.info(`[DB] Connected to database (${new Date().getTime() - startMs}ms)`)
     }).catch(e => {
-      logger.error(`[DB] Failed To Initialize Database. (${new Date().getTime() - startMs}) \n${e.stack}`)
+      logger.error(`[DB] Failed To Initialize Database. (${new Date().getTime() - startMs}ms) \n${e.stack}`)
       if (this.maxReconnectTries <= this.reconnectTries) {
         throw new Error(`Failed to connect database (${this.reconnectTries} Tries)`)
       }
