@@ -5,6 +5,7 @@ const AudioTimer = require('./AudioTimer')
 const Filters = require('./AudioFilters')
 const Queue = require('./Queue')
 const relatedScraper = require('@sirubot/yt-related-scraper').Client
+const fetch = require('node-fetch')
 const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
 const AudioUtils = require('./AudioUtils')
 const QueueEvents = require('./QueueEvents')
@@ -203,21 +204,26 @@ class Audio extends Shoukaku.Shoukaku {
     return new Promise((resolve, reject) => {
       this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Checking FailedAddresses Expired Date..`)
       const TWO_DAY_MILLISEC = (HALF_HOUR_SEC * 2) * 2 * 1000
-      const overHalfHour = failingAddresses.filter(el => el.failingTimestamp + TWO_DAY_MILLISEC <= new Date().getTime())
-      if (overHalfHour.length === 0) {
+      const unmarkableAddresses = failingAddresses.filter(el => el.failingTimestamp + TWO_DAY_MILLISEC <= new Date().getTime())
+      if (unmarkableAddresses.length === 0) {
         this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} Failed Addresses Not Found.`)
         return resolve(false)
       }
-      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] ${overHalfHour.length} Unmarkable addresses`)
-      Promise.all(overHalfHour.map(el => {
+      this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] ${unmarkableAddresses.length} Unmarkable addresses`)
+      Promise.all(unmarkableAddresses.map(el => {
         this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark Address ${el.failingAddress} Failed at: ${el.failingTimestamp} (${el.failingTime})`)
         return new Promise((resolve, reject) => {
-          node.rest.unmarkFailedAddress(el.failingAddress)
-            .then((status) => {
-              this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark ${el.failingAddress} (Response Code: ${status})`)
-              if (![204, 200].includes(status)) {
-                reject(new Error(`Unexpected Server response ${status}`))
-              } else resolve(status)
+          fetch(new URL('/routeplanner/status', node.rest.url), {
+            headers: { Authorization: node.rest.auth },
+            body: {
+              address: el.failingAddress
+            }
+          })
+            .then((res) => {
+              this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark ${el.failingAddress} (Response Code: ${res.status})`)
+              if (![204, 200].includes(res.status)) {
+                reject(new Error(`Unexpected Server response ${res.status}`))
+              } else resolve(res.status)
             }).catch((e) => {
               this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Failed To Unmark ${el.failingAddress}`)
               reject(e)
