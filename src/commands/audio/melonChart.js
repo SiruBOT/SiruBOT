@@ -2,7 +2,9 @@ const Discord = require('discord.js')
 const { BaseCommand } = require('../../structures')
 const moment = require('moment-timezone')
 const Melon = require('melon-chart-api')
-
+const { EMOJI_ARROW_TORWARD, EMOJI_ARROW_BACKWARD, EMOJI_X } = require('../../constant/placeHolderConstant')
+const CONTROL_KEYS = [EMOJI_ARROW_BACKWARD, EMOJI_X, EMOJI_ARROW_TORWARD]
+const ONE_MIN = 60 * 1000
 class Command extends BaseCommand {
   constructor (client) {
     super(client,
@@ -25,21 +27,60 @@ class Command extends BaseCommand {
 
   async run ({ message, args, guildData }) {
     const { locale } = guildData
-    const date = moment(this.parseDate(args.join(' ')))
-    try {
-      const melonData = await Melon(date.format('YYYY/MM/DD'), { cutLine: 100 }).realtime()
-      const getMelonEmbed = () => {
-        // this.client.utils.array.chunkArray(melonData.data, 10) Entries
-        // this.parseMelonDate(melonData.dates.start) Melon date
-        const embed = new Discord.MessageEmbed()
-        embed.setTitle(0)
-      }
-      let page = 0
-      getMelonEmbed(page, melonData)
-      page++
-    } catch {
-      await message.channel.send('Failed to retrive data from melon')
+    const melonData = await Melon(this.parseDate(args.join(' ')), { cutLine: 100 }).realtime()
+    const melonPages = this.client.utils.array.chunkArray(melonData.data, 10)
+    const melonDate = this.parseMelonDate(melonData.dates.start)
+    let page = 1
+    const getMelonEmbed = () => {
+      const embed = new Discord.MessageEmbed()
+      console.log(page)
+      const items = melonPages[page - 1]
+      items.map((el) => {
+        embed.addField(`${el.rank} 위 - ${el.artist}`, el.title)
+      })
+      embed.setThumbnail('https://cdnimg.melon.co.kr/resource/image/web/common/logo_melon142x99.png')
+      embed.setTitle(`${moment(melonDate.date).format('YYYY 년 MM 월 DD 일')} ${melonDate.time} 시 멜론차트`)
+      embed.setFooter(`${page}/${melonPages.length}`)
+      embed.setColor(this.client.utils.find.getColor(message.guild.me))
+      return embed
     }
+    const m = await message.channel.send(getMelonEmbed(page, melonPages))
+    await this.client.utils.message.massReact(m, CONTROL_KEYS)
+    const awaitControl = async () => {
+      const updateMessage = async () => {
+        try {
+          await m.edit(getMelonEmbed())
+          await awaitControl()
+        } catch (e) {
+          console.log(e)
+          await m.reactions.removeAll()
+        }
+      }
+      const controlKeysFilter = (reaction, user) => CONTROL_KEYS.includes(reaction.emoji.name) && user.id === message.author.id
+      try {
+        const collectedReactions = await m.awaitReactions(controlKeysFilter, { max: 1, time: ONE_MIN, errors: ['time'] })
+        switch (collectedReactions.first().emoji.name) {
+          case EMOJI_ARROW_BACKWARD:
+            if (page <= 1) page = melonPages.length
+            else page--
+            await collectedReactions.first().users.remove(message.author.id)
+            await updateMessage()
+            break
+          case EMOJI_ARROW_TORWARD:
+            if (page >= melonPages.length) page = 1
+            else page++
+            await collectedReactions.first().users.remove(message.author.id)
+            await updateMessage()
+            break
+          case EMOJI_X:
+            await m.reactions.removeAll()
+            break
+        }
+      } catch (e) {
+        await message.channel.send('Timed Out.')
+      }
+    }
+    await awaitControl()
   }
 
   parseMelonDate (string) {
