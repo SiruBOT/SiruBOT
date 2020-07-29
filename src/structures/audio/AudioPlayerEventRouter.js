@@ -30,10 +30,10 @@ class AudioPlayerEventRouter {
   }
 
   RouteWebSocketClosedEvents (player, data) {
-    const disconnectCodes = [4014, 4006]
+    const disconnectCodes = [4014]
     if (disconnectCodes.includes(data.code) && data.byRemote === true) {
       if (data.code === disconnectCodes[0]) this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Disconnected from websocket, reconnecting...`)
-      if (data.code === disconnectCodes[1]) this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Invalid Session, reconnecting...`)
+      // if (data.code === disconnectCodes[1]) this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Invalid Session, reconnecting...`)
       const voiceConnection = player.voiceConnection
       const { guildID, voiceChannelID, selfMute, selfDeaf } = voiceConnection
       voiceConnection._sendDiscordWS({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })

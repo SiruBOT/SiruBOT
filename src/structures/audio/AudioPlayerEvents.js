@@ -45,7 +45,7 @@ class AudioPlayerEvents {
 
   TrackCleanUpped (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackStopped} [${data.guildId}] Cleaned Track (Maybe session invalid)`)
-    this.client.audio.queue.autoPlay(data.guildId)
+    this.client.audio.queue.autoPlay(data.guildId, true)
   }
 
   TrackStopped (data) {
