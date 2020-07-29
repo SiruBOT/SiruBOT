@@ -1,4 +1,4 @@
-const CustomClient = require('./CustomClient')
+const { Client } = require('discord.js')
 class BaseEvent {
   /**
    * @description - Base Event for CustomClient
@@ -7,7 +7,7 @@ class BaseEvent {
    * @param {Function} listener - Evernt Listener
    */
   constructor (client, name, listener) {
-    if (!(client instanceof CustomClient)) throw new Error('supplied constructor `client` is must be instance of BaseClient')
+    if (!(client instanceof Client)) throw new Error('supplied constructor `client` is must be instance of Discord.js\'s Client')
     this.client = client
     if (typeof name !== 'string') throw new Error('supplied constructor `name` is must be String')
     this.name = name
