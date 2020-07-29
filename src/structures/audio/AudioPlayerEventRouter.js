@@ -38,6 +38,8 @@ class AudioPlayerEventRouter {
       const { guildID, voiceChannelID, selfMute, selfDeaf } = voiceConnection
       voiceConnection._sendDiscordWS({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })
       voiceConnection.state = 'CONNECTED'
+    } else {
+      player.disconnect()
     }
   }
 
