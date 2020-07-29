@@ -27,19 +27,29 @@ class Command extends BaseCommand {
 
   async run ({ message, args, guildData }) {
     const { locale } = guildData
-    const melonData = await Melon(this.parseDate(args.join(' ')), { cutLine: 100 }).realtime()
+    let realtimeStatus = args.length === 0
+    let melonData
+    if (realtimeStatus) melonData = await Melon(this.parseDate(), { cutLine: 100 }).realtime()
+    else {
+      realtimeStatus = false
+      melonData = await Melon(this.parseDate(args.join(' ')), { cutLine: 100 }).weekly()
+      if (melonData.data.length === 0) {
+        realtimeStatus = true
+        melonData = await Melon(this.parseDate(), { cutLine: 100 }).realtime()
+      }
+    }
+    if (melonData.data.length === 0) return message.channel.send('멜론 차트의 데이터가 없습니다.')
     const melonPages = this.client.utils.array.chunkArray(melonData.data, 10)
     const melonDate = this.parseMelonDate(melonData.dates.start)
     let page = 1
     const getMelonEmbed = () => {
       const embed = new Discord.MessageEmbed()
-      console.log(page)
       const items = melonPages[page - 1]
       items.map((el) => {
         embed.addField(`${el.rank} 위 - ${el.artist}`, el.title)
       })
       embed.setThumbnail('https://cdnimg.melon.co.kr/resource/image/web/common/logo_melon142x99.png')
-      embed.setTitle(`${moment(melonDate.date).format('YYYY 년 MM 월 DD 일')} ${melonDate.time} 시 멜론차트`)
+      embed.setTitle(`${moment(melonDate.date).format('YYYY 년 MM 월 DD 일')} ${realtimeStatus ? '실시간' : ''} 멜론차트`)
       embed.setFooter(`${page}/${melonPages.length}`)
       embed.setColor(this.client.utils.find.getColor(message.guild.me))
       return embed
@@ -52,7 +62,6 @@ class Command extends BaseCommand {
           await m.edit(getMelonEmbed())
           await awaitControl()
         } catch (e) {
-          console.log(e)
           await m.reactions.removeAll()
         }
       }
@@ -77,7 +86,7 @@ class Command extends BaseCommand {
             break
         }
       } catch (e) {
-        await message.channel.send('Timed Out.')
+        await m.reactions.removeAll()
       }
     }
     await awaitControl()
