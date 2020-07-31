@@ -1,7 +1,12 @@
 const Mongo = require('mongoose')
 const Models = require('../constant/models')
 const uuid = require('node-uuid')
-
+const knex = require('knex')
+const knexDefaultOption = {
+  client: 'mysql2',
+  version: '5.7',
+  connection: {}
+}
 class DataBase {
   constructor (client) {
     this.client = client
@@ -42,7 +47,16 @@ class DataBase {
   /**
    * Initialize Database Connection
    */
+
   init () {
+
+  }
+
+  connectKnex () {
+
+  }
+
+  connectMongo () {
     const { _options, logger } = this.client
     const startMs = new Date().getTime()
     logger.info(`${this.defaultPrefix.init} Connecting URL (${_options.db.mongo.mongoURL})`)
