@@ -26,8 +26,8 @@
 > -   Using Git CLI
 >
 >
->     git clone https://github.com/cotwo0139/CHINOBOT_BETA.git
->     cd ./CHINOBOT_BETA.git
+>     git clone https://github.com/Sannoob/Siru-stable.git
+>     cd ./Siru-stable
 >
 > -   Or Download This Repository
 
@@ -46,7 +46,14 @@
 
 > [Click Here (Redirect To MongoDB Web)](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials)
 
+### Install Mariadb or Mysql
+
+> [Click Here (Redirect To Mysql Download Page)](https://www.mysql.com/downloads/)   
+> [Click Here (Redirect To Mariadb Download Page)](https://mariadb.org/download/) (Recommended)
+
 ### Install Java(JDK 11) and Lavalink for Audio Feature
+
+-   If you want audio filter feature, Download our UnOfficial build on [SiruBOT/Lavalink](https://github.com/SiruBOT/Lavalink)
 
 > [Click Here (Java)](https://www.oracle.com/java/technologies/javase-downloads.html)
 
