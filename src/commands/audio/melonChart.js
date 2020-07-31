@@ -9,7 +9,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'melon',
-      ['멜론', '멜론차트', '라솔말'],
+      ['멜론', '멜론차트'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {
@@ -27,6 +27,7 @@ class Command extends BaseCommand {
 
   async run ({ message, args, guildData }) {
     const { locale } = guildData
+    const picker = this.client.utils.localePicker
     let realtimeStatus = args.length === 0
     let melonData
     if (realtimeStatus) melonData = await Melon(this.parseDate(), { cutLine: 100 }).realtime()
@@ -38,7 +39,7 @@ class Command extends BaseCommand {
         melonData = await Melon(this.parseDate(), { cutLine: 100 }).realtime()
       }
     }
-    if (melonData.data.length === 0) return message.channel.send('멜론 차트의 데이터가 없습니다.')
+    if (melonData.data.length === 0) return message.channel.send(picker.get(locale, ''))
     const melonPages = this.client.utils.array.chunkArray(melonData.data, 10)
     const melonDate = this.parseMelonDate(melonData.dates.start)
     let page = 1
@@ -46,11 +47,11 @@ class Command extends BaseCommand {
       const embed = new Discord.MessageEmbed()
       const items = melonPages[page - 1]
       items.map((el) => {
-        embed.addField(`${el.rank} 위 - ${el.artist}`, el.title)
+        embed.addField(`${picker.get(locale, 'COMMANDS_MELON_RANK', { RANK: el.rank })} - ${el.artist}`, el.title)
       })
       embed.setThumbnail('https://cdnimg.melon.co.kr/resource/image/web/common/logo_melon142x99.png')
-      embed.setTitle(`${moment(melonDate.date).format('YYYY 년 MM 월 DD 일')} ${realtimeStatus ? '실시간' : ''} 멜론차트`)
-      embed.setFooter(`${page}/${melonPages.length}`)
+      embed.setTitle(`${moment(melonDate.date).format(picker.get(locale, 'COMMANDS_MELON_FORMAT'))} ${realtimeStatus ? picker.get(locale, 'REALTIME') : ''} ${picker.get(locale, 'MELONCHART')}`)
+      embed.setFooter(picker.get(locale, 'PAGER_PAGE', { CURRENT: page, PAGES: melonPages.length }))
       embed.setColor(this.client.utils.find.getColor(message.guild.me))
       return embed
     }
