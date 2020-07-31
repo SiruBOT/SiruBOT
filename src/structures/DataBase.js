@@ -49,7 +49,7 @@ class DataBase {
    */
 
   init () {
-
+    this.connectMongo()
   }
 
   connectKnex () {
