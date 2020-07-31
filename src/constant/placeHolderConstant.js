@@ -54,5 +54,8 @@ module.exports = {
   EMOJI_SWITCH_ON: '<:emoji_on:649622462765596683>',
   EMOJI_SWITCH_OFF: '<:emoji_off:649622462685773884>',
 
+  SUPPORT_SERVER: 'https://discord.gg/463PGcC',
+  WEBPAGE: 'https://siru.moe',
+  GITHUB: 'https://github.com/Sannoob/Siru-stable',
   PREFIX: '->'
 }
