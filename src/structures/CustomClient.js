@@ -208,6 +208,7 @@ class CustomClient extends Discord.Client {
       case 'shards':
         if (!this.shard) value = 1
         else value = this.shard.count
+        return value
     }
   }
 
