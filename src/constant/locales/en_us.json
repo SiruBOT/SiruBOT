@@ -181,7 +181,7 @@
   "COMMANDS_HELP_USAGE_DESC": "```md\n%USAGE%```",
   "COMMANDS_HELP_DESC": "**%EMOJI_PIN%  Command Description**",
   "COMMANDS_HELP_MORE": "**%EMOJI_PAPER%  More Information**",
-  "COMMANDS_HELP_MORE_DESC": "%PREFIX%help [Command] To More Information of Command\n**[[Support Server]](https://discord.gg/wy6KsRf)  [[Official Webpage]](https://siru.moe)  [[Github]](https://github.com/cotwo0139/SiruBOT_BOT)**",
+  "COMMANDS_HELP_MORE_DESC": "%PREFIX%help [Command] To More Information of Command\n**[[Support Server]](%SUPPORT_SERVER%)  [[Official Webpage]](%WEBPAGE%)  [[Github]](%GITHUB%)**",
   "COMMANDS_MODSETTINGS_FIELD_MOD": "Moaderation Settings",
   "COMMANDS_MODSETTINGS_FIELD_AUDIO": "Music Settings",
   "COMMANDS_MODSETTINGS_FIELD_DEFAULT": "Default Settings",
