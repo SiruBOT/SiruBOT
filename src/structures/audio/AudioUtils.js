@@ -66,7 +66,7 @@ class AudioUtils {
           this.client.audio.nowplayingMessages.set(guildID, { message: pinnedMessage, pinned: true })
         } else {
           try {
-            await message.edit()
+            await message.edit(embed)
           } catch {}
         }
       } else this.client.audio.nowplayingMessages.delete(guildID)
