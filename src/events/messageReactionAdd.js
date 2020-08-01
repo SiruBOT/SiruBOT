@@ -31,6 +31,10 @@ class Event extends BaseEvent {
       }
       if (userPermissions.includes('DJ') && messageReaction.emoji.name === placeHolderConstant.EMOJI_PIN) {
         this.client.audio.utils.toggleNowplayingPinned(message.guild.id)
+        await this.client.audio.utils.updateNowplayingMessage(message.guild.id)
+        try {
+          await messageReaction.users.remove(user)
+        } catch {}
       }
     }
   }
