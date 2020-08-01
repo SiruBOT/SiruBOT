@@ -57,13 +57,17 @@ class AudioUtils {
       if (message && message.deleted === false && message.editable) {
         const embed = await this.getNowplayingEmbed(guildID, pinned)
         if (pinned && message.channel.lastMessageID !== message.id && message.deletable) {
-          await message.delete()
+          try {
+            await message.delete()
+          } catch {}
           const pinnedMessage = await message.channel.send(embed)
           await pinnedMessage.react(placeHolderConstant.EMOJI_STAR)
           await pinnedMessage.react(placeHolderConstant.EMOJI_PIN)
           this.client.audio.nowplayingMessages.set(guildID, { message: pinnedMessage, pinned: true })
         } else {
-          await message.edit(embed)
+          try {
+            await message.edit()
+          } catch {}
         }
       } else this.client.audio.nowplayingMessages.delete(guildID)
     }
