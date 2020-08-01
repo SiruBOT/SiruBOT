@@ -7,7 +7,8 @@ class AudioUtils {
     this.defaultPrefix = {
       sendMessage: `${this.classPrefix}:sendMessage]`,
       getPlayingState: `${this.classPrefix}:getPlayingState]`,
-      updateNowplayingMessage: `${this.classPrefix}:updateNowplayingMessage]`
+      updateNowplayingMessage: `${this.classPrefix}:updateNowplayingMessage]`,
+      toggleNowplayingPinned: `${this.classPrefix}:toggleNowplayingPinned]`
     }
   }
 
@@ -43,15 +44,41 @@ class AudioUtils {
    * @param {String} guildId - guildId of to update nowplaying message
    * @param {Boolean} stop - If True, delete guildId of nowplayingMessage from nowplayingMessagesCollection
    */
-  updateNowplayingMessage (guildID, stop = false) {
+  async updateNowplayingMessage (guildID, stop = false) {
     this.client.logger.debug(`${this.defaultPrefix.updateNowplayingMessage} Updating nowplaying message (${guildID}, ${stop})`)
     const npMessage = this.client.audio.nowplayingMessages.get(guildID)
-    if (npMessage && npMessage.deleted === false && npMessage.editable) {
-      this.getNowplayingEmbed(guildID).then(embed => {
-        npMessage.edit(embed)
-      })
-    } else this.client.audio.nowplayingMessages.delete(guildID)
-    if (stop) this.client.audio.nowplayingMessages.delete(guildID)
+    if (npMessage) {
+      const { pinned, message } = npMessage
+      if (stop) {
+        await message.reactions.removeAll()
+        this.client.audio.nowplayingMessages.delete(guildID)
+        return
+      }
+      if (message && message.deleted === false && message.editable) {
+        const embed = await this.getNowplayingEmbed(guildID, pinned)
+        if (pinned && message.channel.lastMessageID !== message.id && message.deletable) {
+          await message.delete()
+          const pinnedMessage = await message.channel.send(embed)
+          await pinnedMessage.react(placeHolderConstant.EMOJI_STAR)
+          await pinnedMessage.react(placeHolderConstant.EMOJI_PIN)
+          this.client.audio.nowplayingMessages.set(guildID, { message: pinnedMessage, pinned: true })
+        } else {
+          await message.edit(embed)
+        }
+      } else this.client.audio.nowplayingMessages.delete(guildID)
+    }
+  }
+
+  toggleNowplayingPinned (guildID) {
+    this.client.logger.debug(`${this.defaultPrefix.toggleNowplayingPinned} Toggle Nowplaying Pinned Status ${guildID}`)
+    const npMessage = this.client.audio.nowplayingMessages.get(guildID)
+    if (npMessage) {
+      const { pinned, message } = npMessage
+      this.client.audio.nowplayingMessages.set(guildID, { pinned: !pinned, message: message })
+      return !pinned
+    } else {
+      return false
+    }
   }
 
   /**
@@ -79,7 +106,7 @@ class AudioUtils {
   /**
    * @param {String} guild - Guild Id to get nowplaying Embed
    */
-  async getNowplayingEmbed (guildID) {
+  async getNowplayingEmbed (guildID, pinned) {
     const guildData = await this.client.database.getGuild(guildID)
     const messageEmbed = new Discord.MessageEmbed()
     if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) {
@@ -93,7 +120,9 @@ class AudioUtils {
         .setTitle(Discord.Util.escapeMarkdown(guildData.nowplaying.info.title))
         .setURL(guildData.nowplaying.info.uri)
         .setDescription(this.getNowplayingText(guildID, guildData))
-        .setFooter(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_FOOTER', { REMAIN: guildData.queue.length, SOURCE: Discord.Util.escapeMarkdown(guildData.nowplaying.info.author) }))
+        .setFooter(
+          `${this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_FOOTER', { REMAIN: guildData.queue.length, SOURCE: Discord.Util.escapeMarkdown(guildData.nowplaying.info.author) })}${pinned ? ' | ' + placeHolderConstant.EMOJI_PIN : ''}`
+        )
         .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
       if (this.validateYouTubeUrl(guildData.nowplaying.info.uri)) messageEmbed.setThumbnail(`https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg`)
     }
@@ -154,7 +183,7 @@ class AudioUtils {
       } catch {
         try {
           try {
-            if (!lastMessage.deleted) await lastMessage.delete()
+            if (sendChannel && !lastMessage.deleted) await lastMessage.delete()
           } catch {
             this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete Previous Message`)
           }

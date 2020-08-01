@@ -32,8 +32,8 @@ class QueueEvents {
 
   async playBackEndedEvent (data) {
     const guildData = await this.client.database.getGuild(data.guildID)
-    this.client.audio.utils.sendMessage(data.guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_ALL_SONGS_FINISHED'))
-    this.client.audio.utils.updateNowplayingMessage(data.guildID)
+    await this.client.audio.utils.updateNowplayingMessage(data.guildID)
+    await this.client.audio.utils.sendMessage(data.guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_ALL_SONGS_FINISHED'))
   }
 }
 module.exports = QueueEvents

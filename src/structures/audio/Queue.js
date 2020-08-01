@@ -224,10 +224,10 @@ class Queue extends EventEmitter {
       await this.audio.setPlayersDefaultSetting(guildID)
       await this.setNowPlaying(guildID, trackData)
       if (!nowplaying) await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
-      this.audio.utils.updateNowplayingMessage(guildID)
       this.audio.playedTracks.get(guildID).push(trackData.info.identifier)
       this.emit('queueEvent', { guildID, trackData, op: 'trackStarted' })
       await this.client.audio.setPlayersDefaultSetting(guildID)
+      await this.audio.utils.updateNowplayingMessage(guildID)
       return true
     } catch (e) {
       await this.setNowPlaying(guildID, { track: null })

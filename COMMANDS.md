@@ -41,7 +41,7 @@
 
 #### - nowplaying
 
--   [ ] Pin Always Last Message
+-   [x] Pin Always Last Message
 -   [ ] Add My Sirubot Playlist
 -   [x] Auto Update Nowplaying
 
