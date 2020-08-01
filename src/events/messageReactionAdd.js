@@ -9,10 +9,6 @@ class Event extends BaseEvent {
     )
   }
 
-  /**
-   * Run Event
-   * @param {Object} member - GuildMember
-   */
   async run (messageReaction, user) {
     const { message } = messageReaction
     if (message.channel.type === 'dm') return
@@ -33,7 +29,9 @@ class Event extends BaseEvent {
         const filteredVoice = memberVoice.members.filter(e => !e.user.bot && !(e.voice.serverDeaf || e.voice.selfDeaf))
         if (memberVoice && memberVoice.members && filteredVoice.has(member.id) && filteredVoice.size === 1 && !userPermissions.includes('DJ')) userPermissions.push('DJ')
       }
-      if (userPermissions.includes('DJ') && messageReaction.emoji.name === placeHolderConstant.EMOJI_PIN) this.client.audio.utils.toggleNowplayingPinned(message.guild.id)
+      if (userPermissions.includes('DJ') && messageReaction.emoji.name === placeHolderConstant.EMOJI_PIN) {
+        this.client.audio.utils.toggleNowplayingPinned(message.guild.id)
+      }
     }
   }
 }
