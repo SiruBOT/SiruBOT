@@ -117,6 +117,7 @@ class AudioUtils {
       messageEmbed
         .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
         .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
+        .setFooter(pinned ? placeHolderConstant.EMOJI_PIN : '')
     } else {
       const request = this.client.users.cache.get(guildData.nowplaying.request)
       messageEmbed
