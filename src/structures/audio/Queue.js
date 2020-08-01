@@ -140,7 +140,7 @@ class Queue extends EventEmitter {
     if (skip) return this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
     switch (guildData.repeat) {
       case 0:
-        if (!err && guildData.queue.nowplaying.track && guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
+        if (!err && guildData.nowplaying.track && guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
           this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Related Track (Repeat: ${guildData.repeat}, playingRelated: ${guildData.audioPlayrelated})`)
           return this.playRelated(guildID, this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri))
         } else {
