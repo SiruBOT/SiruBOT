@@ -31,6 +31,16 @@ module.exports = {
     level: 'debug'
   },
   db: {
+    mysql: {
+      host: 'my.s.ql',
+      user: 'root',
+      password: 'password',
+      database: 'siru',
+      connectionPool: {
+        min: 3,
+        max: 10
+      }
+    },
     mongo: {
       mongoURL: 'mongodb://mongodbIP:27017/DBNAME?authSource=admin',
       user: 'yourmongodbuser',
