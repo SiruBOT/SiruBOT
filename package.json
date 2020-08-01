@@ -26,6 +26,7 @@
     "node-uuid": "^1.4.8",
     "shoukaku": "github:Deivu/Shoukaku",
     "slyrics": "^0.1.42",
+    "sqlstring": "^2.3.2",
     "string-placeholder": "^1.0.2",
     "utf-8-validate": "^5.0.2",
     "winston": "^3.3.3",
