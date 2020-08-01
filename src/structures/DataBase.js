@@ -2,16 +2,10 @@ const Mongo = require('mongoose')
 const Models = require('../constant/models')
 const uuid = require('node-uuid')
 const knex = require('knex')
-const knexDefaultOption = {
-  client: 'mysql2',
-  version: '5.7',
-  connection: {}
-}
 class DataBase {
   constructor (client) {
     this.client = client
     this.connection = Mongo.connection
-    // Constants
     this.reconnectTime = 5000
     this.reconnectTries = 0
     this.maxReconnectTries = 10
@@ -50,30 +44,36 @@ class DataBase {
 
   init () {
     this.connectMongo()
+    this.connectMYSQL()
   }
 
-  connectKnex () {
-
+  connectMYSQL () {
+    this.knex = knex({
+      client: 'mysql2',
+      version: '5.7',
+      connection: this.client._options.db.mysql,
+      pool: this.client._options.db.connectionPool
+    })
   }
 
   connectMongo () {
     const { _options, logger } = this.client
     const startMs = new Date().getTime()
-    logger.info(`${this.defaultPrefix.init} Connecting URL (${_options.db.mongo.mongoURL})`)
+    logger.info(`${this.defaultPrefix.init} Connecting mongodb URL (${_options.db.mongo.mongoURL})`)
     Mongo.connect(_options.db.mongo.mongoURL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       user: _options.db.mongo.user,
       pass: _options.db.mongo.password
     }).then(() => {
-      logger.info(`[DB] Connected to database (${new Date().getTime() - startMs}ms)`)
+      logger.info(`[DB:Mongo] Connected to mongodb (${new Date().getTime() - startMs}ms)`)
     }).catch(e => {
-      logger.error(`[DB] Failed To Initialize Database. (${new Date().getTime() - startMs}ms) \n${e.stack}`)
+      logger.error(`[DB:Mongo] Failed To Connect mongodb (${new Date().getTime() - startMs}ms) \n${e.stack}`)
       if (this.maxReconnectTries <= this.reconnectTries) {
-        throw new Error(`Failed to connect database (${this.reconnectTries} Tries)`)
+        throw new Error(`Failed to connect mongodb (${this.reconnectTries} Tries)`)
       }
       const calculatedReconnectTime = this.reconnectTime * (!this.reconnectTries ? 1 : this.reconnectTries)
-      logger.info(`[DB] Trying to reconnect in ${calculatedReconnectTime}ms, (${this.reconnectTries} Tries)`)
+      logger.info(`[DB:Mongo] Trying to reconnect in ${calculatedReconnectTime}ms, (${this.reconnectTries} Tries)`)
       setTimeout(() => {
         this.init()
         this.reconnectTries++
