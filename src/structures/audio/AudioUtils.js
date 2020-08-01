@@ -56,7 +56,7 @@ class AudioUtils {
       }
       if (message && message.deleted === false && message.editable) {
         const embed = await this.getNowplayingEmbed(guildID, pinned)
-        if (pinned && message.channel.lastMessageID !== message.id && message.deletable) {
+        if (pinned && message.channel.lastMessageID !== message.id && message.deletable && !message.deleted) {
           try {
             await message.delete()
           } catch {}
