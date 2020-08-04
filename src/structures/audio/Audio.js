@@ -213,7 +213,7 @@ class Audio extends Shoukaku.Shoukaku {
       Promise.all(unmarkableAddresses.map(el => {
         this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark Address ${el.failingAddress} Failed at: ${el.failingTimestamp} (${el.failingTime})`)
         return new Promise((resolve, reject) => {
-          fetch(new URL('/routeplanner/status', node.rest.url), {
+          fetch(new URL('/routeplanner/free/address', node.rest.url), {
             method: 'POST',
             headers: { Authorization: node.rest.auth },
             body: {
