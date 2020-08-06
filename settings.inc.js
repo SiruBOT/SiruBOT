@@ -1,8 +1,6 @@
-const shardCount = 1 // Shard Count
 module.exports = {
   sentry: null, // Your Sentry DSN URL
   shard: {
-    count: shardCount,
     respawn: true,
     shardArgs: [], // Args to next script file (node index.js [args])
     execArgv: [] // Args to next node excutable file (node [args] index.js)
@@ -25,7 +23,11 @@ module.exports = {
       { host: '192.168.0.11', port: 2333, auth: 'youshallnotpass', name: 'Container-1' },
       { host: '192.168.0.22', port: 2333, auth: 'youshallnotpass', name: 'Container-2' }
     ],
-    shards: shardCount
+    relatedRoutePlanner: { // Avoid 429 From Youtube If ipBlocks not provided, disable routeplanner
+      ipBlocks: [], // Your ip range (CIDR)
+      excludeIps: [], // routePlanner will Exclude ip
+      retryCount: 2 // retryCount
+    }
   },
   logger: {
     level: 'debug'
