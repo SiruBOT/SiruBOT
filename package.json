@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@sentry/node": "^5.20.1",
-    "@sirubot/yt-related-scraper": "^0.2.0",
+    "@sirubot/yt-related-scraper": "^0.2.1",
     "@thesharks/jagtag-js": "^1.0.4",
     "canvas": "^2.6.1",
     "date-utils": "^1.2.21",
