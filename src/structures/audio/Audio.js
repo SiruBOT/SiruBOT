@@ -4,11 +4,11 @@ const { Collection } = require('discord.js')
 const AudioTimer = require('./AudioTimer')
 const Filters = require('./AudioFilters')
 const Queue = require('./Queue')
-const relatedScraper = require('@sirubot/yt-related-scraper').Client
 const fetch = require('node-fetch')
 const AudioPlayerEventRouter = require('./AudioPlayerEventRouter')
 const AudioUtils = require('./AudioUtils')
 const QueueEvents = require('./QueueEvents')
+const { RoutePlanner, Client: relatedScraper } = require('@sirubot/yt-related-scraper')
 const ONE_MIN_SEC = 60
 const ONE_HOUR_SEC = ONE_MIN_SEC * 60
 const HALF_HOUR_SEC = ONE_HOUR_SEC * 12
@@ -56,6 +56,12 @@ class Audio extends Shoukaku.Shoukaku {
     this.client.logger.info(`${this.classPrefix}] Init Audio..`)
     this.trackCache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
     this.relatedCache = new NodeCache({ stdTTL: HALF_HOUR_SEC })
+    if (this.client._options.audio.relatedRoutePlanner.ipBlocks.length > 0) {
+      const { relatedRoutePlanner } = this.client._options.audio
+      this.relatedRoutePlanner = new RoutePlanner(relatedRoutePlanner.ipBlocks, relatedRoutePlanner.excludeIps, relatedRoutePlanner.retryCount)
+      this.client.logger.info(`[RoutePlanner] RoutePlanner Enabled, ${relatedRoutePlanner.ipBlocks.length} ipBlocks, ${relatedRoutePlanner.excludeIps.length} excludeIps, ${relatedRoutePlanner.retryCount} retryCount`)
+      this.client.logger.debug(`[RoutePlanner] RoutePlanner Enabled, ipBlocks: ${relatedRoutePlanner.ipBlocks.join(', ')} excludeIps: ${relatedRoutePlanner.excludeIps.join(', ')} ${relatedRoutePlanner.retryCount} retryCount`)
+    }
     this.node429Cache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
 
     this.on('ready', (name, resumed) => this.client.logger.info(`${this.lavalinkPrefix} Lavalink Node: ${name} is now connected. This connection is ${resumed ? 'resumed' : 'a new connection'}`))
@@ -216,13 +222,13 @@ class Audio extends Shoukaku.Shoukaku {
           fetch(new URL('/routeplanner/free/address', node.rest.url), {
             method: 'POST',
             headers: { Authorization: node.rest.auth },
-            body: {
+            body: JSON.stringify({
               address: el.failingAddress
-            }
+            })
           })
             .then((res) => {
               this.client.logger.debug(`${this.defaultPrefix.checkAndunmarkFailedAddresses} [${node.name}] Unmark ${el.failingAddress} (Response Code: ${res.status})`)
-              if (![204, 200].includes(res.status)) {
+              if (!res.ok) {
                 reject(new Error(`Unexpected Server response ${res.status}`))
               } else resolve(res.status)
             }).catch((e) => {
@@ -247,7 +253,9 @@ class Audio extends Shoukaku.Shoukaku {
     }
     this.client.logger.warn(`${this.defaultPrefix.getRelated} No Cache Hits for [${vId}], Scrape related videos`)
     try {
-      const scrapeResult = await relatedScraper.get(vId)
+      const params = [vId]
+      if (this.relatedRoutePlanner) params.push(this.relatedRoutePlanner)
+      const scrapeResult = await relatedScraper.get(...params)
       if (scrapeResult.length <= 0) throw new Error('Scrape result not found.')
       this.relatedCache.set(vId, scrapeResult)
       this.client.logger.debug(`${this.defaultPrefix.getRelated} Registering Cache [${vId}], ${scrapeResult.length} Items`)
