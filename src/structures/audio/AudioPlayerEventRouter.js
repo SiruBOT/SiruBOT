@@ -36,7 +36,7 @@ class AudioPlayerEventRouter {
       // if (data.code === disconnectCodes[1]) this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Invalid Session, reconnecting...`)
       const voiceConnection = player.voiceConnection
       const { guildID, voiceChannelID, selfMute, selfDeaf } = voiceConnection
-      voiceConnection._sendDiscordWS({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })
+      voiceConnection.send({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })
       voiceConnection.state = 'CONNECTED'
     } else {
       player.disconnect()
