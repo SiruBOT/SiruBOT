@@ -99,18 +99,16 @@ class CustomClient extends Discord.Client {
             const ko2enResult = inko.ko2en(name)
             const en2koResult = inko.en2ko(name)
             if (!command.aliases.includes(ko2enResult)) {
-              this.logger.debug(`${load} Added Aliases command [${command.name}] ${name} -> ${ko2enResult}`)
               command.aliases.push(ko2enResult)
             }
             if (!command.aliases.includes(en2koResult)) {
-              this.logger.debug(`${load} Added Aliases command [${command.name}] ${name} -> ${en2koResult}`)
               command.aliases.push(en2koResult)
             }
           }
           addAliases(command.name)
           command.aliases.map(addAliases)
+          this.logger.debug(`${load} Adding ${command.aliases.length} Aliases ${command.aliases.join(', ')} of Command ${command.name}`)
           for (const aliases of command.aliases) {
-            this.logger.debug(`${load} Loading Aliases (${aliases}) of Command ${command.name}`)
             this.aliases.set(aliases, command.name)
           }
           this.commands.set(command.name, command)

@@ -60,7 +60,7 @@ class Audio extends Shoukaku.Shoukaku {
       const { relatedRoutePlanner } = this.client._options.audio
       this.relatedRoutePlanner = new RoutePlanner(relatedRoutePlanner.ipBlocks, relatedRoutePlanner.excludeIps, relatedRoutePlanner.retryCount)
       this.client.logger.info(`[RoutePlanner] RoutePlanner Enabled, ${relatedRoutePlanner.ipBlocks.length} ipBlocks, ${relatedRoutePlanner.excludeIps.length} excludeIps, ${relatedRoutePlanner.retryCount} retryCount`)
-      this.client.logger.debug(`[RoutePlanner] RoutePlanner Enabled, ipBlocks: ${relatedRoutePlanner.ipBlocks.join(', ')} excludeIps: ${relatedRoutePlanner.excludeIps.join(', ')} ${relatedRoutePlanner.retryCount} retryCount`)
+      this.client.logger.debug(`[RoutePlanner] RoutePlanner Enabled, ipBlocks: [${relatedRoutePlanner.ipBlocks.join(', ')}] excludeIps: [${relatedRoutePlanner.excludeIps.length === 0 ? 'None' : relatedRoutePlanner.excludeIps.join(', ')}] retryCount: ${relatedRoutePlanner.retryCount}`)
     }
     this.node429Cache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
 
@@ -253,9 +253,8 @@ class Audio extends Shoukaku.Shoukaku {
     }
     this.client.logger.warn(`${this.defaultPrefix.getRelated} No Cache Hits for [${vId}], Scrape related videos`)
     try {
-      const params = [vId]
-      if (this.relatedRoutePlanner) params.push(this.relatedRoutePlanner)
-      const scrapeResult = await relatedScraper.get(...params)
+      let scrapeResult = await relatedScraper.get(vId)
+      if (this.relatedRoutePlanner) scrapeResult = await relatedScraper.get(vId, this.relatedRoutePlanner)
       if (scrapeResult.length <= 0) throw new Error('Scrape result not found.')
       this.relatedCache.set(vId, scrapeResult)
       this.client.logger.debug(`${this.defaultPrefix.getRelated} Registering Cache [${vId}], ${scrapeResult.length} Items`)
