@@ -9,7 +9,7 @@ class AudioTimer {
   createTimer (guildId) {
     const timer = setTimeout(async () => {
       const guild = this.client.guilds.cache.get(guildId)
-      if (guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !(el.voice.serverDeaf || el.voice.selfDeaf)).size <= 0) {
+      if (this.isInActive(guild)) {
         const guildData = await this.client.database.getGuild(guildId || guildId)
         try {
           await this.client.audio.utils.sendMessage(
@@ -39,11 +39,20 @@ class AudioTimer {
 
   chkTimer (guildId) {
     const guild = this.client.guilds.cache.get(guildId)
-    if (guild.me.voice.channel && guild.me.voice.channel.members && guild.me.voice.channel.members.filter(el => !el.user.bot).filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) {
+    if (this.isInActive(guild)) {
       if (this.timers.get(guildId)) return
       this.client.logger.debug(`[AudioTimer] Timer Started ${this.timeout}ms ${guildId}`)
       this.createTimer(guildId)
     }
+  }
+
+  isInActive (guild) {
+    return guild.me.voice.channel && (
+      (guild.me.voice.channel.members &&
+        guild.me.voice.channel.members.filter(el => !el.user.bot)
+          .filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) ||
+          !this.client.audio.players.get(guild.id).track
+    )
   }
 }
 
