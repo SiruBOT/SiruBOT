@@ -20,7 +20,8 @@ class DataBase {
       get: 'Get',
       update: 'Update',
       remove: 'Remove',
-      add: 'Add'
+      add: 'Add',
+      insert: 'Insert'
     }
     this.classPrefix = '[DataBase'
     this.defaultPrefix = {
@@ -35,6 +36,10 @@ class DataBase {
       removeUserPlayList: `${this.classPrefix}:${this.methods.remove}:${this.collections.userPlayList}]`,
       addErrorInfo: `${this.classPrefix}:${this.methods.add}:${this.collections.errorInfo}]`,
       addUserPlayList: `${this.classPrefix}:${this.methods.add}:${this.collections.userPlayList}]`
+    }
+    this.knexPrefix = {
+      insert: `${this.classPrefix}:${this.methods.insert}]`,
+      insertPingMetrics: `${this.classPrefix}:${this.methods.insert}:insertPingMetrics]`
     }
   }
 
@@ -51,8 +56,7 @@ class DataBase {
     this.knex = knex({
       client: 'mysql2',
       version: '5.7',
-      connection: this.client._options.db.mysql,
-      pool: this.client._options.db.connectionPool
+      connection: this.client._options.db.mysql
     })
   }
 
@@ -79,6 +83,16 @@ class DataBase {
         this.reconnectTries++
       }, calculatedReconnectTime)
     })
+  }
+
+  insertPingMetrics (ping, shardId) {
+    if (isNaN(Number(ping)) || !shardId) return this.client.logger.warn(`${this.knexPrefix.insertPingMetrics} ping or shardId not provided`)
+    return this.insert('pingMetrics', { ping, shardId })
+  }
+
+  insert (table, data) {
+    this.client.logger.debug(`${this.knexPrefix.insert} Insert ${table} data: ${JSON.stringify(data)}`)
+    return this.knex(table).insert(data)
   }
 
   /**
