@@ -105,7 +105,7 @@
   "NOWPLAYING_NOTRACK": "Currently nothing playing!",
   "NOWPLAYING_FOOTER": "Source: %SOURCE% | %REMAIN% Tracks Remaining",
   "HOSTEDBY": "> %EMOJI_HEART%  Hosted on **%NAME%**",
-  "AUDIO_PAUSED_INACTIVE": "> %EMOJI_WARN%  There was no activity on the voice channel, so I paused song!",
+  "AUDIO_PAUSED_INACTIVE": "> %EMOJI_WARN%  There was no activity on the voice channel, I paused song!",
   "AUDIO_DISCONNECTED": "> %EMOJI_WARN% Unexpected disconnect occurred. \n> %EMOJI_WARN%  Use the ``%PREFIX%join`` command or the ``%PREFIX%play`` command to play again.",
   "AUDIO_NO_NODES": "> %EMOJI_BULB%  Currently available nodes do not exist!",
   "AUDIO_REQUIRE_PLAYING": "> %EMOJI_NO%  This command can only be used while playing a song.",
