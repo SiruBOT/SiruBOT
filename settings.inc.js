@@ -37,11 +37,7 @@ module.exports = {
       host: 'my.s.ql',
       user: 'root',
       password: 'password',
-      database: 'siru',
-      connectionPool: {
-        min: 3,
-        max: 10
-      }
+      database: 'siru'
     },
     mongo: {
       mongoURL: 'mongodb://mongodbIP:27017/DBNAME?authSource=admin',
