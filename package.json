@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@sentry/node": "^5.20.1",
-    "@sirubot/yt-related-scraper": "^0.2.11",
+    "@sirubot/yt-related-scraper": "^0.2.22",
     "@thesharks/jagtag-js": "^1.0.4",
     "canvas": "^2.6.1",
     "date-utils": "^1.2.21",
@@ -18,7 +18,7 @@
     "minimist": "^1.2.5",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
-    "mongoose": "^5.9.27",
+    "mongoose": "^5.9.28",
     "mysql2": "^2.1.0",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.6.0",
