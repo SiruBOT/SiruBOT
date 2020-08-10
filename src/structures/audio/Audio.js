@@ -294,7 +294,7 @@ class Audio extends Shoukaku.Shoukaku {
     return new Promise((resolve) => {
       node.rest._getFetch(`/loadtracks?${new URLSearchParams({ identifier: query }).toString()}`)
         .then(data => {
-          this.client.logger.debug(`${this.defaultPrefix.getTrack} Resolve Track ${query} Node #${node.name} Result ${data}`)
+          this.client.logger.debug(`${this.defaultPrefix.getTrack} Resolve Track ${query} Node #${node.name} Result ${JSON.stringify(data)}`)
           resolve(data)
         })
         .catch(err => {
