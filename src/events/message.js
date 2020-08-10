@@ -33,8 +33,8 @@ class Event extends BaseEvent {
     const command = args.shift().toLowerCase()
     const commandClass = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
     const badConnectionCodes = [0, 2, 3]
-    const ownerName = this.client.shard ? await this.client.shard.broadcastEval(`this.users.cache.get("${this.client._options.bot.owners[0]}").tag`) : this.client.users.cache.get(this.client._options.bot.owners[0]).tag
     if (badConnectionCodes.includes(this.client.database.connection.readyState) && message.content.startsWith(prefix) && commandClass) {
+      const ownerName = this.client.shard ? (await this.client.shard.broadcastEval(`this.users.cache.get("${this.client._options.bot.owners[0]}") ? this.users.cache.get("${this.client._options.bot.owners[0]}").tag : false`)).filter(el => !!el)[0] : this.client.users.cache.get(this.client._options.bot.owners[0]).tag
       await message.channel.send(
       `> ${placeHolderConstant.EMOJI_WARN}  봇이 DB와 연결이 끊어져 사용 불가능한 상태인것 같네요, 개발자에게 연락해주세요!
        > ${placeHolderConstant.EMOJI_WARN}  It seems disconnected from database server, please contact developer! (**${ownerName}**)`
@@ -95,7 +95,7 @@ class Event extends BaseEvent {
           }
 
           const havePermissions = commandClass.permissions.filter(el => userPermissions.includes(el))
-          this.client.logger.debug(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${commandClass.name} at ${new Date().getTime()}`)
+          this.client.logger.info(`${this.defaultPrefix.handleCommand} (${message.channel.id}, ${message.id}, ${message.author.id}) Treating command ${commandClass.name} at ${new Date().getTime()}`)
           if (havePermissions.length === 0) return message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_NO_PERMISSIONS', { REQUIRED: commandClass.permissions.join(', ') }))
           try {
             await commandClass.run(compressed)
