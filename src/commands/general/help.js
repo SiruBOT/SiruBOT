@@ -57,7 +57,7 @@ class Command extends BaseCommand {
       )
     }
     embed.addField(picker.get(locale, 'COMMANDS_HELP_MORE'), picker.get(locale, 'COMMANDS_HELP_MORE_DESC'))
-    message.channel.send(message.author, embed)
+    await message.channel.send(message.author, embed)
   }
 }
 
