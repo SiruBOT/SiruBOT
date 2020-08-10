@@ -61,14 +61,14 @@ class Event extends BaseEvent {
         if (memberVoice && memberVoice.members && filteredVoice.has(message.member.id) && filteredVoice.size === 1 && !userPermissions.includes('DJ')) userPermissions.push('DJ')
       }
       const compressed = Object.assign({
-        userData: userData,
-        memberData: memberData,
-        guildData: guildData,
-        message: message,
-        args: args,
-        prefix: prefix,
-        command: command,
-        userPermissions: userPermissions
+        userData,
+        memberData,
+        guildData,
+        message,
+        args,
+        prefix,
+        command,
+        userPermissions
       })
       if (commandClass) {
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))

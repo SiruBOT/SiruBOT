@@ -9,9 +9,10 @@ class AudioTimer {
   createTimer (guildId) {
     const timer = setTimeout(async () => {
       const guild = this.client.guilds.cache.get(guildId)
+      if (!guild) return this.clearTimer(guildId)
       if (this.isInActive(guild)) {
-        const guildData = await this.client.database.getGuild(guildId || guildId)
         try {
+          const guildData = await this.client.database.getGuild(guild.id)
           await this.client.audio.utils.sendMessage(
             guildId,
             this.client.utils.localePicker.get(
@@ -51,7 +52,7 @@ class AudioTimer {
       (guild.me.voice.channel.members &&
         guild.me.voice.channel.members.filter(el => !el.user.bot)
           .filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) ||
-          !this.client.audio.players.get(guild.id).track
+          (this.client.audio.players.get(guild.id) && !this.client.audio.players.get(guild.id).track)
     )
   }
 }

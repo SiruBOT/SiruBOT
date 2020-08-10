@@ -41,8 +41,21 @@ class Command extends BaseCommand {
   async run ({ args, message, command, guildData }) {
     const picker = this.client.utils.localePicker
     const { locale } = guildData
-    const type = this.client.utils.find.matchObj({ 잘가: 'bye', 환영: 'welcome', 입장: 'welcome', 퇴장: 'bye', welcome: 'welcome', bye: 'bye' }, args.shift(), null)
-    const method = this.client.utils.find.matchObj({ view: 'view', set: 'set', 보기: 'view', 설정: 'set' }, args.shift(), null)
+    const type = this.client.utils.find.matchObj({
+      환영: 'welcome',
+      입장: 'welcome',
+      welcome: 'welcome',
+      퇴장: 'bye',
+      bye: 'bye'
+    }, args.shift(), null)
+    const method = this.client.utils.find.matchObj({
+      remove: 'remove',
+      지우기: 'remove',
+      view: 'view',
+      보기: 'view',
+      set: 'set',
+      설정: 'set'
+    }, args.shift(), null)
     // Enter: 0, Leave: 1
     if (!method || !type) return message.channel.send(command)
     else {

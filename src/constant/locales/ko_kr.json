@@ -203,6 +203,7 @@
   "COMMANDS_WELCOME_AUTOROLE_TITLE": "%EMOJI_LABEL%  자동 역할 부여 역할들",
   "COMMANDS_WELCOME_MESSAGE_TITLE": "%EMOJI_PAPER%  보낼 메세지의 내용",
   "COMMANDS_WELCOME_ASK_PROPERTY": "> %EMOJI_PAPER%  설정할 값의 이름과 내용을 적어주세요!\n> %EMOJI_PAPER%  사용 가능한 설정들: %WELCOME_PROPERTIES%",
+  "WELCOME_PROPERTIES": "",
   "MORE_X": " ``(%NUM% 개 더 있음)``",
   "COMMANDS_WELCOME_MESSAGE_DESC": "> [[이 메세지에는 **Jagtag** 가 사용 가능해요!]](https://thesharks.github.io/JagTag-JS/users/methods/home/)\n%TEXT%",
   "COMMANDS_WELCOME_IMAGE_TITLE": "%EMOJI_PAINT%  보낼 사진의 제목",
