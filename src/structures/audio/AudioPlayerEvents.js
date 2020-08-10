@@ -70,5 +70,15 @@ class AudioPlayerEvents {
   /**
    * End of TrackEndEvents
    */
+
+  TrackStuck (data) {
+    this.client.logger.debug(`${this.defaultPrefix.TrackLoadFailed} [${data.guildId}] Track Stucked [${data.track}]`)
+    this.client.audio.queue.deQueue(data.guildId, true, true)
+  }
+
+  TrackExcepetion (data) {
+    this.client.logger.debug(`${this.defaultPrefix.TrackLoadFailed} [${data.guildId}] Track Excepetion [${data.track}]`)
+    this.client.audio.queue.deQueue(data.guildId, true, true)
+  }
 }
 module.exports = AudioPlayerEvents

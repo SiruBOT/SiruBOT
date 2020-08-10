@@ -6,7 +6,8 @@ class AudioPlayerEventRouter {
     this.classPrefix = this.audio.classPrefix + ':AudioPlayerEventRouter'
     this.defaultPrefix = {
       registerEvents: `${this.classPrefix}:registerEvents]`,
-      RouteWebSocketClosedEvents: `${this.classPrefix}:RouteWebSocketClosedEvents]`
+      RouteWebSocketClosedEvents: `${this.classPrefix}:RouteWebSocketClosedEvents]`,
+      RouteTrackExcepetionErrors: `${this.classPrefix}:RouteTrackExcepetionErrors]`
     }
     this.AudioPlayerEvents = new AudioPlayerEvents(this)
   }
@@ -30,14 +31,18 @@ class AudioPlayerEventRouter {
   }
 
   RouteWebSocketClosedEvents (player, data) {
+    this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Disconnected from websocket. ${JSON.stringify(data)}`)
     const disconnectCodes = [4014]
     if (disconnectCodes.includes(data.code) && data.byRemote === true) {
       if (data.code === disconnectCodes[0]) this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Disconnected from websocket, reconnecting...`)
       // if (data.code === disconnectCodes[1]) this.client.logger.warn(`${this.defaultPrefix.RouteWebSocketClosedEvents} [${data.guildId}] Invalid Session, reconnecting...`)
-      const voiceConnection = player.voiceConnection
-      const { guildID, voiceChannelID, selfMute, selfDeaf } = voiceConnection
-      voiceConnection.send({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })
-      voiceConnection.state = 'CONNECTED'
+      this.client.database.getGuild(data.guildId).then((guildData) => {
+        const voiceConnection = player.voiceConnection
+        const { guildID, voiceChannelID, selfMute, selfDeaf } = voiceConnection
+        voiceConnection.send({ guild_id: guildID, channel_id: voiceChannelID, self_deaf: selfDeaf, self_mute: selfMute })
+        voiceConnection.state = 'CONNECTED'
+        player.track = guildData.nowplaying.track
+      })
     } else {
       player.disconnect()
     }
@@ -49,6 +54,7 @@ class AudioPlayerEventRouter {
         this.RouteTrackEndEventReasons(data)
         break
       case 'TrackStuckEvent':
+        this.AudioPlayerEvents.TrackStuck(data)
         break
       case 'TrackExceptionEvent':
         this.RouteTrackExcepetionErrors(data)
@@ -57,9 +63,8 @@ class AudioPlayerEventRouter {
   }
 
   RouteTrackExcepetionErrors (data) {
-    switch (data.error) {
-      // TODO: Handle Error
-    }
+    this.client.logger.error(`${this.defaultPrefix.RouteTrackExcepetionErrors} Track Excepetion ${JSON.stringify(data)}`)
+    this.AudioPlayerEvents.TrackExcepetion(data)
   }
 
   RouteTrackEndEventReasons (data) {
