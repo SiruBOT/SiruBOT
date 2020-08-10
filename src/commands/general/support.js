@@ -29,7 +29,7 @@ class Command extends BaseCommand {
       .setColor(this.client.utils.find.getColor(message.guild.me))
       .addField(picker.get(locale, 'COMMANDS_SUPPORT_TITLE'), picker.get(locale, 'COMMANDS_SUPPORT_CONTENT', { OWNER: ownerName }))
       .setThumbnail(message.author.displayAvatarURL({ dynamic: true, size: 512, format: 'png' }))
-    message.reply(embed)
+    await message.reply(embed)
   }
 }
 
