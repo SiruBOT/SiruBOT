@@ -129,15 +129,15 @@ class Audio extends Shoukaku.Shoukaku {
    */
   stop (guildID, cleanQueue = true) {
     if (!guildID) return new Error('guildID is not provied')
-    this.playedTracks.set(guildID, [])
     this.leave(guildID)
     this.audioTimer.clearTimer(guildID)
-    this.textChannels.delete(guildID)
-    this.textMessages.delete(guildID)
     if (cleanQueue) {
       this.client.database.updateGuild(guildID, { $set: { queue: [] } })
       this.queue.setNowPlaying(guildID, { track: null })
       this.client.database.updateGuild(guildID, { $set: { nowplayingPosition: 0 } })
+      this.playedTracks.set(guildID, [])
+      this.textChannels.delete(guildID)
+      this.textMessages.delete(guildID)
     }
     this.utils.updateNowplayingMessage(guildID)
   }
@@ -253,8 +253,9 @@ class Audio extends Shoukaku.Shoukaku {
     }
     this.client.logger.warn(`${this.defaultPrefix.getRelated} No Cache Hits for [${vId}], Scrape related videos`)
     try {
-      let scrapeResult = await relatedScraper.get(vId)
+      let scrapeResult
       if (this.relatedRoutePlanner) scrapeResult = await relatedScraper.get(vId, this.relatedRoutePlanner)
+      else await relatedScraper.get(vId)
       if (scrapeResult.length <= 0) throw new Error('Scrape result not found.')
       this.relatedCache.set(vId, scrapeResult)
       this.client.logger.debug(`${this.defaultPrefix.getRelated} Registering Cache [${vId}], ${scrapeResult.length} Items`)
