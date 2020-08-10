@@ -30,10 +30,10 @@ class AudioUtils {
    * @param {String} - guildID Id to get playing state (pause,playing,no)
    * @returns {String} - 'pause', 'playing', 'none'
    */
-  getPlayingState (guildID) {
+  getPlayingState (guildID, guildData) {
     let state
-    if (!this.client.audio.players.get(guildID)) state = 'NONE'
-    if (this.client.audio.players.get(guildID).paused) state = 'PAUSED'
+    if (this.client.audio.players.get(guildID) && guildData.nowplaying.track) state = 'NONE'
+    if (!this.client.audio.players.get(guildID) && guildData.nowplaying.track) state = 'PAUSED'
     else state = 'PLAYING'
     this.client.logger.debug(`${this.defaultPrefix.getPlayingState} (get) Playing State ${state}`)
     return state
@@ -113,7 +113,7 @@ class AudioUtils {
   async getNowplayingEmbed (guildID, pinned) {
     const guildData = await this.client.database.getGuild(guildID)
     const messageEmbed = new Discord.MessageEmbed()
-    if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) {
+    if (!guildData.nowplaying.track) {
       messageEmbed
         .setTitle(this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK'))
         .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
@@ -140,8 +140,9 @@ class AudioUtils {
    * @param {Object} guildData - Database Object
    */
   getNowplayingText (guildID, guildData) {
-    if (!this.client.audio.players.get(guildID) || !guildData.nowplaying.track) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
+    if (!guildData.nowplaying.track) return this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_NOTRACK')
     const nowPlayingObject = this.getNowplayingObject(guildID, guildData)
+    if (this.getPlayingState(guildID, guildData) === 'PAUSED') return `${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
     return `${this.client.utils.localePicker.get(guildData.locale, 'HOSTEDBY', { NAME: `${this.client.audio.players.get(guildID).voiceConnection ? this.client.audio.players.get(guildID).voiceConnection.node.name : this.client.utils.localePicker.get(guildData.locale, 'NONE')}` })}\n${nowPlayingObject.playingStatus} ${nowPlayingObject.progressBar} \`\`${nowPlayingObject.time}\`\` ${nowPlayingObject.volume}`
   }
 
@@ -151,11 +152,11 @@ class AudioUtils {
    */
   getNowplayingObject (guildID, guildData) {
     const obj = Object.assign({})
-    Object.defineProperty(obj, 'playingStatus', { value: placeHolderConstant['EMOJI_AUDIO_' + this.getPlayingState(guildID)] })
+    Object.defineProperty(obj, 'playingStatus', { value: placeHolderConstant['EMOJI_AUDIO_' + this.getPlayingState(guildID, guildData)] })
     Object.defineProperty(obj, 'repeatStatus', { value: placeHolderConstant['EMOJI_' + this.getRepeatState(guildData.repeat)] })
-    if (this.client.audio.players.get(guildID) && guildData.nowplaying && guildData.nowplaying.track) Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(this.client.audio.players.get(guildID).position / guildData.nowplaying.info.length) })
+    if (this.client.audio.players.get(guildID) && guildData.nowplaying && guildData.nowplaying.track) Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(guildData.nowplayingPosition / guildData.nowplaying.info.length) })
     else Object.defineProperty(obj, 'progressBar', { value: this.getProgressBar(0) })
-    if (this.client.audio.players.get(guildID) && guildData.nowplaying && guildData.nowplaying.track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(this.client.audio.players.get(guildID).position / 1000, false)}/${this.client.utils.time.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })
+    if (guildData.nowplaying && guildData.nowplaying.track) Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(guildData.nowplayingPosition / 1000, false)}/${this.client.utils.time.toHHMMSS(guildData.nowplaying.info.length / 1000, guildData.nowplaying.info.isStream)}]` })
     else Object.defineProperty(obj, 'time', { value: `[${this.client.utils.time.toHHMMSS(0, false)}/${this.client.utils.time.toHHMMSS(0, false)}]` })
     Object.defineProperty(obj, 'volume', { value: `${this.getVolumeEmoji(guildData.volume)} **${guildData.volume}%**` })
     return obj
