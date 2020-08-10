@@ -102,21 +102,25 @@ class Queue extends EventEmitter {
    * @param {String} originVideoId - video id
    */
   async playRelated (guildID, originVideoId) {
+    this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing Related Track ${guildID}, ${originVideoId}`)
     try {
+      const startTime = new Date().getTime()
       const relatedTracks = await this.audio.getRelated(originVideoId)
       const uniquePlayedTracks = [...new Set(this.audio.playedTracks.get(guildID))]
       const filteredTracks = relatedTracks.filter(relatedTrack => !uniquePlayedTracks.includes(relatedTrack.videoId))
       if (filteredTracks.length === 0) this.audio.playedTracks.set(guildID, [])
       const lavaLinktracks = await this.audio.getTrack(filteredTracks.shift().uri)
       const toPlay = lavaLinktracks.tracks.shift()
-      if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) return this.playNext(guildID)
-      this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier})`)
+      if (['LOAD_FAILED', 'NO_MATCHES'].includes(lavaLinktracks.loadType) || toPlay.info.isStream) {
+        throw new Error('Lavalink Track Search failed')
+      }
+      this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier}) ${new Date().getTime() - startTime}ms`)
       if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort enQueue. Player is not exists!`)
       await this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
     } catch {
       const guildData = await this.client.database.getGuild(guildID)
-      this.client.audio.utils.sendMessage(guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_RELATED_NOT_FOUND'), true)
-      this.audio.stop(guildID, true)
+      await this.client.audio.utils.sendMessage(guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_RELATED_NOT_FOUND'), true)
+      await this.audio.stop(guildID, true)
     }
   }
 
@@ -201,7 +205,6 @@ class Queue extends EventEmitter {
       if (!queue[0]) {
         this.client.logger.debug(`${this.defaultPrefix.playNext} [${guildID}] Nothing items to playing next!`)
         this.emit('queueEvent', { guildID, op: 'playBackEnded' })
-        this.client.audio.stop(guildID)
       }
     }
   }

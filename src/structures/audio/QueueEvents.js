@@ -34,6 +34,7 @@ class QueueEvents {
     const guildData = await this.client.database.getGuild(data.guildID)
     await this.client.audio.utils.updateNowplayingMessage(data.guildID)
     await this.client.audio.utils.sendMessage(data.guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_ALL_SONGS_FINISHED'))
+    await this.client.audio.stop(data.guildID)
   }
 }
 module.exports = QueueEvents
