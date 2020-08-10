@@ -25,9 +25,10 @@ class Command extends BaseCommand {
     const picker = this.client.utils.localePicker
     const { locale } = guildData
     const [commandName] = args
+    const ownerName = this.client.shard ? (await this.client.shard.broadcastEval(`this.users.cache.get("${this.client._options.bot.owners[0]}") ? this.users.cache.get("${this.client._options.bot.owners[0]}").tag : false`)).filter(el => !!el)[0] : this.client.users.cache.get(this.client._options.bot.owners[0]).tag
     const embed = new Discord.MessageEmbed()
       .setColor(this.client.utils.find.getColor(message.guild.me))
-      .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix }), message.guild.me.user.displayAvatarURL({ format: 'png', size: 512 }))
+      .setFooter(picker.get(locale, 'COMMANDS_HELP_FOOTER', { PREFIX: prefix, OWNER: ownerName }), message.guild.me.user.displayAvatarURL({ format: 'png', size: 512 }))
     const command = this.client.commands.get(commandName) || this.client.commands.get(this.client.aliases.get(commandName))
     if (!command || command.hide === true) {
       embed.setTitle(picker.get(locale, 'COMMANDS_HELP_TITLE'))
