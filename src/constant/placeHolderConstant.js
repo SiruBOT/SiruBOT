@@ -57,5 +57,5 @@ module.exports = {
   SUPPORT_SERVER: 'https://discord.gg/463PGcC',
   WEBPAGE: 'https://siru.moe',
   GITHUB: 'https://github.com/Sannoob/Siru-stable',
-  PREFIX: '->'
+  PREFIX: '>>'
 }

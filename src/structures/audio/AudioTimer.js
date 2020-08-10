@@ -51,8 +51,7 @@ class AudioTimer {
     return guild.me.voice.channel && (
       (guild.me.voice.channel.members &&
         guild.me.voice.channel.members.filter(el => !el.user.bot)
-          .filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0) ||
-          (this.client.audio.players.get(guild.id) && !this.client.audio.players.get(guild.id).track)
+          .filter(el => !el.voice.serverDeaf && !el.voice.selfDeaf).size <= 0)
     )
   }
 }
