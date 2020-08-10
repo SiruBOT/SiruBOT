@@ -1,5 +1,5 @@
 const { BaseCommand } = require('../../../structures')
-
+const { UsageFailedError } = require('../../../errors')
 class Command extends BaseCommand {
   constructor (client) {
     super(client,
@@ -26,7 +26,7 @@ class Command extends BaseCommand {
     const filterVal = this.client.audio.filters.getFilterValue(message.guild.id, 'karaoke')
     if (args.length === 0) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_KARAOKE_BASE', { VAL: filterVal ? filterVal.level : picker.get(locale, 'UNSET'), DESC: '' }))
     else {
-      if (!Number.isInteger(Number(args[0]))) return message.channel.send(picker.get(locale, 'INTEGER'))
+      if (!Number.isInteger(Number(args[0]))) throw new UsageFailedError(this.name)
       if (Number(args[0]) < 0) return message.channel.send(picker.get(locale, 'LOWERTHANX', { NUM: '0' }))
       if (Number(args[0]) > 10) return message.channel.send(picker.get(locale, 'HIGHERTHANX', { NUM: '10' }))
       if (Number(args[0]) === 1) {
