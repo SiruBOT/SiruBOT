@@ -188,6 +188,7 @@
   "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% 버그, 에러 제보 - %OWNER%, %PREFIX%지원",
   "COMMANDS_SUPPORT_TITLE": "%EMOJI_BULB%  지원이 필요하신가요?",
   "COMMANDS_SUPPORT_CONTENT": "[[지원 서버]](%SUPPORT_SERVER%) 에 들어오셔서 의견을 남겨주시거나\n%OWNER% 에게 DM으로 남겨주세요!",
+  "COMMANDS_INVITE_CONTENT": "저를 초대해주시겠다니 감사해요! [초대 주소](%INVITE_URL%) 를 사용하여 초대 가능해요!",
   "COMMANDS_HELP_INFO": "> 명령어 정보 - %COMMAND%",
   "COMMANDS_HELP_ALIASES": "**%EMOJI_HASH%  명령어의 다른 이름들**",
   "COMMANDS_HELP_USAGE": "**%EMOJI_BULB%  명령어 사용법**",

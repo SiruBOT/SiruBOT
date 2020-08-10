@@ -55,6 +55,7 @@ module.exports = {
   EMOJI_SWITCH_OFF: '<:emoji_off:649622462685773884>',
 
   SUPPORT_SERVER: 'https://discord.gg/463PGcC',
+  INVITE_URL: 'https://discord.com/oauth2/authorize?client_id=426722888293548032&scope=bot&permissions=2146958847&response_type=code&redirect_uri=https%3A%2F%2Fchinobot.ga%2Fthanks',
   WEBPAGE: 'https://siru.moe',
   GITHUB: 'https://github.com/Sannoob/Siru-stable',
   PREFIX: '>>'

@@ -183,6 +183,7 @@
   "COMMANDS_HELP_FOOTER": "%EMOJI_BULB% Contact - Sangoon_Is_Noob#1683, %PREFIX%support",
   "COMMANDS_SUPPORT_TITLE": "%EMOJI_BULB%  Need to support?",
   "COMMANDS_SUPPORT_CONTENT": "Join [[Support]](%SUPPORT_SERVER%)\nPlease DM %OWNER%!",
+  "COMMANDS_INVITE_CONTENT": "Want invite me? thanks! Invite to [this](%INVITE_URL%) url",
   "COMMANDS_HELP_INFO": "> Command Information - %COMMAND%",
   "COMMANDS_HELP_ALIASES": "**%EMOJI_HASH%  Command aliases**",
   "COMMANDS_HELP_USAGE": "**%EMOJI_BULB%  Command Usage**",
