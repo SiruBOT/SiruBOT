@@ -25,9 +25,6 @@ class Command extends BaseCommand {
     const embed = await this.client.audio.utils.getNowplayingEmbed(message.guild.id)
     const nowPlayingMessage = await message.channel.send(embed)
     if (message.channel.permissionsFor(message.guild.me).has('ADD_REACTIONS')) {
-      if (this.client._options.bot.owners.includes(message.author.id)) {
-        await nowPlayingMessage.react(EMOJI_STAR)
-      }
       await nowPlayingMessage.react(EMOJI_PIN)
     }
     this.client.audio.nowplayingMessages.set(message.guild.id, { message: nowPlayingMessage, pinned: false })
