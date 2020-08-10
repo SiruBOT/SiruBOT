@@ -7,7 +7,6 @@ const Image = require('./image/Image')
 const utils = require('../utils')
 const { getSettings, PermissionChecker } = utils
 const Sentry = require('@sentry/node')
-const ServerLoggerManager = require('./logging/ServerLoggerManager')
 const fs = require('fs')
 const path = require('path')
 const Inko = require('inko')
@@ -48,8 +47,6 @@ class CustomClient extends Discord.Client {
     this.categories = new Discord.Collection()
 
     this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, moveOnDisconnect: true, reconnectTries: 10, noReplace: false })
-
-    this.loggerManager = new ServerLoggerManager(this)
   }
 
   async init () {
@@ -59,7 +56,6 @@ class CustomClient extends Discord.Client {
     }
     if (!this._isTesting) { this.logger.info(`${this.defaultPrefix.init} Initializing Bot..`) }
     await this.utils.localePicker.init()
-    await this.loggerManager.init()
     this.registerEvents()
     this.LoadCommands()
     if (!this._isTesting) {
@@ -256,7 +252,6 @@ class CustomClient extends Discord.Client {
     this.utils.permissionChecker = new PermissionChecker(this)
     this.utils.image = new Image(this.logger)
     this.utils.localePicker.init()
-    this.loggerManager.init()
     this.commands = new Discord.Collection()
     this.aliases = new Discord.Collection()
     this.categories = new Discord.Collection()

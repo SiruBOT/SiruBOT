@@ -6,8 +6,7 @@ module.exports = {
   Logger: require('./Logger'),
   DataBase: require('./DataBase'),
   LocalePicker: require('./LocalePicker'),
-  Image: require('./image/Image'),
-  ServerLogger: require('./logging/ServerLoggerManager')
+  Image: require('./image/Image')
 }
 
 // // DataBase: require('./database'),
