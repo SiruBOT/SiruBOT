@@ -1,0 +1,14 @@
+on: [push, pull_request]
+name: StandardJS
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: goto-bus-stop/standard-action@v1
+        with:
+          # show errors in the the github diff UI
+          annotate: true
+        # Allow the action to add lint errors to the github diff UI
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
