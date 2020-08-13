@@ -28,6 +28,7 @@ class Event extends BaseEvent {
     if (message.author.bot) return
     if (message.channel.type === 'dm') return message.channel.send(`${placeHolderConstant.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${placeHolderConstant.EMOJI_NO}  You can't use commands on the DM.`)
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
+    if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
     const prefix = placeHolderConstant.PREFIX
     const args = message.content.slice(prefix.length).trim().split(/ +/g)
     const command = args.shift().toLowerCase()
@@ -44,7 +45,6 @@ class Event extends BaseEvent {
     const guildData = await this.client.database.getGuild(message.guild.id)
     const userData = await this.client.database.getUser(message.author.id)
     const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
-    if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
     if (message.content.startsWith(prefix)) {
       if (message.author.awaitQuestion) return
       const picker = this.client.utils.localePicker
@@ -71,11 +71,11 @@ class Event extends BaseEvent {
         userPermissions
       })
       if (commandClass) {
+        if (userData.cooldownAt && !((userData.cooldownAt.getTime() + 1500) - new Date().getTime() < 0)) return message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_COOLDOWN', { TIME: ((userData.cooldownAt.getTime() + 1500) - new Date().getTime()) / 1000 }))
+        await this.client.database.updateUser(message.author.id, { $set: { cooldownAt: new Date() } })
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))
         if (this.client.chkRightChannel(message.channel, guildData.tch) || message.member.permissions.has('ADMINISTRATOR')) {
-          /**
-           * Requirements
-           */
+          /* Requirements */
           const { requirements } = commandClass
           const { audioNodes, playingStatus, voiceStatus } = requirements
           // Requirements - audioNodes, playingStatus
