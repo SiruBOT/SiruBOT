@@ -1,6 +1,6 @@
 const { BaseCommand } = require('../../structures')
 const { placeHolderConstant } = require('../../constant')
-const { EMOJI_STAR, EMOJI_PIN } = placeHolderConstant
+const { EMOJI_PIN } = placeHolderConstant
 class Command extends BaseCommand {
   constructor (client) {
     super(client,
