@@ -20,7 +20,8 @@ class Command extends BaseCommand {
     )
   }
 
-  async run ({ message, guildData }) {
+  async run ({ message }) {
+    const guildData = await this.client.database.getGuild(message.guild.id)
     const { locale, queue, nowplaying } = guildData
     const picker = this.client.utils.localePicker
     if (!queue[0] || !nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
@@ -30,34 +31,25 @@ class Command extends BaseCommand {
         REQUEST: message.guild.members.cache.get(nowplaying.request) ? message.guild.members.cache.get(nowplaying.request).displayName : picker.get(locale, 'UNKNOWN')
       }
       if (nowplaying.request === message.author.id) {
-        await this.skip(message.guild.id, nowplaying)
+        await this.client.audio.queue.skip(message.guild.id)
         return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
       } else {
         const toSkip = Math.round(message.member.voice.channel.members.filter(m => !m.user.bot).size / 2)
         const skipperSize = this.client.audio.utils.addSkipper(message.guild.id, message.author.id, toSkip).length
-        message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIP_REQUESTED', {
+        await message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIP_REQUESTED', {
           TITLE: this.client.audio.utils.formatTrack(nowplaying.info),
           CURRENT: skipperSize,
           TOSKIP: toSkip,
           REQUEST: message.guild.members.cache.get(nowplaying.request) ? message.guild.members.cache.get(nowplaying.request).displayName : picker.get(locale, 'UNKNOWN')
         }))
         if (this.client.audio.skippers.get(message.guild.id).length >= toSkip) {
-          await this.skip(message.guild.id, nowplaying)
+          await this.client.audio.queue.skip(message.guild.id)
           return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
         }
       }
     } else {
       return message.channel.send(picker.get(locale, 'AUDIO_NOPLAYER'))
     }
-  }
-
-  async skip (guildID, np) {
-    if ((np.info.length - this.client.audio.players.get(guildID).position) < 2000) return this.client.audio.queue.skip(guildID)
-    return this.client.audio.players.get(guildID).setVolume(1).then(() => {
-      setTimeout(() => {
-        this.client.audio.queue.skip(guildID)
-      }, 1000)
-    })
   }
 }
 
