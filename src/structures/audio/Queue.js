@@ -85,12 +85,10 @@ class Queue extends EventEmitter {
     this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] autoPlay Started`)
     const { queue, nowplayingPosition, nowplaying } = await this.client.database.getGuild(guildID)
     if (this.audio.players.get(guildID)) {
-      if (!error && nowplaying.track !== null && !this.audio.players.get(guildID).track && nowplayingPosition !== nowplaying.info.length) {
+      if (!error && !!nowplaying.track && !this.audio.players.get(guildID).track && nowplayingPosition !== nowplaying.info.length) {
         this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Resume Last Nowplaying...`)
         await this.play(guildID, nowplaying, nowplayingPosition, true)
-        return
-      }
-      if (error || (queue.length > 0 && !nowplaying.track)) {
+      } else if (error || (queue.length > 0 && !nowplaying.track) || (nowplaying.track && nowplayingPosition === nowplaying.info.length)) {
         this.client.logger.debug(`${this.defaultPrefix.autoPlay} [${guildID}] Autoplaying Next Queue...`)
         await this.playNext(guildID)
       }
@@ -173,15 +171,10 @@ class Queue extends EventEmitter {
    * @param {String} guildID - guild id to skips
    * @example - <Queue>.skip('672586746587774976')
    */
-  skip (guildID) {
+  async skip (guildID) {
     this.client.logger.debug(`${this.defaultPrefix.skip} [${guildID}] Skips Track..`)
     this.client.audio.skippers.set(guildID, [])
-    return new Promise((resolve) => {
-      this.audio.players.get(guildID).stopTrack().then((res) => {
-        this.client.logger.debug(`${this.defaultPrefix.skip} [${guildID}] Skips Track.. Result: ${res}`)
-        resolve(res)
-      })
-    })
+    await this.audio.players.get(guildID).stopTrack()
   }
 
   /**
@@ -217,7 +210,7 @@ class Queue extends EventEmitter {
    */
   async play (guildID, trackData, seekPosition = 0, nowplaying = false) {
     const { track } = trackData
-    this.client.logger.debug(`${this.defaultPrefix.play} [${guildID}] Playing Item ${track}...`)
+    this.client.logger.info(`${this.defaultPrefix.play} [${guildID}] Playing Item ${track}...`)
     const playOptions = {}
     Object.defineProperty(playOptions, 'noReplace', { value: false, enumerable: true })
     if (seekPosition) Object.defineProperty(playOptions, 'startTime', { value: seekPosition, enumerable: true })
