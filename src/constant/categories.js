@@ -19,6 +19,10 @@ module.exports = [{
   requiredPermissions: ['Everyone']
 },
 {
+  category: 'GENERAL_GAME',
+  requiredPermissions: ['Everyone']
+},
+{
   category: 'GENERAL_UTILS',
   requiredPermissions: ['Everyone']
 }]
