@@ -22,9 +22,8 @@ class Command extends BaseCommand {
 
   async run ({ message }) {
     const guildData = await this.client.database.getGuild(message.guild.id)
-    const { locale, queue, nowplaying } = guildData
+    const { locale, nowplaying } = guildData
     const picker = this.client.utils.localePicker
-    if (!queue[0] || !nowplaying.track) return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_NOTHING_TO_SKIP'))
     if (nowplaying.track && this.client.audio.players.get(message.guild.id)) {
       const placeHolder = {
         TITLE: this.client.audio.utils.formatTrack(nowplaying.info),
