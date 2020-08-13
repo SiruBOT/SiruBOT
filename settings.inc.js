@@ -5,6 +5,9 @@ module.exports = {
     shardArgs: [], // Args to next script file (node index.js [args])
     execArgv: [] // Args to next node excutable file (node [args] index.js)
   },
+  clientOptions: { // discord.js client options
+    disableMentions: 'all'
+  },
   bot: {
     token: 'SUPEEEEEEEEER SECRET Token',
     // Prefix: /src/constructors/placeHolderConstructors.js[PREFIX]

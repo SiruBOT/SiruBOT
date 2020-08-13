@@ -14,7 +14,7 @@ const inko = new Inko()
 
 class CustomClient extends Discord.Client {
   constructor (options) {
-    super()
+    super(options.clientOptions)
 
     this.classPrefix = '[Client'
     this.defaultPrefix = {
