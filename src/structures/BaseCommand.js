@@ -47,9 +47,10 @@ class BaseCommand {
 
   /**
    * @description - Run function is must be async
+   * @param {Compressed} compressed - Compressed Params
    * @returns {Promise<*>} - Returns Any Values (includes void)
    */
-  async run () {
+  async run (compressed) {
 
   }
 }
