@@ -1,3 +1,4 @@
+/* eslint-disable no-eval */
 const util = require('util')
 const sleep = util.promisify(setTimeout)
 const { placeHolderConstant } = require('../../constant')
@@ -23,10 +24,8 @@ class Command extends BaseCommand {
     )
   }
 
-  /**
-   * @param {Object} compressed - Compressed Object
-   */
-  async run ({ message, args }) {
+  async run (compressed) {
+    const { message, args } = compressed
     const waitReaction = await message.react(placeHolderConstant.EMOJI_SANDCLOCK)
     const codeToRun = args.join(' ')
     const startTime = this.getNanoSecTime()
@@ -34,7 +33,7 @@ class Command extends BaseCommand {
     try {
       const evalPromise = (code) => new Promise((resolve, reject) => {
         try {
-          resolve(eval(code))
+          resolve(eval(`(async () => { ${code} })()`))
         } catch (e) {
           reject(e)
         }
@@ -51,7 +50,7 @@ class Command extends BaseCommand {
       await message.react(placeHolderConstant.EMOJI_X)
       await this.sendOver2000(e.stack || e.message || e.name || e, message, { code: 'js' })
     } finally {
-      await message.channel.send(`Processing Time: ${endTime}ns, ${endTime / 1000000}ms`, { code: 'js' })
+      await message.channel.send(`\`\`> ${endTime / 1000000}ms (${endTime}ns)\`\``)
       try {
         await waitReaction.remove()
       } catch {}
