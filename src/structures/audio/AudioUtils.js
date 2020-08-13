@@ -232,10 +232,12 @@ class AudioUtils {
  * @param {Discord.Member} member - Member to checking
  */
   getVoiceStatus (member) {
-    return Object.assign({
-      listen: this.getListenStatus(member),
-      speak: this.getVoiceMuteStatus(member)
-    })
+    const listen = this.getListenStatus(member.voice)
+    const speak = this.getVoiceMuteStatus(member.voice)
+    return {
+      listen,
+      speak
+    }
   }
 
   /**
