@@ -29,7 +29,7 @@ class Event extends BaseEvent {
         const filteredVoice = memberVoice.members.filter(e => !e.user.bot && !(e.voice.serverDeaf || e.voice.selfDeaf))
         if (memberVoice && memberVoice.members && filteredVoice.has(member.id) && filteredVoice.size === 1 && !userPermissions.includes('DJ')) userPermissions.push('DJ')
       }
-      if (userPermissions.includes('DJ') && messageReaction.emoji.name === placeHolderConstant.EMOJI_PIN) {
+      if ((userPermissions.includes('DJ') || userPermissions.includes('Administrator')) && messageReaction.emoji.name === placeHolderConstant.EMOJI_PIN) {
         this.client.audio.utils.toggleNowplayingPinned(message.guild.id)
         await this.client.audio.utils.updateNowplayingMessage(message.guild.id)
         try {
