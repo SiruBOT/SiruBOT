@@ -1,4 +1,5 @@
 module.exports = {
   UsageFailedError: require('./UsageFailedError'),
-  PermissionError: require('./PermissionError')
+  PermissionError: require('./PermissionError'),
+  FetchFailError: require('./FetchFailError')
 }
