@@ -212,6 +212,7 @@ class Queue extends EventEmitter {
    */
   async play (guildID, trackData, seekPosition = 0, nowplaying = false) {
     const { track } = trackData
+    this.client.audio.skippers.set(guildID, [])
     this.client.logger.info(`${this.defaultPrefix.play} [${guildID}] Playing Item ${track}...`)
     const playOptions = {}
     Object.defineProperty(playOptions, 'noReplace', { value: false, enumerable: true })
