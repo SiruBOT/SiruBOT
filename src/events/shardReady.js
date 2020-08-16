@@ -14,7 +14,7 @@ class Event extends BaseEvent {
    */
   async run () {
     this.client.logger.info(`[BOT] Bot Is Ready. (${this.client.user.tag})`)
-    if (!this.client.shard) this.client.setActivity()
+    this.client.setActivity()
     this.client.initialized = true
   }
 }
