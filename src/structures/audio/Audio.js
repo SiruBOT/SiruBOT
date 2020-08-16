@@ -160,7 +160,7 @@ class Audio extends Shoukaku.Shoukaku {
    * @description - Get Nodes sort by players.
    */
   async getNode (name = undefined) {
-    if (!name || this.nodes.get(name)) return (await this.getUsableNodes()).sort((a, b) => { return a.penalties - b.penalties }).shift()
+    if (!name || this.nodes.get(name)) return (await this.getUsableNodes()).sort((a, b) => { return a.stats.players - b.stats.players }).sort((a, b) => { return a.players.size - b.players.size }).shift()
     else {
       this.nodes.get(name)
     }
