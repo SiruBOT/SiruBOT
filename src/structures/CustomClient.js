@@ -75,6 +75,30 @@ class CustomClient extends Discord.Client {
     else return true
   }
 
+  getInfo () {
+    const mem = process.memoryUsage()
+    return {
+      guilds: this.guilds.cache.size,
+      users: this.users.cache.size,
+      players: this.audio.players.size(),
+      memoryUsage: `ArrayBuffers: ${this.niceBytes(mem.arrayBuffers)}, External: ${this.niceBytes(mem.external)}, Heaptotal: ${this.niceBytes(mem.heapTotal)}, Heapused: ${this.niceBytes(mem.heapUsed)}, Rss: ${this.niceBytes(mem.rss)}`
+    }
+  }
+
+  // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript/23625419
+
+  niceBytes (x) {
+    const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    let l = 0; let n = parseInt(x, 10) || 0
+
+    while (n >= 1024 && ++l) {
+      n = n / 1024
+    }
+    // include a decimal point and a tenths-place digit if presenting
+    // less than ten of KB or greater units
+    return (n.toFixed(n < 10 && l > 0 ? 1 : 0) + ' ' + units[l])
+  }
+
   /**
    * @description - Load Commands files in commands folder
    * @returns {Collection} - Command Collection
