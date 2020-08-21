@@ -136,35 +136,39 @@ class Queue extends EventEmitter {
    * @example - <Queue>.deQueue('672586746587774976')
    */
   async deQueue (guildID, skip = false, err = false) {
+    this.client.logger.debug(`${this.defaultPrefix.deQueue} deQueue ${guildID}, ${skip}, ${err}`)
     const guildData = await this.client.database.getGuild(guildID)
-    if (err) { // Remove Last Element
+    if (err) {
       await this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
       return this.playNext(guildID)
     }
-    if (skip) return this.client.database.updateGuild(guildID, { $pop: { queue: -1 } })
-    switch (guildData.repeat) {
-      case 0:
-        if (!err && guildData.nowplaying.track && guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
-          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Related Track (Repeat: ${guildData.repeat}, playingRelated: ${guildData.audioPlayrelated})`)
-          return this.playRelated(guildID, this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri))
-        } else {
-          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Next Track (Repeat: ${guildData.repeat})`)
+    if (skip) {
+      return this.playNext(guildID)
+    } else {
+      switch (guildData.repeat) {
+        case 0:
+          if (!err && guildData.nowplaying.track && guildData.queue.length === 0 && this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri) !== undefined && guildData.audioPlayrelated === true) {
+            this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Related Track (Repeat: ${guildData.repeat}, playingRelated: ${guildData.audioPlayrelated})`)
+            return this.playRelated(guildID, this.audio.utils.getvIdfromUrl(guildData.nowplaying.info.uri))
+          } else {
+            this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Playing Next Track (Repeat: ${guildData.repeat})`)
+            return this.playNext(guildID)
+          }
+        case 1:
+          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Repeat All Track (Repeat: ${guildData.repeat})`)
+          if (guildData.nowplaying.track && guildData.nowplaying.info && guildData.nowplaying.info.isStream) this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
+          else {
+            await this.client.database.updateGuild(guildID, { $push: { queue: this.getRepeatedObj(guildData.nowplaying) } })
+          }
           return this.playNext(guildID)
-        }
-      case 1:
-        this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Repeat All Track (Repeat: ${guildData.repeat})`)
-        if (guildData.nowplaying.track && guildData.nowplaying.info && guildData.nowplaying.info.isStream) this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
-        else {
-          await this.client.database.updateGuild(guildID, { $push: { queue: this.getRepeatedObj(guildData.nowplaying) } })
-        }
-        return this.playNext(guildID)
-      case 2:
-        this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Repeat Single Track (Repeat: ${guildData.repeat})`)
-        if (guildData.nowplaying.track && guildData.nowplaying.info && guildData.nowplaying.info.isStream) this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
-        else {
-          await this.client.database.updateGuild(guildID, { $push: { queue: { $each: [this.getRepeatedObj(guildData.nowplaying)], $position: 0 } } })
-        }
-        return this.playNext(guildID)
+        case 2:
+          this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Repeat Single Track (Repeat: ${guildData.repeat})`)
+          if (guildData.nowplaying.track && guildData.nowplaying.info && guildData.nowplaying.info.isStream) this.client.logger.debug(`${this.defaultPrefix.deQueue} [${guildID}] Nowplaying is streaming! abort repeat request.`)
+          else {
+            await this.client.database.updateGuild(guildID, { $push: { queue: { $each: [this.getRepeatedObj(guildData.nowplaying)], $position: 0 } } })
+          }
+          return this.playNext(guildID)
+      }
     }
   }
 
@@ -187,15 +191,10 @@ class Queue extends EventEmitter {
   async playNext (guildID) {
     const guildData = await this.client.database.getGuild(guildID)
     const { queue } = guildData
-    if (queue.length !== 0 || guildData.repeat === 2) {
-      if (guildData.nowplaying.track !== null && guildData.repeat === 2) {
-        await this.play(guildID, guildData.nowplaying)
-        this.client.logger.debug(`${this.defaultPrefix.playNext} Play Next Song... (Song: ${guildData.nowplaying.track}) (Single Repeat)`)
-      } else if (guildData.queue.length !== 0) {
-        const playTo = queue[0]
-        this.client.logger.debug(`${this.defaultPrefix.playNext} Play Next Song... (Song: ${playTo.track})`)
-        await this.play(guildID, playTo)
-      }
+    if (queue.length !== 0) {
+      const playTo = queue[0]
+      this.client.logger.debug(`${this.defaultPrefix.playNext} Play Next Song... (Song: ${playTo.track})`)
+      await this.play(guildID, playTo)
     } else {
       if (!queue[0]) {
         this.client.logger.debug(`${this.defaultPrefix.playNext} [${guildID}] Nothing items to playing next!`)
