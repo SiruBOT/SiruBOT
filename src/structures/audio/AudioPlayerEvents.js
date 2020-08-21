@@ -50,7 +50,7 @@ class AudioPlayerEvents {
 
   TrackStopped (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackStopped} [${data.guildId}] Stopped Track (Maybe Skip) [${data.track}]`)
-    this.client.audio.queue.autoPlay(data.guildId, true)
+    this.client.audio.queue.deQueue(data.guildId, true)
   }
 
   TrackFinished (data) {
@@ -60,13 +60,13 @@ class AudioPlayerEvents {
 
   TrackReplaced (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackReplaced} [${data.guildId}] Replaced Track [${data.track}]`)
-    this.client.audio.queue.deQueue(data.guildId)
   }
 
   TrackLoadFailed (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackLoadFailed} [${data.guildId}] Failed to load track [${data.track}]`)
-    this.client.audio.queue.deQueue(data.guildId, true, true)
+    this.client.audio.queue.deQueue(data.guildId, true)
   }
+
   /**
    * End of TrackEndEvents
    */
@@ -78,7 +78,6 @@ class AudioPlayerEvents {
 
   TrackExcepetion (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackLoadFailed} [${data.guildId}] Track Excepetion [${data.track}]`)
-    this.client.audio.queue.deQueue(data.guildId, true, true)
   }
 }
 module.exports = AudioPlayerEvents
