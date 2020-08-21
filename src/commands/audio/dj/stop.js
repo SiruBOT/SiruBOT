@@ -23,14 +23,7 @@ class Command extends BaseCommand {
   async run ({ message, guildData }) {
     const { locale } = guildData
     const picker = this.client.utils.localePicker
-    const Audio = this.client.audio
-    if (!Audio.players.get(message.guild.id)) return message.channel.send(picker.get(locale, 'AUDIO_NOPLAYER'))
-    const interval = setInterval(() => {
-      Audio.stop(message.guild.id)
-      if (!Audio.players.get(message.guild.id)) {
-        clearInterval(interval)
-      }
-    })
+    await this.client.audio.stop(message.guild.id, true)
     message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_STOP_OK'))
   }
 }
