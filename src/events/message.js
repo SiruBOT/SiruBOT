@@ -42,10 +42,10 @@ class Event extends BaseEvent {
       )
       return
     }
-    const guildData = await this.client.database.getGuild(message.guild.id)
-    const userData = await this.client.database.getUser(message.author.id)
-    const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
     if (message.content.startsWith(prefix)) {
+      const guildData = await this.client.database.getGuild(message.guild.id)
+      const userData = await this.client.database.getUser(message.author.id)
+      const memberData = await this.client.database.getMember(message.member.id, message.guild.id)
       if (message.author.awaitQuestion) return
       const picker = this.client.utils.localePicker
       const { locale } = guildData
