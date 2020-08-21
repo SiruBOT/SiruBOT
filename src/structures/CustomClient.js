@@ -80,7 +80,7 @@ class CustomClient extends Discord.Client {
     return {
       guilds: this.guilds.cache.size,
       users: this.users.cache.size,
-      players: this.audio.players.size(),
+      players: this.audio.players.size,
       memoryUsage: `ArrayBuffers: ${this.niceBytes(mem.arrayBuffers)}, External: ${this.niceBytes(mem.external)}, Heaptotal: ${this.niceBytes(mem.heapTotal)}, Heapused: ${this.niceBytes(mem.heapUsed)}, Rss: ${this.niceBytes(mem.rss)}`
     }
   }
