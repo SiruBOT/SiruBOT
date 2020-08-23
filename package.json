@@ -33,7 +33,9 @@
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "standard": "^14.3.4"
+  },
   "scripts": {
     "test": "node ./src/index.js test",
     "ci": "node ./src/index.js test"
