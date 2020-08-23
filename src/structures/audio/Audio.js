@@ -255,7 +255,7 @@ class Audio extends Shoukaku.Shoukaku {
     try {
       let scrapeResult
       if (this.relatedRoutePlanner) scrapeResult = await relatedScraper.get(vId, this.relatedRoutePlanner)
-      else await relatedScraper.get(vId)
+      else scrapeResult = await relatedScraper.get(vId)
       if (scrapeResult.length <= 0) throw new Error('Scrape result not found.')
       this.relatedCache.set(vId, scrapeResult)
       this.client.logger.debug(`${this.defaultPrefix.getRelated} Registering Cache [${vId}], ${scrapeResult.length} Items`)
