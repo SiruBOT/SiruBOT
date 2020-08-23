@@ -47,9 +47,12 @@ class Command extends BaseCommand {
           locale, 'COMMANDS_HELP_DESC'),
         `\`\`\`fix\n${picker.get(locale, `DESC_${command.category.toUpperCase()}_${command.name.toUpperCase()}`)}\`\`\``
       )
+      const usageLocalePath = `USAGE_${command.category.toUpperCase()}_${command.name.toUpperCase()}`
+      const usageBase = picker.get(locale, 'USAGE_BASE', { COMMAND: command.name })
+      const usageArgs = picker.get(locale, usageLocalePath)
       embed.addField(
         picker.get(locale, 'COMMANDS_HELP_USAGE'),
-          `\`\`\`fix\n${picker.get(locale, `USAGE_${command.category.toUpperCase()}_${command.name.toUpperCase()}`, { COMMAND: command.name })}\`\`\``
+        `\`\`\`fix\n${usageBase} ${usageArgs}\`\`\``
       )
       embed.addField(
         picker.get(locale, 'COMMANDS_HELP_ALIASES'),

@@ -102,10 +102,11 @@ class Event extends BaseEvent {
           } catch (e) {
             if (e instanceof Errors.UsageFailedError) {
               const commandInfo = this.client.commands.get(e.commandName)
+              const usageBase = picker.get(locale, 'USAGE_BASE', { COMMAND: e.commandName })
               if (commandInfo) {
                 return message.channel.send(
                   '> ' + picker.get(locale, 'COMMANDS_HELP_USAGE') + '\n' +
-                  '> ```fix\n> ' + picker.get(locale, `USAGE_${commandInfo.category}_${commandInfo.name.toUpperCase()}`, { COMMAND: command }) + '\n> ```'
+                  '> ```fix\n> ' + usageBase + ' ' + picker.get(locale, `USAGE_${commandInfo.category}_${commandInfo.name.toUpperCase()}`) + '\n> ```'
                 )
               }
             }
