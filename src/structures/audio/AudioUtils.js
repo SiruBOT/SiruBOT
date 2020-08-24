@@ -126,7 +126,7 @@ class AudioUtils {
         .setURL(guildData.nowplaying.info.uri)
         .setDescription(this.getNowplayingText(guildID, guildData))
         .setFooter(
-          `${this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_FOOTER', { REMAIN: guildData.queue.length, SOURCE: Discord.Util.escapeMarkdown(guildData.nowplaying.info.author) })}${pinned ? ' | ' + placeHolderConstant.EMOJI_PIN : ''}`
+          `${this.client.utils.localePicker.get(guildData.locale, 'NOWPLAYING_FOOTER', { REMAIN: guildData.queue.length, SOURCE: guildData.nowplaying.info.author ? guildData.nowplaying.info.author : this.client.utils.localePicker.get(guildData.locale, 'NONE') })}${pinned ? ' | ' + placeHolderConstant.EMOJI_PIN : ''}`
         )
         .setColor(this.client.utils.find.getColor(this.client.guilds.cache.get(guildID).me))
       if (this.validateYouTubeUrl(guildData.nowplaying.info.uri)) messageEmbed.setThumbnail(`https://img.youtube.com/vi/${guildData.nowplaying.info.identifier}/mqdefault.jpg`)
