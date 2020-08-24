@@ -10,6 +10,7 @@ class AudioPlayerEvents {
       TrackFinished: `${this.classPrefix}:TrackFinished]`,
       TrackReplaced: `${this.classPrefix}:TrackReplaced]`,
       TrackLoadFailed: `${this.classPrefix}:TrackLoadFailed]`,
+      TrackStopped: `${this.classPrefix}:TrackStopped]`,
       onPlayerUpdate: `${this.classPrefix}:onPlayerUpdate]`,
       onWebSocketClosed: `${this.classPrefix}:onWebSocketClosed]`
     }
