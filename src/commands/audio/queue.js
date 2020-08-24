@@ -73,7 +73,7 @@ class Command extends BaseCommand {
     const descriptionArray = queue.map((item, index) => `\`\`${parseInt(index) + 1}.\`\` \`\`[${this.client.utils.time.toHHMMSS(item.info.length / 1000, item.info.isStream)}]\`\` **${Discord.Util.escapeMarkdown(item.info.title)}** - <@${item.request}>`)
     const chunkedDescriptionArray = this.client.utils.array.chunkArray(descriptionArray, 10)
     const nowplayingObject = this.client.audio.utils.getNowplayingObject(guild.id, guildData)
-    const allDuration = queue.filter(el => !!el.info).map(el => el.info.isStream === false ? el.info.length : 0).reduce((a, b) => a + b) - guildData.nowplaying.info ? guildData.nowplaying.info.isStream ? 0 : guildData.nowplayingPosition : 0 // Without Nowplaying Position
+    const allDuration = queue.filter(el => !!el.info).map(el => el.info.isStream === false ? el.info.length : 0).reduce((a, b) => a + b) - (guildData.nowplaying.info ? guildData.nowplaying.info.isStream ? 0 : guildData.nowplayingPosition : 0) // Without nowplaying position
     return {
       embed: new Discord.MessageEmbed()
         .setDescription(chunkedDescriptionArray[page].map(el => el))
