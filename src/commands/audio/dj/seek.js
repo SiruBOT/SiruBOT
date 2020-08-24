@@ -32,7 +32,7 @@ class Command extends BaseCommand {
     if (this.isStarter(starter)) timeString = timeString.substring(1)
     if (this.isStarter(timeString.charAt(0))) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_MULTIPLE_STARTER'))
     const timeMs = this.parseTime(timeString)
-    if (!isFinite(timeMs) || isNaN(timeMs) || (this.isStarter(starter) && !timeMs) || Number.isInteger(timeMs)) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NAN'))
+    if (!isFinite(timeMs) || isNaN(timeMs) || (this.isStarter(starter) && !timeMs) || !Number.isInteger(timeMs)) return message.channel.send(picker.get(locale, 'COMMANDS_SEEK_NAN'))
     let playerPosition = this.client.audio.players.get(message.guild.id).position
     switch (starter) {
       case '+':
@@ -64,7 +64,7 @@ class Command extends BaseCommand {
     const tokenized = input.split(splitter)
     try { // Split items filter, If includes not number, returns NaN
       tokenized.map((num) => {
-        if (isNaN(num) || !isFinite(num) || Number.isInteger(num)) throw new Error('Unknown Time Format')
+        if (isNaN(num) || !isFinite(num) || !Number.isInteger(num)) throw new Error('Unknown Time Format')
       })
     } catch {
       return NaN
