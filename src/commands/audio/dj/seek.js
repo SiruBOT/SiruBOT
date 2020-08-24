@@ -64,7 +64,7 @@ class Command extends BaseCommand {
     const tokenized = input.split(splitter)
     try { // Split items filter, If includes not number, returns NaN
       tokenized.map((num) => {
-        if (isNaN(num) || !isFinite(num) || !Number.isInteger(num)) throw new Error('Unknown Time Format')
+        if (isNaN(num) || !isFinite(num)) throw new Error('Unknown Time Format')
       })
     } catch {
       return NaN
@@ -87,7 +87,7 @@ class Command extends BaseCommand {
     else if (tokenized[0]) sec += Math.floor(+tokenized[0])
     if (tokenized[1] && (Math.floor(tokenized[1]) > 60 || Math.floor(tokenized[1]) < 0)) return NaN
     else if (tokenized[1]) sec += Math.floor(+tokenized[1]) * 60
-    if (tokenized[2] && (Math.floor(tokenized[2]) > 24 || Math.floor(tokenized[2]) < 0)) return NaN
+    if (tokenized[2] && (Math.floor(tokenized[2]) < 0)) return NaN
     else if (tokenized[2]) sec += Math.floor(+tokenized[2]) * 3600
     return sec * 1000
   }
