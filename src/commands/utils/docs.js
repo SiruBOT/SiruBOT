@@ -25,9 +25,9 @@ class Command extends BaseCommand {
   async run ({ message, args, guildData }) {
     const picker = this.client.utils.localePicker
     const { locale } = guildData
-    if (args.length === 0) return message.channel.send(message.author + '\n' + picker.get(locale, 'GENERAL_INPUT_QUERY'))
+    if (args.length === 0) return message.channel.send('<@' + message.author.id + '>\n' + picker.get(locale, 'GENERAL_INPUT_QUERY'))
     const result = await fetch(`https://djsdocs.sorta.moe/v2/embed?src=https://raw.githubusercontent.com/discordjs/discord.js/docs/master.json&q=${args.join()}`).then(res => res.json())
-    if (!result) return message.channel.send('<@' + message.author + '>\n' + picker.get(locale, 'GENERAL_NO_RESULT'))
+    if (!result) return message.channel.send('<@' + message.author.id + '>\n' + picker.get(locale, 'GENERAL_NO_RESULT'))
     const embed = new Discord.MessageEmbed(result)
     embed.setFooter(message.author.tag, message.author.displayAvatarURL({ format: 'png', size: 512 }))
     return message.channel.send(embed)
