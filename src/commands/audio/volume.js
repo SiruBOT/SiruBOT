@@ -51,7 +51,7 @@ class Command extends BaseCommand {
         currentVolume -= value
         break
       default:
-        currentVolume = value
+        currentVolume = string
     }
     return currentVolume
   }
