@@ -1,6 +1,4 @@
 const { BaseCommand } = require('../../structures')
-const { parse } = require('@sirubot/yt-related-scraper/src/Parser')
-
 class Command extends BaseCommand {
   constructor (client) {
     super(client,
@@ -26,7 +24,6 @@ class Command extends BaseCommand {
     const picker = this.client.utils.localePicker
     if ((userPermissions.includes('Administrator') || userPermissions.includes('DJ')) && args.length > 0) {
       const parsed = this.parseVol(args[0], guildData.volume)
-      message.channel.send(parsed)
       if (isNaN(parsed)) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_FORMAT'))
       if (parsed < 1) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_UNDER_ONE'))
       if (parsed > 150) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_VOLUME_HIGH_HDF'))
