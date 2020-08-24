@@ -25,7 +25,7 @@ class Command extends BaseCommand {
 
   async run (compressed) {
     const { message, guildData } = compressed
-    if (!this.client.audio.players.get(message.guild.id)) return this.client.commands.get('nowplaying').run(compressed)
+    if (!this.client.audio.players.get(message.guild.id) && !guildData.nowplaying.track) return this.client.commands.get('nowplaying').run(compressed)
     if (guildData.queue.length === 0) return this.client.commands.get('nowplaying').run(compressed)
     let page = 0
     const data = await this.getQueueEmbed(message.guild, page)
@@ -70,15 +70,10 @@ class Command extends BaseCommand {
     const picker = this.client.utils.localePicker
     const guildData = await this.client.database.getGuild(guild.id)
     const { locale, queue } = guildData
-    const allDuration = queue.map(el => el.info.isStream === false ? el.info.length : 0).reduce((a, b) => {
-      return a + b
-    })
-    const descriptionArray = []
-    for (const position in queue) {
-      descriptionArray.push(`\`\`${parseInt(position) + 1}.\`\` \`\`[${this.client.utils.time.toHHMMSS(guildData.queue[position].info.length / 1000, guildData.queue[position].info.isStream)}]\`\` **${Discord.Util.escapeMarkdown(guildData.queue[position].info.title)}** - <@${guildData.queue[position].request}>`)
-    }
+    const descriptionArray = queue.map((item, index) => `\`\`${parseInt(index) + 1}.\`\` \`\`[${this.client.utils.time.toHHMMSS(item.info.length / 1000, item.info.isStream)}]\`\` **${Discord.Util.escapeMarkdown(item.info.title)}** - <@${item.request}>`)
     const chunkedDescriptionArray = this.client.utils.array.chunkArray(descriptionArray, 10)
     const nowplayingObject = this.client.audio.utils.getNowplayingObject(guild.id, guildData)
+    const allDuration = queue.filter(el => !!el.info).map(el => el.info.isStream === false ? el.info.length : 0).reduce((a, b) => a + b) - guildData.nowplaying.info ? guildData.nowplaying.info.isStream ? 0 : guildData.nowplayingPosition : 0 // Without Nowplaying Position
     return {
       embed: new Discord.MessageEmbed()
         .setDescription(chunkedDescriptionArray[page].map(el => el))
