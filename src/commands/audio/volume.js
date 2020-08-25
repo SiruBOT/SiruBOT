@@ -45,13 +45,13 @@ class Command extends BaseCommand {
     if (!this.isValid(value)) return NaN
     switch (starter) {
       case '+':
-        currentVolume += value
+        currentVolume += +value
         break
       case '-':
-        currentVolume -= value
+        currentVolume -= +value
         break
       default:
-        currentVolume = string
+        currentVolume = +string
     }
     return currentVolume
   }
