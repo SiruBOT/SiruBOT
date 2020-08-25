@@ -42,6 +42,7 @@ class Command extends BaseCommand {
   parseVol (string, currentVolume) {
     const starter = string.charAt(0)
     const value = +string.substr(1)
+    currentVolume = +currentVolume
     if (!this.isValid(value)) return NaN
     switch (starter) {
       case '+':
