@@ -15,7 +15,7 @@
 > [![Dependencies Status](https://david-dm.org/sannoob/Siru-stable.svg)](https://github.com/sannoob/Siru-stable)  
 > [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsannoob%2FSiru-stable.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsannoob%2FSiru-stable?ref=badge_large)
 >
-> ## Creator: Sannoob#0001
+> ## Creator: Sannoob#3144
 >
 > [![SannoobProfile](https://chinobot.ga/author_profile.png)](https://sannoob.cf)
 
@@ -46,9 +46,8 @@
 
 > [Click Here (Redirect To MongoDB Web)](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials)
 
-### Install Mariadb or Mysql
+### Install Mariadb
 
-> [Click Here (Redirect To Mysql Download Page)](https://www.mysql.com/downloads/)   
 > [Click Here (Redirect To Mariadb Download Page)](https://mariadb.org/download/) (Recommended)
 
 ### Install Java(JDK 11) and Lavalink for Audio Feature
@@ -61,7 +60,7 @@
 
 ## License
 
->     Copyright (C) 2020 Sannoob <cotwo0139@gmail.com>
+>     Copyright (C) 2020 Sannoob <sannooob@gmail.com>
 >
 >     This program is free software: you can redistribute it and/or modify
 >     it under the terms of the GNU General Public License as published by
