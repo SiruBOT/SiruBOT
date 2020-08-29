@@ -6,6 +6,7 @@ const Schema = new mongo.Schema({
   profile: { type: String, default: 'default' },
   blacklisted: { type: Boolean, default: false },
   subscribedPlaylists: { type: Array, default: [] },
+  badges: { type: Array, default: [] },
   cooldownAt: { type: Date, default: 0 }
 }, { collection: 'globalUser', versionKey: false })
 
