@@ -221,9 +221,9 @@ class Audio extends Shoukaku.Shoukaku {
         return new Promise((resolve, reject) => {
           fetch(new URL('/routeplanner/free/address', node.rest.url), {
             method: 'POST',
-            headers: { Authorization: node.rest.auth },
+            headers: { Authorization: node.rest.auth, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              address: el.failingAddress
+              address: el.failingAddress.replace('/', '')
             })
           })
             .then((res) => {
