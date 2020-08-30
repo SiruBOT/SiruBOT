@@ -38,12 +38,12 @@ class Command extends BaseCommand {
   async run ({ message }) {
     const embed = new Discord.MessageEmbed()
     for (const item of this.client.audio.nodes.values()) {
-      embed.addField(`**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.stats.players} players of ${item.stats.playingPlayers}) playing` : `, ${item.state}`}`, `**${niceBytes(item.stats.memory.used)}** Used
+      embed.addField(`**${item.name}** ${item.state === 'CONNECTED' ? `, (${item.stats.players} players of ${item.stats.playingPlayers}) playing` : `, ${item.state}`} Blocked from youtube? ${this.client.audio.node429Cache.get(item.name) === true ? 'Yes' : 'No'}`, `**${niceBytes(item.stats.memory.used)}** Used
       **${item.stats.cpu.cores}** Cores
       **${this.toFixed(item.stats.cpu.systemLoad)}%** System Loads
       **${this.toFixed(item.stats.cpu.lavalinkLoad)}%** Lavalink Loads
       **${this.client.utils.time.toHHMMSS(item.stats.uptime / 1000)}** Uptime
-      `, true)
+      `, false)
     }
     embed.setTitle('Lavalink Nodes Info')
     embed.setFooter('Powered by npmjs.org/shoukaku')
