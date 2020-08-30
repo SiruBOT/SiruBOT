@@ -18,6 +18,7 @@ module.exports = {
   EMOJI_PERSON: '🙍',
   EMOJI_PAPER: '📃',
   EMOJI_HAMMER: '🔨',
+  EMOJI_COMPUTER: '🖥️',
   EMOJI_SANDCLOCK: '⏳',
   EMOJI_WAVE: '👋',
   EMOJI_PAINT: '️🖼️',
@@ -27,6 +28,7 @@ module.exports = {
   EMOJI_ARROW_BACKWARD: '◀️',
   EMOJI_ARROW_TORWARD: '▶️',
   EMOJI_INFO: 'ℹ️',
+  EMOJI_TIMER: '⏲️',
 
   EMOJI_KNOBS: '🎛️',
   EMOJI_MIC: '🎙️',
