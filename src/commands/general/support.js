@@ -21,7 +21,7 @@ class Command extends BaseCommand {
     )
   }
 
-  async run ({ message, args, prefix, userPermissions, guildData }) {
+  async run ({ message, guildData }) {
     const picker = this.client.utils.localePicker
     const { locale } = guildData
     const ownerName = this.client.shard ? (await this.client.shard.broadcastEval(`this.users.cache.get("${this.client._options.bot.owners[0]}") ? this.users.cache.get("${this.client._options.bot.owners[0]}").tag : false`)).filter(el => !!el)[0] : this.client.users.cache.get(this.client._options.bot.owners[0]).tag
