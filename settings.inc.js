@@ -1,5 +1,6 @@
 module.exports = {
   sentry: null, // Your Sentry DSN URL
+  timeZone: 'Asia/Seoul',
   shard: {
     respawn: true,
     shardArgs: [], // Args to next script file (node index.js [args])
