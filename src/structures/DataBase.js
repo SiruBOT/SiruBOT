@@ -2,7 +2,6 @@ const Mongo = require('mongoose')
 const Models = require('../constant/models')
 const uuid = require('node-uuid')
 const knex = require('knex')
-const { options } = require('node-os-utils')
 class DataBase {
   constructor (client) {
     this.client = client
