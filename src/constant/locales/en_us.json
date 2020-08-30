@@ -107,7 +107,7 @@
   "COMMANDS_PING_PING": "%EMOJI_PINGPONG% Ping",
   "COMMANDS_PING_PONG": "%EMOJI_PINGPONG% Pong!",
   "COMMANDS_PING_PINGING": "Pinging..",
-  "COMMANDS_PING_RESULT": "Websocket Ping: %WEBSOCKET%\nMessage Response Ping: %RESPONCE%",
+  "COMMANDS_PING_RESULT": "Websocket Ping: %WEBSOCKET%\nMessage Response Ping: %RESPONSE%",
   "COMMANDS_HANGANG_TEMP": "Temp of hangang %TEMP%°C Time: %TIME%",
   "COMMANDS_HANGANG_TEMP_ERROR": "한강의 온도를 불러오지 못했어요.",
   "COMMANDS_UTILS_LYRICS_NOTFOUND": "%EMOJI_NO%  Lyrics not found..",

@@ -32,7 +32,7 @@ class Command extends BaseCommand {
 
     const m = await message.channel.send(message.author, embed)
     embed.setTitle(picker.get(locale, 'COMMANDS_PING_PONG'))
-    embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.ws.ping}ms`, RESPONCE: `${m.createdAt - message.createdTimestamp}ms` }))
+    embed.setDescription(picker.get(locale, 'COMMANDS_PING_RESULT', { WEBSOCKET: `${this.client.ws.ping}ms`, RESPONSE: `${m.createdAt - message.createdTimestamp}ms` }))
     embed.setTimestamp(new Date().getTime())
     await m.edit(message.author, embed)
   }
