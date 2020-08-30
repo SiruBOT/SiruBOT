@@ -2,6 +2,7 @@ const Mongo = require('mongoose')
 const Models = require('../constant/models')
 const uuid = require('node-uuid')
 const knex = require('knex')
+const { options } = require('node-os-utils')
 class DataBase {
   constructor (client) {
     this.client = client
@@ -64,12 +65,8 @@ class DataBase {
     const { _options, logger } = this.client
     const startMs = new Date().getTime()
     logger.info(`${this.defaultPrefix.init} Connecting mongodb URL (${_options.db.mongo.mongoURL})`)
-    Mongo.connect(_options.db.mongo.mongoURL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      user: _options.db.mongo.user,
-      pass: _options.db.mongo.password
-    }).then(() => {
+    logger.debug(`${this.defaultPrefix.init} MongoDB Options ${JSON.stringify(_options.db.mongo)}`)
+    Mongo.connect(_options.db.mongo.mongoURL, _options.db.mongo.mongoOptions).then(() => {
       logger.info(`[DB:Mongo] Connected to mongodb (${new Date().getTime() - startMs}ms)`)
     }).catch(e => {
       logger.error(`[DB:Mongo] Failed To Connect mongodb (${new Date().getTime() - startMs}ms) \n${e.stack}`)

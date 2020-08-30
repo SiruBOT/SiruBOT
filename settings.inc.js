@@ -45,8 +45,13 @@ module.exports = {
     },
     mongo: {
       mongoURL: 'mongodb://mongodbIP:27017/DBNAME?authSource=admin',
-      user: 'yourmongodbuser',
-      password: 'yourmongodbpassword'
+      mongoOptions: {
+        poolSize: 10,
+        user: 'yourmongodbuser',
+        pass: 'yourmongodbpassword',
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      }
     }
   },
   embed: {
