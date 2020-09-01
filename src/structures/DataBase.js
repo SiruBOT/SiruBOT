@@ -82,7 +82,7 @@ class DataBase {
   }
 
   insertPingMetrics (ping, shardId) {
-    if (isNaN(Number(ping)) || !shardId) return this.client.logger.warn(`${this.knexPrefix.insertPingMetrics} ping or shardId not provided`)
+    if (!Number.isInteger(ping) || !Number.isInteger(shardId)) return this.client.logger.warn(`${this.knexPrefix.insertPingMetrics} ping or shardId not provided`)
     return this.insert('pingMetrics', { ping, shardId })
   }
 
