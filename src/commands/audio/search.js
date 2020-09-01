@@ -28,12 +28,13 @@ class Command extends BaseCommand {
    * @param {Boolean} isSoundCloud - search Platform (SoundCloud: true, Youtube: False)
    */
   async run (compressed, isSoundCloud) {
-    const { message, args } = compressed
-    const locale = compressed.guildData.locale
+    const { message, args, guildData } = compressed
+    const { locale } = guildData
     const picker = this.client.utils.localePicker
 
     // If Conditions True
     const Audio = this.client.audio
+    let resumed = false
     let searchStr = message.attachments.map(el => el.url)[0] ? message.attachments.map(el => el.url)[0] : args.join(' ')
 
     const searchPlatForm = isSoundCloud === true ? 'scsearch:' : 'ytsearch:'
@@ -41,9 +42,13 @@ class Command extends BaseCommand {
     if (!Audio.players.get(message.guild.id) || (this.client.audio.players.get(message.guild.id) !== undefined) === !message.guild.me.voice.channelID || (this.client.audio.players.get(message.guild.id) === undefined ? false : (this.client.audio.players.get(message.guild.id).voiceConnection.voiceChannelID === null)) || (message.guild.me.voice.channelID === undefined ? false : (message.guild.me.voice.channelID !== message.member.voice.channelID))) {
       const voiceJoinSuccess = await this.client.commands.get('join').run(compressed, true)
       if (voiceJoinSuccess !== true) return
+      if (guildData.nowplaying.track) {
+        await message.channel.send(picker.get(locale, 'COMMAND_AUDIO_RESUME', { POSITION: this.client.utils.time.toHHMMSS(guildData.nowplayingPosition / 1000), TRACK: this.client.audio.utils.formatTrack(guildData.nowplaying.info) }))
+        resumed = true
+      }
     }
 
-    if (args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
+    if (!resumed && args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (this.client.utils.find.validURL(searchStr)) {
       return this.client.commands.get('play').run(compressed)
     } else searchStr = searchPlatForm + searchStr
