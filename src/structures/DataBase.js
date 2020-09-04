@@ -21,7 +21,8 @@ class DataBase {
       update: 'Update',
       remove: 'Remove',
       add: 'Add',
-      insert: 'Insert'
+      insert: 'Insert',
+      increment: 'Increment'
     }
     this.classPrefix = '[DataBase'
     this.defaultPrefix = {
@@ -39,6 +40,9 @@ class DataBase {
     }
     this.knexPrefix = {
       insert: `${this.classPrefix}:${this.methods.insert}]`,
+      increaseTrackPlayed: `${this.classPrefix}:${this.methods.increment}:increaseTrackPlayed]`,
+      getPlayedTrack: `${this.classPrefix}:${this.methods.get}:getPlayedTrack]`,
+      getTrackById: `${this.classPrefix}:${this.methods.get}:getTrackById]`,
       insertPingMetrics: `${this.classPrefix}:${this.methods.insert}:insertPingMetrics]`
     }
   }
@@ -254,6 +258,32 @@ class DataBase {
       args
     }).save()
     return createdUUId
+  }
+
+  async getPlayedTrack (lavalinkTrack) {
+    this.client.logger.debug(`${this.knexPrefix.getPlayedTrack} Select track ${lavalinkTrack}`)
+    const track = await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack)[0]
+    if (!track) {
+      this.client.logger.debug(`${this.knexPrefix.getPlayedTrack} Track not found, insert ${lavalinkTrack}`)
+      await this.insert('playedTracks', { lavalinkTrack })
+      const track = await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack)[0]
+      return track
+    } else {
+      return track
+    }
+  }
+
+  async getTrackById (trackId) {
+    this.client.logger.debug(`${this.knexPrefix.getTrackById} Get Track via trackId: ${trackId}`)
+    return this.knex('playedTracks').where('trackId', trackId)
+  }
+
+  async increaseTrackPlayed (lavalinkTrack) {
+    this.client.logger.debug(`${this.knexPrefix.increaseTrackPlayed} Increse track played ${lavalinkTrack}`)
+    const track = await this.getPlayedTrack(lavalinkTrack)
+    await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack)
+      .increment('playedCount', 1)
+    return track
   }
 
   /**
