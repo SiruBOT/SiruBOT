@@ -15,6 +15,7 @@
     "glob": "^7.1.6",
     "inko": "^1.1.1",
     "knex": "^0.21.2",
+    "lavaplayer-track-info": "^2.1.0",
     "melon-chart-api": "^1.1.4",
     "minimist": "^1.2.5",
     "moment": "^2.27.0",
