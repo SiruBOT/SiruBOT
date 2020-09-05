@@ -30,7 +30,8 @@ class Event extends BaseEvent {
     if (message.guild && !message.member) await message.guild.fetchMember(message.author)
     if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
     const prefix = placeHolderConstant.PREFIX
-    const args = message.content.slice(prefix.length).trim().split(/ +/g)
+    /* eslint-disable no-irregular-whitespace */
+    const args = message.content.slice(prefix.length).trim().split(/[ |　]+/g)
     const command = args.shift().toLowerCase()
     const commandClass = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command))
     const badConnectionCodes = [0, 2, 3]
