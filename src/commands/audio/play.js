@@ -37,7 +37,7 @@ class Command extends BaseCommand {
         resumed = true
       }
     }
-    if (!!resumed && args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
+    if (resumed && (args.length === 0 && searchStr.length === 0)) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
 
     if (!this.client.utils.find.validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
