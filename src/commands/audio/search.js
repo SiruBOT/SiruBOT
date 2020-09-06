@@ -48,7 +48,7 @@ class Command extends BaseCommand {
       }
     }
 
-    if (!!resumed && args.length === 0 && searchStr.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
+    if (resumed && (args.length === 0 && searchStr.length === 0)) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
     if (this.client.utils.find.validURL(searchStr)) {
       return this.client.commands.get('play').run(compressed)
     } else searchStr = searchPlatForm + searchStr
@@ -56,7 +56,7 @@ class Command extends BaseCommand {
     const searchResult = await Audio.getTrack(searchStr)
     if (this.client.commands.get('play').chkSearchResult(searchResult, picker, locale, message) !== true) return
     const embed = new Discord.MessageEmbed()
-    const maxres = 10
+    const maxres = !this.client._options.audio.searchResults || this.client._options.audio.searchResults > 10 || this.client._options.audio.searchResults < 1 ? 5 : this.client._options.audio.searchResults
     const slicedNumberArray = Numbers.slice(0, searchResult.tracks.slice(0, maxres).length)
     slicedNumberArray.push(placeHolderConstant.EMOJI_NO)
     const slicedTracks = searchResult.tracks.slice(0, maxres)
