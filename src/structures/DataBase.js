@@ -262,11 +262,11 @@ class DataBase {
 
   async getPlayedTrack (lavalinkTrack) {
     this.client.logger.debug(`${this.knexPrefix.getPlayedTrack} Select track ${lavalinkTrack}`)
-    const track = await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack)[0]
+    const track = (await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack))[0]
     if (!track) {
       this.client.logger.debug(`${this.knexPrefix.getPlayedTrack} Track not found, insert ${lavalinkTrack}`)
       await this.insert('playedTracks', { lavalinkTrack })
-      const track = await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack)[0]
+      const track = (await this.knex('playedTracks').where('lavalinkTrack', lavalinkTrack))[0]
       return track
     } else {
       return track
