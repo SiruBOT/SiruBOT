@@ -1,5 +1,4 @@
-const fetch = require('node-fetch')
-const { FetchFailError } = require('../../errors/')
+const RESTManager = require('./RESTManager')
 const MOJANG_BASE = 'https://api.mojang.com'
 const USER_PROFILE = MOJANG_BASE + '/users/profiles/minecraft/:username'
 const USER_NAME_HISTORY = MOJANG_BASE + '/user/profiles/:uuid/names'
@@ -11,7 +10,7 @@ const PROFILE_HEAD = VISAGE_BASE + '/head/:size/:uuid.png'
 const PROFILE_BUST = VISAGE_BASE + '/bust/:size/:uuid.png'
 const PROFILE_FULL = VISAGE_BASE + '/full/:size/:uuid.png'
 const PROFILE_SKIN = VISAGE_BASE + '/skin/:size/:uuid.png'
-class MinecraftRESTManager {
+class MinecraftRESTManager extends RESTManager {
   /**
    * @typedef {{ id: String, name: String }} BasicProfile Basic minecraft user profile (uuid, name)
    * @typedef {String} MinecraftUserName 3~16 length minecraft username
@@ -78,20 +77,6 @@ class MinecraftRESTManager {
       full: this._replaceParam(PROFILE_FULL, options),
       skin: this._replaceParam(PROFILE_SKIN, options)
     }
-  }
-
-  static _replaceParam (string, object) {
-    let temp = string
-    for (const key of Object.keys(object)) {
-      temp = temp.replace(':' + key, encodeURI(object[key]))
-    }
-    return temp
-  }
-
-  static async _fetch (url) {
-    const res = await fetch(url)
-    if (res.status === 200) return res
-    throw new FetchFailError('Unexpected server response ' + res.status)
   }
 }
 
