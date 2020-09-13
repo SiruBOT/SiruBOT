@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 const { FetchFailError } = require('../../errors/')
 class RESTManager {
-  static _replaceParam (string, object) {
+  static _replaceParam (string = '', object = {}) {
     let temp = string
     for (const key of Object.keys(object)) {
       temp = temp.replace(':' + key, encodeURI(object[key]))
