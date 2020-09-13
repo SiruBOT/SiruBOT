@@ -21,7 +21,7 @@ class MinecraftRESTManager extends RESTManager {
    * @returns {Promise<BasicProfile>} Promise<BasicProfile>
    */
   static async getProfile (username) {
-    const profile = await (await this._fetch(this._replaceParam(USER_PROFILE, { username }))).json()
+    const profile = await this._fetchJson(this._replaceParam(USER_PROFILE, { username }))
     return profile
   }
 
@@ -34,7 +34,7 @@ class MinecraftRESTManager extends RESTManager {
    * @return {Array<NameHistory>} Array of name histories
    */
   static async getNameHistory ({ id }) {
-    const nameHistory = await (await this._fetch(this._replaceParam(USER_NAME_HISTORY, { uuid: id }))).json()
+    const nameHistory = await this._fetchJson(this._replaceParam(USER_NAME_HISTORY, { uuid: id }))
     return nameHistory
   }
 
