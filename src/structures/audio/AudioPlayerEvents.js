@@ -1,4 +1,6 @@
 const AudioUtils = require('./AudioUtils')
+const { decodeTrack } = require('lavaplayer-track-info')
+const Sentry = require('@sentry/node')
 class AudioPlayerEvents {
   constructor (Router) {
     this.router = Router
@@ -11,6 +13,7 @@ class AudioPlayerEvents {
       TrackReplaced: `${this.classPrefix}:TrackReplaced]`,
       TrackLoadFailed: `${this.classPrefix}:TrackLoadFailed]`,
       TrackStopped: `${this.classPrefix}:TrackStopped]`,
+      TrackExcepetion: `${this.classPrefix}:TrackExcepetion]`,
       onPlayerUpdate: `${this.classPrefix}:onPlayerUpdate]`,
       onWebSocketClosed: `${this.classPrefix}:onWebSocketClosed]`
     }
@@ -77,8 +80,20 @@ class AudioPlayerEvents {
     this.client.audio.queue.deQueue(data.guildId, true, true)
   }
 
-  TrackExcepetion (data) {
+  async TrackExcepetion (data) {
     this.client.logger.debug(`${this.defaultPrefix.TrackLoadFailed} [${data.guildId}] Track Excepetion [${data.track}]`)
+    try {
+      const { track } = data
+      if (data.error) Sentry.captureException(new Error(`Failed to play track ${data.track}\n${data.error}`))
+      if (!track) return
+      const guildData = await this.client.database.getGuild(data.guildId)
+      const picker = this.client.utils.localePicker
+      const { locale } = guildData
+      await this.audioUtils.sendMessage(data.guildId, picker.get(locale, 'AUDIO_TRACK_EXCEPETION', { TRACK: this.audioUtils.formatTrack(decodeTrack(track)), ERROR: data.error ? data.error : '' }), true)
+    } catch (e) {
+      Sentry.captureException(e)
+      this.client.logger.error(`${this.defaultPrefix.TrackExcepetion} Failed to handle trackExcepetion in guild ${data.guildId}\n${e.stack || e.message || e}`)
+    }
   }
 }
 module.exports = AudioPlayerEvents
