@@ -23,7 +23,7 @@ class AudioUtils {
   }
 
   formatTrack (trackInfo) {
-    return `**${Discord.Util.escapeMarkdown(trackInfo.title)} [${this.client.utils.time.toHHMMSS(trackInfo.length / 1000, trackInfo.isStream)}]**`
+    return `**${Discord.Util.escapeMarkdown(trackInfo.title)} [${this.client.utils.time.toHHMMSS(Number(trackInfo.length) / 1000, trackInfo.isStream)}]**`
   }
 
   /**
@@ -166,7 +166,7 @@ class AudioUtils {
    * @description - If previous message is deletable, delete message. then send new Text message
    * @param {String} guildID - guildId for sending message
    * @param {String} text - text content to send
-   * @param {[Boolean]} forceSend - ignore condition (guildData.audioMessage)
+   * @param {Boolean} [forceSend=true] - ignore condition (guildData.audioMessage)
    * @example - <AudioUtils>.sendMessage('672586746587774976', 'Hello World!', [false])
    */
   async sendMessage (guildID, text, forceSend = false) {
