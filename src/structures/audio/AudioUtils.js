@@ -166,8 +166,8 @@ class AudioUtils {
    * @description - If previous message is deletable, delete message. then send new Text message
    * @param {String} guildID - guildId for sending message
    * @param {String} text - text content to send
-   * @param {Boolean} [forceSend=true] - ignore condition (guildData.audioMessage)
-   * @example - <AudioUtils>.sendMessage('672586746587774976', 'Hello World!', [false])
+   * @param {Boolean} [forceSend=false] - ignore condition (guildData.audioMessage)
+   * @example - <AudioUtils>.sendMessage('672586746587774976', 'Hello World!', false) // forceSend is optinal
    */
   async sendMessage (guildID, text, forceSend = false) {
     const guildData = await this.client.database.getGuild(guildID)
