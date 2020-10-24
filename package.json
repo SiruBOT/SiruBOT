@@ -2,7 +2,7 @@
   "name": "sirubot-bot",
   "version": "3.1.51",
   "description": "Rich music bot written in node.js (hardcoded)",
-  "main": "index.js",
+  "main": "./src/index.js",
   "dependencies": {
     "@sentry/node": "^5.20.1",
     "@sirubot/yt-related-scraper": "^0.2.22",
@@ -53,7 +53,7 @@
     "discordbot",
     "discord",
     "chatbot",
-    "musicbot",
+    "musicbot"
   ],
   "author": "Sannoob#3144",
   "license": "GPL-3.0",
