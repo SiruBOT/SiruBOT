@@ -1,6 +1,6 @@
 {
   "name": "sirubot-bot",
-  "version": "3.1.51",
+  "version": "3.2.0",
   "description": "Rich music bot written in node.js (hardcoded)",
   "main": "./src/index.js",
   "dependencies": {
