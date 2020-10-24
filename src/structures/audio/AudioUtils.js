@@ -183,13 +183,13 @@ class AudioUtils {
       const lastMessage = this.client.audio.textMessages.get(guildID)
       try {
         if (!lastMessage && sendChannel) throw new Error(null)
-        if (sendChannel.lastMessageID === lastMessage.id) {
+        if (sendChannel.lastMessageID === lastMessage.id && !forceSend) {
           await lastMessage.edit(text)
         } else throw new Error(null)
       } catch {
         try {
           try {
-            if (sendChannel && lastMessage && !lastMessage.deleted) await lastMessage.delete()
+            if (sendChannel && lastMessage && !lastMessage.deleted && !forceSend) await lastMessage.delete()
           } catch {
             this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete Previous Message`)
           }
