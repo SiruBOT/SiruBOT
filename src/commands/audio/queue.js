@@ -7,7 +7,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'queue',
-      ['대기열', '큐', 'list'],
+      ['대기열', '큐', 'list', 'q'],
       ['Everyone'],
       'MUSIC_GENERAL',
       {
