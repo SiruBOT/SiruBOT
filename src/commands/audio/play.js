@@ -37,17 +37,16 @@ class Command extends BaseCommand {
         resumed = true
       }
     }
-    if (resumed && (args.length === 0 && searchStr.length === 0)) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
+
+    if (!resumed && (args.length === 0 && searchStr.length === 0)) return message.channel.send(picker.get(locale, 'GENERAL_INPUT_QUERY'))
+    if (resumed && (args.length === 0 && searchStr.length === 0)) return
 
     if (!this.client.utils.find.validURL(searchStr)) searchStr = searchPlatForm + searchStr
 
     const loadingMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_LOAD'))
-    const searchResult = await Audio.getTrack(searchStr).catch((e) => {
-      throw e
-    })
-    loadingMessage.delete()
+    const searchResult = await Audio.getTrack(searchStr)
 
-    if (this.chkSearchResult(searchResult, picker, locale, message) !== true) return
+    if (this.chkSearchResult(searchResult, picker, locale, loadingMessage) !== true) return
 
     if (searchResult.loadType === 'PLAYLIST_LOADED') {
       const playingList = searchResult.playlistInfo.selectedTrack !== -1
@@ -56,28 +55,37 @@ class Command extends BaseCommand {
         for (let i = 0; i < searchResult.playlistInfo.selectedTrack; i++) {
           searchResult.tracks.shift()
         }
-        this.addQueue(message, searchResult.tracks.shift(), picker, locale)
+        this.addQueue(message, searchResult.tracks.shift(), picker, locale, loadingMessage, true)
         if (searchResult.tracks.length === 0) return
-        const plistMessage = await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length }))
+        const plistMessage = await this.client.utils.message.safeEdit(loadingMessage, picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADD_ASK_PLAYINGLIST', { NUM: searchResult.tracks.length }))
         const emojiList = ['📥', '🚫']
         await this.client.utils.message.massReact(plistMessage, emojiList)
         const filter = (reaction, user) => emojiList.includes(reaction.emoji.name) && user.id === message.author.id
-        const confirmResult = await plistMessage.awaitReactions(filter, { time: 15000, max: 1, errors: ['time'] }).then(coll => coll.first().emoji.name === emojiList[0]).catch(() => true)
-        if (plistMessage.deletable && !plistMessage.deleted) plistMessage.delete()
-        if (!confirmResult) return
+        try {
+          const collected = await plistMessage.awaitReactions(filter, { time: 15000, max: 1, errors: ['time'] })
+          if (collected.first().emoji.name === emojiList[1]) {
+            if (plistMessage.deletable) return await plistMessage.delete()
+          } else {
+            await plistMessage.reactions.removeAll()
+          }
+        } catch (e) {
+          await plistMessage.reactions.removeAll()
+          await this.client.utils.message.safeEdit(plistMessage, picker.get(locale, 'GENERAL_TIMED_OUT'))
+          return
+        }
       }
-      this.addQueue(message, searchResult.tracks, picker, locale)
-      message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST', { NUM: searchResult.tracks.length }))
+      this.addQueue(message, searchResult.tracks, picker, locale, loadingMessage)
+      await this.client.utils.message.safeEdit(loadingMessage, picker.get(locale, 'COMMANDS_AUDIO_PLAY_PLAYLIST_ADDED_PLAYLIST', { NUM: searchResult.tracks.length }))
     }
 
     if (searchResult.loadType === 'SEARCH_RESULT' || searchResult.loadType === 'TRACK_LOADED') {
       const track = searchResult.tracks.shift()
       if (track.info.title.length === 0) track.info.title = searchStr.split('/').slice(-1).shift()
-      this.addQueue(message, track, picker, locale)
+      this.addQueue(message, track, picker, locale, loadingMessage)
     }
   }
 
-  async addQueue (message, trackInfo, picker, locale) {
+  async addQueue (message, trackInfo, picker, locale, loadingMessage, newMessage = false) {
     if (!Array.isArray(trackInfo)) {
       const { nowplaying, queue } = await this.client.database.getGuild(message.guild.id)
       let localeName
@@ -88,14 +96,15 @@ class Command extends BaseCommand {
       })
       if (nowplaying.track) localeName = 'COMMANDS_AUDIO_PLAY_ADDED_SINGLE'
       else localeName = 'COMMANDS_AUDIO_PLAY_ADDED_NOWPLAY'
-      message.channel.send(picker.get(locale, localeName, placeHolder))
+      if (newMessage) loadingMessage.channel.send(picker.get(locale, localeName, placeHolder))
+      else await this.client.utils.message.safeEdit(loadingMessage, picker.get(locale, localeName, placeHolder))
     }
     this.client.audio.queue.enQueue(message.guild.id, trackInfo, message.author.id)
   }
 
-  chkSearchResult (searchResult, picker, locale, message) {
-    if (searchResult.loadType === 'LOAD_FAILED') return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
-    if (searchResult.loadType === 'NO_MATCHES' || !searchResult.tracks || searchResult.tracks.length === 0) return message.channel.send(picker.get(locale, 'GENERAL_NO_RESULT'))
+  chkSearchResult (searchResult, picker, locale, loadingMessage) {
+    if (searchResult.loadType === 'LOAD_FAILED') return this.client.utils.message.safeEdit(loadingMessage, picker.get(locale, 'COMMANDS_AUDIO_PLAY_LOAD_FAIL', { ERROR: searchResult.exception.message }))
+    if (searchResult.loadType === 'NO_MATCHES' || !searchResult.tracks || searchResult.tracks.length === 0) return this.client.utils.message.safeEdit(loadingMessage, picker.get(locale, 'GENERAL_NO_RESULT'))
     return true
   }
 }
