@@ -1,7 +1,7 @@
 {
   "name": "sirubot-bot",
   "version": "3.1.51",
-  "description": "MusicBot With Lavalink, Moderation, some funny stuff",
+  "description": "Rich music bot written in node.js (hardcoded)",
   "main": "index.js",
   "dependencies": {
     "@sentry/node": "^5.20.1",
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cotwo0139/SiruBOT_BOT.git"
+    "url": "git+https://github.com/sannoob/Siru-stable.git"
   },
   "standard": {
     "env": "node"
@@ -54,12 +54,11 @@
     "discord",
     "chatbot",
     "musicbot",
-    "moderation"
   ],
-  "author": "Sangoon_Is_Noob#1683",
+  "author": "Sannoob#3144",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/cotwo0139/SiruBOT_BOT/issues"
+    "url": "https://github.com/sannoob/Siru-stable/issues"
   },
-  "homepage": "https://github.com/cotwo0139/SiruBOT_BOT#readme"
+  "homepage": "https://github.com/sannoob/Siru-stable#readme"
 }
