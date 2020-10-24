@@ -189,7 +189,7 @@ class AudioUtils {
       } catch {
         try {
           try {
-            if (sendChannel && !lastMessage.deleted) await lastMessage.delete()
+            if (sendChannel && lastMessage && !lastMessage.deleted) await lastMessage.delete()
           } catch {
             this.client.logger.error(`${this.defaultPrefix.sendMessage} [${guildID}] Failed Delete Previous Message`)
           }
