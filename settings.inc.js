@@ -1,3 +1,6 @@
+const { Intents } = require('discord.js')
+const IntentsInstance = new Intents(Intents.NON_PRIVILEGED)
+IntentsInstance.remove('GUILD_MEMBERS') // Privileged gateway intents
 module.exports = {
   sentry: null, // Your Sentry DSN URL
   timeZone: 'Asia/Seoul',
@@ -7,7 +10,10 @@ module.exports = {
     execArgv: [] // Args to next node excutable file (node [args] index.js)
   },
   clientOptions: { // discord.js client options
-    disableMentions: 'all'
+    ws: {
+      intents: IntentsInstance // Discord Privileged gateway intents
+    },
+    disableMentions: 'everyone'
   },
   bot: {
     token: 'SUPEEEEEEEEER SECRET Token',
