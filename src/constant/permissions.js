@@ -15,7 +15,13 @@ module.exports = [{
 },
 {
   name: 'Owner',
-  filter: (member) => member.guild.owner.id === member.id
+  filter: (member) => {
+    try {
+      return member.guild.ownerID === member.id
+    } catch {
+      return false
+    }
+  }
 },
 {
   name: 'Everyone',
