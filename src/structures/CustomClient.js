@@ -202,7 +202,7 @@ class CustomClient extends Discord.Client {
       .replace('%USERS%', await this.getvalue('users'))
       .replace('%CHANNELS%', await this.getvalue('channels'))
       .replace('%SHARDCOUNT%', await this.getvalue('shards'))
-      .replace('%SHARDID%', this.shard.ids[this.shard.ids.length - this.shard.ids.length] || 1)
+      .replace('%SHARDID%', this.shard.ids[this.shard.ids.length - this.shard.ids.length] ? this.shard.ids[this.shard.ids.length - this.shard.ids.length] + 1 : 1)
   }
 
   async getvalue (type) {
