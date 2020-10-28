@@ -185,7 +185,7 @@ class CustomClient extends Discord.Client {
       if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
       const activity = await this.getActivityMessage(this._options.bot.games[this.activityNum])
       this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${activity}`)
-      await this.user.setActivity(activity, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
+      await this.user.setActivity(activity, this._options.bot.activity)
     }
     setTimeout(() => this.setActivity(), this._options.bot.gamesInterval)
   }
