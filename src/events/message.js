@@ -27,7 +27,7 @@ class Event extends BaseEvent {
   async handleCommand (message) {
     if (message.author.bot || message.system) return
     if (message.channel.type === 'dm') return message.channel.send(`${placeHolderConstant.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${placeHolderConstant.EMOJI_NO}  You can't use commands on the DM.`)
-    if (message.guild && message.guild.ownerID !== message.author.id && !(message.member || message.guild.members.cache.get(message.author))) await message.guild.members.fetch(message.author.id)
+    if (message.guild && message.guild.ownerID !== message.author.id && !(message.member || message.guild.members.cache.get(message.author.id))) await message.guild.members.fetch(message.author.id)
     if (message.guild && message.guild.ownerID === message.author.id && !(message.member || message.guild.members.cache.get(message.guild.ownerID))) await message.guild.members.fetch(message.guild.ownerID)
     if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
     const prefix = placeHolderConstant.PREFIX
