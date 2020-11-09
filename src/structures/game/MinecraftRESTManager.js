@@ -1,4 +1,6 @@
 const RESTManager = require('./RESTManager')
+const fetch = require('node-fetch')
+const { FetchFailError } = require('../../errors/')
 const MOJANG_BASE = 'https://api.mojang.com'
 const USER_PROFILE = MOJANG_BASE + '/users/profiles/minecraft/:username'
 const USER_NAME_HISTORY = MOJANG_BASE + '/user/profiles/:uuid/names'
@@ -77,6 +79,15 @@ class MinecraftRESTManager extends RESTManager {
       full: this._replaceParam(PROFILE_FULL, options),
       skin: this._replaceParam(PROFILE_SKIN, options)
     }
+  }
+
+  static _fetch (url) {
+    return new Promise((resolve, reject) => {
+      fetch(url).then(res => {
+        if (res.status === 200) throw new FetchFailError('Unexpected server response ' + res.status)
+        resolve(res)
+      }).catch(reject)
+    })
   }
 }
 
