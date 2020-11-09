@@ -84,7 +84,7 @@ class MinecraftRESTManager extends RESTManager {
   static _fetch (url) {
     return new Promise((resolve, reject) => {
       fetch(url).then(res => {
-        if (res.status === 200) throw new FetchFailError('Unexpected server response ' + res.status)
+        if (res.status !== 200) throw new FetchFailError('Unexpected server response ' + res.status)
         resolve(res)
       }).catch(reject)
     })
