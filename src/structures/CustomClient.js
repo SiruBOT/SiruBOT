@@ -181,19 +181,13 @@ class CustomClient extends Discord.Client {
 
   async setActivity () {
     if (this.user) {
-      if (this.announceActivity) {
-        await this.user.setActivity(this.announceActivity.act || 'Errored', this.announceActivity.options || {})
-        await this.user.setStatus(this.announceActivity.status || 'online')
-        this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${this.announceActivity.act || 'Errored'}`)
-      } else {
-        this.activityNum++
-        if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
-        const activity = await this.getActivityMessage(this._options.bot.games[this.activityNum])
-        this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${activity}`)
-        await this.user.setActivity(activity, { url: 'https://www.twitch.tv/discordapp', type: 'STREAMING' })
-      }
-      setTimeout(() => this.setActivity(), this._options.bot.gamesInterval)
+      this.activityNum++
+      if (!this._options.bot.games[this.activityNum]) this.activityNum = 0
+      const activity = await this.getActivityMessage(this._options.bot.games[this.activityNum])
+      this.logger.debug(`${this.defaultPrefix.setActivity} Setting Bot's Activity to ${activity}`)
+      await this.user.setActivity(activity, this._options.bot.activity)
     }
+    setTimeout(() => this.setActivity(), this._options.bot.gamesInterval)
   }
 
   async getActivityMessage (message) {
@@ -202,6 +196,7 @@ class CustomClient extends Discord.Client {
       .replace('%USERS%', await this.getvalue('users'))
       .replace('%CHANNELS%', await this.getvalue('channels'))
       .replace('%SHARDCOUNT%', await this.getvalue('shards'))
+      .replace('%SHARDID%', this.shard ? this.shard.ids[this.shard.ids.length - this.shard.ids.length] + 1 : 1)
   }
 
   async getvalue (type) {

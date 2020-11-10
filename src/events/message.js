@@ -25,9 +25,10 @@ class Event extends BaseEvent {
   }
 
   async handleCommand (message) {
-    if (message.author.bot) return
+    if (message.author.bot || message.system) return
     if (message.channel.type === 'dm') return message.channel.send(`${placeHolderConstant.EMOJI_NO}  DM 에서는 명령어를 사용하실수 없어요..\n${placeHolderConstant.EMOJI_NO}  You can't use commands on the DM.`)
-    if (message.guild && !message.member) await message.guild.fetchMember(message.author)
+    if (message.guild && message.guild.ownerID !== message.author.id && !(message.member || message.guild.members.cache.get(message.author.id))) await message.guild.members.fetch(message.author.id)
+    if (message.guild && message.guild.ownerID === message.author.id && !(message.member || message.guild.members.cache.get(message.guild.ownerID))) await message.guild.members.fetch(message.guild.ownerID)
     if (!this.client.utils.permissionChecker.checkChannelPermission(message.guild.me, message.channel, ['SEND_MESSAGES'])) return
     const prefix = placeHolderConstant.PREFIX
     /* eslint-disable no-irregular-whitespace */
@@ -72,6 +73,12 @@ class Event extends BaseEvent {
         userPermissions
       })
       if (commandClass) {
+        if (this.client.maintain && !this.client._options.bot.owners.includes(message.author.id)) {
+          try {
+            await message.channel.send(`> ${placeHolderConstant.EMOJI_X}  봇이 현재 점검 중인 상태에요, 잠시 후에 이용해주세요!\n> ${placeHolderConstant.EMOJI_X}  Bot is under maintenance, please try again`)
+          } catch { }
+          return
+        }
         if (userData.cooldownAt && !((userData.cooldownAt.getTime() + 1500) - new Date().getTime() < 0)) return message.channel.send(picker.get(locale, 'HANDLE_COMMANDS_COOLDOWN', { TIME: ((userData.cooldownAt.getTime() + 1500) - new Date().getTime()) / 1000 }))
         await this.client.database.updateUser(message.author.id, { $set: { cooldownAt: new Date() } })
         if (this.client.shuttingDown) return message.channel.send(picker.get(locale, 'UNABLE_USE_COMMAND_SHUTDOWN'))

@@ -34,8 +34,9 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.simple(),
+    winston.format.ms(),
     winston.format.printf(info =>
-      colorize.colorize(info.level, `[${new Date().toFormat('HH24:MI:SS')}] [${info.level.toUpperCase()}] ${info.message}`)
+      colorize.colorize(info.level, `[${new Date().toFormat('HH24:MI:SS')}] [${info.ms}] [${info.level.toUpperCase()}] ${info.message}`)
     )
   ),
   transports: transports
