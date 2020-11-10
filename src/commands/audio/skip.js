@@ -34,7 +34,7 @@ class Command extends BaseCommand {
         return message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIPPED', placeHolder))
       } else {
         const toSkip = Math.round(message.member.voice.channel.members.filter(m => !m.user.bot).size / 2)
-        const skipperSize = this.client.audio.utils.addSkipper(message.guild.id, message.author.id, toSkip).length
+        const skipperSize = this.client.audio.utils.addSkipper(message.guild.id, message.author.id).length
         await message.channel.send(picker.get(locale, 'COMMANDS_SKIP_SKIP_REQUESTED', {
           TITLE: this.client.audio.utils.formatTrack(nowplaying.info),
           CURRENT: skipperSize,
