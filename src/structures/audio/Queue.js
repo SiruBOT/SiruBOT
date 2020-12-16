@@ -1,3 +1,4 @@
+const Sentry = require('@sentry/node')
 const { EventEmitter } = require('events')
 /**
  * @event startPlaying - Start Playing Track (Event)
@@ -117,10 +118,11 @@ class Queue extends EventEmitter {
       this.client.logger.debug(`${this.defaultPrefix.playRelated} Playing related video ${toPlay.info.title} (${toPlay.info.identifier}) ${new Date().getTime() - startTime}ms`)
       if (!this.audio.players.get(guildID)) return this.client.logger.debug(`${this.defaultPrefix.playRelated} Abort enQueue. Player is not exists!`)
       await this.enQueue(guildID, toPlay, this.client.user.id, true) // Related 재생할때 autoPlay 부분에서 nowplaying 을 계속 재생하는 오류 하드코딩
-    } catch {
+    } catch (e) {
       const guildData = await this.client.database.getGuild(guildID)
       await this.client.audio.utils.sendMessage(guildID, this.client.utils.localePicker.get(guildData.locale, 'AUDIO_RELATED_NOT_FOUND'), true)
       await this.audio.stop(guildID, true)
+      Sentry.captureException(e)
     }
   }
 
