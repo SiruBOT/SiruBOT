@@ -15,7 +15,13 @@ const inko = new Inko()
 class CustomClient extends Discord.Client {
   constructor (options) {
     super(options.clientOptions)
-
+    this._options = options
+    this.initialized = false
+    this.isCommandsLoaded = false
+    this.commands = new Discord.Collection()
+    this.events = new Discord.Collection()
+    this.aliases = new Discord.Collection()
+    this.categories = new Discord.Collection()
     this.classPrefix = '[Client'
     this.defaultPrefix = {
       init: `${this.classPrefix}:init]`,
@@ -24,29 +30,50 @@ class CustomClient extends Discord.Client {
       setActivity: `${this.classPrefix}:setActivity]`,
       reload: `${this.classPrefix}:reload]`
     }
+  }
 
-    this.announceActivity = null
+  async testAll () {
+    try {
+      this.logger = Logger('TESTING')
+      await this.setUpUtils()
+      this.logger.info('Testing Commands...')
+      try {
+        await this.LoadCommands(true) // Strict Load
+        this.logger.info('Commands Test Succeed')
+      } catch (e) {
+        this.logger.error(`Commands test failed\n${e.stack || e}`)
+        throw e
+      }
+      this.logger.info('Testing Events...')
+      try {
+        await this.registerEvents()
+        this.logger.info('Events Test Succeed')
+      } catch (e) {
+        this.logger.error(`Events test failed\n${e.stack || e}`)
+        throw e
+      }
+    } catch (e) {
+      process.exit(1)
+    } finally {
+      this.logger.info('All Test Succeed')
+      process.exit(0)
+    }
+  }
 
-    this._isTesting = getSettings.isTesting()
-    this._options = options
-    this.logger = new Logger(this)
-    this.database = new DataBase(this)
-
+  async setUpUtils () {
+    this.logger.info('Setup Utils..')
     this.utils = utils
     this.utils.localePicker = new LocalePicker(this)
+    this.logger.info('LocalePicker Init...')
+    try {
+      await this.utils.localePicker.init()
+      this.logger.info('LocalePicker Init Success')
+    } catch (e) {
+      this.logger.error('Failed to init LocalePicker\n' + e.stack || e)
+    }
     this.utils.permissionChecker = new PermissionChecker(this)
     this.utils.image = new Image(this.logger)
-
-    this.activityNum = 0
-    this.initialized = false
-    if (this._options.sentry) Sentry.init({ dsn: this._options.sentry })
-    this.commands_loaded = false
-    this.commands = new Discord.Collection()
-    this.events = new Discord.Collection()
-    this.aliases = new Discord.Collection()
-    this.categories = new Discord.Collection()
-
-    this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, reconnectTries: 10, noReplace: false })
+    return utils
   }
 
   async init () {
@@ -54,14 +81,34 @@ class CustomClient extends Discord.Client {
       this.logger.error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
       throw new Error(`${this.defaultPrefix.init} Bot is Already Initialized!`)
     }
-    if (!this._isTesting) { this.logger.info(`${this.defaultPrefix.init} Initializing Bot..`) }
-    await this.utils.localePicker.init()
-    this.registerEvents()
-    this.LoadCommands()
-    if (!this._isTesting) {
-      this.database.init()
-      this.login(this._options.bot.token)
+    const isTesting = getSettings.isTesting()
+    if (isTesting) return this.testAll()
+    else {
+      try {
+        await this.login(this._options.bot.token)
+        this.activityNum = 0
+        this.logger = Logger(`SHARD-${!this.shard ? 1 : this.shard.ids}`)
+        if (this._options.sentry) {
+          this.logger.debug(`Setting up sentry dsn ${this._options.sentry}`)
+          Sentry.init({ dsn: this._options.sentry })
+        }
+        await this.setUpUtils()
+        this.logger.info('Setup Database...')
+        this.database = new DataBase(this)
+        await this.database.init()
+        this.logger.info('Setup Audio...')
+        this.audio = new Audio(this, this._options.audio.nodes, { restTimeout: 10000, reconnectTries: 10, noReplace: false })
+        this.initialized = true
+        this.logger.info('Load Commands...')
+        await this.LoadCommands()
+        this.logger.info('Register Events...')
+        await this.registerEvents()
+      } catch (e) {
+        console.log('Initialization failed')
+        throw e
+      }
     }
+    return this
   }
 
   /**
@@ -103,9 +150,9 @@ class CustomClient extends Discord.Client {
    * @description - Load Commands files in commands folder
    * @returns {Collection} - Command Collection
    */
-  async LoadCommands () {
+  async LoadCommands (strict = false) {
     const CommandsFile = await this.utils.async.globAsync(path.join(process.cwd(), './src/commands/**/*.js'))
-    const reLoadOrLoad = `${this.commands_loaded ? '(re)' : ''}Load`
+    const reLoadOrLoad = `${this.isCommandsLoaded ? '(re)' : ''}Load`
     const load = `${this.defaultPrefix.LoadCommands} [${reLoadOrLoad}]`
     this.logger.info(`${load} Loading Commands (${CommandsFile.length} Files)`)
     this.logger.debug(`${load} (Commands: ${CommandsFile.join(', ')})`)
@@ -134,14 +181,15 @@ class CustomClient extends Discord.Client {
           this.commands.set(command.name, command)
         } catch (e) {
           this.logger.error(`${load} Command Load Error Ignore it... ${cmd}`)
-          this.logger.error(`${load} ${e.stack || e.message}`)
+          if (strict) throw e
+          else this.logger.error(`${load} ${e.stack || e.message}`)
         }
         delete require.cache[require.resolve(cmd)]
       } else {
         this.logger.warn(`${load} Ignore file ${cmd} (Starts !)`)
       }
     }
-    this.commands_loaded = true
+    this.isCommandsLoaded = true
     for (const item of this.commands.array().filter(el => el.hide === false)) {
       if (!this.categories.keyArray().includes(item.category)) this.categories.set(item.category, [])
       if (this.categories.keyArray().includes(item.category) && this.categories.get(item.category).includes(item.name) === false) {
@@ -151,7 +199,6 @@ class CustomClient extends Discord.Client {
       }
     }
     this.logger.info(`${this.defaultPrefix.LoadCommands} Successfully ${reLoadOrLoad}ed Commands!`)
-    if (this._isTesting) process.exit(0)
     return this.commands
   }
 
@@ -177,6 +224,7 @@ class CustomClient extends Discord.Client {
       this.logger.debug(`${this.defaultPrefix.registerEvents} Registering Event Listener ${event.name}`)
     }
     this.logger.info(`${this.defaultPrefix.registerEvents} Events Successfully Loaded!`)
+    return this.events
   }
 
   async setActivity () {

@@ -54,6 +54,7 @@ class DataBase {
   init () {
     this.connectMongo()
     this.connectMYSQL()
+    return this
   }
 
   connectMYSQL () {
@@ -332,7 +333,7 @@ class DataBase {
   _makeId (length) {
     let result = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * characters.length))
     }
     return result

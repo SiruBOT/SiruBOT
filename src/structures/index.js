@@ -10,8 +10,8 @@ module.exports = {
   Game: require('./game')
 }
 
-// // DataBase: require('./database'),
-// // Audio: require('./audio/Audio'),
-// // Logger: require('./logger'),
-// // Image: require('./image/images'),
+// DataBase: require('./database'),
+// Audio: require('./audio/Audio'),
+// Logger: require('./logger'),
+// Image: require('./image/images'),
 // ServerLogger: require('./logging')
