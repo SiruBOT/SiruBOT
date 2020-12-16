@@ -27,6 +27,7 @@
     "node-fetch": "^2.6.0",
     "node-os-utils": "^1.3.0",
     "node-uuid": "^1.4.8",
+    "npm-run-all": "^4.1.5",
     "shoukaku": "github:Deivu/Shoukaku",
     "slyrics": "^0.1.42",
     "sqlstring": "^2.3.2",
@@ -40,7 +41,13 @@
   },
   "scripts": {
     "test": "node ./src/index.js test",
-    "ci": "node ./src/index.js test"
+    "ci": "node ./src/index.js test",
+    "all:shard": "npm-run-all --parallel \"bot:shard\" \"slash-commands:run\"",
+    "all:noshard": "npm-run-all --parallel \"bot:noshard\" \"slash-commands:run\"",
+    "bot:shard": "node sharder.js",
+    "bot:noshard": "node src/index.js",
+    "slash-commands:dev": "cd ./slashCommands & nodemon .",
+    "slash-commands:run": "cd ./slashCommands & node ."
   },
   "repository": {
     "type": "git",
