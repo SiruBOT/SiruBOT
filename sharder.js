@@ -10,7 +10,7 @@ const manager = new ShardingManager('./src/index.js', {
   shardArgs: settings.shard.shardArgs,
   execArgv: settings.shard.execArgv
 })
-const logger = new Logger()
+const logger = Logger('SHARDER')
 class WebhookLogger {
   constructor (id, token) {
     this.webhookClient = new WebhookClient(id, token)
