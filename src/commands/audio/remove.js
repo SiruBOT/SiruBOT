@@ -32,8 +32,18 @@ class Command extends BaseCommand {
     if (+args[0] > guildData.queue.length) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_MORE_QUEUE', { SIZE: guildData.queue.length }))
     const index = +args[0] - 1
     if (!(userPermissions.includes('Administrator') || userPermissions.includes('DJ')) && guildData.queue[index].request !== message.author.id) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_NO_PERM'))
-    await Promise.all([this.client.database.updateGuild(message.guild.id, { $unset: { [`queue.${index}`]: index } }),
-      this.client.database.updateGuild(message.guild.id, { $pull: { queue: null } })])
+    await this.client.database.updateGuild(message.guild.id, [ // "Cheat Sheet" https://stackoverflow.com/a/62551740
+      {
+        $set: {
+          queue: {
+            $concatArrays: [
+              { $slice: ['$queue', index] },
+              { $slice: ['$queue', { $add: [1, index] }, { $size: '$queue' }] }
+            ]
+          }
+        }
+      }
+    ])
     await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_REMOVED', { POSITION: index + 1, TRACK: this.client.audio.utils.formatTrack(guildData.queue[index].info) }))
   }
 }
