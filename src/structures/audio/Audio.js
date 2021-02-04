@@ -20,7 +20,7 @@ class Audio extends Shoukaku.Shoukaku {
 
     this.utils = new AudioUtils(this.client)
 
-    this.classPrefix = '[Audio:Defalut'
+    this.classPrefix = '[Audio:Default'
     this.lavalinkPrefix = '[Audio:Lavalink]'
     this.defaultPrefix = {
       getTrack: `${this.classPrefix}:getTrack]`,
