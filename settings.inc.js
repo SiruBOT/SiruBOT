@@ -35,6 +35,7 @@ module.exports = {
   },
   audio: {
     searchResults: 10, // Max: 10, Min: 1
+    timeout: 60000,
     nodes: [
       { host: '192.168.0.11', port: 2333, auth: 'youshallnotpass', name: 'Container-1' },
       { host: '192.168.0.22', port: 2333, auth: 'youshallnotpass', name: 'Container-2' }
