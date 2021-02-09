@@ -101,7 +101,7 @@ class AudioUtils {
    * @return {Boolean} - If url is youtube url, returns true, else returns false
    */
   validateYouTubeUrl (url) {
-    const regExp = new RegExp(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/)
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\?v=)([^#&?]*).*/
     const match = url.match(regExp)
     if (match && match[2].length === 11) return true
     else return false
