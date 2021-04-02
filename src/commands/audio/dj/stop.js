@@ -4,7 +4,7 @@ class Command extends BaseCommand {
   constructor (client) {
     super(client,
       'stop',
-      ['종료', 'disconnect', 'leave'],
+      ['종료', 'disconnect', 'leave', 'dc'],
       ['DJ', 'Administrator'],
       'MUSIC_DJ',
       {
