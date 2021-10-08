@@ -1,0 +1,18 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "20:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: knex
+    versions:
+    - 0.95.0
+    - 0.95.1
+    - 0.95.2
+    - 0.95.3
+  - dependency-name: "@sentry/node"
+    versions:
+    - 6.0.2
