@@ -6,7 +6,6 @@
   "dependencies": {
     "@sentry/node": "^6.0.3",
     "@sirubot/yt-related-scraper": "^0.2.22",
-    "@thesharks/jagtag-js": "^2.0.0",
     "canvas": "^2.6.1",
     "chartjs-node-canvas": "^3.0.6",
     "date-utils": "^1.2.21",
@@ -28,7 +27,7 @@
     "node-os-utils": "^1.3.0",
     "node-uuid": "^1.4.8",
     "npm-run-all": "^4.1.5",
-    "shoukaku": "github:Deivu/Shoukaku",
+    "shoukaku": "^1.5.2",
     "slyrics": "^0.1.42",
     "sqlstring": "^2.3.2",
     "string-placeholder": "^1.0.2",
