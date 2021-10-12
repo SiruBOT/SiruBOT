@@ -54,8 +54,6 @@ class Audio extends Shoukaku.Shoukaku {
     this.audioRouter = new AudioPlayerEventRouter(this)
 
     this.client.logger.info(`${this.classPrefix}] Init Audio..`)
-    this.trackCache = new NodeCache({ stdTTL: ONE_HOUR_SEC })
-    this.relatedCache = new NodeCache({ stdTTL: HALF_HOUR_SEC })
     if (this.client._options.audio.relatedRoutePlanner.ipBlocks.length > 0) {
       const { relatedRoutePlanner } = this.client._options.audio
       this.relatedRoutePlanner = new RoutePlanner(relatedRoutePlanner.ipBlocks, relatedRoutePlanner.excludeIps, relatedRoutePlanner.retryCount)
@@ -247,18 +245,9 @@ class Audio extends Shoukaku.Shoukaku {
    * @param {String} vId - Youtube Video Id
    */
   async getRelated (vId) {
-    if (this.relatedCache.get(vId) && this.relatedCache.get(vId).length > 0) {
-      this.client.logger.debug(`${this.defaultPrefix.getRelated} Cache Hit [${vId}], returns ${this.relatedCache.get(vId).length} Items`)
-      return this.relatedCache.get(vId)
-    }
-    this.client.logger.warn(`${this.defaultPrefix.getRelated} No Cache Hits for [${vId}], Scrape related videos`)
     try {
-      let scrapeResult
-      if (this.relatedRoutePlanner) scrapeResult = await relatedScraper.get(vId, this.relatedRoutePlanner)
-      else scrapeResult = await relatedScraper.get(vId)
+      const scrapeResult = await relatedScraper.get(vId, this.relatedRoutePlanner ? this.relatedRoutePlanner : null) // Routeplanner를 사용한다면 인자값 전달, 아니라면 null 전달
       if (scrapeResult.length <= 0) throw new Error('Scrape result not found.')
-      this.relatedCache.set(vId, scrapeResult)
-      this.client.logger.debug(`${this.defaultPrefix.getRelated} Registering Cache [${vId}], ${scrapeResult.length} Items`)
       return scrapeResult
     } catch (e) {
       this.client.logger.error(`${this.defaultPrefix.getRelated} Failed to scrape youtube related video ${e.stack}`)
@@ -270,23 +259,10 @@ class Audio extends Shoukaku.Shoukaku {
    * @param {String} query - Search String ('ytsearch: asdfmovie')
    * @returns {Promise<Object>} - query Result (Promise)
    */
-  async getTrack (query, cache = true) {
+  async getTrack (query) {
     if (!query) return new Error(`${this.defaultPrefix.getTrack} Query is not provied`)
     const node = await this.getNode()
-    if (this.trackCache.get(query) && cache) {
-      this.client.logger.debug(`${this.defaultPrefix.getTrack} Query Keyword: ${query} Cache Available (${this.trackCache.get(query)}) returns Data`)
-      return this.trackCache.get(query)
-    }
     const resultFetch = await this.getFetch(node, query)
-    if (resultFetch !== null && !['LOAD_FAILED', 'NO_MATCHES'].includes(resultFetch.loadType)) {
-      this.client.logger.debug(`[AudioManager] Cache not found. registring cache... (${query})`)
-      this.trackCache.set(query, resultFetch)
-      resultFetch.tracks.map(el => {
-        if (query === el.info.identifier) return
-        this.client.logger.debug(`[AudioManager] Registring Identifier: ${el.info.identifier}`)
-        this.trackCache.set(el.info.identifier, el)
-      })
-    }
     return resultFetch
   }
 
