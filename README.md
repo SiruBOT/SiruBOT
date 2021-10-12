@@ -3,7 +3,6 @@
 > ### Support Server, Invite BOT
 >
 > [![Discord](https://discordapp.com/api/guilds/562920560955228176/embed.png?style=banner2)](https://discord.gg/invite/463PGcC)<br>
-> [![Discord Bots](https://top.gg/api/widget/426722888293548032.svg)](https://top.gg/bot/426722888293548032)
 
 ## Status
 
@@ -16,8 +15,6 @@
 > [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsannoob%2FSiru-stable.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsannoob%2FSiru-stable?ref=badge_large)
 >
 > ## Creator: Sannoob#3144
->
-> [![SannoobProfile](https://chinobot.ga/author_profile.png)](https://sannoob.cf)
 
 ## Installation
 
