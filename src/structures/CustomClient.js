@@ -87,10 +87,12 @@ class CustomClient extends Discord.Client {
       try {
         await this.login(this._options.bot.token)
         this.activityNum = 0
-        this.logger = Logger(`SHARD-${!this.shard ? 1 : this.shard.ids}`)
+        const shardId = !this.shard ? 0 : this.shard.ids
+        this.logger = Logger(`SHARD-${shardId}`)
         if (this._options.sentry) {
           this.logger.debug(`Setting up sentry dsn ${this._options.sentry}`)
           Sentry.init({ dsn: this._options.sentry })
+          Sentry.setTag("shard-id", shardId);
         }
         await this.setUpUtils()
         this.logger.info('Setup Database...')
