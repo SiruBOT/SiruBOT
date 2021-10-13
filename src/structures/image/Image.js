@@ -97,6 +97,7 @@ class ImageUtil {
    * @returns {Buffer} - Image data buffer
    */
   async getStatusImage (avatarURL, status, size = 256) {
+    if (typeof avatarURL !== 'string') new Error('avatarURL is must be string')
     if (!avatarURL || !status) return new Error('avatarURL, Status not provided')
     const avatarImage = await Canvas.loadImage(avatarURL)
     const canvas = Canvas.createCanvas(size, size)
