@@ -1,6 +1,6 @@
 {
   "name": "sirubot-bot",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "Rich music bot written in node.js & lavalink (hardcoded)",
   "main": "./src/index.js",
   "dependencies": {
