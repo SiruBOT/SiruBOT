@@ -187,7 +187,7 @@
   "COMMANDS_AUDIO_REMOVE_NAN": "> %EMOJI_NO%  지울 노래의 위치는 양의 정수만 가능해요!",
   "COMMANDS_AUDIO_REMOVE_QUEUE_LESS": "> %EMOJI_NO%  대기열에 지울 노래가 없어요!",
   "COMMANDS_AUDIO_REMOVE_REMOVED": "> %EMOJI_MUSIC%  %TRACK% (**#%POSITION%**) 을(를) 대기열에서 지웠어요.",
-  "COMMANDS_AUDIO_REMOVE_REMOVED_ALL": "> %EMOJI_MUSIC%  대기열에 있는 모든 노래 **%NUM%%**개를 지웠어요.",
+  "COMMANDS_AUDIO_REMOVE_REMOVED_ALL": "> %EMOJI_MUSIC%  대기열에 있는 모든 노래 **%NUM%**개를 지웠어요.",
   "COMMANDS_AUDIO_REMOVE_MORE_QUEUE": "> %EMOJI_NO%  지울 노래의 위치는 대기열의 개수 **%SIZE%** 개 보다 클 수 없어요!",
   "COMMANDS_AUDIO_REMOVE_NO_PERM": "> %EMOJI_NO%  이 곡은 당신이 지울수 있는 권한이 없어요!",
   "COMMANDS_AUDIO_RELATED_ON": "> %EMOJI_STAR%  추천곡 기능이 **켜짐** %EMOJI_SWITCH_ON% 으로 설정되었어요!",
