@@ -49,6 +49,22 @@ CREATE TABLE `playedTracks` (
   `playedCount` bigint(20) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `nodeInfoMetrics`
+--
+
+CREATE TABLE `nodeInfoMetrics` (
+  `id` bigint(20) NOT NULL,
+  `systemLoad` bigint(20) NOT NULL,
+  `lavalinkLoad` bigint(20) NOT NULL,
+  `players` bigint(20) NOT NULL,
+  `playingPlayers` bigint(20) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 --
 -- 덤프된 테이블의 인덱스
 --
@@ -66,6 +82,11 @@ ALTER TABLE `playedTracks`
   ADD PRIMARY KEY (`trackId`);
 
 --
+-- 테이블의 인덱스 `nodeInfoMetrics`
+--
+ALTER TABLE `nodeInfoMetrics`
+  ADD PRIMARY KEY (`id`);
+--
 -- 덤프된 테이블의 AUTO_INCREMENT
 --
 
@@ -80,6 +101,12 @@ ALTER TABLE `pingMetrics`
 --
 ALTER TABLE `playedTracks`
   MODIFY `trackId` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- 테이블의 AUTO_INCREMENT `playedTracks`
+--
+ALTER TABLE `nodeInfoMetrics`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
