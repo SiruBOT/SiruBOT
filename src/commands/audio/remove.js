@@ -27,7 +27,7 @@ class Command extends BaseCommand {
     const picker = this.client.utils.localePicker
     const { locale } = guildData
     if (args.length <= 0) throw new UsageFailedError(this.name)
-    if (allArray.includes(args[0])) all = true
+    if (allArray.includes(args[0].toLowerCase())) all = true
     if (!all) {
       if (+args[0] <= 0 || !Number.isInteger(+args[0]) || !isFinite(+args[0]) || isNaN(+args[0])) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_NAN'))
       if (guildData.queue.length <= 0) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_QUEUE_LESS'))
@@ -51,6 +51,7 @@ class Command extends BaseCommand {
       await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_REMOVED', { POSITION: index + 1, TRACK: this.client.audio.utils.formatTrack(guildData.queue[index].info) }))
     } else {
       if (!(userPermissions.includes('Administrator') || userPermissions.includes('DJ'))) return message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_NO_PERM'))
+      const queueSize = await this.client.audio.queue.get(message.guild.id)
       await this.client.database.updateGuild(message.guild.id, [ // "Cheat Sheet" https://stackoverflow.com/a/62551740
         {
           $set: {
@@ -58,7 +59,7 @@ class Command extends BaseCommand {
           }
         }
       ])
-      await message.channel.send('다 지워졌다')
+      await message.channel.send(picker.get(locale, 'COMMANDS_AUDIO_REMOVE_REMOVED_ALL', { NUM: queueSize.length }))
     }
   }
 }
