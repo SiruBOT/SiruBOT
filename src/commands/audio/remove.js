@@ -11,7 +11,7 @@ class Command extends BaseCommand {
       'MUSIC_GENERAL',
       {
         audioNodes: true,
-        playingStatus: false,
+        playingStatus: true,
         voiceStatus: {
           listenStatus: false,
           sameChannel: false,
