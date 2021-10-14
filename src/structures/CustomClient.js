@@ -87,7 +87,7 @@ class CustomClient extends Discord.Client {
       try {
         await this.login(this._options.bot.token)
         this.activityNum = 0
-        const shardId = !this.shard ? 0 : this.shard.ids
+        const shardId = !this.shard ? 0 : this.shard.ids.join('-')
         this.logger = Logger(`SHARD-${shardId}`)
         if (this._options.sentry) {
           this.logger.debug(`Setting up sentry dsn ${this._options.sentry}`)
