@@ -2518,6 +2518,11 @@ path-type@^3.0.0:
   dependencies:
     pify "^3.0.0"
 
+petitio@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/petitio/-/petitio-1.4.0.tgz#1887cba89b95de2c61ef774a2f1baf68845ba022"
+  integrity sha512-9LaVd/5BLmbNU8Q4Ax8NezihiPt2ISNqi2vKilEchSSf+YSOXxfsLUb0SUmDskm1WkBOVTsqdyuyYI0RYKqr0Q==
+
 pg-connection-string@2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.5.0.tgz#538cadd0f7e603fc09a12590f3b8a452c2c0cf34"
@@ -2841,14 +2846,14 @@ shell-quote@^1.6.1:
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
   integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==
 
-shoukaku@1.5.2:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-1.5.2.tgz#797576ebf40a4979fedf9ff2dd46e712034bde80"
-  integrity sha512-sRb6j78RHVfdy96/DdhBA1emZWdPnFH2+5JZ9t3TThjMvfiBa/AaMJMyVBpYH8svI+xOZnXEsfQyqN9BJ15oqA==
+shoukaku@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-2.1.0.tgz#57a6846b362d91200e07129cf80cb906c46ce356"
+  integrity sha512-UoNuvlljSt2HbdgF+2gD9YHfJ3h88x480+GMaVzWddzmIbdnExtqKDnHi0TSL3Rg+RIxIFdbkCpDwRnshtX2rQ==
   dependencies:
     abort-controller "^3.0.0"
-    node-fetch "^2.6.1"
-    ws "^7.3.1"
+    petitio "^1.4.0"
+    ws "^8.2.3"
 
 side-channel@^1.0.4:
   version "1.0.4"
@@ -3374,10 +3379,15 @@ wrappy@1:
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
-ws@^7.3.1, ws@^7.4.4:
+ws@^7.4.4:
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.5.tgz#8b4bc4af518cfabd0473ae4f99144287b33eb881"
   integrity sha512-BAkMFcAzl8as1G/hArkxOxq3G7pjUqQ3gzYbLL0/5zNkph70e+lCoxBGnm6AW1+/aiNeV4fnKqZ8m4GZewmH2w==
+
+ws@^8.2.3:
+  version "8.2.3"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.2.3.tgz#63a56456db1b04367d0b721a0b80cae6d8becbba"
+  integrity sha512-wBuoj1BDpC6ZQ1B7DWQBYVLphPWkm8i9Y0/3YdHjHKHiohOJ1ws+3OccDWtH+PoC9DZD5WOTrJvNbWvjS6JWaA==
 
 xdg-basedir@^4.0.0:
   version "4.0.0"
