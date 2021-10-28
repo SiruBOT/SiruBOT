@@ -57,6 +57,9 @@ settings.js
 # TypeScript v1 declaration files
 typings/
 
+# Typescript build files
+build/
+
 # TypeScript cache
 *.tsbuildinfo
 
