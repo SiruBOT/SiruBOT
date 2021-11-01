@@ -1,27 +1,25 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# Typescript 빌드를 실행합니다
 
 name: Typescript build
 
-on: [push, pull_request]
+on: [push, pull_request] # push, pull request 가 발생했을때 작동합니다.
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Ubuntu 최신버전에서 실행합니다
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [16.x, 17.x] # Node.JS 16.x 17.x 버전에서 빌드합니다
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }} b
-      uses: actions/setup-node@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1 # actions/setup-node@v1 을 사용하여 Node.JS 버전을 설정합니다
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install yarn -g
-
+        
     - name: Install dependencies
-      run: yarn install --production=false
+      run: yarn install --production=false # yarn install 명령어로 개발 환경을 설정합니다
     
     - name: Build typescript
-      run: yarn run build
+      run: yarn run build # Typescript 프로젝트를 빌드합니다
