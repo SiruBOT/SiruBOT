@@ -4,7 +4,7 @@
   "description": "Rich music bot written in node.js & lavalink (hardcoded)",
   "main": "./src/index.js",
   "dependencies": {
-    "@sentry/node": "^6.14.0",
+    "@sentry/node": "^6.14.1",
     "@sirubot/yt-related-scraper": "^0.2.22",
     "canvas": "^2.6.1",
     "chartjs-node-canvas": "^4.1.4",
