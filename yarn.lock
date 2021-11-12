@@ -2841,10 +2841,10 @@ shell-quote@^1.6.1:
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
   integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==
 
-shoukaku@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-2.1.0.tgz#57a6846b362d91200e07129cf80cb906c46ce356"
-  integrity sha512-UoNuvlljSt2HbdgF+2gD9YHfJ3h88x480+GMaVzWddzmIbdnExtqKDnHi0TSL3Rg+RIxIFdbkCpDwRnshtX2rQ==
+shoukaku@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-2.1.1.tgz#752c249261b51f9276709e814ef8d972dedfda54"
+  integrity sha512-YjCeV3xCBUtGfBWyyKwLClZiyfu3YwN+RWZEnGwYI4z4IwYAzopDWug/Ew5zATHbDcA5ov8cdAFevOjYitZpvA==
   dependencies:
     abort-controller "^3.0.0"
     petitio "^1.4.0"
