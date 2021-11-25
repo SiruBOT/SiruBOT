@@ -471,10 +471,10 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chartjs-node-canvas@^4.1.4:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/chartjs-node-canvas/-/chartjs-node-canvas-4.1.4.tgz#6266b0d6f020675479dc593b24fe236c6472f01f"
-  integrity sha512-YMR4VfClpKaiKQ3/RIwU2pxtyalGlX60xXLeyL5sOcn/otM5HuMzBhynDavpqVlLXSfr4CRx6jbmwggLoWl3LA==
+chartjs-node-canvas@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/chartjs-node-canvas/-/chartjs-node-canvas-4.1.5.tgz#04e09a96c06d294257ecfe705e28e31b84e132c4"
+  integrity sha512-cCtaXZdBXdY2WVglsQu3oX5+vTrKLZgB/3hzYuRVR9DI6mGRoVv0Q8IHHUMyZXkv9SippJAW9tP5RgIrilZ3Xw==
   dependencies:
     canvas "^2.8.0"
     tslib "^2.3.1"
