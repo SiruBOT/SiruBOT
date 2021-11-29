@@ -2841,14 +2841,14 @@ shell-quote@^1.6.1:
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
   integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==
 
-shoukaku@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-2.1.0.tgz#57a6846b362d91200e07129cf80cb906c46ce356"
-  integrity sha512-UoNuvlljSt2HbdgF+2gD9YHfJ3h88x480+GMaVzWddzmIbdnExtqKDnHi0TSL3Rg+RIxIFdbkCpDwRnshtX2rQ==
+shoukaku@2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-2.1.2.tgz#f281c7d95edaa763187232f0f775f6ef87a2418b"
+  integrity sha512-Jf/X80DH2qwOPqeKlSTrMdIGXs59WJFWRk0JpYetfYL9HYsLfm2rKvLcTmu5f42ic/7AphwuEwSxZ26aUhRFww==
   dependencies:
     abort-controller "^3.0.0"
     petitio "^1.4.0"
-    ws "^8.2.3"
+    ws "^8.3.0"
 
 side-channel@^1.0.4:
   version "1.0.4"
@@ -3379,10 +3379,10 @@ ws@^7.4.4:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.5.tgz#8b4bc4af518cfabd0473ae4f99144287b33eb881"
   integrity sha512-BAkMFcAzl8as1G/hArkxOxq3G7pjUqQ3gzYbLL0/5zNkph70e+lCoxBGnm6AW1+/aiNeV4fnKqZ8m4GZewmH2w==
 
-ws@^8.2.3:
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.2.3.tgz#63a56456db1b04367d0b721a0b80cae6d8becbba"
-  integrity sha512-wBuoj1BDpC6ZQ1B7DWQBYVLphPWkm8i9Y0/3YdHjHKHiohOJ1ws+3OccDWtH+PoC9DZD5WOTrJvNbWvjS6JWaA==
+ws@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.3.0.tgz#7185e252c8973a60d57170175ff55fdbd116070d"
+  integrity sha512-Gs5EZtpqZzLvmIM59w4igITU57lrtYVFneaa434VROv4thzJyV6UjIL3D42lslWlI+D4KzLYnxSwtfuiO79sNw==
 
 xdg-basedir@^4.0.0:
   version "4.0.0"
