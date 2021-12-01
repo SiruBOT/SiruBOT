@@ -1,5 +1,6 @@
 import { Logger } from "tslog";
 import { ArgumentParser } from "argparse";
+import type { IBootStrapperArgs } from "./types";
 
 const parser: ArgumentParser = new ArgumentParser({
   description: "SiruBOT BootStrapper CLI",
@@ -12,4 +13,8 @@ parser.add_argument("-s", "--shard", {
   default: false,
 });
 
-parser.parse_args();
+const args: IBootStrapperArgs = parser.parse_args();
+
+if (args.shard === "auto") {
+  log.info("Sharding enabled");
+}
