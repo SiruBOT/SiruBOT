@@ -9,6 +9,7 @@
     "@types/argparse": "^2.0.10",
     "argparse": "^2.0.1",
     "discord.js": "^13.2.0",
+    "shoukaku": "^2.1.0",
     "tslog": "^3.2.2"
   },
   "devDependencies": {
