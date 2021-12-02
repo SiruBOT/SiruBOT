@@ -13,8 +13,15 @@ parser.add_argument("-s", "--shard", {
   default: false,
 });
 
+parser.add_argument("-c", "--config", {
+  help: "Config file path",
+  default: false,
+  required: true,
+});
+
 const args: IBootStrapperArgs = parser.parse_args();
 
 if (args.shard === "auto") {
   log.info("Sharding enabled");
 }
+log.info(`Config file: ${args.config}`);
