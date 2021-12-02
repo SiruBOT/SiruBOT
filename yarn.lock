@@ -518,6 +518,13 @@ discord-api-types@^0.23.1:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.23.1.tgz#832d0ee2b3c8e2eae02947c1dbf38121d6d357d5"
   integrity sha512-igWmn+45mzXRWNEPU25I/pr8MwxHb767wAr51oy3VRLRcTlp5ADBbrBR0lq3SA1Rfw3MtM4TQu1xo3kxscfVdQ==
 
+discord-hybrid-sharding@^1.3.5:
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/discord-hybrid-sharding/-/discord-hybrid-sharding-1.3.5.tgz#70926526fd9d21556d504d14ae504f79b3d07410"
+  integrity sha512-tH8uu9AoTfu7AGJa9vcY7z0cxN0EoA1x8Ts5Wqz79eCZrAQFZuL8Kj0ykGkGta3u8yY/j/7ldkP8fpRLKfVlSA==
+  dependencies:
+    node-fetch "^2.6.1"
+
 discord.js@^13.2.0:
   version "13.2.0"
   resolved "https://registry.yarnpkg.com/discord.js/-/discord.js-13.2.0.tgz#db2e7f643bbc661d1c63b3ebad0ccc6572c0065b"
