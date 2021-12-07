@@ -1,4 +1,5 @@
 export interface IBootStrapperArgs {
-  shard: "auto" | "off";
+  shard: boolean;
   config: string;
+  debug: boolean;
 }
