@@ -1,0 +1,37 @@
+root:
+  sentryDsn: "URL" # Your sentry DSN URL (https://sentry.io/...)
+  bot:
+    activity:
+      # url: "URL" # If you use activity type "WATCHING" uncomment this line & set URL to your stream URL
+      type: "PLAYING" # STREAMING | LISTENING | WATCHING | PLAYING
+    token: "TOKEN" # Your bot's token
+    playing: "Hello, World!" # Your bot's playing status
+    owners: # Your bot's owners id
+      - "ID0" # Discord User ID
+  # webhook: # If you want to use webhook for sharding notification. Uncomment this line and fill your webhook's id, token
+  #   id: "Discord Webhook Id" # Your webhook id
+  #   token: "Discord Webhook Token" # Your webhook token
+  database:
+    mysql:
+      host: "localhost" # Your mysql host
+      port: 3306 # Your mysql port
+      user: "user" # Your mysql user
+      password: "password" # Your mysql password
+      database: "database" # Your mysql database
+    mongo:
+      url: "mongodb://host:port/dbname?authSource=admin" # Your mongoDB URL
+      user: "root" # Your mongoDB user
+      password: "password" # Your mongoDB password
+  audio:
+    searchResults: 5 # Number of search results to show (Max result: 10, Min result: 1)
+    timeout: 60000 # Timeout for audio search
+    nodes: # Lavalink nodes
+      - name: "My Node"
+        url: "localhost:5000"
+        auth: "youshallnotpass"
+    # relatedRoutePlanner: # Related video search route planner (Avoid 429 from youtube) If you use this uncomment this line and fill your ip range (CIDR notation)
+    #   ipBlocks:
+    #     - "ffff:ffff:ffff:ffff::/64" # Your IP block
+    #   excludeIps:
+    #     - "0.0.0.0"
+    #   retryCount: 2
