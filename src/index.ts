@@ -9,11 +9,12 @@ import { parse } from "yaml";
 import * as Cluster from "discord-hybrid-sharding";
 
 // read file when file exists & file extension == .yaml
-function readFile(path: string): string {
-  if (!existsSync(path)) throw new Error(`File ${path} does not exist`);
+async function readFile(path: string): Promise<string> {
+  const fileExists = await exists(path);
+  if (!fileExists) throw new Error(`File ${path} does not exist`);
   if (typeof path == "string" && !path.endsWith(".yaml"))
     throw new Error(`File ${path} is not a YAML file`);
-  return readFileSync(path, "utf8");
+  return readFile(path, "utf-8");
 }
 
 // Args Parser
