@@ -2,7 +2,7 @@ import { version, name } from "../package.json";
 import type { IBootStrapperArgs, ISettings } from "./types";
 
 import { ArgumentParser } from "argparse";
-import { existsSync, readFileSync } from "fs";
+import { exists, readFile } from "fs/promises";
 import { Logger } from "tslog";
 import { parse } from "yaml";
 
