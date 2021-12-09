@@ -22,4 +22,4 @@ jobs:
       run: yarn install --production=false # yarn install 명령어로 개발 환경을 설정합니다
     
     - name: Build typescript
-      run: yarn run build # Typescript 프로젝트를 빌드합니다
+      run: yarn run build --noEmit # Typescript 프로젝트를 빌드합니다
