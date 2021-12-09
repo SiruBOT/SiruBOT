@@ -2,19 +2,30 @@ import { version, name } from "../package.json";
 import type { IBootStrapperArgs, ISettings, IGatewayResponse } from "./types";
 
 import { ArgumentParser } from "argparse";
-import { existsSync, readFileSync } from "fs";
+import { stat, readFile } from "fs/promises";
 import { Logger } from "tslog";
 import { parse } from "yaml";
 import { fetch, Response } from "undici";
 
 import * as Cluster from "discord-hybrid-sharding";
 
+// fs.exists is deprecated
+async function exists(path: string): Promise<boolean> {
+  try {
+    await stat(path);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 // read file when file exists & file extension == .yaml
-function readFile(path: string): string {
-  if (!existsSync(path)) throw new Error(`File ${path} does not exist`);
+async function safeReadFile(path: string): Promise<string> {
+  const fileExists = await exists(path);
+  if (!fileExists) throw new Error(`File ${path} does not exist`);
   if (typeof path == "string" && !path.endsWith(".yaml"))
     throw new Error(`File ${path} is not a YAML file`);
-  return readFileSync(path, "utf8");
+  return readFile(path, "utf-8");
 }
 
 // Args Parser
@@ -67,15 +78,13 @@ async function boot() {
   );
   log.debug(`Loading config from ${args.config}`);
 
-  const fileContent: string = readFile(args.config);
+  const fileContent: string = await safeReadFile(args.config);
   const parsedConfig: ISettings = parse(fileContent);
-
   if (args.shard) {
     log.info("Auto sharding enabled");
     try {
       const token: string = parsedConfig.bot.token;
       log.debug("Fetching shard count to Discord.");
-      log.debug(`Using token [${token.padEnd(token.length - 5, "*")}]`);
       const gatewayFetch: Response = await fetch(
         `https://discord.com/api/gateway/bot`,
         {
