@@ -63,9 +63,13 @@ log.debug(
 );
 log.debug(`Loading config from ${args.config}`);
 
-const fileContent = readFile(args.config);
-const parsedConfig: ISettings = parse(fileContent);
-console.log(parsedConfig);
+async function printConfig() {
+  const fileContent = await readFile(args.config);
+  const parsedConfig: ISettings = parse(fileContent);
+  console.log(parsedConfig);
+}
+
+printConfig()
 
 if (args.shard) {
   log.info("Auto sharding enabled");
