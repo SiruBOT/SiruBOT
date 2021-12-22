@@ -1788,10 +1788,10 @@ keyv@^4.0.0:
   dependencies:
     json-buffer "3.0.1"
 
-knex@^0.95.13:
-  version "0.95.13"
-  resolved "https://registry.yarnpkg.com/knex/-/knex-0.95.13.tgz#b0547c91f6a02662f08c5bf9efbb12d660f392f7"
-  integrity sha512-XagG/iYA4RabYy1BmgY607Q00kBduOgb/Nej3+UDcCNdmuzDvZcfFo/726BYhfxv5amTBtGjewodZrTNbO63VA==
+knex@^0.95.15:
+  version "0.95.15"
+  resolved "https://registry.yarnpkg.com/knex/-/knex-0.95.15.tgz#39d7e7110a6e2ad7de5d673d2dea94143015e0e7"
+  integrity sha512-Loq6WgHaWlmL2bfZGWPsy4l8xw4pOE+tmLGkPG0auBppxpI0UcK+GYCycJcqz9W54f2LiGewkCVLBm3Wq4ur/w==
   dependencies:
     colorette "2.0.16"
     commander "^7.1.0"

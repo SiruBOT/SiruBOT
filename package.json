@@ -13,7 +13,7 @@
     "git-repo-info": "^2.1.1",
     "glob": "^7.1.6",
     "inko": "^1.1.1",
-    "knex": "^0.95.13",
+    "knex": "^0.95.15",
     "lavaplayer-track-info": "^2.1.0",
     "melon-chart-api": "^1.1.4",
     "minimist": "^1.2.5",
