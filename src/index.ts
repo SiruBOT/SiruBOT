@@ -81,8 +81,9 @@ async function boot() {
   const fileContent: string = await safeReadFile(args.config);
   const parsedConfig: ISettings = parse(fileContent);
   if (args.shard) {
-    log.info("Auto sharding enabled");
+    log.info("Auto sharding enabled, booting shards...");
     try {
+      const shardLogger: Logger = log.getChildLogger({ name: "Sharder" });
       const token: string = parsedConfig.bot.token;
       log.debug("Fetching shard count to Discord.");
       const gatewayFetch: Response = await fetch(
@@ -99,11 +100,32 @@ async function boot() {
             gatewayFetch.statusText
         );
       const gatewayJson = (await gatewayFetch.json()) as IGatewayResponse;
-      log.info(`Shard count: ${gatewayJson.shards}`);
-      log.debug("Gateway info", gatewayJson);
+      shardLogger.info(
+        `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`
+      );
+      const clusterManager: Cluster.Manager = new Cluster.Manager(
+        __dirname + "/bot.js",
+        {
+          totalShards: gatewayJson.shards,
+          token,
+          mode: "process",
+          shardArgs: [JSON.stringify(parsedConfig)],
+          usev13: false,
+        }
+      );
+      shardLogger.info(
+        `total Shards: ${clusterManager.totalShards}, total Clusters: ${clusterManager.totalClusters}`
+      );
+      clusterManager.on("clusterCreate", (cluster) => {
+        shardLogger.info(`Launched Cluster ${cluster.id}`);
+      });
+      clusterManager.spawn(undefined, undefined, -1);
     } catch (err) {
       log.error(err);
     }
+  } else {
+    log.info("Booting single bot mode");
+    // TODO: Implement single bot mode
   }
 }
 
