@@ -1,5 +1,6 @@
-sentryDsn: "URL" # Your sentry DSN URL (https://sentry.io/...)
+#sentryDsn: "URL" # Your sentry DSN URL (https://sentry.io/...)
 bot:
+  shardsPerClusters: 2 # Number of shards per clusters
   activity:
     # url: "URL" # If you use activity type "WATCHING" uncomment this line & set URL to your stream URL
     type: "PLAYING" # STREAMING | LISTENING | WATCHING | PLAYING

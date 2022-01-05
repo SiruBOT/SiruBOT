@@ -1,7 +1,8 @@
 import { NodeOptions } from "shoukaku/types";
 export interface ISettings {
-  sentryDsn: string | null;
+  sentryDsn?: string;
   bot: {
+    shardsPerClusters: number;
     activity: {
       url?: string;
       type: "STREAMING" | "LISTENING" | "WATCHING" | "PLAYING";
