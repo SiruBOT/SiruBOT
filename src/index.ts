@@ -1,13 +1,13 @@
+import yaml from "yaml";
+import Cluster from "discord-hybrid-sharding";
+
 import { version, name } from "../package.json";
 import type { IBootStrapperArgs, ISettings, IGatewayResponse } from "./types";
 
 import { ArgumentParser } from "argparse";
 import { stat, readFile } from "fs/promises";
 import { Logger } from "tslog";
-import { parse } from "yaml";
 import { fetch, Response } from "undici";
-
-import * as Cluster from "discord-hybrid-sharding";
 
 // fs.exists is deprecated
 async function exists(path: string): Promise<boolean> {
@@ -52,22 +52,24 @@ parser.add_argument("-c", "--config", {
   required: true,
 });
 
+// Parse Args
+const args: IBootStrapperArgs = parser.parse_args();
+// Logger setup
+const log: Logger = new Logger({
+  name: "Bootstrap",
+  minLevel: args.debug ? "debug" : "info",
+});
+
+const fatal = (err: Error): void => {
+  log.fatal(err);
+  process.exit(1);
+};
+
+process.on("uncaughtException", fatal);
+process.on("unhandledRejection", fatal);
+
+// Async function for boot
 async function boot() {
-  const args: IBootStrapperArgs = parser.parse_args();
-
-  const log: Logger = new Logger({
-    name: "Bootstrap",
-    minLevel: args.debug ? "debug" : "info",
-  });
-
-  const fatal = (err: Error): void => {
-    log.fatal(err);
-    process.exit(1);
-  };
-
-  process.on("uncaughtException", fatal);
-  process.on("unhandledRejection", fatal);
-
   log.info(`${name} version: ${version}, log level: ${log.settings.minLevel}`);
   log.debug(
     `config file: ${args.config}, shard: ${
@@ -78,14 +80,17 @@ async function boot() {
   );
   log.debug(`Loading config from ${args.config}`);
 
+  // Read config file
   const fileContent: string = await safeReadFile(args.config);
-  const parsedConfig: ISettings = parse(fileContent);
+  const parsedConfig: ISettings = yaml.parse(fileContent);
   if (args.shard) {
     log.info("Auto sharding enabled, booting shards...");
     try {
       const shardLogger: Logger = log.getChildLogger({ name: "Sharder" });
       const token: string = parsedConfig.bot.token;
       log.debug("Fetching shard count to Discord.");
+
+      // Fetch shard_count from Discord Gateway
       const gatewayFetch: Response = await fetch(
         `https://discord.com/api/gateway/bot`,
         {
@@ -99,18 +104,20 @@ async function boot() {
             " " +
             gatewayFetch.statusText
         );
+      // Cast gateway response to IGatewayResponse
       const gatewayJson = (await gatewayFetch.json()) as IGatewayResponse;
       shardLogger.info(
         `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`
       );
+      // Start sharding
       const clusterManager: Cluster.Manager = new Cluster.Manager(
         __dirname + "/bot.js",
         {
           totalShards: gatewayJson.shards,
           token,
           mode: "process",
-          shardArgs: [JSON.stringify(parsedConfig)],
-          usev13: false,
+          shardArgs: [JSON.stringify(parsedConfig), JSON.stringify(args)],
+          usev13: true,
         }
       );
       shardLogger.info(
