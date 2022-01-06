@@ -4,6 +4,7 @@
   "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
+    "@discordjs/builders": "^0.11.0",
     "@sentry/node": "^6.16.1",
     "@sentry/tracing": "^6.16.1",
     "@sirubot/yt-related-scraper": "^0.2.22",
