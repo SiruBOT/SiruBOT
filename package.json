@@ -1,6 +1,6 @@
 {
   "name": "sirubot",
-  "version": "4.0.0",
+  "version": "4.0.0-alpha.1",
   "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
