@@ -6,6 +6,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.11.0",
     "@discordjs/rest": "^0.2.0-canary.0",
+    "@sentry/integrations": "^6.16.1",
     "@sentry/node": "^6.16.1",
     "@sentry/tracing": "^6.16.1",
     "@sirubot/yt-related-scraper": "^0.2.22",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@types/argparse": "^2.0.10",
+    "@types/node-fetch": "^2.5.12",
     "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
