@@ -16,7 +16,7 @@ export class BaseCommand {
     slashCommand: SlashCommandBuilder,
     category: CommandCategories,
     permissions: CommandPermissions[],
-    requirements: ICommandRequirements,
+    requirements: ICommandRequirements
   ) {
     this.slashCommand = slashCommand;
     this.category = category;
