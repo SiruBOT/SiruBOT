@@ -137,13 +137,10 @@ async function boot() {
         __dirname + "/bot.js",
         {
           totalShards: gatewayJson.shards,
-          totalClusters: Math.ceil(
-            gatewayJson.shards / parsedConfig.bot.shardsPerClusters
-          ),
+          shardsPerClusters: parsedConfig.bot.shardsPerClusters,
           token,
           mode: "process",
           shardArgs: [JSON.stringify(parsedConfig), JSON.stringify(args)],
-          usev13: true,
         }
       );
       log.info(
@@ -159,7 +156,7 @@ async function boot() {
           })`
         );
       });
-      clusterManager.spawn(undefined, undefined, -1);
+      clusterManager.spawn({ timeout: -1 });
     } catch (err) {
       log.error(err);
     }

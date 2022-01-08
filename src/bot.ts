@@ -22,7 +22,6 @@ try {
 
 // Setup logger
 const log: Logger = new Logger({
-  // @ts-expect-error Cluster.data.CLUSTER is set after the cluster is spawned
   name: bootStrapperArgs.shard ? `Cluster ${Cluster.data.CLUSTER}` : "Client",
   minLevel: bootStrapperArgs.debug ? "debug" : "info",
 });
@@ -42,12 +41,9 @@ if (bootStrapperArgs.shard) {
   log.debug(
     "Sharding enabled. setup clientOptions.shards, clientOptions.shardCount"
   );
-  // @ts-expect-error Cluster.data.SHARD_LIST is set after the cluster is spawned
   clientOptions.shards = Cluster.data.SHARD_LIST;
-  // @ts-expect-error Cluster.data.TOTAL_SHARDS is set after the cluster is spawned
   clientOptions.shardCount = Cluster.data.TOTAL_SHARDS;
   log.info(
-    // @ts-expect-error clientOptions.shards is set after cluster is spawned
     `Sharding info shards: [ ${clientOptions.shards.join(
       ", "
     )} ], shardCount: ${clientOptions.shardCount}`
@@ -59,7 +55,7 @@ const client = new Client(clientOptions, log, argvSettings, bootStrapperArgs);
 
 if (bootStrapperArgs.shard) {
   log.debug("Sharding enabled. Set Client.cluster to Cluster.Client");
-  client.cluster = new Cluster.Client(client, true);
+  client.cluster = new Cluster.Client(client);
 }
 
 if (
