@@ -1,9 +1,9 @@
-import * as Discord from "discord.js";
+import type { Client } from ".";
 export class BaseEvent {
-  client: Discord.Client;
+  client: Client;
   name: string;
 
-  constructor(client: Discord.Client, name: string) {
+  constructor(client: Client, name: string) {
     this.client = client;
     this.name = name;
   }
