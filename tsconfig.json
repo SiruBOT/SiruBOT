@@ -8,13 +8,13 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "outDir": "./build"
+        "outDir": "./build",
     },
     "include": [
-        "src/**/*.ts"
+        "src/**/*.ts",
     ],
     "exclude": [
         "node_modules",
-        "./build"
+        "./build",
     ],
 }

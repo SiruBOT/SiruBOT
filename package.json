@@ -13,7 +13,7 @@
     "argparse": "^2.0.1",
     "discord-api-types": "^0.26.1",
     "discord-hybrid-sharding": "^1.4.3",
-    "discord.js": "^13.5.1",
+    "discord.js": "^13.6.0",
     "fast-glob": "^3.2.8",
     "shoukaku": "^2.1.0",
     "tslog": "^3.3.1",
@@ -26,16 +26,19 @@
     "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
+    "del": "^6.0.0",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "fancy-log": "^2.0.0",
+    "gulp": "^4.0.2",
     "prettier": "^2.4.1",
     "typescript": "^4.4.4"
   },
   "scripts": {
     "lint": "eslint --ext .ts ./src",
-    "build": "tsc",
-    "build:start": "tsc && node ./build"
+    "build": "gulp clean && tsc",
+    "build:start": "gulp clean && tsc && node ./build"
   },
   "repository": {
     "type": "git",
