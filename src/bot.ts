@@ -78,7 +78,7 @@ if (
     Sentry.setTag("clusterId", client.cluster.id);
   }
 } else {
-  log.warn(`Sentry DSN is not a valid URL: ${argvSettings.sentryDsn}`);
+  log.warn(`Sentry disabled. Sentry URL: ${argvSettings.sentryDsn}`);
 }
 
 // ignore uncaughtException, unhandledRejection
