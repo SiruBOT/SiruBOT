@@ -1,17 +1,16 @@
+import { type ClientEvents } from "discord.js";
 import type { Client } from ".";
-export class BaseEvent {
-  client: Client;
-  name: string;
+export abstract class BaseEvent {
+  public client: Client;
+  public name: keyof ClientEvents;
 
-  constructor(client: Client, name: string) {
+  constructor(client: Client, name: keyof ClientEvents) {
     this.client = client;
     this.name = name;
   }
 
-  /**
-   * @description - Function on this event emitted
-   * @returns {Promise<*>} - Returns Any Values (includes void)
-   */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async run(): Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async run(...args: ClientEvents[keyof ClientEvents]): Promise<void> {
+    throw new Error("Method not implemented. BaseEvent#run");
+  }
 }
