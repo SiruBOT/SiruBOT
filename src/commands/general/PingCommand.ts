@@ -17,7 +17,7 @@ export default class PingCommand extends BaseCommand {
       {
         audioNode: false,
         trackPlaying: false,
-        guildPermission: "SEND_MESSAGES",
+        guildPermissions: ["SEND_MESSAGES"],
         voiceStatus: {
           listenStatus: false,
           sameChannel: false,
