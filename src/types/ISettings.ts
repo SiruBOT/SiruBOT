@@ -34,10 +34,15 @@ export interface ISettings {
       password: string;
       database: string;
     };
-    mongo: {
+    mongodb: {
       url: string;
       user: string;
       pass: string;
+    };
+    redis: {
+      host: string;
+      port: number;
+      password: string;
     };
   };
 }
