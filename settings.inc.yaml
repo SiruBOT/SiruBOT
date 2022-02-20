@@ -15,12 +15,12 @@ database:
   mysql:
     host: "localhost" # Your mysql host
     port: 3306 # Your mysql port
-    user: "user" # Your mysql user
+    username: "user" # Your mysql user
     password: "password" # Your mysql password
     database: "database" # Your mysql database
   mongodb:
     url: "mongodb://host:port/dbname?authSource=admin" # Your mongoDB URL
-    user: "root" # Your mongoDB user
+    username: "root" # Your mongoDB username
     password: "password" # Your mongoDB password
   redis:
     host: "localhost" # Your redis host

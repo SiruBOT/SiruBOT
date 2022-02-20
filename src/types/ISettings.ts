@@ -1,4 +1,4 @@
-import { NodeOptions } from "shoukaku/types";
+import { type NodeOptions } from "shoukaku/types";
 export interface ISettings {
   sentryDsn?: string;
   bot: {
@@ -30,13 +30,13 @@ export interface ISettings {
     mysql: {
       host: string;
       port: number;
-      user: string;
+      username: string;
       password: string;
       database: string;
     };
     mongodb: {
       url: string;
-      user: string;
+      username: string;
       pass: string;
     };
     redis: {
