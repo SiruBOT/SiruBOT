@@ -1,0 +1,5 @@
+{
+  "COMMAND_MISSING_PERMISSIONS": "> ❎  이 명령어를 실행하기 위한 봇의 권한이 부족해요!\n> 🏁  필요한 권한: {0}",
+  "UNKNOWN_COMMAND": "> ❌  알 수 없는 명령어에요.",
+  "COMMAND_HANDLE_ERROR": "> ❌  명령어를 실행하는 도중 오류가 발생하였어요. ``{0}``"
+}
