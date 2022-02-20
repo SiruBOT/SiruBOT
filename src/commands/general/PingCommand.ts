@@ -30,7 +30,7 @@ export default class PingCommand extends BaseCommand {
   public async runCommand(
     interaction: Discord.CommandInteraction<Discord.CacheType>
   ): Promise<void> {
-    const calculatedPing = interaction.createdTimestamp - new Date().getTime();
+    const calculatedPing = new Date().getTime() - interaction.createdTimestamp;
     await interaction.reply({
       content: `Pong! interaction handle ping: ${calculatedPing}ms\nWebsocket ping: ${interaction.client.ws.ping}ms`,
     });
