@@ -11,6 +11,7 @@
         "outDir": "./build",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "strictPropertyInitialization": false
     },
     "include": [
         "src/**/*.ts",
