@@ -15,17 +15,22 @@ import type Cluster from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
 import type { IBootStrapperArgs, ISettings } from "../types";
 import type { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseEvent } from "./BaseEvent";
+import { Audio } from "./audio/Audio";
+import { BaseEvent, DatabaseHelper } from "./";
 
 class Client extends Discord.Client {
-  public cluster?: Cluster.Client;
   public settings: ISettings;
   public bootStrapperArgs: IBootStrapperArgs;
+
+  public cluster?: Cluster.Client;
   public log: Logger;
-  private restClient: DiscordREST;
 
   public commands: Discord.Collection<string, BaseCommand>;
   public events: Discord.Collection<string, BaseEvent>;
+  public databaseHelper: DatabaseHelper;
+  public audio: Audio;
+
+  private restClient: DiscordREST;
   // eventFunctions: Discord.Collection<
   //   string,
   //   (...args: Discord.ClientEvents[keyof Discord.ClientEvents]) => Promise<void>
@@ -45,15 +50,18 @@ class Client extends Discord.Client {
 
     this.commands = new Discord.Collection<string, BaseCommand>();
     this.events = new Discord.Collection<string, BaseEvent>();
+    this.databaseHelper = new DatabaseHelper(this);
 
     this.restClient = new DiscordREST({ version: "9" });
   }
 
   // Setup bot database, load commands, connect lavalink nodes.. setup audio..p
   public async start(): Promise<void> {
-    this.once("ready", this.setupClient); // Login -> Ready -> setupClient -> loadCommands -> ...
-    this.log.info("Logging into discord...");
     try {
+      this.log.debug("Setup audio before client logging in...");
+      this.audio = new Audio(this);
+      this.once("ready", this.setupClient); // Login -> Ready -> setupClient -> loadCommands -> ...
+      this.log.debug("Logging into discord...");
       await this.login(this.settings.bot.token);
       this.restClient.setToken(this.settings.bot.token);
     } catch (err) {
@@ -65,13 +73,24 @@ class Client extends Discord.Client {
 
   private async setupClient() {
     this.log.debug("Login successful. Setup client...");
-    Sentry.captureException(new Error("Discord client ready"));
+    // Boot Status
+    this.user?.setStatus("dnd");
+    this.user?.setActivity({ type: "PLAYING", name: "Booting..." });
     try {
-      await this.loadCommands(); // TODO: 전부 핸들하고 하나라도 오류나면 process.exit(1)
+      await this.databaseHelper.setup();
+      await this.loadCommands();
       await this.loadEvents();
+      this.user?.setStatus("online");
+      this.user?.setActivity({
+        type: this.settings.bot.activity.type ?? "PLAYING",
+        url: this.settings.bot.activity.url,
+        name: this.settings.bot.playing,
+      });
+      this.log.info("Client setup complete.");
     } catch (err) {
-      Sentry.captureException(err);
       this.log.error(err);
+      Sentry.captureException(err);
+      this.destroy();
       throw new Error("Failed to setup client.");
     }
   }
@@ -94,6 +113,7 @@ class Client extends Discord.Client {
     ) => {
       try {
         await eventInstance.run(...args);
+        // :thinking:
       } catch (err) {
         this.log.error("Unhandled event error from " + eventInstance.name);
         this.log.error(err);
@@ -234,7 +254,9 @@ class Client extends Discord.Client {
     }
     // toPost
     if (toPost.length > 0) {
-      this.log.debug(`Post ${toPost.length} commands not in local commands`);
+      this.log.debug(
+        `Post ${toPost.length} commands not in applicationCommands endpoint`
+      );
       for (const command of toPost) {
         this.log.debug(`Posting command ${command.name}`);
         await this.restClient.post(
