@@ -30,6 +30,7 @@ const log: Logger = new Logger({
 const intents: Discord.Intents = new Discord.Intents([
   "GUILD_MEMBERS",
   "GUILDS",
+  "GUILD_VOICE_STATES",
 ]);
 log.debug(`Client intents: ${intents.toArray().join(", ")}`);
 
