@@ -100,7 +100,8 @@ export default class DebugEvent extends BaseEvent {
             content: locale.format(
               interaction.locale,
               "COMMAND_HANDLE_ERROR",
-              exceptionId
+              exceptionId,
+              error as string
             ),
           });
           transaction?.setHttpStatus(500);

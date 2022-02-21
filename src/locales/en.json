@@ -1,5 +1,5 @@
 {
   "COMMAND_MISSING_PERMISSIONS": "> ❎  Missing permissions.\n> Required permission(s): ${0}",
   "UNKNOWN_COMMAND": "> ❌  Unknown command.",
-  "COMMAND_HANDLE_ERROR": "> ❌  An error occurred while running the command.. ``{0}``"
+  "COMMAND_HANDLE_ERROR": "> ❌  An error occurred while running the command.. ``{0}``\n```js\n{1}\n```"
 }
