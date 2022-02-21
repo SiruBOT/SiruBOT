@@ -3,20 +3,14 @@
 // nowplaying: { type: Object, default: { track: null } },
 
 // nowplayingPosition: { type: Number, default: 0 }, Redis
-import { type ShoukakuTrack } from "shoukaku";
 import { Schema, model } from "mongoose";
+import { IGuildAudioData } from "../../../types/";
 
-interface AudioTrack {
-  requesterUserId: string;
-  shoukakuTrack: ShoukakuTrack;
-}
-
-interface GuildAudioData {
-  nowPlaying: AudioTrack | null;
-  queue: AudioTrack[];
-}
-
-const GuildAudioDataSchema: Schema = new Schema<GuildAudioData>({
+const GuildAudioDataSchema: Schema = new Schema<IGuildAudioData>({
+  _id: Schema.Types.ObjectId,
+  discordGuildId: {
+    type: String,
+  },
   nowPlaying: {
     type: Object,
     default: null,
@@ -27,7 +21,7 @@ const GuildAudioDataSchema: Schema = new Schema<GuildAudioData>({
   },
 });
 
-const GuildAudioDataModel = model<GuildAudioData>(
+const GuildAudioDataModel = model<IGuildAudioData>(
   "GuildAudioData",
   GuildAudioDataSchema
 );

@@ -6,3 +6,6 @@ export { IGatewayResponse } from "./IGatewayResponse";
 export { ICommandRequirements } from "./ICommandRequirements";
 export { CommandCategories } from "./CommandCategories";
 export { CommandPermissions } from "./CommandPermissions";
+
+export { IGuildAudioData } from "./IGuildAudioData";
+export { IAudioTrack } from "./IAudioTrack";
