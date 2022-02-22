@@ -22,7 +22,7 @@ try {
 
 // Setup logger
 const log: Logger = new Logger({
-  name: bootStrapperArgs.shard ? `Cluster ${Cluster.data.CLUSTER}` : "Client",
+  name: bootStrapperArgs.shard ? `Cluster#${Cluster.data.CLUSTER}` : "Client",
   minLevel: bootStrapperArgs.debug ? "debug" : "info",
 });
 
