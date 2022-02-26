@@ -1,2 +1,2 @@
-export { UnitsConverter } from "./UnitsConverter";
+export { Formatter } from "./Formatter";
 export { isURL } from "./URLUtils";

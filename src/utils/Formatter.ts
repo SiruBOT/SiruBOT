@@ -1,6 +1,6 @@
 import { ShoukakuTrack } from "shoukaku";
 
-export class UnitsConverter {
+export class Formatter {
   public static humanizeSeconds(sec: number): string {
     const hours = Math.floor(sec / 3600);
     const minutes = Math.floor(sec / 60) % 60;
