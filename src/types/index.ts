@@ -1,11 +1,25 @@
+// Bootstrapper
 export { ISettings } from "./ISettings";
 export { IBootStrapperArgs } from "./IBootStrapperArgs";
 export { IGatewayResponse } from "./IGatewayResponse";
 
-// BaseCommand
-export { ICommandRequirements } from "./ICommandRequirements";
-export { CommandCategories } from "./CommandCategories";
-export { CommandPermissions } from "./CommandPermissions";
+// Command
+export { ICommandRequirements } from "./CommandTypes/ICommandRequirements";
+export { CommandCategories } from "./CommandTypes/CommandCategories";
+export { CommandPermissions } from "./CommandTypes/CommandPermissions";
 
-export { IGuildAudioData } from "./IGuildAudioData";
-export { IAudioTrack } from "./IAudioTrack";
+// Handler
+export { HandledCommandInteraction } from "./InteractionHandlerTypes/HandledCommandInteraction";
+export {
+  VoiceConnectedGuildMember,
+  VoiceConnectedGuildMemberVoiceState,
+} from "./InteractionHandlerTypes/VoiceConnectedGuildMember";
+
+// Audio
+export { IGuildAudioData } from "./audio/IGuildAudioData";
+export { IAudioTrack } from "./audio/IAudioTrack";
+export { IAudioPlaylist } from "./audio/IAudioPlaylist";
+
+// Audio Enums
+export { RepeatMode } from "./audio/RepeatMode";
+export { ShoukakuTrackListType } from "./audio/ShoukakuTrackListType";

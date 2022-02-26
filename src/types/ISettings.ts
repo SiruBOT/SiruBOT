@@ -37,7 +37,7 @@ export interface ISettings {
     mongodb: {
       url: string;
       username: string;
-      pass: string;
+      password: string;
     };
     redis: {
       host: string;
