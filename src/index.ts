@@ -4,11 +4,16 @@ import Cluster from "discord-hybrid-sharding";
 import { version, name } from "../package.json";
 import type { IBootStrapperArgs, ISettings, IGatewayResponse } from "./types";
 
+import { Routes, APIApplication } from "discord-api-types/v9";
+import { REST as DiscordREST } from "@discordjs/rest";
+
 import { ArgumentParser } from "argparse";
 import { stat, readFile } from "fs/promises";
 import { Logger } from "tslog";
 import { fetch, Response } from "undici";
-import { WebhookNotifier } from "./structures";
+import { BaseCommand, Client, WebhookNotifier } from "./structures";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import FastGlob from "fast-glob";
 
 // fs.exists is deprecated
 async function exists(path: string): Promise<boolean> {
@@ -33,6 +38,12 @@ async function safeReadFile(path: string): Promise<string> {
 const parser: ArgumentParser = new ArgumentParser({
   description: "SiruBOT Boot CLI",
   add_help: true,
+});
+
+parser.add_argument("-r", "--register", {
+  help: "Update slash commands",
+  default: false,
+  action: "store_true",
 });
 
 parser.add_argument("-s", "--shard", {
@@ -62,13 +73,7 @@ const log: Logger = new Logger({
   minLevel: args.debug ? "debug" : "info",
 });
 
-const fatal = (err: Error): void => {
-  log.fatal(err);
-  process.exit(1);
-};
-
-process.on("uncaughtException", fatal);
-process.on("unhandledRejection", fatal);
+boot();
 
 // Async function for boot
 async function boot() {
@@ -97,14 +102,102 @@ async function boot() {
       parsedConfig.webhook.token,
       log
     );
+    await webhookNotifier.safeSendEmbed(
+      webhookNotifier.infoEmbed().setDescription("Webhook Notifier Enabled")
+    );
   }
 
+  const fatal = (err: Error): void => {
+    log.fatal(err);
+    if (webhookNotifier) {
+      webhookNotifier
+        ?.safeSendEmbed(
+          webhookNotifier
+            .buildEmbed()
+            .setColor("RED")
+            .setDescription("FATAL Error: " + err.stack?.slice(0, 1000))
+        )
+        .finally(() => {
+          process.exit(2);
+        });
+    } else {
+      process.exit(2);
+    }
+  };
+
+  process.on("uncaughtException", fatal);
+  process.on("unhandledRejection", fatal);
+
+  if (args.register) {
+    await updateSlashCommands();
+  }
   if (args.shard) {
     // Autosharding async function
-    autoSharding();
+    await autoSharding();
   } else {
     log.info("Booting single bot mode");
     // TODO: Implement single bot mode
+  }
+
+  async function updateSlashCommands() {
+    const restClient = new DiscordREST({ version: "9" });
+    restClient.setToken(parsedConfig.bot.token);
+    log.info("Update slash commands...");
+    log.debug("Fetch global commands info from applicationCommands endpoint..");
+    // Get applicationCommands from discord api (Old thing)
+    const applicationInfo: APIApplication = (await restClient.get(
+      Routes.oauth2CurrentApplication()
+    )) as APIApplication;
+    if (!applicationInfo) throw new Error("ApplicationInfo not found");
+
+    const commandFiles: string[] = await FastGlob(
+      Client.generateGlobPattern("commands")
+    );
+    const slashCommands: Omit<
+      SlashCommandBuilder,
+      "addSubcommand" | "addSubcommandGroup"
+    >[] = [];
+    log.info(`Found ${commandFiles.length} commands`);
+
+    // Register commands to slashCommands array
+    for (const commandPath of commandFiles) {
+      log.debug(`Process command ${commandPath}`);
+      const CommandClass = await import(commandPath);
+      // Command file validation
+      if (!CommandClass.default)
+        throw new Error(
+          "Command file is missing default export\n" + commandPath
+        );
+      const commandInstance: BaseCommand = new CommandClass.default();
+      if (!(commandInstance instanceof BaseCommand))
+        throw new Error(
+          "Command file is not extends BaseCommand\n" + commandPath
+        );
+      slashCommands.push(commandInstance.slashCommand);
+    }
+
+    await restClient.put(
+      process.env.DEVGUILD
+        ? Routes.applicationGuildCommands(
+            applicationInfo.id,
+            process.env.DEVGUILD
+          )
+        : Routes.applicationCommands(applicationInfo.id),
+      {
+        body: slashCommands,
+      }
+    );
+    const logStr = `${
+      slashCommands.length
+    } Commands successfully published on ${
+      process.env.DEVGUILD
+        ? "applicationGuildCommands (/) at " + process.env.DEVGUILD
+        : "applicationCommands (/)"
+    }`;
+    log.info(logStr);
+    webhookNotifier?.safeSendEmbed(
+      webhookNotifier.infoEmbed().setDescription(logStr)
+    );
   }
 
   async function autoSharding() {
@@ -162,5 +255,3 @@ async function boot() {
     }
   } // AutoSharding
 }
-
-boot();
