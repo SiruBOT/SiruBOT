@@ -1,6 +1,7 @@
 import Discord from "discord.js";
 import type { Cluster } from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
+import { EmbedFactory } from "../utils";
 export class WebhookNotifier extends Discord.WebhookClient {
   name: string;
   log: Logger;
@@ -16,7 +17,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
   }
 
   buildEmbed(): Discord.MessageEmbed {
-    const embed: Discord.MessageEmbed = new Discord.MessageEmbed();
+    const embed: Discord.MessageEmbed = EmbedFactory.createEmbed();
     embed.setTitle(this.name);
     embed.setTimestamp(new Date());
     return embed;
