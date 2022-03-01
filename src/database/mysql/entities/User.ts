@@ -5,17 +5,19 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  Unique,
 } from "typeorm";
 
 @Entity()
+@Unique(["discordUserId"])
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn() // Internal id
-  id: number;
+  @PrimaryGeneratedColumn("uuid") // Internal id
+  uuid: string;
 
-  @Column() // Discord User ID
+  @Column({ name: "discord_user_id" }) // Discord User ID
   discordUserId: string;
 
-  @Column({ default: false }) // Is the user agreed to the terms of service?
+  @Column({ name: "eula_agreed", default: false }) // Is the user agreed to the terms of service?
   eulaAgreed: boolean;
 
   @Column("simple-array") // Array of IDs of playlists the user has
@@ -24,9 +26,9 @@ export class User extends BaseEntity {
   @Column("simple-array") // Array of ID of playlists the user liked
   likedPlaylists: number[];
 
-  @CreateDateColumn() // Created at
+  @CreateDateColumn({ name: "created_at" }) // Created at
   createdAt: Date;
 
-  @UpdateDateColumn() // Updated at
+  @UpdateDateColumn({ name: "updated_at" }) // Updated at
   updatedAt: Date;
 }
