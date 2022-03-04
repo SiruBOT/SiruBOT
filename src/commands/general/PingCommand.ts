@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
-
 import { BaseCommand, Client } from "../../structures";
 import { CommandCategories, CommandPermissions } from "../../types";
+import { EmbedFactory } from "../../utils";
 
 export default class PingCommand extends BaseCommand {
   constructor(client: Client) {
@@ -28,11 +28,15 @@ export default class PingCommand extends BaseCommand {
   }
 
   public async runCommand(
-    interaction: Discord.CommandInteraction<Discord.CacheType>
+    interaction: Discord.CommandInteraction
   ): Promise<void> {
-    const calculatedPing = new Date().getTime() - interaction.createdTimestamp;
-    await interaction.reply({
-      content: `Pong! interaction handle ping: ${calculatedPing}ms\nWebsocket ping: ${interaction.client.ws.ping}ms`,
-    });
+    const pingEmbed: Discord.MessageEmbed = EmbedFactory.createEmbed();
+    await interaction.deferReply();
+    pingEmbed.setDescription(
+      `Discord -> BOT -> Discord | ${
+        new Date().getTime() - interaction.createdTimestamp
+      }ms\nDiscord <-> BOT | ${this.client.ws.ping}ms`
+    );
+    await interaction.editReply({ embeds: [pingEmbed] });
   }
 }
