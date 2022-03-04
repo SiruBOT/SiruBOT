@@ -7,6 +7,8 @@ export interface LocalePickerOption {
   locales: { [key: string]: Locale };
 }
 
+export type ReusableFormatFunction = (key: string, ...args: string[]) => string;
+
 export class LocalePicker {
   public option: LocalePickerOption;
   constructor(option: LocalePickerOption) {
@@ -30,5 +32,11 @@ export class LocalePicker {
 
   addLocale(localeName: string, localeData: Locale): void {
     this.option.locales[localeName] = localeData;
+  }
+
+  getReusableFormatFunction(localeName: string): ReusableFormatFunction {
+    return (key: string, ...args: string[]): string => {
+      return this.format(localeName, key, ...args);
+    };
   }
 }
