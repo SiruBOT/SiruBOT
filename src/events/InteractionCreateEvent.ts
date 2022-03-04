@@ -3,8 +3,15 @@ import * as Sentry from "@sentry/node";
 import type { Transaction } from "@sentry/types";
 import { type BaseCommand, BaseEvent, type Client } from "../structures";
 import locale from "../locales";
+import { Constants, ShoukakuSocket } from "shoukaku";
+import { ICommandRequirements } from "../types";
+import { Guild } from "../database/mysql/entities";
+import { PlayerDispatcher } from "../structures/audio/PlayerDispatcher";
 
-export default class DebugEvent extends BaseEvent {
+const SYSTEM_MESSAGE_EPHEMERAL = false;
+const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
+
+export default class InteractionCreateEvent extends BaseEvent {
   constructor(client: Client) {
     super(client, "interactionCreate");
   }
@@ -16,6 +23,9 @@ export default class DebugEvent extends BaseEvent {
     });
     transaction.setData("interactionType", interaction.type);
     transaction.setData("interactionLocale", interaction.locale);
+    this.client.log.debug(
+      `Interaction received. ${interaction.id}/${interaction.type}`
+    );
     await this.routeInteraciton(interaction, transaction);
   }
 
@@ -48,35 +58,140 @@ export default class DebugEvent extends BaseEvent {
         content: locale.format(interaction.locale, "UNKNOWN_COMMAND"),
       });
     } else {
-      // Start of inGuild
+      // -------- Handle guild command interaction --------
       if (interaction.inGuild()) {
-        transaction?.setData("issuedWhere", "inGuild");
-        // Handle guild permissions
+        // If guild is not cached. fetch guild
+        if (!interaction.inCachedGuild()) {
+          this.client.log.debug(
+            `Guild ${interaction.guildId} not cached. fetch Guild..`
+          );
+          await this.client.guilds.fetch(interaction.guildId);
+          transaction?.setData("isCached", "notCachedGuild");
+        } else {
+          transaction?.setData("isCached", "inCachedGuild");
+        }
+        // eslint-disable-next-line prettier/prettier
+        const { requirements }: { requirements: ICommandRequirements } = command;
+        // -------- Handle guild permissions --------
         const missingPermissions: Discord.PermissionString[] = [];
-        for (const guildPermission of command.requirements.guildPermissions) {
+        for (const guildPermission of requirements.guildPermissions) {
           if (!interaction.guild?.me?.permissions.has(guildPermission)) {
             missingPermissions.push(guildPermission);
           }
         }
         if (missingPermissions.length > 0) {
+          const permissionString: string = missingPermissions
+            .map((p) => {
+              return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); // ADMINISTRATOR -> Administrator
+            })
+            .map((p) => `\`\`${p}\`\``)
+            .join(", ");
+          this.client.log.warn(
+            `Missing permissions @ ${command.slashCommand.name} (${permissionString})`
+          );
           await interaction.reply({
-            ephemeral: true,
-            // eslint-disable-next-line prettier/prettier
+            ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
             content: locale.format(
               interaction.locale,
               "COMMAND_MISSING_PERMISSIONS",
-              missingPermissions
-                .map((p) => {
-                  return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); // ADMINISTRATOR -> Administrator
-                })
-                .map((p) => `\`\`${p}\`\``)
-                .join(", ")
+              permissionString
             ), // end of format
           });
+          transaction?.setData("missingPermissions", permissionString);
           transaction?.setHttpStatus(401);
           transaction?.finish();
           return;
         }
+
+        // -------- Handle audioNodes  --------
+        if (requirements.audioNode) {
+          const connectedNodes: ShoukakuSocket[] = [
+            ...this.client.audio.nodes.values(),
+          ].filter((e: ShoukakuSocket) => {
+            return e.state == Constants.state.CONNECTED;
+          });
+          if (connectedNodes.length === 0) {
+            await interaction.reply({
+              ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+              content: locale.format(interaction.locale, "NO_NODES_AVAILABLE"),
+            });
+            transaction?.setData("endReason", "NoNodesAvailable");
+            transaction?.setHttpStatus(500);
+            transaction?.finish();
+            return;
+          }
+        }
+
+        // -------- Handle trackPlaying --------
+        if (requirements.trackPlaying) {
+          const dispatcher: PlayerDispatcher | undefined =
+            this.client.audio.dispatchers.get(interaction.guildId);
+          if (!dispatcher) {
+            await interaction.reply({
+              ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+              content: locale.format(
+                interaction.locale,
+                "AVALIABLE_ONLY_PLAYING"
+              ),
+            });
+            transaction?.setData("endReason", "TrackNotPlaying");
+            transaction?.setHttpStatus(500);
+            transaction?.finish();
+            return;
+          }
+        }
+
+        // -------- Handle user voiceStatus --------
+        if (requirements.voiceStatus) {
+          const member: Discord.GuildMember | undefined =
+            await interaction.guild?.members.fetch(interaction.user.id);
+          if (!member)
+            throw new Error(
+              "Fetch member. but member not found. " + interaction.user.id
+            );
+          if (
+            requirements.voiceStatus.voiceConnected &&
+            !member.voice.channelId
+          ) {
+            await interaction.reply({
+              ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+              content: locale.format(interaction.locale, "JOIN_VOICE_FIRST"),
+            });
+            transaction?.setData("endReason", "JoinFirst");
+            transaction?.setHttpStatus(500);
+            transaction?.finish();
+            return;
+          }
+          if (requirements.voiceStatus.listenStatus && member.voice.selfDeaf) {
+            await interaction.reply({
+              ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+              content: locale.format(interaction.locale, "LISTEN_FIRST"),
+            });
+            transaction?.setData("endReason", "ListenFirst");
+            transaction?.setHttpStatus(500);
+            transaction?.finish();
+            return;
+          }
+          // If default voice channel sets. skip it!
+          // const guildConfig: Guild =
+          //   await this.client.databaseHelper.upsertAndFindGuild(
+          //     interaction.guildId
+          //   );
+          //TODO: implement samechannel
+
+          // if (
+          //   requirements.voiceStatus.sameChannel && // SameChannel = true
+          //   guildConfig.voiceChannelId
+          //   !(await interaction.guild?.channels.fetch(
+          //     guildConfig.voiceChannelId
+          //   )) &&
+          //   interaction.guild?.me && // If guild.me (client) exists
+          //   interaction.guild?.me?.voice.channelId && // and me (client) is joined a channel
+          //   member.voice.channelId !== interaction.guild?.me?.voice.channelId // and not same channel
+          // ) {
+          // }
+        }
+
         // Execute Command
         try {
           await command.runCommand(interaction);
@@ -85,25 +200,37 @@ export default class DebugEvent extends BaseEvent {
               interaction
             )})`
           );
+          transaction?.setData("endReason", "ok");
           transaction?.setHttpStatus(200);
           transaction?.finish();
         } catch (error) {
           this.client.log.error(
             `Command failed to execute (${this.generateCommandInfoString(
               interaction
-            )})`
+            )})`,
+            error
           );
-          this.client.log.error(error);
           const exceptionId: string = Sentry.captureException(error);
-          interaction.reply({
-            ephemeral: true,
+          const payload: Discord.InteractionReplyOptions = {
+            ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
             content: locale.format(
               interaction.locale,
               "COMMAND_HANDLE_ERROR",
               exceptionId,
               error as string
             ),
-          });
+          };
+          try {
+            await interaction.reply(payload);
+          } catch (error) {
+            await interaction.channel?.send(payload);
+          } finally {
+            this.client.log.warn(
+              `Failed to reply error message ${exceptionId} ${error}`
+            );
+          }
+          transaction?.setData("endReason", "error");
+          transaction?.setData("errorId", exceptionId);
           transaction?.setHttpStatus(500);
           transaction?.finish();
         }
