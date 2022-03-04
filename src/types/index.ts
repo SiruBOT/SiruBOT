@@ -22,4 +22,6 @@ export { IAudioPlaylist } from "./audio/IAudioPlaylist";
 
 // Audio Enums
 export { RepeatMode } from "./audio/RepeatMode";
+export { RepeatModeString } from "./audio/RepeatMode";
 export { ShoukakuTrackListType } from "./audio/ShoukakuTrackListType";
+export { IJoinOptions } from "./audio/IJoinOptions";
