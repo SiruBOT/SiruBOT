@@ -40,35 +40,14 @@ class Client extends Discord.Client {
 
   // Setup bot database, load commands, connect lavalink nodes.. setup audio..p
   public async start(): Promise<void> {
+    this.log.debug("Setup client audio, commands & events, database...");
     try {
-      this.log.debug("Setup audio before client logging in...");
       this.audio = new AudioHandler(this);
-      this.once("ready", this.setupClient); // Login -> Ready -> setupClient -> loadCommands -> ...
-      this.log.debug("Logging into discord...");
-      await this.login(this.settings.bot.token);
-    } catch (err) {
-      Sentry.captureException(err);
-      this.log.error(err);
-      throw new Error("Failed to login to Discord.");
-    }
-  }
-
-  private async setupClient() {
-    this.log.debug("Login successful. Setup client...");
-    // Boot Status
-    this.user?.setStatus("dnd");
-    this.user?.setActivity({ type: "PLAYING", name: "Booting..." });
-    try {
-      await this.databaseHelper.setup();
       await this.loadCommands();
       await this.loadEvents();
-      this.user?.setStatus("online");
-      this.user?.setActivity({
-        type: this.settings.bot.activity.type ?? "PLAYING",
-        url: this.settings.bot.activity.url,
-        name: this.settings.bot.playing,
-      });
-      this.log.info("Client setup complete.");
+      await this.databaseHelper.setup();
+      this.log.info("Client setup complete, logging in...");
+      await this.login(this.settings.bot.token);
     } catch (err) {
       this.log.error(err);
       Sentry.captureException(err);
