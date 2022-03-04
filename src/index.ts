@@ -102,9 +102,6 @@ async function boot() {
       parsedConfig.webhook.token,
       log
     );
-    await webhookNotifier.safeSendEmbed(
-      webhookNotifier.infoEmbed().setDescription("Webhook Notifier Enabled")
-    );
   }
 
   const fatal = (err: Error): void => {
@@ -187,16 +184,16 @@ async function boot() {
         body: slashCommands,
       }
     );
-    const logStr = `${
-      slashCommands.length
-    } Commands successfully published on ${
-      process.env.DEVGUILD
-        ? "applicationGuildCommands (/) at " + process.env.DEVGUILD
-        : "applicationCommands (/)"
-    }`;
+    const publishAt: string = process.env.DEVGUILD
+      ? "applicationGuildCommands (/) at " + process.env.DEVGUILD
+      : "applicationCommands (/)";
+    const logStr = `${slashCommands.length} Commands successfully published on ${publishAt}`;
     log.info(logStr);
     webhookNotifier?.safeSendEmbed(
-      webhookNotifier.infoEmbed().setDescription(logStr)
+      webhookNotifier
+        .infoEmbed()
+        .setTitle(`🗒️  ${slashCommands.length} Commands published`)
+        .setDescription(logStr)
     );
   }
 
@@ -241,7 +238,15 @@ async function boot() {
       );
       clusterManager.on("clusterCreate", (cluster: Cluster.Cluster) => {
         cluster.on("spawn", () => {
+          log.info(
+            `Cluster spawned (${cluster.id + 1}/${
+              cluster.manager.totalClusters
+            })`
+          );
           webhookNotifier?.clusterSpawned(cluster);
+        });
+        cluster.on("ready", () => {
+          log.info(`Cluster #${cluster.id} ready`);
         });
         log.info(
           `Launched Cluster ${cluster.id} (${cluster.id + 1} of ${
