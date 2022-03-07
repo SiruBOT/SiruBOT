@@ -1,16 +1,21 @@
 import * as Sentry from "@sentry/node";
-import { Shoukaku, Libraries, ShoukakuSocket, JoinOptions } from "shoukaku";
+import { Shoukaku, Libraries, ShoukakuSocket } from "shoukaku";
 import { Logger } from "tslog";
+import { IJoinOptions } from "../../types/audio/IJoinOptions";
 import { Client } from "../Client";
 import { PlayerDispatcher } from "./PlayerDispatcher";
 import { PlayerDispatcherFactory } from "./PlayerDispatcherFactory";
+
 export class AudioHandler extends Shoukaku {
   public client: Client;
   private log: Logger;
   private playerDispatcherFactory: PlayerDispatcherFactory;
   public dispatchers: Map<string, PlayerDispatcher>;
   constructor(client: Client) {
-    super(new Libraries.DiscordJS(client), client.settings.audio.nodes, {});
+    super(new Libraries.DiscordJS(client), client.settings.audio.nodes, {
+      resumable: true,
+      resumableTimeout: 60,
+    });
     this.client = client;
     this.log = this.client.log.getChildLogger({
       name: this.client.log.settings.name,
@@ -43,42 +48,48 @@ export class AudioHandler extends Shoukaku {
     this.on("debug", (name, reason) =>
       this.log.debug(`Lavalink Node: ${name}`, reason || "No reason")
     );
+    this.on("playerUpdate", (player) => {
+      this.log.debug(
+        `Lavalink player update @ ${player.connection.node.name}.${player.connection.guildId}`
+      );
+    });
   }
 
-  async joinChannel(
-    joinOptions: JoinOptions,
-    localeString: string
-  ): Promise<PlayerDispatcher> {
+  async joinChannel(joinOptions: IJoinOptions): Promise<PlayerDispatcher> {
     const idealNode: ShoukakuSocket = this.getNode();
     const shoukakuPlayer = await idealNode.joinChannel(joinOptions);
     const dispatcher =
       await this.playerDispatcherFactory.createPlayerDispatcher(
         shoukakuPlayer,
-        localeString
+        joinOptions.textChannelId
       );
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
+    await dispatcher.playOrResumeOrNothing();
     return dispatcher;
+  }
+
+  addPlayerDispatcher(
+    guildId: string,
+    dispatcher: PlayerDispatcher
+  ): PlayerDispatcher {
+    if (this.dispatchers.get(guildId)) {
+      Sentry.captureMessage(
+        "PlayerDispatcher is already exists in AudioHandler"
+      );
+      this.log.warn("PlayerDispatcher is already exists in AudioHandler");
+    }
+    this.dispatchers.set(guildId, dispatcher);
+    return dispatcher;
+  }
+
+  deletePlayerDispatcher(guildId: string): string {
+    if (!this.dispatchers.get(guildId))
+      throw new Error(`PlayerDispatcher ${guildId} is not exists.`);
+    this.dispatchers.delete(guildId);
+    return guildId;
   }
 
   getLogger(): Logger {
     return this.log;
   }
-
-  addPlayerDispatcher(guildId: string, dispatcher: PlayerDispatcher) {
-    if (this.dispatchers.get(guildId)) {
-      Sentry.captureMessage(
-        "AudioHandler is already exists in PlayerDispatcher."
-      );
-      this.log.warn("AudioHandler is already exists in PlayerDispatcher.");
-    }
-    return this.dispatchers.set(guildId, dispatcher);
-  }
 }
-
-// export interface JoinOptions {
-//   guildId: Snowflake;
-//   shardId: number;
-//   channelId: Snowflake;
-//   mute?: boolean;
-//   deaf?: boolean;
-// }
