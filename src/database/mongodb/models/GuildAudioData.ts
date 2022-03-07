@@ -3,27 +3,36 @@
 // nowplaying: { type: Object, default: { track: null } },
 
 // nowplayingPosition: { type: Number, default: 0 }, Redis
-import { Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 import { IGuildAudioData } from "../../../types/";
 
-const GuildAudioDataSchema: Schema = new Schema<IGuildAudioData>({
-  _id: Schema.Types.ObjectId,
-  discordGuildId: {
-    type: String,
-  },
-  nowPlaying: {
-    type: Object,
-    default: null,
-  },
-  queue: {
-    type: [], // WTF
-    default: [],
-  },
-});
+export interface GuildAudioDataDocument extends IGuildAudioData, Document {}
 
-const GuildAudioDataModel = model<IGuildAudioData>(
-  "GuildAudioData",
-  GuildAudioDataSchema
-);
+const GuildAudioDataSchema: Schema<GuildAudioDataDocument> =
+  new Schema<GuildAudioDataDocument>(
+    {
+      discordGuildId: {
+        required: true,
+        type: String,
+      },
+      nowPlaying: {
+        type: Object,
+        default: null,
+      },
+      position: {
+        type: Number,
+        default: 0,
+      },
+      positionUpdatedAt: {
+        type: Date,
+        default: new Date(0),
+      },
+      queue: {
+        type: [],
+        default: [],
+      },
+    },
+    { timestamps: true }
+  );
 
-export default GuildAudioDataModel;
+export default model<IGuildAudioData>("GuildAudioData", GuildAudioDataSchema);
