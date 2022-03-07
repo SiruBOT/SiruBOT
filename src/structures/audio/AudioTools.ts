@@ -1,5 +1,6 @@
 import { MessageEmbed, User } from "discord.js";
 import { ShoukakuTrack } from "shoukaku";
+import { IAudioTrack } from "../../types";
 export class AudioTools {
   static getNowPlayingEmbed(
     track: ShoukakuTrack,
@@ -10,5 +11,19 @@ export class AudioTools {
       .setColor("#FFBADA")
       .setDescription(track.info.title || "Title not found.");
     return embed;
+  }
+
+  static getAudioTrack(
+    shoukakuTrack: ShoukakuTrack,
+    requesterUserId: string,
+    relatedTrack = false,
+    repeated = false
+  ): IAudioTrack {
+    return {
+      shoukakuTrack,
+      relatedTrack,
+      repeated,
+      requesterUserId,
+    };
   }
 }
