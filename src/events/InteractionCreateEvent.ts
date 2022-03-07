@@ -5,7 +5,7 @@ import { type BaseCommand, BaseEvent, type Client } from "../structures";
 import locale from "../locales";
 import { Constants, ShoukakuSocket } from "shoukaku";
 import { ICommandRequirements } from "../types";
-import { Guild } from "../database/mysql/entities";
+// import { Guild } from "../database/mysql/entities";
 import { PlayerDispatcher } from "../structures/audio/PlayerDispatcher";
 
 const SYSTEM_MESSAGE_EPHEMERAL = false;
@@ -60,13 +60,29 @@ export default class InteractionCreateEvent extends BaseEvent {
     } else {
       // -------- Handle guild command interaction --------
       if (interaction.inGuild()) {
+        transaction?.setData("guildId", interaction.guildId);
         // If guild is not cached. fetch guild
         if (!interaction.inCachedGuild()) {
           this.client.log.debug(
             `Guild ${interaction.guildId} not cached. fetch Guild..`
           );
-          await this.client.guilds.fetch(interaction.guildId);
           transaction?.setData("isCached", "notCachedGuild");
+          try {
+            await this.client.guilds.fetch(interaction.guildId);
+          } catch (error) {
+            const exceptionId: string = Sentry.captureException(error);
+            await interaction.reply({
+              content: locale.format(
+                interaction.locale,
+                "GUILD_CACHE_FAILED",
+                exceptionId,
+                error as string
+              ),
+            });
+            transaction?.setData("error", "Guild_Cache_Failed");
+            transaction?.finish();
+            return;
+          }
         } else {
           transaction?.setData("isCached", "inCachedGuild");
         }
