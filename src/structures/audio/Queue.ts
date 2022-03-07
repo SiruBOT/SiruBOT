@@ -38,7 +38,7 @@ export class Queue {
   }
 
   async pushTracks(tracks: IAudioTrack[]): Promise<number> {
-    this.log.debug(`Push ${tracks} tracks to ${this.guildId}`);
+    this.log.debug(`Push ${tracks.length} tracks to ${this.guildId}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: tracks } },
     });
@@ -50,7 +50,7 @@ export class Queue {
       `Push track ${track.shoukakuTrack.info.identifier} with position 0`
     );
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
-      $push: { queue: { each: [track], $position: 0 } },
+      $push: { queue: { $each: [track], $position: 0 } },
     });
     return track;
   }
@@ -102,6 +102,7 @@ export class Queue {
     return await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $set: {
         position: position,
+        positionUpdatedAt: new Date(),
       },
     });
   }
