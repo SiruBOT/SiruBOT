@@ -127,6 +127,7 @@ async function boot() {
 
   if (args.register) {
     await updateSlashCommands();
+    return;
   }
   if (args.shard) {
     // Autosharding async function
