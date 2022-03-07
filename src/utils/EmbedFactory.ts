@@ -1,14 +1,16 @@
 import { Client, MessageEmbed, User } from "discord.js";
+import { ShoukakuTrack } from "shoukaku";
 import { Formatter } from ".";
 import { version } from "../../package.json";
 import { BOT_NAME, DEFAULT_COLOR } from "../constant/Constants";
 import { ReusableFormatFunction } from "../locales/LocalePicker";
 import { IAudioTrack } from "../types";
+import { ExtendedEmbed } from "./ExtendedEmbed";
 
 //
 export class EmbedFactory {
-  static createEmbed(): MessageEmbed {
-    return new MessageEmbed()
+  static createEmbed(): ExtendedEmbed {
+    return new ExtendedEmbed()
       .setFooter({ text: EmbedFactory.footerString })
       .setColor(DEFAULT_COLOR);
   }
@@ -21,8 +23,8 @@ export class EmbedFactory {
     client: Client,
     format: ReusableFormatFunction,
     track: IAudioTrack
-  ): Promise<MessageEmbed> {
-    const embed: MessageEmbed = EmbedFactory.createEmbed();
+  ): Promise<ExtendedEmbed> {
+    const embed: ExtendedEmbed = EmbedFactory.createEmbed();
     if (!track.relatedTrack) {
       const userInfo: User | undefined =
         client.users.cache.get(track.requesterUserId) ??
@@ -44,19 +46,14 @@ export class EmbedFactory {
         ),
       });
     }
-    embed.setDescription(
-      `[${Formatter.formatTrack(track.shoukakuTrack, format("LIVESTREAM"))}](${
-        track.shoukakuTrack.info.uri
-      })`
-    );
-    if (
-      track.shoukakuTrack.info.sourceName === "youtube" &&
-      track.shoukakuTrack.info.identifier
-    ) {
-      embed.setThumbnail(
-        `https://img.youtube.com/vi/${track.shoukakuTrack.info.identifier}/maxresdefault.jpg`
-      );
-    }
+    embed
+      .setDescription(
+        `[${Formatter.formatTrack(
+          track.shoukakuTrack,
+          format("LIVESTREAM")
+        )}](${track.shoukakuTrack.info.uri})`
+      )
+      .setTrackThumbnail(track.shoukakuTrack.info);
     return embed;
   }
 }
