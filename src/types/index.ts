@@ -19,6 +19,7 @@ export {
 export { IGuildAudioData } from "./audio/IGuildAudioData";
 export { IAudioTrack } from "./audio/IAudioTrack";
 export { IAudioPlaylist } from "./audio/IAudioPlaylist";
+export { ShoukakuTrackInfo } from "./audio/ShoukakuTrackInfo";
 
 // Audio Enums
 export { RepeatMode } from "./audio/RepeatMode";
