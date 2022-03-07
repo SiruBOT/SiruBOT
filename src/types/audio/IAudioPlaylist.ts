@@ -6,5 +6,6 @@ export interface IAudioPlaylist {
   playlistAuthorId: string;
   likes: number;
   playlistId: string;
-  createdAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
