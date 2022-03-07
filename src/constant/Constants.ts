@@ -7,3 +7,6 @@ export const EMOJI_REPEAT: { [index: string]: string } = {
   ALL: "🔂",
   SINGLE: "🔁",
 };
+export const EMOJI_PLAYLIST = "🗃️";
+export const EMOJI_X = "❌";
+export const EMOJI_INBOX_TRAY = "📥";
