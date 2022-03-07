@@ -25,7 +25,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
     return embed;
   }
 
-  clusterSpawned(cluster: Cluster): Promise<void> {
+  clusterSpawned(cluster: Cluster): void {
     const embed: Discord.MessageEmbed = this.infoEmbed();
     embed.setTitle(
       `💡  Cluster spawned (${cluster.id + 1}/${cluster.manager.totalClusters})`
