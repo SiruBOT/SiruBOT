@@ -1,5 +1,4 @@
 import { CommandInteraction, type GuildMember } from "discord.js";
-import type { ICommandRequirements } from "..";
 import { VoiceConnectedGuildMember } from "./VoiceConnectedGuildMember";
 
 type VoiceConnectedType = "voiceConnected";
