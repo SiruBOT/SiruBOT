@@ -15,12 +15,8 @@ import {
 import locale from "../../locales";
 import { isURL, Formatter, EmbedFactory } from "../../utils";
 import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
-import { AudioUtils } from "../../structures/audio/AudioUtils";
-import {
-  EMOJI_INBOX_TRAY,
-  EMOJI_PLAYLIST,
-  EMOJI_X,
-} from "../../constant/Constants";
+import { AudioTools } from "../../structures/audio/AudioTools";
+import { EMOJI_INBOX_TRAY, EMOJI_X } from "../../constant/Constants";
 
 export default class PlayCommand extends BaseCommand {
   constructor(client: Client) {
@@ -132,7 +128,7 @@ export default class PlayCommand extends BaseCommand {
           });
           await dispatcher.addTracks(
             searchResult.tracks.map((e: ShoukakuTrack) =>
-              AudioUtils.getAudioTrack(e, interaction.user.id)
+              AudioTools.getAudioTrack(e, interaction.user.id)
             )
           );
         } else {
@@ -183,7 +179,7 @@ export default class PlayCommand extends BaseCommand {
           });
           // Add track (not playlist)
           await dispatcher.addTrack(
-            AudioUtils.getAudioTrack(track, interaction.user.id)
+            AudioTools.getAudioTrack(track, interaction.user.id)
           );
           // Check interaction does not have channel
           if (!interaction.channel)
@@ -221,7 +217,7 @@ export default class PlayCommand extends BaseCommand {
               });
               await dispatcher.addTracks(
                 slicedPlaylist.map((e: ShoukakuTrack) =>
-                  AudioUtils.getAudioTrack(e, interaction.user.id)
+                  AudioTools.getAudioTrack(e, interaction.user.id)
                 )
               );
             } else {
