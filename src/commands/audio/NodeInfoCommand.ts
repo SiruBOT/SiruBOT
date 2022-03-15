@@ -34,7 +34,7 @@ export default class NodeInfoCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
+      CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       {
         audioNode: false,
@@ -74,17 +74,21 @@ export default class NodeInfoCommand extends BaseCommand {
       nodeInfoEmbed.addField(
         `**${node.name}**`,
         `State: **${STATE_STRING[node.state]}**\n` +
-          `Uptime: **${Formatter.humanizeSeconds(
-            node.stats.uptime / 1000
-          )}**\n` +
-          `Cores: **${cores}**\n` +
-          `Lavalink Load: **${this.formatLoad(lavalinkLoad)}%**\n` +
-          `System Load: **${this.formatLoad(systemLoad)}%**\n` +
-          `Used Memory: **${niceBytes(node.stats.memory.used)}**\n` +
-          `Free Memory: **${niceBytes(node.stats.memory.free)}**\n` +
-          `Frames Sent: **${node.stats.frameStats.sent}**\n` +
-          `Frames Nulled: **${node.stats.frameStats.nulled}**\n` +
-          `Frames Deficit: **${node.stats.frameStats.deficit}**\n`
+          (node.state === Constants.state.CONNECTED)
+          ? `Players: **${node.stats.players}**\n` +
+              `Playing Players: **${node.stats.playingPlayers}**\n` +
+              `Uptime: **${Formatter.humanizeSeconds(
+                node.stats.uptime / 1000
+              )}**\n` +
+              `Cores: **${cores}**\n` +
+              `Lavalink Load: **${this.formatLoad(lavalinkLoad)}%**\n` +
+              `System Load: **${this.formatLoad(systemLoad)}%**\n` +
+              `Used Memory: **${niceBytes(node.stats.memory.used)}**\n` +
+              `Free Memory: **${niceBytes(node.stats.memory.free)}**\n` +
+              `Frames Sent: **${node.stats.frameStats.sent}**\n` +
+              `Frames Nulled: **${node.stats.frameStats.nulled}**\n` +
+              `Frames Deficit: **${node.stats.frameStats.deficit}**\n`
+          : ""
       );
     }
     interaction.reply({ embeds: [nodeInfoEmbed] });
