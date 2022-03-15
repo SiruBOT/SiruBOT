@@ -19,8 +19,7 @@ export interface ISettings {
     searchResults: number;
     timeout: number;
     nodes: NodeOptions[];
-    relatedRoutePlanner: {
-      enabled: boolean;
+    relatedRoutePlanner?: {
       ipBlocks: string[];
       excludeIps: string[];
       retryCount: number;
