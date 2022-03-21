@@ -10,3 +10,7 @@ export const EMOJI_REPEAT: { [index: string]: string } = {
 export const EMOJI_PLAYLIST = "🗃️";
 export const EMOJI_X = "❌";
 export const EMOJI_INBOX_TRAY = "📥";
+export const AUTOCOMPLETE_MAX_RESULT = 10;
+export const EMOJI_VOLUME_SMALL = "🔉";
+export const EMOJI_VOLUME_LOUD = "🔊";
+export const EMOJI_VOLUME_MUTE = "🔇";
