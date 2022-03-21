@@ -10,7 +10,7 @@ export class PlayerDispatcherFactory {
   private log: Logger;
   constructor(audio: AudioHandler) {
     this.audio = audio;
-    this.log = this.audio.getLogger();
+    this.log = this.audio.getLoggerInstance();
   }
 
   async createPlayerDispatcher(
@@ -25,7 +25,6 @@ export class PlayerDispatcherFactory {
       textChannelId
     );
     playerDispatcher.registerPlayerEvent();
-    // Check resume
     this.log.debug(
       `PlayerDispatcher successfully created @ ${player.connection.guildId}/${player.connection.channelId}`
     );
