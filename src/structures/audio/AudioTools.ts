@@ -2,7 +2,7 @@ import { MessageEmbed, User } from "discord.js";
 import { ShoukakuTrack } from "shoukaku";
 import { IAudioTrack } from "../../types";
 export class AudioTools {
-  static getNowPlayingEmbed(
+  public static getNowPlayingEmbed(
     track: ShoukakuTrack,
     requestUser: User
   ): MessageEmbed {
@@ -13,7 +13,7 @@ export class AudioTools {
     return embed;
   }
 
-  static getAudioTrack(
+  public static getAudioTrack(
     shoukakuTrack: ShoukakuTrack,
     requesterUserId: string,
     relatedTrack = false,
