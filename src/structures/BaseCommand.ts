@@ -15,6 +15,7 @@ export abstract class BaseCommand {
   public category: CommandCategories;
   public permissions: CommandPermissions[];
   public requirements: ICommandRequirements;
+  public botPermissions: Discord.PermissionString[];
   protected client: Client;
 
   public constructor(
@@ -25,12 +26,14 @@ export abstract class BaseCommand {
     client: Client,
     category: CommandCategories,
     permissions: CommandPermissions[],
-    requirements: ICommandRequirements
+    requirements: ICommandRequirements,
+    botPermissions: Discord.PermissionString[]
   ) {
     this.slashCommand = slashCommand;
     this.client = client;
     this.category = category;
     this.permissions = permissions;
+    this.botPermissions = botPermissions;
     this.requirements = requirements;
   }
 
