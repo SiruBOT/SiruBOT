@@ -49,10 +49,8 @@ class Client extends Discord.Client {
       this.log.info("Client setup complete, logging in...");
       await this.login(this.settings.bot.token);
     } catch (err) {
-      this.log.error(err);
       Sentry.captureException(err);
-      this.destroy();
-      throw new Error("Failed to setup client.");
+      throw err;
     }
   }
 
