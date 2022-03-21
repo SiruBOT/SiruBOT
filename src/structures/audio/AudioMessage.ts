@@ -28,7 +28,7 @@ export class AudioMessage {
     });
   }
 
-  async format(key: string, ...args: string[]): Promise<string> {
+  public async format(key: string, ...args: string[]): Promise<string> {
     this.log.debug(`Format key ${key} with guild config ${this.guildId}`);
     const guildConfig: Guild = await this.databaseHelper.upsertAndFindGuild(
       this.guildId
@@ -36,7 +36,7 @@ export class AudioMessage {
     return locale.format(guildConfig.guildLocale, key, ...args);
   }
 
-  async getReusableFormatFunction(): Promise<ReusableFormatFunction> {
+  public async getReusableFormatFunction(): Promise<ReusableFormatFunction> {
     this.log.debug(
       `Get reusable format function (for reduce db query) ${this.guildId}`
     );
@@ -46,7 +46,7 @@ export class AudioMessage {
     return locale.getReusableFormatFunction(guildConfig.guildLocale);
   }
 
-  async sendMessage(
+  public async sendMessage(
     options: string | MessagePayload | MessageOptions
   ): Promise<void> {
     const channel: AnyChannel | null = await this.client.channels.fetch(
