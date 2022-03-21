@@ -28,18 +28,18 @@ export default class RepeatCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
+      CommandCategories.MUSIC,
       [CommandPermissions.DJ],
       {
         audioNode: false,
         trackPlaying: false,
-        guildPermissions: ["SEND_MESSAGES"],
         voiceStatus: {
           listenStatus: false,
           sameChannel: false,
           voiceConnected: false,
         },
-      }
+      },
+      ["SEND_MESSAGES"]
     );
   }
 

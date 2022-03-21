@@ -16,18 +16,18 @@ export default class StopCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
-      [CommandPermissions.EVERYONE],
+      CommandCategories.MUSIC,
+      [CommandPermissions.DJ],
       {
         audioNode: true,
         trackPlaying: true,
-        guildPermissions: ["SEND_MESSAGES"],
         voiceStatus: {
           listenStatus: false,
           sameChannel: false,
           voiceConnected: false,
         },
-      }
+      },
+      ["SEND_MESSAGES"]
     );
   }
 

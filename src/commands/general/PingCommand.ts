@@ -17,13 +17,13 @@ export default class PingCommand extends BaseCommand {
       {
         audioNode: false,
         trackPlaying: false,
-        guildPermissions: ["SEND_MESSAGES"],
         voiceStatus: {
           listenStatus: false,
           sameChannel: false,
           voiceConnected: false,
         },
-      }
+      },
+      ["SEND_MESSAGES"]
     );
   }
 
