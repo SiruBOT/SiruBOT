@@ -16,7 +16,12 @@ import locale from "../../locales";
 import { isURL, Formatter, EmbedFactory } from "../../utils";
 import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import { AudioTools } from "../../structures/audio/AudioTools";
-import { EMOJI_INBOX_TRAY, EMOJI_X } from "../../constant/Constants";
+import {
+  AUTOCOMPLETE_MAX_RESULT,
+  EMOJI_INBOX_TRAY,
+  EMOJI_X,
+} from "../../constant/Constants";
+import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 
 export default class PlayCommand extends BaseCommand {
   constructor(client: Client) {
@@ -27,23 +32,24 @@ export default class PlayCommand extends BaseCommand {
         return option
           .setName("query")
           .setDescription("노래 검색어")
+          .setAutocomplete(true)
           .setRequired(true);
       });
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
+      CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       {
         audioNode: true,
         trackPlaying: false,
-        guildPermissions: ["SEND_MESSAGES", "CONNECT", "SPEAK", "EMBED_LINKS"],
         voiceStatus: {
           listenStatus: true,
           sameChannel: false, // false or true
           voiceConnected: true,
         },
-      }
+      },
+      ["SEND_MESSAGES", "CONNECT", "SPEAK", "EMBED_LINKS"]
     );
   }
 
@@ -142,14 +148,30 @@ export default class PlayCommand extends BaseCommand {
             selectedTrack + 1, // Array starts 0
             searchResult.tracks.length
           );
-          const enQueueState: string = this.willPlayingOrEnqueued(
-            guildAudioData.nowPlaying,
-            guildAudioData.queue.length,
-            interaction.locale,
-            track
-          );
+          const enQueueState: string =
+            this.willPlayingOrEnqueued(
+              guildAudioData.nowPlaying,
+              guildAudioData.queue.length
+            ) === "WILL_PLAYING"
+              ? locale.format(
+                  interaction.locale,
+                  "WILL_PLAYING",
+                  Formatter.formatTrack(
+                    track,
+                    locale.format(interaction.locale, "LIVESTREAM")
+                  )
+                )
+              : locale.format(
+                  interaction.locale,
+                  "ENQUEUED_TRACK",
+                  Formatter.formatTrack(
+                    track,
+                    locale.format(interaction.locale, "LIVESTREAM")
+                  ),
+                  (guildAudioData.queue.length + 1).toString()
+                );
           const okButtonCustomId = "play_command_playlist_ok";
-          const noButtonCustomId = "noButton";
+          const noButtonCustomId = "play_command_playlist_cancel";
           const actionRow: Discord.MessageActionRow =
             new Discord.MessageActionRow().addComponents(
               new Discord.MessageButton()
@@ -161,22 +183,23 @@ export default class PlayCommand extends BaseCommand {
                 .setEmoji(EMOJI_X)
                 .setStyle("SECONDARY")
             );
-          await followUpOrEditReply({
-            content: enQueueState,
-            components: [actionRow],
-            embeds: [
-              EmbedFactory.createEmbed()
-                .setTitle(locale.format(interaction.locale, "PLAYLIST"))
-                .setDescription(
-                  locale.format(
-                    interaction.locale,
-                    "INCLUDES_PLAYLIST",
-                    slicedPlaylist.length.toString()
+          const promptMessage: Discord.Message<true> =
+            await followUpOrEditReply({
+              content: enQueueState,
+              components: [actionRow],
+              embeds: [
+                EmbedFactory.createEmbed()
+                  .setTitle(locale.format(interaction.locale, "PLAYLIST"))
+                  .setDescription(
+                    locale.format(
+                      interaction.locale,
+                      "INCLUDES_PLAYLIST",
+                      slicedPlaylist.length.toString()
+                    )
                   )
-                )
-                .setTrackThumbnail(track.info),
-            ],
-          });
+                  .setTrackThumbnail(track.info),
+              ],
+            });
           // Add track (not playlist)
           await dispatcher.addTrack(
             AudioTools.getAudioTrack(track, interaction.user.id)
@@ -188,7 +211,8 @@ export default class PlayCommand extends BaseCommand {
           const buttonCollectorFilter: Discord.CollectorFilter<
             [Discord.ButtonInteraction<"cached">]
           > = (i: Discord.ButtonInteraction<"cached">) =>
-            i.user.id === interaction.user.id;
+            i.user.id == interaction.user.id &&
+            i.message.id == promptMessage.id;
           try {
             const collectorInteraction: Discord.ButtonInteraction<Discord.CacheType> =
               await interaction.channel.awaitMessageComponent({
@@ -197,29 +221,39 @@ export default class PlayCommand extends BaseCommand {
                 time: 20000,
               });
             if (collectorInteraction.customId === okButtonCustomId) {
-              await collectorInteraction.update({
-                content: enQueueState,
-                components: [],
-                embeds: [
-                  EmbedFactory.createEmbed()
-                    .setTitle(locale.format(interaction.locale, "PLAYLIST"))
-                    .setDescription(
-                      locale.format(
-                        interaction.locale,
-                        "PLAYLIST_ADDED_NOEMOJI",
-                        searchResult.playlistName ??
-                          locale.format(interaction.locale, "UNKNOWN"),
-                        slicedPlaylist.length.toString()
+              const dispatcher: PlayerDispatcher | undefined =
+                this.client.audio.dispatchers.get(interaction.guildId);
+              if (!dispatcher) {
+                await collectorInteraction.update({
+                  content: enQueueState,
+                  components: [],
+                  embeds: [],
+                });
+              } else {
+                await collectorInteraction.update({
+                  content: enQueueState,
+                  components: [],
+                  embeds: [
+                    EmbedFactory.createEmbed()
+                      .setTitle(locale.format(interaction.locale, "PLAYLIST"))
+                      .setDescription(
+                        locale.format(
+                          interaction.locale,
+                          "PLAYLIST_ADDED_NOEMOJI",
+                          searchResult.playlistName ??
+                            locale.format(interaction.locale, "UNKNOWN"),
+                          slicedPlaylist.length.toString()
+                        )
                       )
-                    )
-                    .setTrackThumbnail(track.info),
-                ],
-              });
-              await dispatcher.addTracks(
-                slicedPlaylist.map((e: ShoukakuTrack) =>
-                  AudioTools.getAudioTrack(e, interaction.user.id)
-                )
-              );
+                      .setTrackThumbnail(track.info),
+                  ],
+                });
+                await dispatcher.addTracks(
+                  slicedPlaylist.map((e: ShoukakuTrack) =>
+                    AudioTools.getAudioTrack(e, interaction.user.id)
+                  )
+                );
+              }
             } else {
               // User cancel
               await collectorInteraction.update({
@@ -249,43 +283,70 @@ export default class PlayCommand extends BaseCommand {
       case ShoukakuTrackListType.Track:
         const guildAudioData: IGuildAudioData =
           await dispatcher.queue.getGuildAudioData();
-        await followUpOrEditReply(
-          this.willPlayingOrEnqueued(
-            guildAudioData.nowPlaying,
-            guildAudioData.queue.length,
-            interaction.locale,
-            searchResult.tracks[0]
-          )
-        );
-        await dispatcher.addTrack({
+        const addTo: IAudioTrack = {
           requesterUserId: interaction.user.id,
           shoukakuTrack: searchResult.tracks[0],
           relatedTrack: false,
           repeated: false,
+        };
+        const trackEmbed: ExtendedEmbed = await EmbedFactory.getTrackEmbed(
+          this.client,
+          locale.getReusableFormatFunction(interaction.locale),
+          addTo
+        );
+        await followUpOrEditReply({
+          content: locale.format(
+            interaction.locale,
+            this.willPlayingOrEnqueued(
+              guildAudioData.nowPlaying,
+              guildAudioData.queue.length
+            ) + "_TITLE",
+            (guildAudioData.queue.length + 1).toString()
+          ),
+          embeds: [trackEmbed],
         });
+        await dispatcher.addTrack(addTo);
         break;
     }
   }
 
   willPlayingOrEnqueued(
     nowplaying: IAudioTrack | null,
-    queueLength: number,
-    localeName: string,
-    track: ShoukakuTrack
+    queueLength: number
   ): string {
     const localeKey: string =
       !nowplaying && queueLength === 0 ? "WILL_PLAYING" : "ENQUEUED_TRACK";
-    return localeKey === "WILL_PLAYING"
-      ? locale.format(
-          localeName,
-          "WILL_PLAYING",
-          Formatter.formatTrack(track, locale.format(localeName, "LIVESTREAM"))
-        )
-      : locale.format(
-          localeName,
-          "ENQUEUED_TRACK",
-          Formatter.formatTrack(track, locale.format(localeName, "LIVESTREAM")),
-          (queueLength + 1).toString()
-        );
+    return localeKey;
+  }
+
+  public async runAutocomplete(
+    interaction: Discord.AutocompleteInteraction<Discord.CacheType>
+  ): Promise<void> {
+    const idealNode: ShoukakuSocket = this.client.audio.getNode();
+    // 노드가 없다면 결과없음 반환
+    if (!idealNode) return await interaction.respond([]);
+    const query: string | null = interaction.options.getString("query");
+    // 쿼리가 없거나 길이가 100이상이거나 URL일 경우 결과없음
+    if (!query || query.length > 100 || isURL(query))
+      return await interaction.respond([]);
+    const searchResult: ShoukakuTrackList = await idealNode.rest.resolve(
+      `ytsearch:${query}`
+    );
+    // Search가 아니면 결과없음
+    if (searchResult.type !== "SEARCH") return await interaction.respond([]);
+    return interaction.respond(
+      searchResult.tracks
+        .map((v: ShoukakuTrack) => {
+          return {
+            name: v.info.title
+              ? v.info.title.length > 100
+                ? v.info.title.slice(0, 90) + "..."
+                : v.info.title
+              : "N/A",
+            value: v.info.uri ?? query.slice(0, 100),
+          };
+        })
+        .slice(0, AUTOCOMPLETE_MAX_RESULT)
+    );
   }
 }
