@@ -100,6 +100,7 @@ async function boot() {
       LOGGER_NAME,
       parsedConfig.webhook.id,
       parsedConfig.webhook.token,
+      parsedConfig.bot.owners,
       log
     );
   }
@@ -111,8 +112,10 @@ async function boot() {
         ?.safeSendEmbed(
           webhookNotifier
             .buildEmbed()
+            .setTitle("Fatal Error")
             .setColor("RED")
-            .setDescription("FATAL Error: " + err.stack?.slice(0, 1000))
+            .setDescription("FATAL " + err.stack?.slice(0, 1000)),
+          true // It's important
         )
         .finally(() => {
           process.exit(2);
@@ -231,6 +234,7 @@ async function boot() {
           shardsPerClusters: parsedConfig.bot.shardsPerClusters,
           token,
           mode: "process",
+          respawn: true,
           shardArgs: [JSON.stringify(parsedConfig), JSON.stringify(args)],
         }
       );
@@ -238,6 +242,20 @@ async function boot() {
         `total Shards: ${clusterManager.totalShards}, total Clusters: ${clusterManager.totalClusters}`
       );
       clusterManager.on("clusterCreate", (cluster: Cluster.Cluster) => {
+        log.info(
+          `Launched Cluster ${cluster.id} (${cluster.id + 1} of ${
+            clusterManager.totalClusters
+          })`
+        );
+        // Event Listen
+        cluster.on("death", () => {
+          log.error(`Cluster death (#${cluster.id})`);
+          webhookNotifier?.clusterDeath(cluster);
+        });
+        cluster.on("error", (error) => {
+          log.error(`Cluster error (#${cluster.id})`, error);
+          webhookNotifier?.clusterError(cluster, error);
+        });
         cluster.on("spawn", () => {
           log.info(
             `Cluster spawned (${cluster.id + 1}/${
@@ -249,13 +267,8 @@ async function boot() {
         cluster.on("ready", () => {
           log.info(`Cluster #${cluster.id} ready`);
         });
-        log.info(
-          `Launched Cluster ${cluster.id} (${cluster.id + 1} of ${
-            clusterManager.totalClusters
-          })`
-        );
       });
-      clusterManager.spawn({ timeout: -1 });
+      clusterManager.spawn({ timeout: 10000 });
     } catch (err) {
       log.error(err);
     }
