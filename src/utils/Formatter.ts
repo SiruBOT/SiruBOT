@@ -1,6 +1,15 @@
 import { ShoukakuTrack } from "shoukaku";
-
+import {
+  EMOJI_VOLUME_LOUD,
+  EMOJI_VOLUME_SMALL,
+  EMOJI_VOLUME_MUTE,
+} from "../constant/Constants";
 export class Formatter {
+  /**
+   * Convert seconds to readble format (like 00:00:00)
+   * @param sec Seconds to covert
+   * @returns {string} readable string
+   */
   public static humanizeSeconds(sec: number): string {
     const hours = Math.floor(sec / 3600);
     const minutes = Math.floor(sec / 60) % 60;
@@ -10,6 +19,12 @@ export class Formatter {
       .map((v) => (v < 10 ? "0" + v : v))
       .filter((v, i) => v !== "00" || i > 0)
       .join(":");
+  }
+
+  public static volumeEmoji(vol: number): string {
+    if (vol > 60) return EMOJI_VOLUME_LOUD;
+    if (vol > 0) return EMOJI_VOLUME_SMALL;
+    else return EMOJI_VOLUME_MUTE;
   }
 
   public static formatTrack(
