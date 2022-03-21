@@ -3,6 +3,7 @@ import Cluster from "discord-hybrid-sharding";
 import { Logger } from "tslog";
 import * as Sentry from "@sentry/node";
 import { RewriteFrames } from "@sentry/integrations";
+import * as SentryTracing from "@sentry/tracing";
 
 import { Client } from "./structures";
 import * as URLUtils from "./utils/URLUtils";
@@ -45,7 +46,7 @@ if (bootStrapperArgs.shard) {
   clientOptions.shards = Cluster.data.SHARD_LIST;
   clientOptions.shardCount = Cluster.data.TOTAL_SHARDS;
   log.info(
-    `Sharding info shards: [ ${clientOptions.shards.join(
+    `Sharding Info | shards: [ ${clientOptions.shards.join(
       ", "
     )} ], shardCount: ${clientOptions.shardCount}`
   );
@@ -66,12 +67,13 @@ if (
   log.info(`Sentry enabled, DSN: ${argvSettings.sentryDsn}`);
   Sentry.init({
     dsn: argvSettings.sentryDsn,
-    debug: true,
+    debug: bootStrapperArgs.debug,
     tracesSampleRate: 1.0,
     integrations: [
       new RewriteFrames({
         root: global.__dirname,
       }),
+      new SentryTracing.Integrations.BrowserTracing(),
     ],
   });
   if (bootStrapperArgs.shard && client.cluster) {
@@ -88,8 +90,17 @@ const fatal = (err: Error): void => {
   Sentry.captureException(err);
 };
 
-process.on("uncaughtException", fatal);
-process.on("unhandledRejection", fatal);
-
 log.debug("Pre configuration complete. Call client.start() function.");
-client.start();
+client
+  .start()
+  .then(() => {
+    process.on("uncaughtException", fatal);
+    process.on("unhandledRejection", fatal);
+  })
+  .catch((err) => {
+    log.error(
+      "Failed to start the bot. for more information, start with -d(ebug) option",
+      err
+    );
+    process.exit(2);
+  });
