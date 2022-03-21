@@ -23,22 +23,30 @@ export default class VolumeCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
+      CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       {
-        audioNode: false,
-        trackPlaying: false,
-        guildPermissions: ["SEND_MESSAGES"],
+        audioNode: true,
+        trackPlaying: true,
         voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
+          listenStatus: true,
+          sameChannel: true,
+          voiceConnected: true,
         },
-      }
+      },
+      ["SEND_MESSAGES"]
     );
   }
 
   public async runCommand(
     interaction: Discord.CommandInteraction
-  ): Promise<void> {}
+  ): Promise<void> {
+    let requiredAdmin = false;
+    const forceSkip: boolean | null =
+      interaction.options.getBoolean("forceskip");
+    const skipTo: number | null = interaction.options.getInteger("to");
+    if (skipTo || forceSkip) requiredAdmin = true;
+    
+    // if (!skipTo) {}
+  }
 }
