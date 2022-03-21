@@ -21,16 +21,16 @@ export class Guild extends BaseEntity {
   @Column({ name: "guild_locale", default: "ko" })
   guildLocale: string;
 
-  @Column({ name: "voice_channel_id", nullable: true }) // Default voice channel
+  @Column({ name: "voice_channel_id", nullable: true, default: null }) // Default voice channel
   voiceChannelId: string;
 
-  @Column({ name: "text_channel_id", nullable: true }) // Default voice channel
+  @Column({ name: "text_channel_id", nullable: true, default: null }) // Default voice channel
   textChannelId: string;
 
   @Column({ name: "send_audio_messages", default: true }) // Send message when a song updates
   sendAudioMessages: boolean;
 
-  @Column({ name: "dj_role_id", nullable: true }) // DJ Role id
+  @Column({ name: "dj_role_id", nullable: true, default: null }) // DJ Role id
   djRoleId: string;
 
   @Column({ default: 0 }) // 0 = disabled, 1 = repeat all, 2 = repeat single
