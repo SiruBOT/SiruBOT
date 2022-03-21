@@ -15,18 +15,18 @@ export default class QueueCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
+      CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       {
         audioNode: true,
         trackPlaying: true,
-        guildPermissions: ["SEND_MESSAGES"],
         voiceStatus: {
           listenStatus: false,
           sameChannel: false,
           voiceConnected: false,
         },
-      }
+      },
+      ["SEND_MESSAGES"]
     );
   }
 
