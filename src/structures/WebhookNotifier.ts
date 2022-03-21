@@ -2,23 +2,37 @@ import Discord from "discord.js";
 import type { Cluster } from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
 import { EmbedFactory } from "../utils";
-import { OK_COLOR } from "../constant/Constants";
+import { OK_COLOR, WARN_COLOR } from "../constant/Constants";
+import { ExtendedEmbed } from "../utils/ExtendedEmbed";
+import { codeBlock } from "@discordjs/builders";
 export class WebhookNotifier extends Discord.WebhookClient {
   name: string;
+  owners: string[];
   log: Logger;
 
-  constructor(name: string, id: string, token: string, log: Logger) {
+  constructor(
+    name: string,
+    id: string,
+    token: string,
+    owners: string[],
+    log: Logger
+  ) {
     super({ id, token });
     this.name = name;
     this.log = log;
+    this.owners = owners;
   }
 
-  infoEmbed(): Discord.MessageEmbed {
+  infoEmbed(): ExtendedEmbed {
     return this.buildEmbed().setColor(OK_COLOR);
   }
 
-  buildEmbed(): Discord.MessageEmbed {
-    const embed: Discord.MessageEmbed = EmbedFactory.createEmbed();
+  warnEmbed(): ExtendedEmbed {
+    return this.buildEmbed().setColor(WARN_COLOR);
+  }
+
+  buildEmbed(): ExtendedEmbed {
+    const embed: ExtendedEmbed = EmbedFactory.createEmbed();
     embed
       .setFooter({ text: EmbedFactory.footerString })
       .setTimestamp(new Date());
@@ -43,9 +57,34 @@ export class WebhookNotifier extends Discord.WebhookClient {
     this.safeSendEmbed(embed);
   }
 
-  async safeSendEmbed(embed: Discord.MessageEmbed): Promise<void> {
+  clusterError(cluster: Cluster, error: Error): void {
+    const embed: Discord.MessageEmbed = this.warnEmbed();
+    embed.setTitle(`⚠️  Cluster Error #${cluster.id}`);
+    embed.setDescription(
+      codeBlock("ts", error.stack ?? "N/A, Check the console.")
+    );
+    this.safeSendEmbed(embed, true);
+  }
+
+  clusterDeath(cluster: Cluster): void {
+    const embed: Discord.MessageEmbed = this.warnEmbed();
+    embed.setTitle(`⚠️  Cluster Death #${cluster.id}`);
+    this.safeSendEmbed(embed, true);
+  }
+
+  async safeSendEmbed(
+    embed: Discord.MessageEmbed,
+    important = false
+  ): Promise<void> {
     try {
-      await this.send({ embeds: [embed] });
-    } catch {}
+      await this.send({
+        content: important
+          ? this.owners.map((e) => "<@" + e + ">").join(", ")
+          : undefined,
+        embeds: [embed],
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

@@ -26,7 +26,7 @@ export class DatabaseHelper {
       entities: [Guild, User],
       synchronize: true,
       ...this.client.settings.database.mysql,
-      logging: true,
+      logging: this.client.bootStrapperArgs.debug,
     });
     this.mysqlConn = mysqlConn;
 
