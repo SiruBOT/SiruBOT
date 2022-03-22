@@ -12,7 +12,7 @@
     "@sirubot/yt-related-scraper": "^0.3.1-alpha.2",
     "argparse": "^2.0.1",
     "discord-api-types": "^0.29.0",
-    "discord-hybrid-sharding": "^1.4.6",
+    "discord-hybrid-sharding": "sannoob/discord-hybrid-sharding#patch-2",
     "discord.js": "^13.6.0",
     "fast-glob": "^3.2.11",
     "mongoose": "^6.2.6",
