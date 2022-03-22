@@ -257,18 +257,23 @@ async function boot() {
           webhookNotifier?.clusterError(cluster, error);
         });
         cluster.on("spawn", () => {
+          const spawnedTime = new Date().getTime();
           log.info(
             `Cluster spawned (${cluster.id + 1}/${
               cluster.manager.totalClusters
             })`
           );
           webhookNotifier?.clusterSpawned(cluster);
-        });
-        cluster.on("ready", () => {
-          log.info(`Cluster #${cluster.id} ready`);
-        });
+          cluster.once("ready", () => {
+            log.info(`Cluster #${cluster.id} ready`);
+            webhookNotifier?.clusterReady(
+              cluster,
+              new Date().getTime() - spawnedTime
+            );
+          });
+        }); // Spawn
       });
-      clusterManager.spawn({ timeout: 10000 });
+      clusterManager.spawn({ timeout: -1 });
     } catch (err) {
       log.error(err);
     }

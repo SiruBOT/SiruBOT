@@ -72,6 +72,13 @@ export class WebhookNotifier extends Discord.WebhookClient {
     this.safeSendEmbed(embed, true);
   }
 
+  clusterReady(cluster: Cluster, elapsedTime: number): void {
+    const embed: Discord.MessageEmbed = this.infoEmbed();
+    embed.setTitle(`✅  Cluster Ready #${cluster.id}`);
+    embed.setDescription("Took **" + elapsedTime + "ms** to Ready");
+    this.safeSendEmbed(embed, true);
+  }
+
   async safeSendEmbed(
     embed: Discord.MessageEmbed,
     important = false
@@ -83,8 +90,6 @@ export class WebhookNotifier extends Discord.WebhookClient {
           : undefined,
         embeds: [embed],
       });
-    } catch (e) {
-      console.error(e);
-    }
+    } catch {}
   }
 }
