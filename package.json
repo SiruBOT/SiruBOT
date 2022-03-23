@@ -19,7 +19,7 @@
     "mysql2": "^2.3.3",
     "reflect-metadata": "^0.1.13",
     "shoukaku": "^2.1.5",
-    "slyrics": "^1.0.1",
+    "slyrics": "^1.0.2",
     "tslog": "^3.3.2",
     "typeorm": "^0.2.45",
     "undici": "^4.15.1",
