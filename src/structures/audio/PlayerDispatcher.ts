@@ -8,7 +8,6 @@ import {
   TrackExceptionEvent,
   WebSocketClosedEvent,
 } from "shoukaku";
-import locale from "../../locales";
 import { Logger } from "tslog";
 import { IAudioTrack, IGuildAudioData, RepeatMode } from "../../types";
 import { DatabaseHelper } from "..";
@@ -389,7 +388,7 @@ export class PlayerDispatcher extends EventEmitter {
 
   public destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
-    this.audio.dispatchers.delete(this.guildId);
+    this.audio.deletePlayerDispatcher(this.guildId);
     this.audio.players.delete(this.guildId);
     this.player.connection.disconnect();
   }
