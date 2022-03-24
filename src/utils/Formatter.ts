@@ -3,7 +3,14 @@ import {
   EMOJI_VOLUME_LOUD,
   EMOJI_VOLUME_SMALL,
   EMOJI_VOLUME_MUTE,
+  PROGRESS_BAR_START_WHITE,
+  PROGRESS_BAR_END_WHITE,
+  PROGRESS_BAR_WHITE,
+  PROGRESS_BAR_START_BLACK,
+  PROGRESS_BAR_END_BLACK,
+  PROGRESS_BAR_BLACK,
 } from "../constant/Constants";
+const PROGRESS_BAR_EMOJI_COUNT = 10;
 export class Formatter {
   /**
    * Convert seconds to readble format (like 00:00:00)
@@ -52,5 +59,29 @@ export class Formatter {
           }]`
         : ""
     }`;
+  }
+
+  static progressBar(percent: number) {
+    let str = "";
+    for (let i = 0; i < PROGRESS_BAR_EMOJI_COUNT; i++) {
+      if (i < Math.floor(percent * PROGRESS_BAR_EMOJI_COUNT)) {
+        if (i === 0) {
+          str += PROGRESS_BAR_START_WHITE;
+        } else if (i === PROGRESS_BAR_EMOJI_COUNT - 1) {
+          str += PROGRESS_BAR_END_WHITE;
+        } else {
+          str += PROGRESS_BAR_WHITE;
+        }
+      } else {
+        if (i === 0) {
+          str += PROGRESS_BAR_START_BLACK;
+        } else if (i === PROGRESS_BAR_EMOJI_COUNT - 1) {
+          str += PROGRESS_BAR_END_BLACK;
+        } else {
+          str += PROGRESS_BAR_BLACK;
+        }
+      }
+    }
+    return str;
   }
 }
