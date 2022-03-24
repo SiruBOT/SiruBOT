@@ -13,7 +13,7 @@ export class Queue {
     this.databaseHelper = databaseHelper;
   }
 
-  async cleanQueue(): Promise<IGuildAudioData> {
+  public async cleanQueue(): Promise<IGuildAudioData> {
     this.log.debug(`Clean the queue @ ${this.guildId}`);
     const cleanedData = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
@@ -22,14 +22,14 @@ export class Queue {
     return cleanedData;
   }
 
-  async getQueue(): Promise<IAudioTrack[]> {
+  public async getQueue(): Promise<IAudioTrack[]> {
     this.log.debug(`Get queue from ${this.guildId}`);
     const { queue }: { queue: IAudioTrack[] } =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
     return queue;
   }
 
-  async pushTrack(track: IAudioTrack): Promise<IAudioTrack> {
+  public async pushTrack(track: IAudioTrack): Promise<IAudioTrack> {
     this.log.debug(`Push track ${track.shoukakuTrack.info.identifier}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: track },
@@ -37,7 +37,7 @@ export class Queue {
     return track;
   }
 
-  async pushTracks(tracks: IAudioTrack[]): Promise<number> {
+  public async pushTracks(tracks: IAudioTrack[]): Promise<number> {
     this.log.debug(`Push ${tracks.length} tracks to ${this.guildId}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: tracks } },
@@ -45,7 +45,7 @@ export class Queue {
     return tracks.length;
   }
 
-  async unshiftTrack(track: IAudioTrack): Promise<IAudioTrack> {
+  public async unshiftTrack(track: IAudioTrack): Promise<IAudioTrack> {
     this.log.debug(
       `Push track ${track.shoukakuTrack.info.identifier} with position 0`
     );
@@ -55,7 +55,7 @@ export class Queue {
     return track;
   }
 
-  async shiftTrack(): Promise<IAudioTrack | null> {
+  public async shiftTrack(): Promise<IAudioTrack | null> {
     const beforeShift = await this.databaseHelper.upsertGuildAudioData(
       this.guildId
     );
@@ -74,7 +74,7 @@ export class Queue {
     return beforeShift.queue[0];
   }
 
-  async setNowPlaying(track: IAudioTrack): Promise<IAudioTrack | null> {
+  public async setNowPlaying(track: IAudioTrack): Promise<IAudioTrack | null> {
     this.log.debug(`Set nowplaying`);
     const updated = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
@@ -83,21 +83,21 @@ export class Queue {
     return updated.nowPlaying;
   }
 
-  async getNowPlaying(): Promise<IAudioTrack | null> {
+  public async getNowPlaying(): Promise<IAudioTrack | null> {
     this.log.debug(`Get nowplaying from ${this.guildId}`);
     const { nowPlaying }: { nowPlaying: IAudioTrack | null } =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
     return nowPlaying;
   }
 
-  async skipTo(to: number) {
+  public async skipTo(to: number) {
     this.log.debug(`Slice queue to ${to} tracks`);
     this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: [], $slice: to } },
     });
   }
 
-  async setPosition(position: number | null): Promise<IGuildAudioData> {
+  public async setPosition(position: number | null): Promise<IGuildAudioData> {
     this.log.debug(`Update position to ${position}`);
     return await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $set: {
@@ -107,7 +107,7 @@ export class Queue {
     });
   }
 
-  async getGuildAudioData(): Promise<IGuildAudioData> {
+  public async getGuildAudioData(): Promise<IGuildAudioData> {
     this.log.debug(`Get guildAudioData from ${this.guildId}`);
     const guildAudioData: IGuildAudioData =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
