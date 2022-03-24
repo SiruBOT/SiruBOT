@@ -49,6 +49,18 @@ export class AudioHandler extends Shoukaku {
     this.setupEvents();
   }
 
+  public getPlayerDispatcher(guildId: string): PlayerDispatcher {
+    const dispatcher: PlayerDispatcher | undefined =
+      this.dispatchers.get(guildId);
+    if (!dispatcher)
+      throw new Error(`PlayerDispatcher not found on ${guildId}`);
+    return dispatcher;
+  }
+
+  public hasPlayerDispatcher(guildId: string): boolean {
+    return this.dispatchers.has(guildId);
+  }
+
   public async joinChannel(
     joinOptions: IJoinOptions
   ): Promise<PlayerDispatcher> {
