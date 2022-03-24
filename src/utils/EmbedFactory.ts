@@ -34,8 +34,6 @@ export class EmbedFactory {
           name: `${userInfo.username}#${userInfo.discriminator}`,
         });
       }
-    } else {
-      embed.setTitle(format("TRACK_EMBED_RELATED"));
     }
     if (track.shoukakuTrack.info.author) {
       embed.setFooter({
@@ -61,7 +59,9 @@ export class EmbedFactory {
     client: Client,
     format: ReusableFormatFunction,
     nowplaying: IGuildAudioData["nowPlaying"],
-    position: number | null
+    position: number | null,
+    remainTracks?: number,
+    remainTimes?: number
   ): Promise<ExtendedEmbed> {
     if (!nowplaying) {
       return this.createEmbed().setTitle(format("NOWPLAYING_NONE"));
@@ -91,8 +91,31 @@ export class EmbedFactory {
         ? `[${formattedTrack}](${nowplaying.shoukakuTrack.info.uri})`
         : formattedTrack;
       trackEmbed.setDescription(
-        `${urlLinkTitle}\n${readablePosition} ${progressBar} ${readableTrackLength}`
+        `${urlLinkTitle}\n${readablePosition}  ${progressBar}  ${readableTrackLength}`
       );
+      const footerItems: string[] = [];
+      if (nowplaying.shoukakuTrack.info.author) {
+        footerItems.push(
+          format(
+            "SOURCE",
+            nowplaying.shoukakuTrack.info.author,
+            EmbedFactory.footerString
+          )
+        );
+      }
+      if (nowplaying.relatedTrack) {
+        footerItems.push(format("TRACK_EMBED_RELATED"));
+      }
+      if (remainTracks && remainTimes) {
+        footerItems.push(
+          format(
+            "REMAIN_TRACKS",
+            remainTracks.toString(),
+            Formatter.humanizeSeconds(remainTimes)
+          )
+        );
+      }
+      trackEmbed.setFooter({ text: footerItems.join(" | ") });
       return trackEmbed;
     }
   }
