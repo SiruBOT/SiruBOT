@@ -42,7 +42,7 @@ export default class LyricsCommand extends BaseCommand {
   }
 
   public async runCommand(
-    interaction: HandledCommandInteraction<"voiceNotConnected">
+    interaction: HandledCommandInteraction
   ): Promise<void> {
     await interaction.deferReply();
     const query: string = interaction.options.getString("query", true);
