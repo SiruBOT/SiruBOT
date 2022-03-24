@@ -18,10 +18,22 @@ import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import { AudioTools } from "../../structures/audio/AudioTools";
 import {
   AUTOCOMPLETE_MAX_RESULT,
+  BUTTON_AWAIT_TIMEOUT,
   EMOJI_INBOX_TRAY,
   EMOJI_X,
 } from "../../constant/Constants";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
+import { MessageUtil } from "../../utils/MessageUtil";
+
+const commandRequirements = {
+  audioNode: true,
+  trackPlaying: false,
+  voiceStatus: {
+    listenStatus: true,
+    sameChannel: false, // false or true
+    voiceConnected: true,
+  },
+} as const;
 
 export default class PlayCommand extends BaseCommand {
   constructor(client: Client) {
@@ -40,26 +52,18 @@ export default class PlayCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: true,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: true,
-          sameChannel: false, // false or true
-          voiceConnected: true,
-        },
-      },
+      commandRequirements,
       ["SEND_MESSAGES", "CONNECT", "SPEAK", "EMBED_LINKS"]
     );
   }
 
   public async runCommand(
-    interaction: HandledCommandInteraction<"voiceConnected">,
+    interaction: HandledCommandInteraction<typeof commandRequirements>,
     soundCloud = false
   ): Promise<void> {
     await interaction.deferReply();
     // Join voice channel before playing
-    if (!this.client.audio.dispatchers.get(interaction.guildId)) {
+    if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
       const { voice }: { voice: VoiceConnectedGuildMemberVoiceState } =
         interaction.member;
       try {
@@ -77,43 +81,25 @@ export default class PlayCommand extends BaseCommand {
         );
         throw error;
       }
-      await interaction.editReply({
-        content: locale.format(
-          interaction.locale,
-          "JOINED_VOICE",
-          voice.channelId
-        ),
-      });
     }
     const query: string = interaction.options.getString("query", true);
     // Get ideal node
     const node: ShoukakuSocket = this.client.audio.getNode();
-    const dispatcher: PlayerDispatcher | undefined =
-      this.client.audio.dispatchers.get(interaction.guildId);
-    if (!dispatcher) throw new Error("PlayerDispatcher not found.");
+    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
+      interaction.guildId
+    );
     const searchResult: ShoukakuTrackList = await node.rest.resolve(
       isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
     );
-    const followUpOrEditReply: (
-      options: string | Discord.MessagePayload | Discord.InteractionReplyOptions
-    ) => Promise<Discord.Message<true>> = async (
-      options: string | Discord.MessagePayload | Discord.InteractionReplyOptions
-    ) => {
-      if (interaction.replied) {
-        return interaction.followUp(options);
-      } else {
-        return interaction.editReply(options);
-      }
-    };
     // Search result
     switch (searchResult.type) {
       case ShoukakuTrackListType.LoadFailed:
-        await followUpOrEditReply({
+        await MessageUtil.followUpOrEditReply(interaction, {
           content: locale.format(interaction.locale, "LOAD_FAILED"),
         });
         break;
       case ShoukakuTrackListType.NoMatches:
-        await followUpOrEditReply({
+        await MessageUtil.followUpOrEditReply(interaction, {
           content: locale.format(interaction.locale, "NO_MATCHES"),
         });
         break;
@@ -123,7 +109,7 @@ export default class PlayCommand extends BaseCommand {
           searchResult.selectedTrack === -1 ||
           !searchResult.tracks[searchResult.selectedTrack ?? -1]
         ) {
-          await followUpOrEditReply({
+          await MessageUtil.followUpOrEditReply(interaction, {
             content: locale.format(
               interaction.locale,
               "PLAYLIST_ADD",
@@ -184,7 +170,7 @@ export default class PlayCommand extends BaseCommand {
                 .setStyle("SECONDARY")
             );
           const promptMessage: Discord.Message<true> =
-            await followUpOrEditReply({
+            await MessageUtil.followUpOrEditReply(interaction, {
               content: enQueueState,
               components: [actionRow],
               embeds: [
@@ -218,12 +204,10 @@ export default class PlayCommand extends BaseCommand {
               await interaction.channel.awaitMessageComponent({
                 componentType: "BUTTON",
                 filter: buttonCollectorFilter,
-                time: 20000,
+                time: BUTTON_AWAIT_TIMEOUT,
               });
             if (collectorInteraction.customId === okButtonCustomId) {
-              const dispatcher: PlayerDispatcher | undefined =
-                this.client.audio.dispatchers.get(interaction.guildId);
-              if (!dispatcher) {
+              if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
                 await collectorInteraction.update({
                   content: enQueueState,
                   components: [],
@@ -294,7 +278,7 @@ export default class PlayCommand extends BaseCommand {
           locale.getReusableFormatFunction(interaction.locale),
           addTo
         );
-        await followUpOrEditReply({
+        await MessageUtil.followUpOrEditReply(interaction, {
           content: locale.format(
             interaction.locale,
             this.willPlayingOrEnqueued(
