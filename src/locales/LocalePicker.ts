@@ -15,7 +15,7 @@ export class LocalePicker {
     this.option = option;
   }
 
-  format(locale: string, key: string, ...args: string[]): string {
+  public format(locale: string, key: string, ...args: string[]): string {
     let localeData: Locale | undefined = this.option.locales[locale];
     if (!localeData) {
       localeData = this.option.locales[this.option.fallBackLocale];
@@ -30,11 +30,11 @@ export class LocalePicker {
     });
   }
 
-  addLocale(localeName: string, localeData: Locale): void {
+  public addLocale(localeName: string, localeData: Locale): void {
     this.option.locales[localeName] = localeData;
   }
 
-  getReusableFormatFunction(localeName: string): ReusableFormatFunction {
+  public getReusableFormatFunction(localeName: string): ReusableFormatFunction {
     return (key: string, ...args: string[]): string => {
       return this.format(localeName, key, ...args);
     };
