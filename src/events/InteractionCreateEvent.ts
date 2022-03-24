@@ -144,7 +144,7 @@ export default class InteractionCreateEvent extends BaseEvent {
               ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
               content: locale.format(
                 interaction.locale,
-                "COMMAND_MISSING_PERMISSIONS",
+                "MISSING_BOT_PERMISSIONS",
                 permissionString
               ), // end of format
             });
@@ -172,8 +172,24 @@ export default class InteractionCreateEvent extends BaseEvent {
             guildMember: member,
             settings: this.client.settings,
           });
-          interaction.channel?.send(userPermissions.toString());
-
+          // Command.permissions 중 userPermissions 에 한개라도 있으면 권한 있음, 없으면 권한 없음
+          if (
+            command.permissions.filter((e) => userPermissions.includes(e))
+              .length === 0
+          ) {
+            transaction?.setData("endReason", "CommandPermissionNotFound");
+            transaction?.setHttpStatus(403);
+            transaction?.finish();
+            await interaction.reply({
+              ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+              content: locale.format(
+                interaction.locale,
+                "MISSING_USER_PERMISSIONS",
+                command.permissions.map((e) => `**${e}**`).join(", ")
+              ),
+            });
+            return;
+          }
           if (guildConfig.textChannelId) {
             const defaultTextChannel: Discord.AnyChannel | undefined | null =
               this.client.channels.cache // 채널 캐시에 없다면 fetch
@@ -192,6 +208,10 @@ export default class InteractionCreateEvent extends BaseEvent {
                   defaultTextChannel.id
                 ),
               });
+              transaction?.setData("endReason", "NotDefaultTextChannel");
+              transaction?.setHttpStatus(500);
+              transaction?.finish();
+              return;
             }
           }
           // const defaultVoiceChannel: Discord.AnyChannel | undefined | null =
@@ -227,9 +247,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
           // -------- Handle trackPlaying --------
           if (requirements.trackPlaying) {
-            const dispatcher: PlayerDispatcher | undefined =
-              this.client.audio.dispatchers.get(interaction.guildId);
-            if (!dispatcher) {
+            if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
               await interaction.reply({
                 ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
                 content: locale.format(
