@@ -34,9 +34,9 @@ export default class StopCommand extends BaseCommand {
   public async runCommand(
     interaction: HandledCommandInteraction
   ): Promise<void> {
-    const dispatcher: PlayerDispatcher | undefined =
-      this.client.audio.dispatchers.get(interaction.guildId);
-    if (!dispatcher) throw new Error("PlayerDispatcher not found.");
+    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
+      interaction.guildId
+    );
     await interaction.reply({
       content: locale.format(interaction.locale, "CLEANED_AND_STOPPED"),
     });

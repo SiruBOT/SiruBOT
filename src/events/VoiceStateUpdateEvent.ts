@@ -20,13 +20,13 @@ export default class VoiceStateUpdateEvent extends BaseEvent {
         }`
       );
       if (!dispatcher) return;
-      // Handle Disconnect.
-      if (!newState.channelId) {
-        dispatcher.destroy();
-        await dispatcher.sendDisconnected();
-        return;
-      }
       try {
+        // Handle Disconnect.
+        if (!newState.channelId) {
+          dispatcher.destroy();
+          await dispatcher.sendDisconnected();
+          return;
+        }
         await dispatcher.player.connection.reconnect(newState.channelId);
       } catch (error) {
         Sentry.captureException(error);

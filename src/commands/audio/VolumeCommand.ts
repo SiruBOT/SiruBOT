@@ -73,9 +73,11 @@ export default class VolumeCommand extends BaseCommand {
           interaction.guildId,
           { volume }
         );
-      const dispatcher: PlayerDispatcher | undefined =
-        this.client.audio.dispatchers.get(interaction.guildId);
-      if (dispatcher) dispatcher.setVolumePercent(guildConfig.volume);
+      try {
+        this.client.audio
+          .getPlayerDispatcher(interaction.guildId)
+          .setVolumePercent(guildConfig.volume);
+      } catch {}
       await interaction.reply({
         content: locale.format(
           interaction.locale,
