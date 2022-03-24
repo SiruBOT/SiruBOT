@@ -1,25 +1,23 @@
-import { Client, MessageEmbed, User } from "discord.js";
-import { ShoukakuTrack } from "shoukaku";
+import { Client, User } from "discord.js";
 import { Formatter } from ".";
 import { version } from "../../package.json";
 import { BOT_NAME, DEFAULT_COLOR } from "../constant/Constants";
 import { ReusableFormatFunction } from "../locales/LocalePicker";
-import { IAudioTrack } from "../types";
+import { IAudioTrack, IGuildAudioData } from "../types";
 import { ExtendedEmbed } from "./ExtendedEmbed";
 
-//
 export class EmbedFactory {
-  static createEmbed(): ExtendedEmbed {
+  public static createEmbed(): ExtendedEmbed {
     return new ExtendedEmbed()
       .setFooter({ text: EmbedFactory.footerString })
       .setColor(DEFAULT_COLOR);
   }
 
-  static get footerString(): string {
+  public static get footerString(): string {
     return `${BOT_NAME} - ${version}`;
   }
 
-  static async getTrackEmbed(
+  public static async getTrackEmbed(
     client: Client,
     format: ReusableFormatFunction,
     track: IAudioTrack
@@ -36,6 +34,8 @@ export class EmbedFactory {
           name: `${userInfo.username}#${userInfo.discriminator}`,
         });
       }
+    } else {
+      embed.setTitle(format("TRACK_EMBED_RELATED"));
     }
     if (track.shoukakuTrack.info.author) {
       embed.setFooter({
@@ -55,5 +55,45 @@ export class EmbedFactory {
       )
       .setTrackThumbnail(track.shoukakuTrack.info);
     return embed;
+  }
+
+  public static async getNowplayingEmbed(
+    client: Client,
+    format: ReusableFormatFunction,
+    nowplaying: IGuildAudioData["nowPlaying"],
+    position: number | null
+  ): Promise<ExtendedEmbed> {
+    if (!nowplaying) {
+      return this.createEmbed().setTitle(format("NOWPLAYING_NONE"));
+    } else {
+      const trackLength: number = nowplaying.shoukakuTrack.info.length ?? 0;
+      const currentPosition: number = position ?? 0;
+      const readablePosition: string = Formatter.humanizeSeconds(
+        currentPosition / 1000
+      );
+      const readableTrackLength: string = Formatter.humanizeSeconds(
+        trackLength / 1000
+      );
+      const trackEmbed: ExtendedEmbed = await this.getTrackEmbed(
+        client,
+        format,
+        nowplaying
+      );
+      const formattedTrack = `**${Formatter.formatTrack(
+        nowplaying.shoukakuTrack,
+        format("LIVESTREAM"),
+        false
+      )}**`;
+      const progressBar: string = Formatter.progressBar(
+        currentPosition / trackLength
+      );
+      const urlLinkTitle: string = nowplaying.shoukakuTrack.info.uri
+        ? `[${formattedTrack}](${nowplaying.shoukakuTrack.info.uri})`
+        : formattedTrack;
+      trackEmbed.setDescription(
+        `${urlLinkTitle}\n${readablePosition} ${progressBar} ${readableTrackLength}`
+      );
+      return trackEmbed;
+    }
   }
 }
