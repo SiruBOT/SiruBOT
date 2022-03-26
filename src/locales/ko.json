@@ -31,6 +31,7 @@
   "OFF": "꺼짐",
   "MISSING_USER_PERMISSIONS": "❎  이 명령어를 사용할 권한이 없어요!\n🏁  필요한 권한: {0}",
   "LYRICS_SEARCH_NOT_FOUND": "❎  검색 결과를 찾을 수 없어요.",
+  "NOWPLAYING_TITLE": "> 🎶  <#{0}> 에서 재생 중",
   "LYRICS_NAN": "📑  가사 정보를 찾을 수 없어요.",
   "RELATED_MODE": "⭐  추천 곡 재생 기능 **{0}**",
   "RELATED_MODE_SET": "⭐  추천 곡 재생 기능을 **{0}** 으로 설정했어요!",
