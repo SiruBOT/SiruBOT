@@ -57,20 +57,24 @@ export class Paginator {
   ): MessageActionRow {
     const actionRow: MessageActionRow = new MessageActionRow();
     actionRow.addComponents(
-      new MessageButton()
-        .setCustomId(this.previousBtnId)
-        .setEmoji(EMOJI_PREV)
-        .setStyle("SECONDARY")
-        .setDisabled(this.currentPage === 1),
-      new MessageButton()
-        .setCustomId(this.stopBtnId)
-        .setEmoji(EMOJI_STOP)
-        .setStyle("SECONDARY"),
-      new MessageButton()
-        .setCustomId(this.nextBtnId)
-        .setEmoji(EMOJI_NEXT)
-        .setStyle("SECONDARY")
-        .setDisabled(this.currentPage === this.totalPages),
+      ...(this.totalPages !== 1
+        ? [
+            new MessageButton()
+              .setCustomId(this.previousBtnId)
+              .setEmoji(EMOJI_PREV)
+              .setStyle("SECONDARY")
+              .setDisabled(this.currentPage === 1),
+            new MessageButton()
+              .setCustomId(this.stopBtnId)
+              .setEmoji(EMOJI_STOP)
+              .setStyle("SECONDARY"),
+            new MessageButton()
+              .setCustomId(this.nextBtnId)
+              .setEmoji(EMOJI_NEXT)
+              .setStyle("SECONDARY")
+              .setDisabled(this.currentPage === this.totalPages),
+          ]
+        : []),
       ...(additionalComponents ?? [])
     );
     return actionRow;
@@ -82,7 +86,9 @@ export class Paginator {
       interaction,
       this.pagePayload(page)
     );
-    await this.awaitButtons(interaction);
+    if (this.totalPages > 1) {
+      await this.awaitButtons(interaction);
+    }
   }
 
   public pagePayload(
