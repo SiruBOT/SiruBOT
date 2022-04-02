@@ -1,5 +1,4 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import * as Discord from "discord.js";
 import { Guild } from "../../database/mysql/entities";
 import { BaseCommand, Client } from "../../structures";
 import {
@@ -9,7 +8,6 @@ import {
 } from "../../types";
 import { Formatter } from "../../utils";
 import locale from "../../locales";
-import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 export default class VolumeCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
