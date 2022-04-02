@@ -95,19 +95,23 @@ export class Paginator {
     pageValue: PageFnReturn
   ): MessagePayload | InteractionReplyOptions {
     const actionRow = this.getActionRow();
-    switch (typeof pageValue) {
-      case "string":
-        return {
-          content: pageValue,
-          components: [actionRow],
-        };
-      default:
-        return Object.assign(
-          {
+    if (actionRow.components.length > 0) {
+      switch (typeof pageValue) {
+        case "string":
+          return {
+            content: pageValue,
             components: [actionRow],
-          },
-          pageValue
-        );
+          };
+        default:
+          return Object.assign(
+            {
+              components: [actionRow],
+            },
+            pageValue
+          );
+      }
+    } else {
+      return typeof pageValue === "string" ? { content: pageValue } : pageValue;
     }
   }
 
