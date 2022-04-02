@@ -6,9 +6,9 @@
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
-    "@sentry/integrations": "^6.18.2",
-    "@sentry/node": "^6.18.2",
-    "@sentry/tracing": "^6.18.2",
+    "@sentry/integrations": "^6.19.3",
+    "@sentry/node": "^6.19.3",
+    "@sentry/tracing": "^6.19.3",
     "@sirubot/yt-related-scraper": "^0.3.1-alpha.2",
     "argparse": "^2.0.1",
     "discord-api-types": "^0.29.0",
