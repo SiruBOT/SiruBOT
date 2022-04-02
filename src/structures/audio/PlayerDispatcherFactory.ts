@@ -1,12 +1,11 @@
 import { AudioHandler } from "./AudioHandler";
-import { Client } from "../Client";
 import { ShoukakuPlayer } from "shoukaku";
 import { Logger } from "tslog";
 import { PlayerDispatcher } from "./PlayerDispatcher";
+import { IJoinOptions } from "../../types";
 
 export class PlayerDispatcherFactory {
   public audio: AudioHandler;
-  public client: Client;
   private log: Logger;
   constructor(audio: AudioHandler) {
     this.audio = audio;
@@ -15,14 +14,14 @@ export class PlayerDispatcherFactory {
 
   async createPlayerDispatcher(
     player: ShoukakuPlayer,
-    textChannelId: string
+    joinOptions: IJoinOptions
   ): Promise<PlayerDispatcher> {
     const databaseHelper = this.audio.client.databaseHelper;
     const playerDispatcher = new PlayerDispatcher(
       this.audio,
       player,
       databaseHelper,
-      textChannelId
+      joinOptions
     );
     playerDispatcher.registerPlayerEvent();
     this.log.debug(

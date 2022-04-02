@@ -9,7 +9,12 @@ import {
   WebSocketClosedEvent,
 } from "shoukaku";
 import { Logger } from "tslog";
-import { IAudioTrack, IGuildAudioData, RepeatMode } from "../../types";
+import {
+  IAudioTrack,
+  IGuildAudioData,
+  IJoinOptions,
+  RepeatMode,
+} from "../../types";
 import { DatabaseHelper } from "..";
 import * as Sentry from "@sentry/node";
 import { AudioMessage } from "./AudioMessage";
@@ -31,7 +36,7 @@ export class PlayerDispatcher extends EventEmitter {
     audio: AudioHandler,
     player: ShoukakuPlayer,
     databaseHelper: DatabaseHelper,
-    textChannelId: string
+    joinOptions: IJoinOptions
   ) {
     super();
     this.audio = audio;
@@ -45,7 +50,7 @@ export class PlayerDispatcher extends EventEmitter {
     this.audioMessage = new AudioMessage(
       this.client,
       this.guildId,
-      textChannelId,
+      joinOptions.textChannelId,
       this.databaseHelper,
       this.log
     );
@@ -228,6 +233,7 @@ export class PlayerDispatcher extends EventEmitter {
         }
       } catch (error) {
         const exceptionId: string = Sentry.captureException(error);
+        this.log.error("Failed to scrape related video.", error);
         // 추천 영상을 가져오는 도중 오류가 발생했어요! 노래를 종료할게요.
         await this.cleanStop();
         await this.audioMessage.sendMessage(
