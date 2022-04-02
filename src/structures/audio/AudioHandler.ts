@@ -15,7 +15,7 @@ import {
   RoutePlanner,
   Scraper,
 } from "@sirubot/yt-related-scraper";
-import { IAudioTrack } from "../../types";
+import { IAudioTrack, PlayingState } from "../../types";
 export class AudioHandler extends Shoukaku {
   public client: Client;
   private log: Logger;
@@ -49,6 +49,17 @@ export class AudioHandler extends Shoukaku {
     this.setupEvents();
   }
 
+  public getPlayingState(guildId: string): PlayingState {
+    const dispatcher: PlayerDispatcher | undefined =
+      this.dispatchers.get(guildId);
+    if (dispatcher && dispatcher.player.track) {
+      if (dispatcher.player.paused) return PlayingState.PAUSED;
+      else return PlayingState.PLAYING;
+    } else {
+      return PlayingState.NOTPLAYING;
+    }
+  }
+
   public getPlayerDispatcher(guildId: string): PlayerDispatcher {
     const dispatcher: PlayerDispatcher | undefined =
       this.dispatchers.get(guildId);
@@ -72,7 +83,7 @@ export class AudioHandler extends Shoukaku {
     const dispatcher =
       await this.playerDispatcherFactory.createPlayerDispatcher(
         shoukakuPlayer,
-        joinOptions.textChannelId
+        joinOptions
       );
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
     await dispatcher.playOrResumeOrNothing();
