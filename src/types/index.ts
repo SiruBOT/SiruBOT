@@ -25,5 +25,4 @@ export { IJoinOptions } from "./audio/IJoinOptions";
 
 // Audio Enums
 export { RepeatMode } from "./audio/RepeatMode";
-export { RepeatModeString } from "./audio/RepeatMode";
 export { PlayingState } from "./audio/PlayingState";
