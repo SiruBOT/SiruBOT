@@ -5,7 +5,6 @@ import {
   CommandPermissions,
   HandledCommandInteraction,
   RepeatMode,
-  RepeatModeString,
 } from "../../../types";
 import locale from "../../../locales";
 import { Guild } from "../../../database/mysql/entities";
@@ -20,9 +19,9 @@ export default class RepeatCommand extends BaseCommand {
         option
           .setName("repeat_mode")
           .setDescription("Repeat mode")
-          .addChoice("Single", "SINGLE")
-          .addChoice("All", "ALL")
-          .addChoice("Off", "OFF");
+          .addChoice("Off", "0")
+          .addChoice("All", "1")
+          .addChoice("Single", "2");
         return option;
       });
     super(
@@ -57,34 +56,28 @@ export default class RepeatCommand extends BaseCommand {
         content: locale.format(
           interaction.locale,
           "REPEAT_STATE",
-          EMOJI_REPEAT[RepeatModeString[guildConfig.repeat]], // EMOJI_REPEAT => OFF: "EMOJI", RepeatModeString => (number like string): "OFF"
+          EMOJI_REPEAT[guildConfig.repeat], // EMOJI_REPEAT => OFF: "EMOJI", RepeatModeString => (number like string): "OFF"
           locale.format(
             interaction.locale,
-            "REPEAT_" + RepeatModeString[guildConfig.repeat]
+            "REPEAT_" + guildConfig.repeat.toString()
           )
         ),
       });
       return;
     } else {
-      const toSet: RepeatMode =
-        repeatMode === RepeatModeString[RepeatMode.ALL]
-          ? RepeatMode.ALL
-          : repeatMode === RepeatModeString[RepeatMode.SINGLE]
-          ? RepeatMode.SINGLE
-          : RepeatMode.OFF;
       const guildConfig: Guild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId,
-          { repeat: toSet }
+          { repeat: parseInt(repeatMode) }
         );
       await interaction.reply({
         content: locale.format(
           interaction.locale,
           "REPEAT_SET",
-          EMOJI_REPEAT[RepeatModeString[guildConfig.repeat]], // EMOJI_REPEAT => OFF: "EMOJI", RepeatModeString => (number like string): "OFF"
+          EMOJI_REPEAT[guildConfig.repeat],
           locale.format(
             interaction.locale,
-            "REPEAT_" + RepeatModeString[guildConfig.repeat]
+            "REPEAT_" + guildConfig.repeat.toString()
           )
         ),
       });
