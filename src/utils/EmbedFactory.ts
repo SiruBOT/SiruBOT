@@ -71,9 +71,9 @@ export class EmbedFactory {
       const readablePosition: string = Formatter.humanizeSeconds(
         currentPosition / 1000
       );
-      const readableTrackLength: string = Formatter.humanizeSeconds(
-        trackLength / 1000
-      );
+      const readableTrackLength: string = nowplaying.shoukakuTrack.info.isStream
+        ? `[${format("LIVESTREAM")}]`
+        : Formatter.humanizeSeconds(trackLength / 1000);
       const trackEmbed: ExtendedEmbed = await this.getTrackEmbed(
         client,
         format,
