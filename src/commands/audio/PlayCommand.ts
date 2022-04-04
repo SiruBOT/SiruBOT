@@ -6,8 +6,8 @@ import { BaseCommand, Client } from "../../structures";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
   IAudioTrack,
+  ICommandContext,
   IGuildAudioData,
   ShoukakuTrackListType,
   VoiceConnectedGuildMemberVoiceState,
@@ -58,7 +58,7 @@ export default class PlayCommand extends BaseCommand {
   }
 
   public async runCommand(
-    interaction: HandledCommandInteraction<typeof commandRequirements>,
+    { interaction }: ICommandContext<typeof commandRequirements>,
     soundCloud = false
   ): Promise<void> {
     await interaction.deferReply();

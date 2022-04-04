@@ -4,8 +4,8 @@ import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
   IAudioTrack,
+  ICommandContext,
   IGuildAudioData,
 } from "../../types";
 import { Guild } from "../../database/mysql/entities/Guild";
@@ -42,9 +42,9 @@ export default class QueueCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: HandledCommandInteraction<typeof commandRequirements>
-  ): Promise<void> {
+  public async runCommand({
+    interaction,
+  }: ICommandContext<typeof commandRequirements>): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );

@@ -3,7 +3,7 @@ import { BaseCommand, Client } from "../../../structures";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
+  ICommandContext,
 } from "../../../types";
 import locale from "../../../locales";
 import { Guild } from "../../../database/mysql/entities";
@@ -39,9 +39,7 @@ export default class RepeatCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: HandledCommandInteraction
-  ): Promise<void> {
+  public async runCommand({ interaction }: ICommandContext): Promise<void> {
     const relatedMode: string | null =
       interaction.options.getString("related_mode");
     if (!relatedMode) {

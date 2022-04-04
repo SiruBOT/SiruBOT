@@ -1,8 +1,11 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import * as Discord from "discord.js";
 import { Constants, ShoukakuSocket } from "shoukaku";
 import { BaseCommand, Client } from "../../structures";
-import { CommandCategories, CommandPermissions } from "../../types";
+import {
+  CommandCategories,
+  CommandPermissions,
+  ICommandContext,
+} from "../../types";
 import { EmbedFactory, Formatter } from "../../utils";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 
@@ -49,9 +52,7 @@ export default class NodeInfoCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: Discord.CommandInteraction
-  ): Promise<void> {
+  public async runCommand({ interaction }: ICommandContext): Promise<void> {
     const nodes: ShoukakuSocket[] = [...this.client.audio.nodes.values()];
     const onlineNodes: ShoukakuSocket[] = nodes.filter(
       (v) => v.state === Constants.state.CONNECTED

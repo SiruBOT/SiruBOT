@@ -4,7 +4,7 @@ import { PlayerDispatcher } from "../../../structures/audio/PlayerDispatcher";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
+  ICommandContext,
 } from "../../../types";
 import locale from "../../../locales";
 
@@ -31,9 +31,7 @@ export default class StopCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: HandledCommandInteraction
-  ): Promise<void> {
+  public async runCommand({ interaction }: ICommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );

@@ -3,8 +3,7 @@ import { BaseCommand, Client } from "../../../structures";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
-  RepeatMode,
+  ICommandContext,
 } from "../../../types";
 import locale from "../../../locales";
 import { Guild } from "../../../database/mysql/entities";
@@ -42,12 +41,13 @@ export default class RepeatCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: HandledCommandInteraction
-  ): Promise<void> {
+  public async runCommand({
+    interaction,
+    userPermissions,
+  }: ICommandContext): Promise<void> {
     const repeatMode: string | null =
       interaction.options.getString("repeat_mode");
-    if (!repeatMode) {
+    if (!repeatMode || !userPermissions.includes(CommandPermissions.DJ)) {
       const guildConfig: Guild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId

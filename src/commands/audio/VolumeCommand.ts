@@ -4,7 +4,7 @@ import { BaseCommand, Client } from "../../structures";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
+  ICommandContext,
 } from "../../types";
 import { Formatter } from "../../utils";
 import locale from "../../locales";
@@ -37,9 +37,7 @@ export default class VolumeCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: HandledCommandInteraction
-  ): Promise<void> {
+  public async runCommand({ interaction }: ICommandContext): Promise<void> {
     const volume: number | null = interaction.options.getInteger("volume");
     if (!volume) {
       const guildConfig: Guild =

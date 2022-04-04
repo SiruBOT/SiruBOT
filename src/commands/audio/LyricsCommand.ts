@@ -3,7 +3,7 @@ import { BaseCommand, Client } from "../../structures";
 import {
   CommandCategories,
   CommandPermissions,
-  HandledCommandInteraction,
+  ICommandContext,
 } from "../../types";
 import { ILyricsSearchResult, MelonProvider } from "slyrics";
 import locale from "../../locales";
@@ -41,9 +41,7 @@ export default class LyricsCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: HandledCommandInteraction
-  ): Promise<void> {
+  public async runCommand({ interaction }: ICommandContext): Promise<void> {
     await interaction.deferReply();
     const query: string = interaction.options.getString("query", true);
     const provider: MelonProvider = new MelonProvider();

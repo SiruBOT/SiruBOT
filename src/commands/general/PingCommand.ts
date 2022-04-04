@@ -1,7 +1,11 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Discord from "discord.js";
 import { BaseCommand, Client } from "../../structures";
-import { CommandCategories, CommandPermissions } from "../../types";
+import {
+  CommandCategories,
+  CommandPermissions,
+  ICommandContext,
+} from "../../types";
 import { EmbedFactory } from "../../utils";
 
 export default class PingCommand extends BaseCommand {
@@ -27,9 +31,7 @@ export default class PingCommand extends BaseCommand {
     );
   }
 
-  public async runCommand(
-    interaction: Discord.CommandInteraction
-  ): Promise<void> {
+  public async runCommand({ interaction }: ICommandContext): Promise<void> {
     const pingEmbed: Discord.MessageEmbed = EmbedFactory.createEmbed();
     await interaction.deferReply();
     pingEmbed.setDescription(
