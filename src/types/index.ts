@@ -7,7 +7,7 @@ export { IGatewayResponse } from "./IGatewayResponse";
 export { ICommandRequirements } from "./CommandTypes/ICommandRequirements";
 export { CommandCategories } from "./CommandTypes/CommandCategories";
 export { CommandPermissions } from "./CommandTypes/CommandPermissions";
-
+export { ICommandContext } from "./InteractionHandlerTypes/ICommandContext";
 // Handler
 export { HandledCommandInteraction } from "./InteractionHandlerTypes/HandledCommandInteraction";
 export {

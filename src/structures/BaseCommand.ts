@@ -4,6 +4,7 @@ import type { Client } from ".";
 import type {
   CommandCategories,
   CommandPermissions,
+  ICommandContext,
   ICommandRequirements,
 } from "../types";
 
@@ -37,49 +38,49 @@ export abstract class BaseCommand {
     this.requirements = requirements;
   }
 
-  async runCommand(
+  public async runCommand(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interaction: Discord.CommandInteraction
+    context: ICommandContext
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runCommand");
   }
 
-  async runAutocomplete(
+  public async runAutocomplete(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.AutocompleteInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runAutocomplete");
   }
 
-  async runButton(
+  public async runButton(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.ButtonInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runButton");
   }
 
-  async runContextMenu(
+  public async runContextMenu(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.ContextMenuInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runContextMenu");
   }
 
-  async runMessageComponent(
+  public async runMessageComponent(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.MessageComponentInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runMessageComponent");
   }
 
-  async runSelectMenu(
+  public async runSelectMenu(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.SelectMenuInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runSelectMenu");
   }
 
-  async runUserContextMenu(
+  public async runUserContextMenu(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.UserContextMenuInteraction
   ): Promise<void> {
