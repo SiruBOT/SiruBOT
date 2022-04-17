@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Sentry from "@sentry/node";
 import * as Discord from "discord.js";
+import LRU from "lru-cache";
 import { ShoukakuSocket, ShoukakuTrack, ShoukakuTrackList } from "shoukaku";
 import { BaseCommand, Client } from "../../structures";
 import {
@@ -36,6 +37,12 @@ const commandRequirements = {
 } as const;
 
 export default class PlayCommand extends BaseCommand {
+  // Autocomplete URL -> Playcommand cache, short ttl
+  private searchCache: LRU<string, ShoukakuTrackList> = new LRU({
+    ttl: 1000 * 30, // 30 seconds
+    max: 100, // Max items
+    updateAgeOnGet: true, // extend ttl on get
+  });
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("play")
@@ -88,7 +95,8 @@ export default class PlayCommand extends BaseCommand {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );
-    const searchResult: ShoukakuTrackList = await node.rest.resolve(
+    const searchResult: ShoukakuTrackList = await this.fetchTracksCached(
+      node,
       isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
     );
     // Search result
@@ -207,6 +215,7 @@ export default class PlayCommand extends BaseCommand {
                 time: BUTTON_AWAIT_TIMEOUT,
               });
             if (collectorInteraction.customId === okButtonCustomId) {
+              // Prevent erorr when user click ok button after dispatcher is destroyed
               if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
                 await collectorInteraction.update({
                   content: enQueueState,
@@ -214,6 +223,7 @@ export default class PlayCommand extends BaseCommand {
                   embeds: [],
                 });
               } else {
+                // Print successfully added message
                 await collectorInteraction.update({
                   content: enQueueState,
                   components: [],
@@ -232,6 +242,7 @@ export default class PlayCommand extends BaseCommand {
                       .setTrackThumbnail(track.info),
                   ],
                 });
+                // Add sliced playlist
                 await dispatcher.addTracks(
                   slicedPlaylist.map((e: ShoukakuTrack) =>
                     AudioTools.getAudioTrack(e, interaction.user.id)
@@ -239,7 +250,7 @@ export default class PlayCommand extends BaseCommand {
                 );
               }
             } else {
-              // User cancel
+              // When user press cancel button
               await collectorInteraction.update({
                 content: enQueueState,
                 components: [],
@@ -252,12 +263,14 @@ export default class PlayCommand extends BaseCommand {
               err.name.includes("INTERACTION_COLLECTOR_ERROR") &&
               err.message.includes("time")
             ) {
+              // Timeout handle
               await interaction.editReply({
                 content: enQueueState,
                 components: [],
                 embeds: [],
               });
             } else {
+              // When something f*cked up, throw error
               throw error;
             }
           }
@@ -294,7 +307,7 @@ export default class PlayCommand extends BaseCommand {
     }
   }
 
-  willPlayingOrEnqueued(
+  private willPlayingOrEnqueued(
     nowplaying: IAudioTrack | null,
     queueLength: number
   ): string {
@@ -313,7 +326,8 @@ export default class PlayCommand extends BaseCommand {
     // 쿼리가 없거나 길이가 100이상이거나 URL일 경우 결과없음
     if (!query || query.length > 100 || isURL(query))
       return await interaction.respond([]);
-    const searchResult: ShoukakuTrackList = await idealNode.rest.resolve(
+    const searchResult: ShoukakuTrackList = await this.fetchTracksCached(
+      idealNode,
       `ytsearch:${query}`
     );
     // Search가 아니면 결과없음
@@ -332,5 +346,41 @@ export default class PlayCommand extends BaseCommand {
         })
         .slice(0, AUTOCOMPLETE_MAX_RESULT)
     );
+  }
+
+  private async fetchTracksCached(
+    node: ShoukakuSocket,
+    query: string
+  ): Promise<ShoukakuTrackList> {
+    const cacheKey = `${node.name}-${query}`;
+    const searchCache: ShoukakuTrackList | undefined =
+      this.searchCache.get(cacheKey);
+    if (searchCache) {
+      this.client.log.debug(
+        `Cache hit for ${cacheKey} with ${searchCache.tracks.length} tracks`
+      );
+      return searchCache;
+    } else {
+      const trackList: ShoukakuTrackList = await node.rest.resolve(query);
+      this.client.log.debug(
+        `Cache miss for ${cacheKey} with ${trackList.tracks.length} tracks, caching search results & tracks`
+      );
+      this.searchCache.set(cacheKey, trackList);
+      if (trackList.tracks.length > 0) {
+        trackList.tracks.forEach((v: ShoukakuTrack) => {
+          if (v.info.uri) {
+            const fakeTrackListForCache: ShoukakuTrackList = {
+              type: ShoukakuTrackListType.Search,
+              tracks: [v],
+            };
+            this.searchCache.set(
+              `${node.name}-${v.info.uri}`,
+              fakeTrackListForCache
+            );
+          }
+        });
+      }
+      return trackList;
+    }
   }
 }
