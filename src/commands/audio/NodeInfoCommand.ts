@@ -40,7 +40,7 @@ export default class NodeInfoCommand extends BaseCommand {
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       {
-        audioNode: false,
+        audioNode: true,
         trackPlaying: false,
         voiceStatus: {
           listenStatus: false,
@@ -59,10 +59,10 @@ export default class NodeInfoCommand extends BaseCommand {
     );
     const totalPlayers: number = onlineNodes
       .map((e) => e.stats.players)
-      .reduce((a, b) => a + b);
+      .reduce((a, b) => a + b, 0);
     const totalPlayingPlayers: number = onlineNodes
       .map((e) => e.stats.playingPlayers)
-      .reduce((a, b) => a + b);
+      .reduce((a, b) => a + b, 0);
     const nodeInfoEmbed: ExtendedEmbed = EmbedFactory.createEmbed();
     nodeInfoEmbed.setTitle("📡  Node status");
     nodeInfoEmbed.setTimestamp(new Date());
