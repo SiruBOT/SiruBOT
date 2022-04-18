@@ -10,6 +10,7 @@ import { PlayerDispatcher } from "../structures/audio/PlayerDispatcher";
 import { Logger } from "tslog";
 import { Guild } from "../database/mysql/entities";
 import { CommandPermissionChecker } from "../structures/CommandPermissionChecker";
+import { CommandPermissionError } from "../structures/errors/CommandPermissionError";
 
 const SYSTEM_MESSAGE_EPHEMERAL = false;
 const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
@@ -92,37 +93,35 @@ export default class InteractionCreateEvent extends BaseEvent {
         content: locale.format(interaction.locale, "UNKNOWN_COMMAND"),
       });
     } else {
+      transaction?.setData("guildId", interaction.guildId);
       // -------- Handle guild command interaction --------
-      if (interaction.inGuild()) {
+      if (!interaction.inCachedGuild() && interaction.guildId) {
+        this.log.debug(
+          `Guild ${interaction.guildId} not cached. fetch Guild..`
+        );
+        transaction?.setData("isCached", "notCachedGuild");
+        try {
+          await this.client.guilds.fetch(interaction.guildId);
+        } catch (error) {
+          const exceptionId: string = Sentry.captureException(error);
+          await interaction.reply({
+            content: locale.format(
+              interaction.locale,
+              "GUILD_CACHE_FAILED",
+              exceptionId,
+              error as string
+            ),
+          });
+          transaction?.setData("error", "Guild_Cache_Failed");
+          transaction?.finish();
+          return;
+        }
+      } else {
+        transaction?.setData("isCached", "inCachedGuild");
+      }
+      if (interaction.inCachedGuild()) {
         // Start of Handle Command
         try {
-          transaction?.setData("guildId", interaction.guildId);
-          // If guild is not cached. fetch guild
-          if (!interaction.inCachedGuild()) {
-            this.log.debug(
-              `Guild ${interaction.guildId} not cached. fetch Guild..`
-            );
-            transaction?.setData("isCached", "notCachedGuild");
-            try {
-              await this.client.guilds.fetch(interaction.guildId);
-            } catch (error) {
-              const exceptionId: string = Sentry.captureException(error);
-              await interaction.reply({
-                content: locale.format(
-                  interaction.locale,
-                  "GUILD_CACHE_FAILED",
-                  exceptionId,
-                  error as string
-                ),
-              });
-              transaction?.setData("error", "Guild_Cache_Failed");
-              transaction?.finish();
-              return;
-            }
-          } else {
-            transaction?.setData("isCached", "inCachedGuild");
-          }
-
           // -------- Handle bot's permissions --------
           const missingPermissions: Discord.PermissionString[] = [];
           for (const guildPermission of command.botPermissions) {
@@ -313,7 +312,11 @@ export default class InteractionCreateEvent extends BaseEvent {
               }
             }
           }
-          await command.runCommand(interaction);
+          // Run command
+          await command.runCommand({
+            interaction,
+            userPermissions,
+          });
           this.log.debug(
             `Command successfully executed (${this.generateCommandInfoString(
               interaction
@@ -322,34 +325,50 @@ export default class InteractionCreateEvent extends BaseEvent {
           transaction?.setData("endReason", "ok");
           transaction?.setHttpStatus(200);
           transaction?.finish();
+          return;
         } catch (error) {
-          this.log.error(
-            `Command failed to execute (${this.generateCommandInfoString(
-              interaction
-            )})`,
-            error
-          );
-          const exceptionId: string = Sentry.captureException(error);
-          const payload: Discord.InteractionReplyOptions = {
-            ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
-            content: locale.format(
-              interaction.locale,
-              "COMMAND_HANDLE_ERROR",
-              exceptionId,
-              error as string
-            ),
-          };
-          try {
-            await interaction.reply(payload);
-          } catch (error) {
-            this.log.warn(
-              `Failed to reply error message ${exceptionId} ${error}`
+          // Command Permission error handle
+          if (error instanceof CommandPermissionError) {
+            await interaction.reply({
+              ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
+              content: locale.format(
+                interaction.locale,
+                "COMMAND_PERMISSION_ERROR",
+                error.permission
+              ),
+            });
+            return;
+          } else {
+            this.log.error(
+              `Command failed to execute (${this.generateCommandInfoString(
+                interaction
+              )})`,
+              error
             );
+            const exceptionId: string = Sentry.captureException(error);
+            const payload: Discord.InteractionReplyOptions = {
+              ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
+              content: locale.format(
+                interaction.locale,
+                "COMMAND_HANDLE_ERROR",
+                exceptionId,
+                error as string
+              ),
+            };
+            try {
+              await interaction.reply(payload);
+            } catch (error) {
+              this.log.warn(
+                `Failed to reply error message ${exceptionId}`,
+                error
+              );
+            }
+            transaction?.setData("endReason", "error");
+            transaction?.setData("errorId", exceptionId);
+            transaction?.setHttpStatus(500);
+            transaction?.finish();
+            return;
           }
-          transaction?.setData("endReason", "error");
-          transaction?.setData("errorId", exceptionId);
-          transaction?.setHttpStatus(500);
-          transaction?.finish();
         }
       } // End of inGuild
     }
