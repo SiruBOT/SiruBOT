@@ -8,7 +8,9 @@ import {
 } from "../../types";
 import { Formatter } from "../../utils";
 import locale from "../../locales";
+import { CommandPermissionError } from "../../structures/errors/CommandPermissionError";
 export default class VolumeCommand extends BaseCommand {
+  // https://google.com
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("volume")
@@ -37,7 +39,10 @@ export default class VolumeCommand extends BaseCommand {
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
+  public async runCommand({
+    interaction,
+    userPermissions,
+  }: ICommandContext): Promise<void> {
     const volume: number | null = interaction.options.getInteger("volume");
     if (!volume) {
       const guildConfig: Guild =
@@ -54,6 +59,8 @@ export default class VolumeCommand extends BaseCommand {
       });
       return;
     } else {
+      if (!userPermissions.includes(CommandPermissions.DJ))
+        throw new CommandPermissionError(CommandPermissions.DJ);
       // Max Volume = 150
       if (volume > 150) {
         return await interaction.reply({
