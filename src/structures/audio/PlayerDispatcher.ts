@@ -28,6 +28,7 @@ export class PlayerDispatcher extends EventEmitter {
   public client: Client;
   public player: ShoukakuPlayer;
   private guildId: string;
+  private destroyed: boolean;
   public queue: Queue;
   private databaseHelper: DatabaseHelper;
   private audioMessage: AudioMessage;
@@ -43,6 +44,7 @@ export class PlayerDispatcher extends EventEmitter {
     this.client = audio.client;
     this.player = player;
     this.guildId = player.connection.guildId;
+    this.destroyed = false;
     this.log = this.client.log.getChildLogger({
       name: this.client.log.settings.name + "/PlayerDispatcher/" + this.guildId,
     });
@@ -181,7 +183,7 @@ export class PlayerDispatcher extends EventEmitter {
     );
     const toPlay: IAudioTrack | null = await this.queue.shiftTrack();
     if (toPlay) {
-      this.playTrack(toPlay, guildConfig.volume);
+      await this.playTrack(toPlay, guildConfig.volume);
       return toPlay;
     } else if (
       guildConfig.repeat === RepeatMode.OFF &&
@@ -394,6 +396,7 @@ export class PlayerDispatcher extends EventEmitter {
 
   public destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
+    this.destroyed = true;
     this.audio.deletePlayerDispatcher(this.guildId);
     this.audio.players.delete(this.guildId);
     this.player.connection.disconnect();

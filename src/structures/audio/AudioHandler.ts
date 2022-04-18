@@ -23,6 +23,7 @@ export class AudioHandler extends Shoukaku {
   public dispatchers: Map<string, PlayerDispatcher>;
   public relatedScraper: Scraper;
   public routePlanner?: RoutePlanner;
+
   constructor(client: Client) {
     super(new Libraries.DiscordJS(client), client.settings.audio.nodes, {
       resumable: true,
