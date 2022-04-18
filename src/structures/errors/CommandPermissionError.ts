@@ -1,9 +1,14 @@
 import { CommandPermissions } from "../../types";
 
 export class CommandPermissionError extends Error {
-  permissions: CommandPermissions;
-  constructor(permissions: CommandPermissions) {
+  permission: CommandPermissions;
+  constructor(permission: CommandPermissions) {
     super();
-    this.permissions = permissions;
+    this.name = "CommandPermissionError";
+    this.message =
+      "You don't have permission to use this command (required: " +
+      permission +
+      ")";
+    this.permission = permission;
   }
 }
