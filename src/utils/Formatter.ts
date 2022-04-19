@@ -9,6 +9,8 @@ import {
   PROGRESS_BAR_START_BLACK,
   PROGRESS_BAR_END_BLACK,
   PROGRESS_BAR_BLACK,
+  PROGRESS_BAR_START_SINGLE_WHITE,
+  PROGRESS_BAR_END_MIDDLE_WHITE,
 } from "../constant/Constants";
 const PROGRESS_BAR_EMOJI_COUNT = 10;
 export class Formatter {
@@ -63,22 +65,33 @@ export class Formatter {
 
   static progressBar(percent: number) {
     let str = "";
+    const p = Math.floor(percent * PROGRESS_BAR_EMOJI_COUNT); // Current progress (0 ~ PROGRESS_BAR_EMOJI_COUNT)
     for (let i = 0; i < PROGRESS_BAR_EMOJI_COUNT; i++) {
-      if (i < Math.floor(percent * PROGRESS_BAR_EMOJI_COUNT)) {
-        if (i === 0) {
-          str += PROGRESS_BAR_START_WHITE;
-        } else if (i === PROGRESS_BAR_EMOJI_COUNT - 1) {
-          str += PROGRESS_BAR_END_WHITE;
+      if (i == 0) {
+        if (p == 0) {
+          str += PROGRESS_BAR_START_BLACK;
+        } else if (p == 1) {
+          str += PROGRESS_BAR_START_SINGLE_WHITE;
         } else {
-          str += PROGRESS_BAR_WHITE;
+          str += PROGRESS_BAR_START_WHITE;
         }
       } else {
-        if (i === 0) {
-          str += PROGRESS_BAR_START_BLACK;
-        } else if (i === PROGRESS_BAR_EMOJI_COUNT - 1) {
-          str += PROGRESS_BAR_END_BLACK;
+        if (p > i) {
+          if (p - 1 == i) {
+            if (i == PROGRESS_BAR_EMOJI_COUNT - 1) {
+              str += PROGRESS_BAR_END_WHITE;
+            } else {
+              str += PROGRESS_BAR_END_MIDDLE_WHITE;
+            }
+          } else {
+            str += PROGRESS_BAR_WHITE;
+          }
         } else {
-          str += PROGRESS_BAR_BLACK;
+          if (i < PROGRESS_BAR_EMOJI_COUNT - 1) {
+            str += PROGRESS_BAR_BLACK;
+          } else {
+            str += PROGRESS_BAR_END_BLACK;
+          }
         }
       }
     }
