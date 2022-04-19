@@ -31,9 +31,11 @@ export const EMOJI_PREV = "<:btn_left:955803837095088128>";
 export const EMOJI_NEXT = "<:btn_right:955803837254488074>";
 export const EMOJI_STOP = "<:btn_stop:955804418815721472>";
 /** Emojis (Progress bars) */
+export const PROGRESS_BAR_START_SINGLE_WHITE = "<:progress_start_single:965594966028079244>";
 export const PROGRESS_BAR_START_WHITE = "<:progress_start_white:956493674609541140>";
 export const PROGRESS_BAR_WHITE = "<:progress_bar_white:956493673913270325>";
 export const PROGRESS_BAR_END_WHITE = "<:progress_end_white:956493674445934602>";
+export const PROGRESS_BAR_END_MIDDLE_WHITE = "<:progress_end_middle_white:965594965650583602>";
 export const PROGRESS_BAR_START_BLACK = "<:progress_start_black:956491293532520458>";
 export const PROGRESS_BAR_BLACK = "<:progress_bar_black:956491293507321896>";
 export const PROGRESS_BAR_END_BLACK = "<:progress_end_black:956491293448613908>";
