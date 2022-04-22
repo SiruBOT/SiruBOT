@@ -46,7 +46,7 @@
     "typescript": "^4.6.2"
   },
   "scripts": {
-    "lint:check": "eslint --ext .ts ./src",
+    "lint": "eslint --ext .ts ./src",
     "lint:fix": "eslint --ext .ts ./src --fix",
     "build:ts": "yarn run build:clean && tsc --project ./tsconfig.json",
     "build:clean": "gulp clean",
