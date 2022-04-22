@@ -22,13 +22,14 @@ import { ReusableFormatFunction } from "../../locales/LocalePicker";
 import { Formatter } from "../../utils";
 import { EventEmitter } from "events";
 import { Guild } from "../../database/mysql/entities";
+import { BreakOnDestroyed } from "./PlayerDecorator";
 
 export class PlayerDispatcher extends EventEmitter {
   public audio: AudioHandler;
   public client: Client;
   public player: ShoukakuPlayer;
   private guildId: string;
-  private destroyed: boolean;
+  private _destroyed: boolean;
   public queue: Queue;
   private databaseHelper: DatabaseHelper;
   private audioMessage: AudioMessage;
@@ -44,7 +45,7 @@ export class PlayerDispatcher extends EventEmitter {
     this.client = audio.client;
     this.player = player;
     this.guildId = player.connection.guildId;
-    this.destroyed = false;
+    this._destroyed = false;
     this.log = this.client.log.getChildLogger({
       name: this.client.log.settings.name + "/PlayerDispatcher/" + this.guildId,
     });
@@ -59,6 +60,7 @@ export class PlayerDispatcher extends EventEmitter {
     this.queue = new Queue(this.guildId, this.databaseHelper, this.log);
   }
 
+  @BreakOnDestroyed()
   registerPlayerEvent() {
     this.player.on("closed", (...args) => this.onClosed(...args));
     this.player.on("end", (...args) => this.onEnd(...args));
@@ -66,6 +68,7 @@ export class PlayerDispatcher extends EventEmitter {
     this.player.on("exception", (...args) => this.onException(...args));
   }
 
+  @BreakOnDestroyed()
   private async onClosed(reason: WebSocketClosedEvent) {
     this.log.warn(`Websocket closed`, reason || "No reason");
     this.destroy();
@@ -75,12 +78,14 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   public async sendDisconnected(): Promise<void> {
     await this.audioMessage.sendMessage(
       await this.audioMessage.format("DISCONNECT_ERROR")
     );
   }
 
+  @BreakOnDestroyed()
   private async onUpdate(data: PlayerUpdate) {
     const { position }: { position: number | undefined } = data.state;
     if (!position) {
@@ -97,11 +102,13 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   private async onException(exception: TrackExceptionEvent) {
     this.log.error(`Error while playback`, exception);
     Sentry.captureException(exception);
   }
 
+  @BreakOnDestroyed()
   private async onEnd(trackEndEvent: TrackEndEvent) {
     this.log.debug(
       `Track ended, playing next item or handle repeat/related`,
@@ -144,6 +151,7 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   public async addTracks(tracks: IAudioTrack[]): Promise<number> {
     this.log.debug(`Add tracks ${tracks.length}`);
     await this.queue.pushTracks(tracks);
@@ -151,6 +159,7 @@ export class PlayerDispatcher extends EventEmitter {
     return tracks.length;
   }
 
+  @BreakOnDestroyed()
   public async addTrack(track: IAudioTrack): Promise<IAudioTrack> {
     this.log.debug(`Add track ${track.shoukakuTrack.info.identifier}`);
     await this.queue.pushTrack(track);
@@ -158,6 +167,7 @@ export class PlayerDispatcher extends EventEmitter {
     return track;
   }
 
+  @BreakOnDestroyed()
   public async playOrResumeOrNothing(): Promise<IAudioTrack | void> {
     const { nowPlaying, queue } = await this.queue.getGuildAudioData();
     if (nowPlaying && !this.player.track) {
@@ -176,6 +186,7 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   private async playNextTrack(): Promise<IAudioTrack | void> {
     this.log.debug(`Playing next track`);
     const guildConfig: Guild = await this.databaseHelper.upsertAndFindGuild(
@@ -201,6 +212,7 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   private async playRelated(): Promise<void> {
     // Related track handle
     const beforeTrack: IAudioTrack | null = await this.queue.getNowPlaying();
@@ -245,6 +257,7 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   private async handleRepeat(repeatStatus: RepeatMode): Promise<void> {
     const beforeTrack: IAudioTrack | null = await this.queue.getNowPlaying();
     if (!beforeTrack) {
@@ -274,6 +287,7 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   private async resumeNowPlaying(nowPlaying: IAudioTrack) {
     // Player track = null, DB nowplaying = exists
     const guildConfig = await this.databaseHelper.upsertAndFindGuild(
@@ -305,6 +319,7 @@ export class PlayerDispatcher extends EventEmitter {
     return nowPlaying;
   }
 
+  @BreakOnDestroyed()
   private async playTrack(
     toPlay: IAudioTrack,
     volume: number,
@@ -353,6 +368,7 @@ export class PlayerDispatcher extends EventEmitter {
     });
   }
 
+  @BreakOnDestroyed()
   public async skipTrack(
     to: number | null = null
   ): Promise<void | IAudioTrack> {
@@ -366,6 +382,7 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
+  @BreakOnDestroyed()
   public setVolumePercent(val: number): number {
     const calc = val / 100;
     this.log.debug(`Set player's volume to ${val}% (${calc})`);
@@ -373,6 +390,7 @@ export class PlayerDispatcher extends EventEmitter {
     return val;
   }
 
+  @BreakOnDestroyed()
   public async stopPlayer(): Promise<void> {
     await this.cleanStop();
     // Send Audio Message
@@ -381,12 +399,14 @@ export class PlayerDispatcher extends EventEmitter {
     });
   }
 
+  @BreakOnDestroyed()
   public async cleanStop() {
     this.log.debug(`Clean queue & destroy dispatcher`);
     this.destroy();
     await this.queue.cleanQueue();
   }
 
+  @BreakOnDestroyed()
   private async handleError(exceptionId: string): Promise<void> {
     this.destroy();
     await this.audioMessage.sendMessage({
@@ -394,9 +414,13 @@ export class PlayerDispatcher extends EventEmitter {
     });
   }
 
+  public get destroyed(): boolean {
+    return this._destroyed;
+  }
+
   public destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
-    this.destroyed = true;
+    this._destroyed = true;
     this.audio.deletePlayerDispatcher(this.guildId);
     this.audio.players.delete(this.guildId);
     this.player.connection.disconnect();
