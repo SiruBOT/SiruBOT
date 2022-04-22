@@ -85,17 +85,27 @@ if (
 }
 
 // ignore uncaughtException, unhandledRejection
-const fatal = (err: Error): void => {
-  log.fatal(err);
+const uncaughtException = (err: Error): void => {
+  log.error("Uncaught exception: ", err);
   Sentry.captureException(err);
+};
+
+const unhandledRejection = (
+  _reason: string,
+  promise: Promise<unknown>
+): void => {
+  promise.catch((reason) => {
+    Sentry.captureException(reason);
+    log.fatal("Uncaught rejection, reason: ", reason);
+  });
 };
 
 log.debug("Pre configuration complete. Call client.start() function.");
 client
   .start()
   .then(() => {
-    process.on("uncaughtException", fatal);
-    process.on("unhandledRejection", fatal);
+    process.on("uncaughtException", uncaughtException);
+    process.on("unhandledRejection", unhandledRejection);
   })
   .catch((err) => {
     log.error(

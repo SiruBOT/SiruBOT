@@ -67,7 +67,7 @@ parser.add_argument("-c", "--config", {
 // Parse Args
 const args: IBootStrapperArgs = parser.parse_args();
 // Logger setup
-const LOGGER_NAME = "Bootstrap";
+const LOGGER_NAME = "Manager";
 const log: Logger = new Logger({
   name: LOGGER_NAME,
   minLevel: args.debug ? "debug" : "info",
@@ -233,8 +233,8 @@ async function boot() {
           totalShards: gatewayJson.shards,
           shardsPerClusters: parsedConfig.bot.shardsPerClusters,
           token,
-          mode: "process",
           respawn: true,
+          execArgv: ["--trace-warnings"],
           shardArgs: [JSON.stringify(parsedConfig), JSON.stringify(args)],
         }
       );
