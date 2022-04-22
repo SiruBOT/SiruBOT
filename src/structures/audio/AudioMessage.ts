@@ -1,4 +1,9 @@
-import { AnyChannel, MessageOptions, MessagePayload } from "discord.js";
+import {
+  AnyChannel,
+  MessageOptions,
+  MessagePayload,
+  Message,
+} from "discord.js";
 import { Logger } from "tslog";
 import { Client, DatabaseHelper } from "..";
 import { Guild } from "../../database/mysql/entities";
@@ -10,6 +15,7 @@ export class AudioMessage {
   private client: Client;
   private guildId: string;
   private channelId: string;
+  private lastMessageId: string | undefined;
   private databaseHelper: DatabaseHelper;
   private log: Logger;
   constructor(
@@ -49,21 +55,65 @@ export class AudioMessage {
   public async sendMessage(
     options: string | MessagePayload | MessageOptions
   ): Promise<void> {
-    const channel: AnyChannel | null = await this.client.channels.fetch(
-      this.channelId
-    );
-    if (channel?.isText()) {
-      try {
-        await channel.send(options);
-      } catch (error) {
-        Sentry.captureException(error);
-        this.log.warn(
-          `Failed to send audioMessage to ${this.channelId}`,
-          error
-        );
+    this.log.debug(`Send audio message to guild ${this.guildId}...`);
+    const { textChannelId, sendAudioMessages }: Guild =
+      await this.databaseHelper.upsertAndFindGuild(this.guildId);
+    if (!sendAudioMessages) return;
+    let targetChannel: AnyChannel | null = null;
+    if (textChannelId) {
+      targetChannel = await this.fetchChannel(textChannelId);
+    }
+    if (!textChannelId || !targetChannel) {
+      targetChannel = await this.fetchChannel(this.channelId);
+    }
+    if (targetChannel?.isText()) {
+      const lastMessage: Message | undefined = (
+        await targetChannel.messages.fetch({
+          limit: 1,
+        })
+      ).first();
+      if (
+        lastMessage &&
+        lastMessage.id == this.lastMessageId &&
+        lastMessage.editable
+      ) {
+        try {
+          this.log.debug(
+            `Trying to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id}...`
+          );
+          await lastMessage.edit(options);
+        } catch (e) {
+          this.log.error(
+            `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} is message is deleted?`,
+            e
+          );
+          Sentry.captureException(e);
+          this.log.debug(
+            `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} trying to send message`
+          );
+          const lastMsg: Message = await targetChannel.send(options);
+          this.lastMessageId = lastMsg.id;
+        }
+      } else {
+        if (this.lastMessageId)
+          await targetChannel.messages.delete(this.lastMessageId).catch(); // Ignore errors
+        this.log.debug(`Send message to ${targetChannel.id}`);
+        const lastMsg: Message = await targetChannel.send(options);
+        this.lastMessageId = lastMsg.id;
       }
-    } else {
-      throw new Error("Channel is not textChannel");
+    }
+  }
+
+  private async fetchChannel(channelId: string): Promise<AnyChannel | null> {
+    try {
+      return await this.client.channels.fetch(channelId);
+    } catch (e) {
+      this.log.error(
+        `Failed to fetch channel (${channelId}), is channel is deleted?`,
+        e
+      );
+      Sentry.captureException(e);
+      return null;
     }
   }
 }
