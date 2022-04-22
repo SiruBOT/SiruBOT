@@ -264,6 +264,7 @@ async function boot() {
             })`
           );
           webhookNotifier?.clusterSpawned(cluster);
+          cluster.removeAllListeners("ready");
           cluster.once("ready", () => {
             log.info(`Cluster #${cluster.id} ready`);
             webhookNotifier?.clusterReady(
