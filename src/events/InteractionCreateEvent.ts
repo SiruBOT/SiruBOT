@@ -191,10 +191,10 @@ export default class InteractionCreateEvent extends BaseEvent {
           }
           if (guildConfig.textChannelId) {
             const defaultTextChannel: Discord.AnyChannel | undefined | null =
-              this.client.channels.cache // 채널 캐시에 없다면 fetch
+              this.client.channels.cache // 채널 캐시에 없다면 fetch, AnyChannel = TextChannel : AnyChannel, channels.fetch => AnyChannel
                 .filter((ch) => ch.isText())
-                .get(guildConfig.voiceChannelId) ??
-              (await this.client.channels.fetch(guildConfig.voiceChannelId));
+                .get(guildConfig.textChannelId) ??
+              (await this.client.channels.fetch(guildConfig.textChannelId));
             if (
               defaultTextChannel?.isText() &&
               interaction.channelId != defaultTextChannel.id
@@ -213,11 +213,6 @@ export default class InteractionCreateEvent extends BaseEvent {
               return;
             }
           }
-          // const defaultVoiceChannel: Discord.AnyChannel | undefined | null =
-          //   this.client.channels.cache // 채널 캐시에 없다면 fetch
-          //     .filter((ch) => ch.type === "GUILD_VOICE")
-          //     .get(guildConfig.voiceChannelId) ??
-          //   (await this.client.channels.fetch(guildConfig.voiceChannelId));
 
           /** Handle commandRequirements */
           const { requirements }: { requirements: ICommandRequirements } =
@@ -264,6 +259,11 @@ export default class InteractionCreateEvent extends BaseEvent {
           // -------- Handle user voiceStatus --------
           if (requirements.voiceStatus) {
             // VoiceConnected
+            // const defaultVoiceChannel: Discord.AnyChannel | undefined | null =
+            //   this.client.channels.cache // 채널 캐시에 없다면 fetch
+            //     .filter((ch) => ch.type === "GUILD_VOICE")
+            //     .get(guildConfig.voiceChannelId) ??
+            //   (await this.client.channels.fetch(guildConfig.voiceChannelId));
             if (
               requirements.voiceStatus.voiceConnected &&
               !member.voice.channelId

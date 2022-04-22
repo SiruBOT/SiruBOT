@@ -204,7 +204,7 @@ export default class PlayCommand extends BaseCommand {
           // Create filter for awaitMessageComponent
           const buttonCollectorFilter: Discord.CollectorFilter<
             [Discord.ButtonInteraction<"cached">]
-          > = (i: Discord.ButtonInteraction<"cached">) =>
+          > = (i: Discord.ButtonInteraction<"cached">): boolean =>
             i.user.id == interaction.user.id &&
             i.message.id == promptMessage.id;
           try {
