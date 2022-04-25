@@ -18,7 +18,9 @@ try {
   bootStrapperArgs = JSON.parse(process.argv[3]);
 } catch {
   console.error(process.argv);
-  throw "Failed to parse process.argv[2] and process.argv[3] (Bot config and Bootstrapper args)";
+  throw new Error(
+    "Failed to parse process.argv[2] and process.argv[3] (Bot config and Bootstrapper args)"
+  );
 }
 
 // Setup logger
