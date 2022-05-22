@@ -8,7 +8,7 @@ import type { Logger } from "tslog";
 import type { IBootStrapperArgs, ISettings } from "../types";
 import { AudioHandler } from "./audio/AudioHandler";
 import { BaseEvent, DatabaseHelper } from "./";
-
+import { MESSAGE_CACHE_SWEEPER_INTERVAL } from "../constant/ClientConstant";
 class Client extends Discord.Client {
   public settings: ISettings;
   public bootStrapperArgs: IBootStrapperArgs;
@@ -28,7 +28,27 @@ class Client extends Discord.Client {
     bootStrapperArgs: IBootStrapperArgs
   ) {
     // Discord#ClientOptions
-    super(clientOptions);
+    super({
+      ...clientOptions,
+      sweepers: {
+        messages: {
+          interval: MESSAGE_CACHE_SWEEPER_INTERVAL,
+          filter: () => {
+            return (
+              value: Discord.Message<boolean>,
+              key: string,
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              _collection: Discord.Collection<string, Discord.Message<boolean>>
+            ) => {
+              return value.guildId
+                ? this.audio.dispatchers.get(value.guildId)?.audioMessage
+                    .nowplayingMessage?.id != key
+                : true;
+            };
+          },
+        },
+      },
+    });
     this.settings = botSettings;
     this.bootStrapperArgs = bootStrapperArgs;
     this.log = log;

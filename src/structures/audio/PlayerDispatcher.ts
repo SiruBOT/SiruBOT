@@ -31,8 +31,8 @@ export class PlayerDispatcher extends EventEmitter {
   private guildId: string;
   private _destroyed: boolean;
   public queue: Queue;
+  public audioMessage: AudioMessage;
   private databaseHelper: DatabaseHelper;
-  private audioMessage: AudioMessage;
   public log: Logger;
   constructor(
     audio: AudioHandler,
