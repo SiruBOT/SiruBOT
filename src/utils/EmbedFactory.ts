@@ -1,7 +1,7 @@
 import { Client, User } from "discord.js";
 import { Formatter } from ".";
 import { version } from "../../package.json";
-import { BOT_NAME, DEFAULT_COLOR } from "../constant/Constants";
+import { BOT_NAME, DEFAULT_COLOR } from "../constant/MessageConstant";
 import { ReusableFormatFunction } from "../locales/LocalePicker";
 import { IAudioTrack, IGuildAudioData } from "../types";
 import { ExtendedEmbed } from "./ExtendedEmbed";

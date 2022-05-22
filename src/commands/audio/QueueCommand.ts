@@ -14,7 +14,7 @@ import { ArrayUtil } from "../../utils/ArrayUtil";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 import { Paginator } from "../../utils/Paginator";
 import locale from "../../locales";
-import { EMOJI_PLAY_STATE, EMOJI_REPEAT } from "../../constant/Constants";
+import { EMOJI_PLAY_STATE, EMOJI_REPEAT } from "../../constant/MessageConstant";
 
 const SPLIT_SIZE = 10;
 const commandRequirements = {
@@ -160,7 +160,7 @@ export default class QueueCommand extends BaseCommand {
             };
           } else {
             return {
-              embeds: [embed],
+              embeds: [],
               content: locale.format(interaction.locale, "NOWPLAYING_NONE"),
             };
           }

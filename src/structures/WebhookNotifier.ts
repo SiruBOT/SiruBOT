@@ -2,7 +2,7 @@ import Discord from "discord.js";
 import type { Cluster } from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
 import { EmbedFactory } from "../utils";
-import { OK_COLOR, WARN_COLOR } from "../constant/Constants";
+import { OK_COLOR, WARN_COLOR } from "../constant/MessageConstant";
 import { ExtendedEmbed } from "../utils/ExtendedEmbed";
 import { codeBlock } from "@discordjs/builders";
 export class WebhookNotifier extends Discord.WebhookClient {

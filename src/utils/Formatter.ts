@@ -11,7 +11,7 @@ import {
   PROGRESS_BAR_BLACK,
   PROGRESS_BAR_START_SINGLE_WHITE,
   PROGRESS_BAR_END_MIDDLE_WHITE,
-} from "../constant/Constants";
+} from "../constant/MessageConstant";
 const PROGRESS_BAR_EMOJI_COUNT = 10;
 export class Formatter {
   /**

@@ -14,8 +14,8 @@ import {
   EMOJI_NEXT,
   EMOJI_PREV,
   EMOJI_STOP,
-  PAGINATION_AWAIT_TIMEOUT,
-} from "../constant/Constants";
+} from "../constant/MessageConstant";
+import { PAGINATION_AWAIT_TIMEOUT } from "../constant/TimeConstant";
 import { MessageUtil } from "./MessageUtil";
 
 export type PageFnReturn = string | MessagePayload | MessageOptions;

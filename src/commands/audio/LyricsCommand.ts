@@ -9,7 +9,7 @@ import { ILyricsSearchResult, MelonProvider } from "slyrics";
 import locale from "../../locales";
 import { AutocompleteInteraction, CacheType } from "discord.js";
 import { EmbedFactory } from "../../utils";
-import { AUTOCOMPLETE_MAX_RESULT } from "../../constant/Constants";
+import { AUTOCOMPLETE_MAX_RESULT } from "../../constant/MessageConstant";
 
 export default class LyricsCommand extends BaseCommand {
   constructor(client: Client) {

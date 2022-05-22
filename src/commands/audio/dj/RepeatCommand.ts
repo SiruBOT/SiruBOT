@@ -7,7 +7,7 @@ import {
 } from "../../../types";
 import locale from "../../../locales";
 import { Guild } from "../../../database/mysql/entities";
-import { EMOJI_REPEAT } from "../../../constant/Constants";
+import { EMOJI_REPEAT } from "../../../constant/MessageConstant";
 
 export default class RepeatCommand extends BaseCommand {
   constructor(client: Client) {
