@@ -15,7 +15,11 @@ import {
   RoutePlanner,
   Scraper,
 } from "@sirubot/yt-related-scraper";
-import { IAudioTrack, PlayingState } from "../../types";
+import { IAudioTrack, IGuildAudioData, PlayingState } from "../../types";
+import { EmbedFactory } from "../../utils";
+import { Guild } from "../../database/mysql/entities";
+import locale from "../../locales";
+
 export class AudioHandler extends Shoukaku {
   public client: Client;
   private log: Logger;
@@ -110,6 +114,19 @@ export class AudioHandler extends Shoukaku {
       throw new Error(`PlayerDispatcher ${guildId} is not exists.`);
     this.dispatchers.delete(guildId);
     return guildId;
+  }
+
+  public async getNowPlayingEmbed(guildId: string, localeName?: string) {
+    const { guildLocale }: Guild =
+      await this.client.databaseHelper.upsertAndFindGuild(guildId);
+    const { nowPlaying, position }: IGuildAudioData =
+      await this.client.databaseHelper.upsertGuildAudioData(guildId);
+    return await EmbedFactory.getNowplayingEmbed(
+      this.client,
+      locale.getReusableFormatFunction(localeName ?? guildLocale),
+      nowPlaying,
+      position
+    );
   }
 
   public async getRelatedVideo(videoId: string): Promise<IAudioTrack | null> {

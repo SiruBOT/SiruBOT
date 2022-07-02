@@ -17,6 +17,7 @@ export class AudioMessage {
   private channelId: string;
   private lastMessageId: string | undefined;
   private databaseHelper: DatabaseHelper;
+  public nowplayingMessage?: Message<true>;
   private log: Logger;
   constructor(
     client: Client,
@@ -30,7 +31,7 @@ export class AudioMessage {
     this.channelId = channelId;
     this.databaseHelper = databaseHelper;
     this.log = log.getChildLogger({
-      name: log.settings.name + "AudioMessage",
+      name: log.settings.name + "/AudioMessage",
     });
   }
 
