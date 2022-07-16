@@ -3,7 +3,7 @@ import { Client } from "../Client";
 import { Queue } from "./Queue";
 import {
   PlayerUpdate,
-  ShoukakuPlayer,
+  Player,
   TrackEndEvent,
   TrackExceptionEvent,
   WebSocketClosedEvent,
@@ -27,7 +27,7 @@ import { BreakOnDestroyed } from "./PlayerDecorator";
 export class PlayerDispatcher extends EventEmitter {
   public audio: AudioHandler;
   public client: Client;
-  public player: ShoukakuPlayer;
+  public player: Player;
   private guildId: string;
   private _destroyed: boolean;
   public queue: Queue;
@@ -36,7 +36,7 @@ export class PlayerDispatcher extends EventEmitter {
   public log: Logger;
   constructor(
     audio: AudioHandler,
-    player: ShoukakuPlayer,
+    player: Player,
     databaseHelper: DatabaseHelper,
     joinOptions: IJoinOptions
   ) {
@@ -87,7 +87,7 @@ export class PlayerDispatcher extends EventEmitter {
 
   @BreakOnDestroyed()
   private async onUpdate(data: PlayerUpdate) {
-    const { position }: { position: number | undefined } = data.state;
+    const { position, connected } = data.state;
     if (!position) {
       this.log.debug(`PlayerUpdate data is not containing position data.`);
     } else {
@@ -96,9 +96,7 @@ export class PlayerDispatcher extends EventEmitter {
           data.state.connected ? data.state.position : null
         }`
       );
-      await this.queue.setPosition(
-        data.state.connected ? data.state.position : null
-      );
+      await this.queue.setPosition(connected ? position : null);
     }
   }
 
@@ -161,7 +159,7 @@ export class PlayerDispatcher extends EventEmitter {
 
   @BreakOnDestroyed()
   public async addTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(`Add track ${track.shoukakuTrack.info.identifier}`);
+    this.log.debug(`Add track ${track.track.info.identifier}`);
     await this.queue.pushTrack(track);
     await this.playOrResumeOrNothing();
     return track;
@@ -220,8 +218,8 @@ export class PlayerDispatcher extends EventEmitter {
       await this.audioMessage.getReusableFormatFunction();
     if (
       !beforeTrack ||
-      beforeTrack.shoukakuTrack.info.sourceName !== "youtube" ||
-      !beforeTrack.shoukakuTrack.info.identifier
+      beforeTrack.track.info.sourceName !== "youtube" ||
+      !beforeTrack.track.info.identifier
     ) {
       // Youtube only message send & clean disconnect
       this.log.debug(
@@ -233,9 +231,7 @@ export class PlayerDispatcher extends EventEmitter {
       // Handle related
       try {
         const relatedVideo: IAudioTrack | null =
-          await this.audio.getRelatedVideo(
-            beforeTrack.shoukakuTrack.info.identifier
-          );
+          await this.audio.getRelatedVideo(beforeTrack.track.info.identifier);
         if (!relatedVideo) {
           // 추천 영상을 찾지 못했어요.
           await this.audioMessage.sendMessage(format("RELATED_FAILED"));
@@ -295,9 +291,9 @@ export class PlayerDispatcher extends EventEmitter {
     );
     const { position, positionUpdatedAt }: IGuildAudioData =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
-    if (!nowPlaying || nowPlaying?.shoukakuTrack.info.isStream || !position) {
+    if (!nowPlaying || nowPlaying?.track.info.isStream || !position) {
       this.log.debug(
-        nowPlaying?.shoukakuTrack.info.isStream
+        nowPlaying?.track.info.isStream
           ? `Nowplaying is stream or position is not exist, skipping...`
           : `Nowplaying data not found. but resumeNowplaying option provided. trying without resumeNowPlaying`
       );
@@ -312,9 +308,7 @@ export class PlayerDispatcher extends EventEmitter {
       `Approximately Calculated nowplaying position: ${calculatedPos}`
     );
     const resumePosition: number =
-      calculatedPos > (nowPlaying.shoukakuTrack.info.length ?? 0)
-        ? 0
-        : calculatedPos;
+      calculatedPos > (nowPlaying.track.info.length ?? 0) ? 0 : calculatedPos;
     await this.playTrack(nowPlaying, guildConfig.volume, resumePosition);
     return nowPlaying;
   }
@@ -324,7 +318,7 @@ export class PlayerDispatcher extends EventEmitter {
     toPlay: IAudioTrack,
     volume: number,
     position?: number
-  ): Promise<ShoukakuPlayer> {
+  ): Promise<Player> {
     this.log.debug(
       `Playing track with volume ${volume} ${
         position ? "with position " + position : ""
@@ -335,36 +329,27 @@ export class PlayerDispatcher extends EventEmitter {
     const playingMessage: string = position
       ? format(
           "RESUMED_PLAYING",
-          Formatter.formatTrack(
-            toPlay.shoukakuTrack,
-            format("LIVESTREAM"),
-            true
-          ),
+          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"), true),
           Formatter.humanizeSeconds(position / 1000)
         )
       : toPlay.relatedTrack
       ? format(
           "PLAYING_NOW_RELATED",
-          Formatter.formatTrack(
-            toPlay.shoukakuTrack,
-            format("LIVESTREAM"),
-            true
-          )
+          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"), true)
         )
       : format(
           "PLAYING_NOW",
-          Formatter.formatTrack(
-            toPlay.shoukakuTrack,
-            format("LIVESTREAM"),
-            true
-          )
+          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"), true)
         );
     await this.audioMessage.sendMessage(playingMessage);
     await this.queue.setNowPlaying(toPlay);
     this.setVolumePercent(volume);
-    return this.player.playTrack(toPlay.shoukakuTrack.track, {
-      startTime: position,
-      noReplace: false,
+    return this.player.playTrack({
+      track: toPlay.track.track,
+      options: {
+        startTime: position,
+        noReplace: false,
+      },
     });
   }
 

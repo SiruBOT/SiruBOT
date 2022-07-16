@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Sentry from "@sentry/node";
 import * as Discord from "discord.js";
 import LRU from "lru-cache";
-import { ShoukakuSocket, ShoukakuTrack, ShoukakuTrackList } from "shoukaku";
+import { Node, Track, LavalinkResponse } from "shoukaku";
 import { BaseCommand, Client } from "../../structures";
 import {
   CommandCategories,
@@ -38,7 +38,7 @@ const commandRequirements = {
 
 export default class PlayCommand extends BaseCommand {
   // Autocomplete URL -> Playcommand cache, short ttl
-  private searchCache: LRU<string, ShoukakuTrackList> = new LRU({
+  private searchCache: LRU<string, LavalinkResponse> = new LRU({
     ttl: 1000 * 30, // 30 seconds
     max: 100, // Max items
     updateAgeOnGet: true, // extend ttl on get
@@ -95,39 +95,41 @@ export default class PlayCommand extends BaseCommand {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );
-    // Get ideal node
-    const node: ShoukakuSocket = this.client.audio.getNode();
-    const searchResult: ShoukakuTrackList = await this.fetchTracksCached(
+    // Get ideal node, AudioNode 옵션이 true이기때문에 node 가 없을 수 없음
+    const node = this.client.audio.getNode();
+    if (!node) throw new Error("Ideal node not found");
+    const searchResult = await this.fetchTracksCached(
       node,
       isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
     );
+    if (!searchResult) throw new Error("Search result not found");
     // Search result
-    switch (searchResult.type) {
-      case ShoukakuTrackListType.LoadFailed:
+    switch (searchResult.loadType) {
+      case "LOAD_FAILED":
         await MessageUtil.followUpOrEditReply(interaction, {
           content: locale.format(interaction.locale, "LOAD_FAILED"),
         });
         break;
-      case ShoukakuTrackListType.NoMatches:
+      case "NO_MATCHES":
         await MessageUtil.followUpOrEditReply(interaction, {
           content: locale.format(interaction.locale, "NO_MATCHES"),
         });
         break;
       // Playlist Handle
-      case ShoukakuTrackListType.PlayList:
+      case "PLAYLIST_LOADED":
         // Only playlist url
-        if (searchResult.selectedTrack === -1) {
+        if (searchResult.playlistInfo?.selectedTrack === -1) {
           await MessageUtil.followUpOrEditReply(interaction, {
             content: locale.format(
               interaction.locale,
               "PLAYLIST_ADD",
-              searchResult.playlistName ??
+              searchResult.playlistInfo?.name ??
                 locale.format(interaction.locale, "UNKNOWN"),
               searchResult.tracks.length.toString()
             ),
           });
           await dispatcher.addTracks(
-            searchResult.tracks.map((e: ShoukakuTrack) =>
+            searchResult.tracks.map((e: Track) =>
               AudioTools.getAudioTrack(e, interaction.user.id)
             )
           );
@@ -136,11 +138,12 @@ export default class PlayCommand extends BaseCommand {
           const guildAudioData: IGuildAudioData =
             await dispatcher.queue.getGuildAudioData();
           // Selected track
-          const selectedTrack: number = searchResult.selectedTrack ?? 0;
+          const selectedTrack: number =
+            searchResult.playlistInfo.selectedTrack ?? 0;
           // eslint-disable-next-line security/detect-object-injection
-          const track: ShoukakuTrack = searchResult.tracks[selectedTrack];
+          const track: Track = searchResult.tracks[selectedTrack];
           // Slice tracks after selected track position
-          const slicedPlaylist: ShoukakuTrack[] = searchResult.tracks.slice(
+          const slicedPlaylist: Track[] = searchResult.tracks.slice(
             selectedTrack + 1, // Array starts 0
             searchResult.tracks.length
           );
@@ -243,7 +246,7 @@ export default class PlayCommand extends BaseCommand {
                         locale.format(
                           interaction.locale,
                           "PLAYLIST_ADDED_NOEMOJI",
-                          searchResult.playlistName ??
+                          searchResult.playlistInfo?.name ??
                             locale.format(interaction.locale, "UNKNOWN"),
                           slicedPlaylist.length.toString()
                         )
@@ -253,7 +256,7 @@ export default class PlayCommand extends BaseCommand {
                 });
                 // Add sliced playlist
                 await dispatcher.addTracks(
-                  slicedPlaylist.map((e: ShoukakuTrack) =>
+                  slicedPlaylist.map((e: Track) =>
                     AudioTools.getAudioTrack(e, interaction.user.id)
                   )
                 );
@@ -286,13 +289,13 @@ export default class PlayCommand extends BaseCommand {
         }
         break;
       // Enqueue first of search result or track
-      case ShoukakuTrackListType.Search:
-      case ShoukakuTrackListType.Track:
+      case "SEARCH_RESULT":
+      case "TRACK_LOADED":
         const guildAudioData: IGuildAudioData =
           await dispatcher.queue.getGuildAudioData();
         const addTo: IAudioTrack = {
           requesterUserId: interaction.user.id,
-          shoukakuTrack: searchResult.tracks[0],
+          track: searchResult.tracks[0],
           relatedTrack: false,
           repeated: false,
         };
@@ -329,22 +332,24 @@ export default class PlayCommand extends BaseCommand {
   public async runAutocomplete(
     interaction: Discord.AutocompleteInteraction<Discord.CacheType>
   ): Promise<void> {
-    const idealNode: ShoukakuSocket = this.client.audio.getNode();
+    const idealNode = this.client.audio.getNode();
     // 노드가 없다면 결과없음 반환
     if (!idealNode) return await interaction.respond([]);
     const query: string | null = interaction.options.getString("query");
     // 쿼리가 없거나 길이가 100이상이거나 URL일 경우 결과없음
     if (!query || query.length > 100 || isURL(query))
       return await interaction.respond([]);
-    const searchResult: ShoukakuTrackList = await this.fetchTracksCached(
+    const searchResult = await this.fetchTracksCached(
       idealNode,
       `ytsearch:${query}`
     );
-    // Search가 아니면 결과없음
-    if (searchResult.type !== "SEARCH") return await interaction.respond([]);
+    // Search가 아니거나 검색 결과가 null 일 경우 결과 없음.
+    // TODO 플레이리스트일경우 플레이리스트 추가, 한곡 추가, 등등, URL일경우 URL 정보 표시해주기
+    if (!searchResult || searchResult.loadType !== "SEARCH_RESULT")
+      return await interaction.respond([]);
     return interaction.respond(
       searchResult.tracks
-        .map((v: ShoukakuTrack) => {
+        .map((v: Track) => {
           return {
             name: v.info.title
               ? v.info.title.length > 100
@@ -359,11 +364,11 @@ export default class PlayCommand extends BaseCommand {
   }
 
   private async fetchTracksCached(
-    node: ShoukakuSocket,
+    node: Node,
     query: string
-  ): Promise<ShoukakuTrackList> {
+  ): Promise<LavalinkResponse | null> {
     const cacheKey = `${node.name}-${query}`;
-    const searchCache: ShoukakuTrackList | undefined =
+    const searchCache: LavalinkResponse | undefined =
       this.searchCache.get(cacheKey);
     if (searchCache) {
       this.client.log.debug(
@@ -371,16 +376,18 @@ export default class PlayCommand extends BaseCommand {
       );
       return searchCache;
     } else {
-      const trackList: ShoukakuTrackList = await node.rest.resolve(query);
+      const trackList = await node.rest.resolve(query);
+      if (!trackList) return null;
       this.client.log.debug(
         `Cache miss for ${cacheKey} with ${trackList.tracks.length} tracks, caching search results & tracks`
       );
       this.searchCache.set(cacheKey, trackList);
       if (trackList.tracks.length > 0) {
-        trackList.tracks.forEach((v: ShoukakuTrack) => {
+        trackList.tracks.forEach((v: Track) => {
           if (v.info.uri) {
-            const fakeTrackListForCache: ShoukakuTrackList = {
-              type: ShoukakuTrackListType.Search,
+            const fakeTrackListForCache: LavalinkResponse = {
+              loadType: "SEARCH_RESULT",
+              playlistInfo: {},
               tracks: [v],
             };
             this.searchCache.set(

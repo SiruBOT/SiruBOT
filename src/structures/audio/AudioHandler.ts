@@ -1,10 +1,5 @@
 import * as Sentry from "@sentry/node";
-import {
-  Shoukaku,
-  Libraries,
-  ShoukakuSocket,
-  ShoukakuTrackList,
-} from "shoukaku";
+import { Shoukaku, Connectors, Node, LavalinkResponse } from "shoukaku";
 import { Logger } from "tslog";
 import { IJoinOptions } from "../../types/audio/IJoinOptions";
 import { Client } from "../Client";
@@ -29,9 +24,11 @@ export class AudioHandler extends Shoukaku {
   public routePlanner?: RoutePlanner;
 
   constructor(client: Client) {
-    super(new Libraries.DiscordJS(client), client.settings.audio.nodes, {
-      resumable: true,
-      resumableTimeout: 60,
+    super(new Connectors.DiscordJS(client), client.settings.audio.nodes, {
+      resume: true,
+      resumeByLibrary: true,
+      alwaysSendResumeKey: true,
+      resumeTimeout: 60000,
       moveOnDisconnect: true,
       reconnectTries: 3,
     });
@@ -80,7 +77,8 @@ export class AudioHandler extends Shoukaku {
   public async joinChannel(
     joinOptions: IJoinOptions
   ): Promise<PlayerDispatcher> {
-    const idealNode: ShoukakuSocket = this.getNode();
+    const idealNode = this.getNode();
+    if (!idealNode) throw new Error("Ideal node not found");
     this.log.debug(
       `Join channel #${joinOptions.channelId} with Node ${idealNode.name}`
     );
@@ -133,16 +131,21 @@ export class AudioHandler extends Shoukaku {
     const scrapeResult: IRelatedVideo[] | null =
       await this.relatedScraper.scrape(videoId, this?.routePlanner);
     if (!scrapeResult || scrapeResult.length <= 0) return null;
-    const idealNode: ShoukakuSocket = this.getNode();
-    const searchResult: ShoukakuTrackList = await idealNode.rest.resolve(
-      scrapeResult[0].videoId
-    );
-    if (["LOAD_FAILED", "NO_MATCHES"].includes(searchResult.type)) return null;
+    const idealNode = this.getNode();
+    if (!idealNode) throw new Error("Ideal node not found");
+    const searchResult = await idealNode.rest.resolve(scrapeResult[0].videoId);
+    if (
+      !searchResult ||
+      ["LOAD_FAILED", "NO_MATCHES"].includes(searchResult?.loadType)
+    )
+      return null;
+    const track = searchResult.tracks.at(0);
+    if (!track) return null;
     return {
       requesterUserId: this.client.isReady() ? this.client.user.id : "",
       relatedTrack: true,
       repeated: false,
-      shoukakuTrack: searchResult.tracks[0],
+      track,
     };
   }
 
@@ -172,11 +175,6 @@ export class AudioHandler extends Shoukaku {
     this.on("debug", (name, reason) =>
       this.log.debug(`Lavalink Node: ${name}`, reason || "No reason")
     );
-    this.on("playerUpdate", (player) => {
-      this.log.debug(
-        `Lavalink player update @ ${player.connection.node.name}.${player.connection.guildId}`
-      );
-    });
   }
 
   public getLoggerInstance(): Logger {

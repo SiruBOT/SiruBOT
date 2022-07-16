@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Constants, ShoukakuSocket } from "shoukaku";
+import { Constants, Node } from "shoukaku";
 import { BaseCommand, Client } from "../../structures";
 import {
   CommandCategories,
@@ -20,6 +21,7 @@ function niceBytes(x: number): string {
   }
   // include a decimal point and a tenths-place digit if presenting
   // less than ten of KB or greater units
+  // eslint-disable-next-line security/detect-object-injection
   return n.toFixed(n < 10 && l > 0 ? 1 : 0) + " " + units[l];
 }
 
@@ -53,15 +55,15 @@ export default class NodeInfoCommand extends BaseCommand {
   }
 
   public async runCommand({ interaction }: ICommandContext): Promise<void> {
-    const nodes: ShoukakuSocket[] = [...this.client.audio.nodes.values()];
-    const onlineNodes: ShoukakuSocket[] = nodes.filter(
-      (v) => v.state === Constants.state.CONNECTED
+    const nodes: Node[] = [...this.client.audio.nodes.values()];
+    const onlineNodes: Node[] = nodes.filter(
+      (v) => v.state === Constants.State.CONNECTED
     );
     const totalPlayers: number = onlineNodes
-      .map((e) => e.stats.players)
+      .map((e) => e.stats!.players)
       .reduce((a, b) => a + b, 0);
     const totalPlayingPlayers: number = onlineNodes
-      .map((e) => e.stats.playingPlayers)
+      .map((e) => e.stats!.playingPlayers)
       .reduce((a, b) => a + b, 0);
     const nodeInfoEmbed: ExtendedEmbed = EmbedFactory.createEmbed();
     nodeInfoEmbed.setTitle("📡  Node status");
@@ -71,31 +73,33 @@ export default class NodeInfoCommand extends BaseCommand {
         `Total players: **${totalPlayers}** | Total playing players: **${totalPlayingPlayers}**`
     );
     for (const node of nodes) {
-      const { cores, lavalinkLoad, systemLoad } = node.stats.cpu;
+      const cpuStats = node?.stats?.cpu;
       nodeInfoEmbed.addField(
         `**${node.name}**`,
         `State: **${STATE_STRING[node.state]}**\n` +
-          (node.state === Constants.state.CONNECTED)
-          ? `Players: **${node.stats.players}**\n` +
-              `Playing Players: **${node.stats.playingPlayers}**\n` +
+          (node.state === Constants.State.CONNECTED)
+          ? `Players: **${node?.stats?.players ?? 0}**\n` +
+              `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
               `Uptime: **${Formatter.humanizeSeconds(
-                node.stats.uptime / 1000
+                node?.stats?.uptime ?? 0 / 1000
               )}**\n` +
-              `Cores: **${cores}**\n` +
-              `Lavalink Load: **${this.formatLoad(lavalinkLoad)}%**\n` +
-              `System Load: **${this.formatLoad(systemLoad)}%**\n` +
-              `Used Memory: **${niceBytes(node.stats.memory.used)}**\n` +
-              `Free Memory: **${niceBytes(node.stats.memory.free)}**\n` +
-              `Frames Sent: **${node.stats.frameStats.sent}**\n` +
-              `Frames Nulled: **${node.stats.frameStats.nulled}**\n` +
-              `Frames Deficit: **${node.stats.frameStats.deficit}**\n`
+              `Cores: **${cpuStats?.cores ?? "Not detected"}**\n` +
+              `Lavalink Load: **${this.formatLoad(
+                cpuStats?.lavalinkLoad
+              )}%**\n` +
+              `System Load: **${this.formatLoad(cpuStats?.systemLoad)}%**\n` +
+              `Used Memory: **${niceBytes(node?.stats?.memory.used ?? 0)}**\n` +
+              `Free Memory: **${niceBytes(node?.stats?.memory.free ?? 0)}**\n` +
+              `Frames Sent: **${node?.stats?.frameStats.sent ?? 0}**\n` +
+              `Frames Nulled: **${node?.stats?.frameStats.nulled ?? 0}**\n` +
+              `Frames Deficit: **${node?.stats?.frameStats.deficit ?? 0}**\n`
           : ""
       );
     }
     interaction.reply({ embeds: [nodeInfoEmbed] });
   }
 
-  private formatLoad(load: number): string {
+  private formatLoad(load = 0): string {
     return Number(load * 100).toFixed(2);
   }
 }

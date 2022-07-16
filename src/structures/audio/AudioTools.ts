@@ -1,14 +1,14 @@
-import { ShoukakuTrack } from "shoukaku";
+import { Track } from "shoukaku";
 import { IAudioTrack } from "../../types";
 export class AudioTools {
   public static getAudioTrack(
-    shoukakuTrack: ShoukakuTrack,
+    track: Track,
     requesterUserId: string,
     relatedTrack = false,
     repeated = false
   ): IAudioTrack {
     return {
-      shoukakuTrack,
+      track,
       relatedTrack,
       repeated,
       requesterUserId,

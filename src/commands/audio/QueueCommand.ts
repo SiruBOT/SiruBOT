@@ -76,17 +76,15 @@ export default class QueueCommand extends BaseCommand {
               // index = 1 ~ 10
               // page = 1 ~ end
               return `\`\`#${index + 1 + (page - 1) * 10} [${
-                track.shoukakuTrack.info.length
-                  ? Formatter.humanizeSeconds(
-                      track.shoukakuTrack.info.length / 1000
-                    )
+                track.track.info.length
+                  ? Formatter.humanizeSeconds(track.track.info.length / 1000)
                   : "N/A"
-              }]\`\` | **${track.shoukakuTrack.info.title ?? "N/A"}** <@${
+              }]\`\` | **${track.track.info.title ?? "N/A"}** <@${
                 track.requesterUserId
               }>`;
             })
             .join("\n");
-          embed.setTrackThumbnail(queue[0].shoukakuTrack.info);
+          embed.setTrackThumbnail(queue[0].track.info);
           embed.setDescription(pageContent);
           embed.setFooter({
             text: locale.format(
@@ -97,12 +95,11 @@ export default class QueueCommand extends BaseCommand {
                 queue
                   .filter((track) => {
                     return (
-                      track.shoukakuTrack.info.length &&
-                      !track.shoukakuTrack.info.isStream
+                      track.track.info.length && !track.track.info.isStream
                     );
                   })
                   .reduce((prev, bTrack) => {
-                    return prev + (bTrack.shoukakuTrack.info.length ?? 0);
+                    return prev + (bTrack.track.info.length ?? 0);
                   }, 0) / 1000
               ),
               page.toString(),
@@ -139,9 +136,9 @@ export default class QueueCommand extends BaseCommand {
                   ? `${Formatter.humanizeSeconds(audioData.position / 1000)}`
                   : "N/A"
               } / ${
-                audioData.nowPlaying.shoukakuTrack.info.length
+                audioData.nowPlaying.track.info.length
                   ? Formatter.humanizeSeconds(
-                      audioData.nowPlaying.shoukakuTrack.info.length / 1000
+                      audioData.nowPlaying.track.info.length / 1000
                     )
                   : "N/A"
               }]**`
@@ -149,7 +146,7 @@ export default class QueueCommand extends BaseCommand {
             const npInfo: string =
               "> " +
               `**${Formatter.formatTrack(
-                audioData.nowPlaying.shoukakuTrack,
+                audioData.nowPlaying.track,
                 locale.format(interaction.locale, "LIVESTREAM"),
                 false
               )}**\n` +

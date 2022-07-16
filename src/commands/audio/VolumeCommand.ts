@@ -10,7 +10,6 @@ import { Formatter } from "../../utils";
 import locale from "../../locales";
 import { CommandPermissionError } from "../../structures/errors/CommandPermissionError";
 export default class VolumeCommand extends BaseCommand {
-  // https://google.com
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("volume")

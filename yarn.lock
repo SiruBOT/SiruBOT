@@ -3378,14 +3378,13 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shoukaku@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-2.1.5.tgz#b7d0297c9b57a5077c52a7853eaeabc48e0aef1c"
-  integrity sha512-sAQ7m9qhpxV5SwuzcZ4JvbDqv3OGyyAH1qNvfpbvEk/ZkE+JwbpXqGyUWM8yKIbpNsHiG2217Jjc7fPBc8+TJg==
+shoukaku@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/shoukaku/-/shoukaku-3.1.2.tgz#6104fd7ca892e443eeb7a0e7efc504fc4d0b7828"
+  integrity sha512-p3dqnKx0cv2BlVi2tvi++JilVRu5wBGG6Q0GHlrpNhiEe7kxZotSJom/smodUTGr+QaEYCY3e1j3JL+TO1NRkg==
   dependencies:
-    abort-controller "^3.0.0"
     petitio "^1.4.0"
-    ws "^8.5.0"
+    ws "^8.7.0"
 
 sift@16.0.0:
   version "16.0.0"
@@ -4138,10 +4137,15 @@ wrappy@1:
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
-ws@^8.2.3, ws@^8.4.0, ws@^8.5.0:
+ws@^8.2.3, ws@^8.4.0:
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.5.0.tgz#bfb4be96600757fe5382de12c670dab984a1ed4f"
   integrity sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==
+
+ws@^8.7.0:
+  version "8.8.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.8.1.tgz#5dbad0feb7ade8ecc99b830c1d77c913d4955ff0"
+  integrity sha512-bGy2JzvzkPowEJV++hF07hAD6niYSr0JzBNo/J29WsB57A2r7Wlc1UFcTR9IzrPvuNVO4B8LGqF8qcpsVOhJCA==
 
 xml-name-validator@^4.0.0:
   version "4.0.0"

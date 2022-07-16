@@ -30,7 +30,7 @@ export class Queue {
   }
 
   public async pushTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(`Push track ${track.shoukakuTrack.info.identifier}`);
+    this.log.debug(`Push track ${track.track.info.identifier}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: track },
     });
@@ -46,9 +46,7 @@ export class Queue {
   }
 
   public async unshiftTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(
-      `Push track ${track.shoukakuTrack.info.identifier} with position 0`
-    );
+    this.log.debug(`Push track ${track.track.info.identifier} with position 0`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: [track], $position: 0 } },
     });
