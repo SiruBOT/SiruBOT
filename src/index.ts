@@ -73,9 +73,10 @@ const log: Logger = new Logger({
   minLevel: args.debug ? "debug" : "info",
 });
 
+/* ---------------- BOOT CALL ---------------- */
 boot();
 
-// Async function for boot
+/* Async function for boot */
 async function boot() {
   // Read config file
   log.info(`${name} version: ${version}, log level: ${log.settings.minLevel}`);

@@ -22,10 +22,6 @@ database:
     url: "mongodb://host:port/dbname?authSource=admin" # Your mongoDB URL
     username: "root" # Your mongoDB username
     password: "password" # Your mongoDB password
-  redis:
-    host: "localhost" # Your redis host
-    port: 6379 # Your redis port
-    password: "password" # Your redis password
 audio:
   searchResults: 5 # Number of search results to show (Max result: 10, Min result: 1)
   timeout: 60000 # Timeout for audio search
