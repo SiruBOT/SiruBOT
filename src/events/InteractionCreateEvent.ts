@@ -3,10 +3,8 @@ import * as Sentry from "@sentry/node";
 import type { Transaction } from "@sentry/types";
 import { type BaseCommand, BaseEvent, type Client } from "../structures";
 import locale from "../locales";
-import { Constants, ShoukakuSocket } from "shoukaku";
-import { CommandPermissions, ICommandRequirements } from "../types";
-// import { Guild } from "../database/mysql/entities";
-import { PlayerDispatcher } from "../structures/audio/PlayerDispatcher";
+import { Constants, Node } from "shoukaku";
+import { ICommandRequirements } from "../types";
 import { Logger } from "tslog";
 import { Guild } from "../database/mysql/entities";
 import { CommandPermissionChecker } from "../structures/CommandPermissionChecker";
@@ -219,10 +217,10 @@ export default class InteractionCreateEvent extends BaseEvent {
             command;
           // -------- Handle audioNodes  --------
           if (requirements.audioNode) {
-            const connectedNodes: ShoukakuSocket[] = [
+            const connectedNodes: Node[] = [
               ...this.client.audio.nodes.values(),
-            ].filter((e: ShoukakuSocket) => {
-              return e.state == Constants.state.CONNECTED;
+            ].filter((e: Node) => {
+              return e.state == Constants.State.CONNECTED;
             });
             if (connectedNodes.length === 0) {
               await interaction.reply({

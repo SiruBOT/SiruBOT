@@ -1,8 +1,6 @@
-import { type Base64String } from "shoukaku";
-
 export interface IAudioPlaylist {
   title: string;
-  entries: Base64String[];
+  entries: string[];
   playlistAuthorId: string;
   likes: number;
   playlistId: string;

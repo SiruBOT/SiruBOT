@@ -1,5 +1,5 @@
 import { AudioHandler } from "./AudioHandler";
-import { ShoukakuPlayer } from "shoukaku";
+import { Player } from "shoukaku";
 import { Logger } from "tslog";
 import { PlayerDispatcher } from "./PlayerDispatcher";
 import { IJoinOptions } from "../../types";
@@ -13,7 +13,7 @@ export class PlayerDispatcherFactory {
   }
 
   async createPlayerDispatcher(
-    player: ShoukakuPlayer,
+    player: Player,
     joinOptions: IJoinOptions
   ): Promise<PlayerDispatcher> {
     const databaseHelper = this.audio.client.databaseHelper;

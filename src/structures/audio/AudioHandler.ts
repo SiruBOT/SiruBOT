@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { Shoukaku, Connectors, Node, LavalinkResponse } from "shoukaku";
+import { Shoukaku, Connectors } from "shoukaku";
 import { Logger } from "tslog";
 import { IJoinOptions } from "../../types/audio/IJoinOptions";
 import { Client } from "../Client";

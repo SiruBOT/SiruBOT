@@ -1,4 +1,4 @@
-import { type NodeOptions } from "shoukaku/types";
+import { NodeOption } from "shoukaku";
 export interface ISettings {
   sentryDsn?: string;
   bot: {
@@ -18,7 +18,7 @@ export interface ISettings {
   audio: {
     searchResults: number;
     timeout: number;
-    nodes: NodeOptions[];
+    nodes: NodeOption[];
     relatedRoutePlanner?: {
       ipBlocks: string[];
       excludeIps: string[];

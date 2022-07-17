@@ -35,23 +35,22 @@ export class EmbedFactory {
         });
       }
     }
-    if (track.shoukakuTrack.info.author) {
+    if (track.track.info.author) {
       embed.setFooter({
         text: format(
           "SOURCE",
-          track.shoukakuTrack.info.author,
+          track.track.info.author,
           EmbedFactory.footerString
         ),
       });
     }
     embed
       .setDescription(
-        `[${Formatter.formatTrack(
-          track.shoukakuTrack,
-          format("LIVESTREAM")
-        )}](${track.shoukakuTrack.info.uri})`
+        `[${Formatter.formatTrack(track.track, format("LIVESTREAM"))}](${
+          track.track.info.uri
+        })`
       )
-      .setTrackThumbnail(track.shoukakuTrack.info);
+      .setTrackThumbnail(track.track.info);
     return embed;
   }
 
@@ -66,12 +65,12 @@ export class EmbedFactory {
     if (!nowplaying) {
       return this.createEmbed().setTitle(format("NOWPLAYING_NONE"));
     } else {
-      const trackLength: number = nowplaying.shoukakuTrack.info.length ?? 0;
+      const trackLength: number = nowplaying.track.info.length ?? 0;
       const currentPosition: number = position ?? 0;
       const readablePosition: string = Formatter.humanizeSeconds(
         currentPosition / 1000
       );
-      const readableTrackLength: string = nowplaying.shoukakuTrack.info.isStream
+      const readableTrackLength: string = nowplaying.track.info.isStream
         ? `[${format("LIVESTREAM")}]`
         : Formatter.humanizeSeconds(trackLength / 1000);
       const trackEmbed: ExtendedEmbed = await this.getTrackEmbed(
@@ -80,25 +79,25 @@ export class EmbedFactory {
         nowplaying
       );
       const formattedTrack = `**${Formatter.formatTrack(
-        nowplaying.shoukakuTrack,
+        nowplaying.track,
         format("LIVESTREAM"),
         false
       )}**`;
       const progressBar: string = Formatter.progressBar(
         currentPosition / trackLength
       );
-      const urlLinkTitle: string = nowplaying.shoukakuTrack.info.uri
-        ? `[${formattedTrack}](${nowplaying.shoukakuTrack.info.uri})`
+      const urlLinkTitle: string = nowplaying.track.info.uri
+        ? `[${formattedTrack}](${nowplaying.track.info.uri})`
         : formattedTrack;
       trackEmbed.setDescription(
         `${urlLinkTitle}\n${readablePosition}  ${progressBar}  ${readableTrackLength}`
       );
       const footerItems: string[] = [];
-      if (nowplaying.shoukakuTrack.info.author) {
+      if (nowplaying.track.info.author) {
         footerItems.push(
           format(
             "SOURCE",
-            nowplaying.shoukakuTrack.info.author,
+            nowplaying.track.info.author,
             EmbedFactory.footerString
           )
         );

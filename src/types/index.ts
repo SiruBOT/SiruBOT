@@ -20,7 +20,6 @@ export { IGuildAudioData } from "./audio/IGuildAudioData";
 export { IAudioTrack } from "./audio/IAudioTrack";
 export { IAudioPlaylist } from "./audio/IAudioPlaylist";
 export { ShoukakuTrackInfo } from "./audio/ShoukakuTrackInfo";
-export { ShoukakuTrackListType } from "./audio/ShoukakuTrackListType";
 export { IJoinOptions } from "./audio/IJoinOptions";
 
 // Audio Enums

@@ -1,4 +1,4 @@
-import { ShoukakuTrack } from "shoukaku";
+import { Track } from "shoukaku";
 import {
   EMOJI_VOLUME_LOUD,
   EMOJI_VOLUME_SMALL,
@@ -37,7 +37,7 @@ export class Formatter {
   }
 
   public static formatTrack(
-    track: ShoukakuTrack,
+    track: Track,
     streamString = "Live Stream",
     showLength = true
   ): string {

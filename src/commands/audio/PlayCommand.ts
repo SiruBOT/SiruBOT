@@ -10,7 +10,6 @@ import {
   IAudioTrack,
   ICommandContext,
   IGuildAudioData,
-  ShoukakuTrackListType,
   VoiceConnectedGuildMemberVoiceState,
 } from "../../types";
 import locale from "../../locales";
