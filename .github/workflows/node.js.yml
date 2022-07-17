@@ -12,14 +12,18 @@ jobs:
         node-version: [16.x, 17.x] # Node.JS 16.x 17.x 버전에서 빌드합니다
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1 # actions/setup-node@v1 을 사용하여 Node.JS 버전을 설정합니다
+    - 
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      name: Setup node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3 # actions/setup-node@v1 을 사용하여 Node.JS 버전을 설정합니다
       with:
         node-version: ${{ matrix.node-version }}
-        
-    - name: Install dependencies
+    -
+      name: Install dependencies
       run: yarn install --production=false # yarn install 명령어로 개발 환경을 설정합니다
     
-    - name: Build typescript
+    -
+      name: Run typescript build
       run: yarn run build:ts --noEmit # Typescript 프로젝트를 빌드합니다

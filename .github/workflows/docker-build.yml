@@ -1,0 +1,14 @@
+name: Docker Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Build the docker image
+        run: ./build.sh
