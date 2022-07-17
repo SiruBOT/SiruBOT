@@ -1,14 +1,28 @@
+# Eslint 를 실행합니다
+
+name: Run eslint
+
 on: [push, pull_request]
-name: StandardJS
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
+
+    strategy:
+      matrix:
+        node-version: [16.x, 17.x]
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: goto-bus-stop/standard-action@v1
-        with:
-          # show errors in the the github diff UI
-          annotate: true
-        # Allow the action to add lint errors to the github diff UI
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      name: Setup node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    -
+      name: Install dependencies
+      run: yarn install --production=false
+    -
+      name: Run eslint
+      run: yarn run lint

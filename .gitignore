@@ -51,11 +51,14 @@ node_modules/
 jspm_packages/
 web/node_modules/
 
-# Privacy
-settings.js
+# Config file
+settings.yaml
 
 # TypeScript v1 declaration files
 typings/
+
+# Typescript build files
+build/
 
 # TypeScript cache
 *.tsbuildinfo

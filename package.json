@@ -1,70 +1,68 @@
 {
-  "name": "sirubot-bot",
-  "version": "3.4.11",
-  "description": "Rich music bot written in node.js & lavalink (hardcoded)",
+  "name": "sirubot",
+  "version": "4.1.0-alpha.1",
+  "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
-    "@sentry/node": "^6.0.3",
-    "@sirubot/yt-related-scraper": "^0.2.22",
-    "canvas": "^2.6.1",
-    "chartjs-node-canvas": "^4.1.4",
-    "date-utils": "^1.2.21",
-    "discord.js": "^12.4.1",
-    "git-repo-info": "^2.1.1",
-    "glob": "^7.1.6",
-    "inko": "^1.1.1",
-    "knex": "^0.95.4",
-    "lavaplayer-track-info": "^2.1.0",
-    "melon-chart-api": "^1.1.4",
-    "minimist": "^1.2.5",
-    "moment": "^2.27.0",
-    "moment-duration-format": "^2.3.2",
-    "moment-timezone": "^0.5.31",
-    "mongoose": "^6.0.12",
-    "mysql2": "^2.3.2",
-    "node-cache": "^5.1.2",
-    "node-fetch": "^2.6.0",
-    "node-os-utils": "^1.3.0",
-    "node-uuid": "^1.4.8",
-    "npm-run-all": "^4.1.5",
-    "shoukaku": "2.1.0",
-    "slyrics": "^0.1.42",
-    "sqlstring": "^2.3.2",
-    "string-placeholder": "^1.0.2",
-    "utf-8-validate": "^5.0.7",
-    "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.0"
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
+    "@sentry/integrations": "^6.19.3",
+    "@sentry/node": "^6.19.3",
+    "@sentry/tracing": "^6.19.3",
+    "@sirubot/yt-related-scraper": "^0.3.1-alpha.2",
+    "argparse": "^2.0.1",
+    "discord-api-types": "^0.29.0",
+    "discord-hybrid-sharding": "sannoob/discord-hybrid-sharding#patch-2",
+    "discord.js": "^13.6.0",
+    "fast-glob": "^3.2.11",
+    "lru-cache": "^7.8.1",
+    "mongoose": "^6.2.6",
+    "mysql2": "^2.3.3",
+    "reflect-metadata": "^0.1.13",
+    "shoukaku": "^3.1.2",
+    "slyrics": "^1.0.2",
+    "tslog": "^3.3.2",
+    "typeorm": "^0.2.45",
+    "undici": "^4.15.1",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "standard": "^16.0.0"
+    "@types/argparse": "^2.0.10",
+    "@types/ip": "^1.1.0",
+    "@types/lru-cache": "^7.6.1",
+    "@types/node-fetch": "^2.6.1",
+    "@types/yaml": "^1.9.7",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
+    "del": "^6.0.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-security": "^1.5.0",
+    "fancy-log": "^2.0.0",
+    "gulp": "^4.0.2",
+    "prettier": "^2.6.0",
+    "tsc-watch": "^4.6.2",
+    "typescript": "^4.6.2"
   },
   "scripts": {
-    "test": "node ./src/index.js test",
-    "ci": "node ./src/index.js test",
-    "all:shard": "npm-run-all --parallel \"bot:shard\" \"slash-commands:run\"",
-    "all:noshard": "npm-run-all --parallel \"bot:noshard\" \"slash-commands:run\"",
-    "bot:shard": "node sharder.js",
-    "bot:noshard": "node src/index.js",
-    "slash-commands:dev": "cd ./slashCommands & nodemon .",
-    "slash-commands:run": "cd ./slashCommands & node ."
+    "lint": "eslint --ext .ts ./src",
+    "lint:fix": "eslint --ext .ts ./src --fix",
+    "build:ts": "yarn run build:clean && tsc --project ./tsconfig.json",
+    "build:clean": "gulp clean",
+    "deploy:commands": "node ./build -d -r -c"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sannoob/Siru-stable.git"
+    "url": "git+https://github.com/SiruBOT/SiruBOT"
   },
-  "standard": {
-    "env": "node"
+  "engines": {
+    "node": ">=16.6.0"
   },
-  "keywords": [
-    "discordbot",
-    "discord",
-    "chatbot",
-    "musicbot"
-  ],
   "author": "Sannoob#3144",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/sannoob/Siru-stable/issues"
+    "url": "https://github.com/SiruBOT/SiruBOT/issues"
   },
-  "homepage": "https://github.com/sannoob/Siru-stable#readme"
+  "homepage": "https://github.com/SiruBOT/SiruBOT/issues"
 }
