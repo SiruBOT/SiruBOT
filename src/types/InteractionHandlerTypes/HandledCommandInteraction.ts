@@ -9,11 +9,3 @@ export class HandledCommandInteraction<
     ? VoiceConnectedGuildMember
     : GuildMember;
 }
-
-// export class HandledCommandInteraction<
-//   T extends boolean = false
-// > extends CommandInteraction<"cached"> {
-//   public member: T extends VoiceConnectedType
-//     ? VoiceConnectedGuildMember
-//     : GuildMember;
-// }

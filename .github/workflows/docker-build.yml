@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    name: Docker build
     runs-on: ubuntu-latest
     steps:
       -
@@ -11,4 +12,4 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Build the docker image
-        run: echo Branch ${{ github.head_ref }} hash ${{ github.sha }} && docker build -t sannoob/sirubot:${{ github.head_ref }}-${{ github.sha }} -f ./Dockerfile .
+        run: "echo Branch: ${{ github.head_ref }} Hash: ${{ github.sha }} && docker build -t sannoob/sirubot:${{ github.head_ref }}-${{ github.sha }} -f ./Dockerfile ."
