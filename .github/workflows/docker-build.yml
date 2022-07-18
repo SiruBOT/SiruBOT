@@ -10,5 +10,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      -
         name: Build the docker image
-        run: "echo Branch: ${{ github.head_ref || github.ref }} Hash: ${{ github.sha }} && docker build -t sannoob/sirubot:${{ github.head_ref || github.ref }}-${{ github.sha }} -f ./Dockerfile ."
+        run: "echo Branch: ${{ steps.extract_branch.outputs.branch }} Hash: ${{ github.sha }} && docker build -t sannoob/sirubot:${{ steps.extract_branch.outputs.branch }}-${{ github.sha }} -f ./Dockerfile ."
