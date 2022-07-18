@@ -26,7 +26,7 @@ audio:
   searchResults: 5 # Number of search results to show (Max result: 10, Min result: 1)
   timeout: 60000 # Timeout for audio search
   nodes: # Lavalink nodes
-    - name: "My Node"
+    - name: "Default Node"
       url: "localhost:5000"
       auth: "youshallnotpass"
   # relatedRoutePlanner: # Related video search route planner (Avoid 429 from youtube) If you use this uncomment this line and fill your ip range (CIDR notation)

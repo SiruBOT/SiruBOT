@@ -3,8 +3,7 @@ name: Docker Build
 on: [push, pull_request]
 
 jobs:
-  build:
-    name: Docker build
+  docker-build:
     runs-on: ubuntu-latest
     steps:
       -
