@@ -9,6 +9,7 @@ import { Logger } from "tslog";
 import { Guild } from "../database/mysql/entities";
 import { CommandPermissionChecker } from "../structures/CommandPermissionChecker";
 import { CommandPermissionError } from "../structures/errors/CommandPermissionError";
+import { InteractionType } from "discord.js";
 
 const SYSTEM_MESSAGE_EPHEMERAL = false;
 const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
@@ -40,26 +41,18 @@ export default class InteractionCreateEvent extends BaseEvent {
     interaction: Discord.Interaction,
     transaction?: Transaction
   ) {
-    if (interaction.isCommand()) {
-      await this.handleCommand(interaction, transaction);
-      return;
+    switch (interaction.type) {
+      case InteractionType.ApplicationCommand:
+        transaction?.setData("interactionType", "ApplicationCommand");
+        await this.handleCommand(interaction, transaction);
+        break;
+      case InteractionType.ApplicationCommandAutocomplete:
+        transaction?.setData(
+          "interactionType",
+          "ApplicationCommandAutocomplete"
+        );
+        await this.handleAutoComplete(interaction, transaction);
     }
-    if (interaction.isAutocomplete()) {
-      await this.handleAutoComplete(interaction, transaction);
-      return;
-    }
-    // if (interaction.isAutocomplete())
-
-    // // eslint-disable-next-line prettier/prettier
-    // if (interaction.isButton())
-
-    // if (interaction.isContextMenu())
-
-    // if (interaction.isMessageComponent())
-
-    // if (interaction.isSelectMenu())
-
-    // if (interaction.isUserContextMenu())
   }
 
   private generateCommandInfoString(
@@ -97,7 +90,6 @@ export default class InteractionCreateEvent extends BaseEvent {
         this.log.debug(
           `Guild ${interaction.guildId} not cached. fetch Guild..`
         );
-        transaction?.setData("isCached", "notCachedGuild");
         try {
           await this.client.guilds.fetch(interaction.guildId);
         } catch (error) {
@@ -106,8 +98,7 @@ export default class InteractionCreateEvent extends BaseEvent {
             content: locale.format(
               interaction.locale,
               "GUILD_CACHE_FAILED",
-              exceptionId,
-              error as string
+              exceptionId
             ),
           });
           transaction?.setData("error", "Guild_Cache_Failed");
@@ -115,15 +106,22 @@ export default class InteractionCreateEvent extends BaseEvent {
           return;
         }
       } else {
-        transaction?.setData("isCached", "inCachedGuild");
+        transaction?.setData("isCached", "Already_Cached");
       }
+      // TODO: TEST?
+      if (!interaction.isChatInputCommand())
+        throw new Error("ChatInputCommand");
+      // Start
       if (interaction.inCachedGuild()) {
+        if (!interaction.guild.members.me) throw new Error("TODO: Handle this");
         // Start of Handle Command
         try {
           // -------- Handle bot's permissions --------
-          const missingPermissions: Discord.PermissionString[] = [];
+          const missingPermissions: Discord.PermissionsString[] = [];
           for (const guildPermission of command.botPermissions) {
-            if (!interaction.guild?.me?.permissions.has(guildPermission)) {
+            if (
+              !interaction.guild.members.me.permissions.has(guildPermission)
+            ) {
               missingPermissions.push(guildPermission);
             }
           }
@@ -188,13 +186,13 @@ export default class InteractionCreateEvent extends BaseEvent {
             return;
           }
           if (guildConfig.textChannelId) {
-            const defaultTextChannel: Discord.AnyChannel | undefined | null =
+            const defaultTextChannel: Discord.Channel | undefined | null =
               this.client.channels.cache // 채널 캐시에 없다면 fetch, AnyChannel = TextChannel : AnyChannel, channels.fetch => AnyChannel
-                .filter((ch) => ch.isText())
+                .filter((ch) => ch.isTextBased())
                 .get(guildConfig.textChannelId) ??
               (await this.client.channels.fetch(guildConfig.textChannelId));
             if (
-              defaultTextChannel?.isText() &&
+              defaultTextChannel?.isTextBased() &&
               interaction.channelId != defaultTextChannel.id
             ) {
               await interaction.reply({
@@ -292,15 +290,16 @@ export default class InteractionCreateEvent extends BaseEvent {
             // Samechannel
             if (requirements.voiceStatus.sameChannel) {
               if (
-                interaction.guild?.me?.voice.channelId &&
-                member.voice.channelId != interaction.guild?.me?.voice.channelId
+                interaction.guild?.members.me?.voice.channelId &&
+                member.voice.channelId !=
+                  interaction.guild?.members.me?.voice.channelId
               ) {
                 await interaction.reply({
                   ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
                   content: locale.format(
                     interaction.locale,
                     "SAME_CHANNEL",
-                    interaction.guild.me.voice.channelId
+                    interaction.guild.members.me.voice.channelId
                   ),
                 });
                 transaction?.setData("endReason", "SameChannel");
@@ -311,7 +310,7 @@ export default class InteractionCreateEvent extends BaseEvent {
             }
           }
           // Run command
-          await command.runCommand({
+          await command.onCommandInteraction({
             interaction,
             userPermissions,
           });
@@ -390,7 +389,7 @@ export default class InteractionCreateEvent extends BaseEvent {
       return;
     } else {
       try {
-        await command.runAutocomplete(interaction);
+        await command.onAutocompleteInteraction(interaction);
       } catch (error) {
         Sentry.captureException(error);
         this.log.error(

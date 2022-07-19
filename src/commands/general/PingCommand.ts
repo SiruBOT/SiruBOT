@@ -12,7 +12,13 @@ export default class PingCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("ping")
-      .setDescription("Replies with ping!");
+      .setNameLocalizations({
+        ko: "핑",
+      })
+      .setDescription("Replies with ping!")
+      .setDescriptionLocalizations({
+        ko: "봇의 반응 속도를 보여드려요!",
+      });
     super(
       slashCommand,
       client,
@@ -27,12 +33,14 @@ export default class PingCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
-    const pingEmbed: Discord.MessageEmbed = EmbedFactory.createEmbed();
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext): Promise<void> {
+    const pingEmbed: Discord.EmbedBuilder = EmbedFactory.createEmbed();
     await interaction.deferReply();
     pingEmbed.setDescription(
       `Discord -> BOT -> Discord | ${

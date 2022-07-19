@@ -25,12 +25,9 @@ export class AudioHandler extends Shoukaku {
 
   constructor(client: Client) {
     super(new Connectors.DiscordJS(client), client.settings.audio.nodes, {
-      resume: true,
-      resumeByLibrary: true,
-      alwaysSendResumeKey: true,
       resumeTimeout: 60000,
       moveOnDisconnect: true,
-      reconnectTries: 3,
+      reconnectTries: 10,
     });
     this.client = client;
     this.log = this.client.log.getChildLogger({

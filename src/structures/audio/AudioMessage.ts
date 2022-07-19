@@ -1,9 +1,4 @@
-import {
-  AnyChannel,
-  MessageOptions,
-  MessagePayload,
-  Message,
-} from "discord.js";
+import { MessagePayload, Message, Channel } from "discord.js";
 import { Logger } from "tslog";
 import { Client, DatabaseHelper } from "..";
 import { Guild } from "../../database/mysql/entities";
@@ -53,59 +48,63 @@ export class AudioMessage {
     return locale.getReusableFormatFunction(guildConfig.guildLocale);
   }
 
-  public async sendMessage(
-    options: string | MessagePayload | MessageOptions
-  ): Promise<void> {
+  public async sendMessage(options: string | MessagePayload): Promise<void> {
     this.log.debug(`Send audio message to guild ${this.guildId}...`);
     const { textChannelId, sendAudioMessages }: Guild =
       await this.databaseHelper.upsertAndFindGuild(this.guildId);
-    if (!sendAudioMessages) return;
-    let targetChannel: AnyChannel | null = null;
+    if (!sendAudioMessages) {
+      this.log.warn(
+        `Guild ${this.guildId} disabled audio messages, ignoreing...`
+      );
+      return;
+    }
+    let targetChannel: Channel | null = null;
     if (textChannelId) {
       targetChannel = await this.fetchChannel(textChannelId);
-    }
-    if (!textChannelId || !targetChannel) {
+    } else {
       targetChannel = await this.fetchChannel(this.channelId);
     }
-    if (targetChannel?.isText()) {
-      const lastMessage: Message | undefined = (
-        await targetChannel.messages.fetch({
-          limit: 1,
-        })
-      ).first();
-      if (
-        lastMessage &&
-        lastMessage.id == this.lastMessageId &&
-        lastMessage.editable
-      ) {
-        try {
-          this.log.debug(
-            `Trying to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id}...`
-          );
-          await lastMessage.edit(options);
-        } catch (e) {
-          this.log.error(
-            `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} is message is deleted?`,
-            e
-          );
-          Sentry.captureException(e);
-          this.log.debug(
-            `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} trying to send message`
-          );
-          const lastMsg: Message = await targetChannel.send(options);
-          this.lastMessageId = lastMsg.id;
-        }
-      } else {
-        if (this.lastMessageId)
-          await targetChannel.messages.delete(this.lastMessageId).catch(); // Ignore errors
-        this.log.debug(`Send message to ${targetChannel.id}`);
+    if (!targetChannel || !targetChannel.isTextBased()) {
+      this.log.warn(`Target channel not found ${this.channelId}`);
+      return;
+    }
+    const lastMessage: Message | undefined = (
+      await targetChannel.messages.fetch({
+        limit: 1,
+      })
+    ).first();
+    if (
+      lastMessage &&
+      lastMessage.id == this.lastMessageId &&
+      lastMessage.editable
+    ) {
+      try {
+        this.log.debug(
+          `Trying to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id}...`
+        );
+        await lastMessage.edit(options);
+      } catch (e) {
+        this.log.error(
+          `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} is message is deleted?`,
+          e
+        );
+        Sentry.captureException(e);
+        this.log.debug(
+          `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} trying to send message`
+        );
         const lastMsg: Message = await targetChannel.send(options);
         this.lastMessageId = lastMsg.id;
       }
+    } else {
+      if (this.lastMessageId)
+        await targetChannel.messages.delete(this.lastMessageId).catch(); // Ignore errors
+      this.log.debug(`Send message to ${targetChannel.id}`);
+      const lastMsg: Message = await targetChannel.send(options);
+      this.lastMessageId = lastMsg.id;
     }
   }
 
-  private async fetchChannel(channelId: string): Promise<AnyChannel | null> {
+  private async fetchChannel(channelId: string): Promise<Channel | null> {
     try {
       return await this.client.channels.fetch(channelId);
     } catch (e) {

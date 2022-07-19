@@ -1,4 +1,4 @@
-import Discord from "discord.js";
+import Discord, { GatewayIntentBits } from "discord.js";
 import Cluster from "discord-hybrid-sharding";
 import { Logger } from "tslog";
 import * as Sentry from "@sentry/node";
@@ -30,12 +30,13 @@ const log: Logger = new Logger({
 });
 
 // Setup Client
-const intents: Discord.Intents = new Discord.Intents([
-  "GUILD_MEMBERS",
-  "GUILDS",
-  "GUILD_VOICE_STATES",
-]);
-log.debug(`Client intents: ${intents.toArray().join(", ")}`);
+const intents: GatewayIntentBits[] = [
+  GatewayIntentBits.GuildMembers,
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildVoiceStates,
+];
+
+log.debug(`Client intents: ${intents.join(", ")}`);
 
 const clientOptions: Discord.ClientOptions = {
   intents,

@@ -1,19 +1,18 @@
 import yaml from "yaml";
 import Cluster from "discord-hybrid-sharding";
-
-import { version, name } from "../package.json";
-import type { IBootStrapperArgs, ISettings, IGatewayResponse } from "./types";
-
-import { Routes, APIApplication } from "discord-api-types/v9";
-import { REST as DiscordREST } from "@discordjs/rest";
-
 import { ArgumentParser } from "argparse";
 import { stat, readFile } from "fs/promises";
 import { Logger } from "tslog";
 import { fetch, Response } from "undici";
-import { BaseCommand, Client, WebhookNotifier } from "./structures";
-import { SlashCommandBuilder } from "@discordjs/builders";
 import FastGlob from "fast-glob";
+
+import { version, name } from "../package.json";
+import type { IBootStrapperArgs, ISettings, IGatewayResponse } from "./types";
+import { BaseCommand, Client, WebhookNotifier } from "./structures";
+
+import { Routes, APIApplication } from "discord-api-types/v9";
+import { REST as DiscordREST } from "@discordjs/rest";
+import { Colors, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
 
 // fs.exists is deprecated
 async function exists(path: string): Promise<boolean> {
@@ -114,7 +113,7 @@ async function boot() {
           webhookNotifier
             .buildEmbed()
             .setTitle("Fatal Error")
-            .setColor("RED")
+            .setColor(Colors.Red)
             .setDescription("FATAL " + err.stack?.slice(0, 1000)),
           true // It's important
         )
@@ -155,10 +154,7 @@ async function boot() {
     const commandFiles: string[] = await FastGlob(
       Client.generateGlobPattern("commands")
     );
-    const slashCommands: Omit<
-      SlashCommandBuilder,
-      "addSubcommand" | "addSubcommandGroup"
-    >[] = [];
+    const slashCommands: RESTPostAPIApplicationCommandsJSONBody[] = [];
     log.info(`Found ${commandFiles.length} commands`);
 
     // Register commands to slashCommands array
@@ -175,7 +171,8 @@ async function boot() {
         throw new Error(
           "Command file is not extends BaseCommand\n" + commandPath
         );
-      slashCommands.push(commandInstance.slashCommand);
+      log.debug(`Validating command file ${commandPath}`);
+      slashCommands.push(commandInstance.slashCommand.toJSON());
     }
 
     await restClient.put(

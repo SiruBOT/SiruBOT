@@ -13,7 +13,7 @@ const CommandPermissionsFilters: {
 } = {
   // Admin
   [CommandPermissions.ADMIN]: (options: PermissionFilterOptions): boolean => {
-    return options.guildMember.permissions.has("ADMINISTRATOR");
+    return options.guildMember.permissions.has("Administrator");
   },
   // BotOwner
   [CommandPermissions.BOTOWNER]: (options: PermissionFilterOptions) =>
@@ -25,7 +25,7 @@ const CommandPermissionsFilters: {
   },
   // Default Permission
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [CommandPermissions.EVERYONE]: (options?: PermissionFilterOptions) => true,
+  [CommandPermissions.EVERYONE]: () => true,
 };
 
 export class CommandPermissionChecker {
@@ -33,6 +33,7 @@ export class CommandPermissionChecker {
     permissionFilterOptions: PermissionFilterOptions
   ): CommandPermissions[] {
     return Object.values(CommandPermissions).filter((permission) =>
+      // eslint-disable-next-line security/detect-object-injection
       CommandPermissionsFilters[permission](permissionFilterOptions)
     );
   }

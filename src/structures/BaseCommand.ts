@@ -16,7 +16,7 @@ export abstract class BaseCommand {
   public category: CommandCategories;
   public permissions: CommandPermissions[];
   public requirements: ICommandRequirements;
-  public botPermissions: Discord.PermissionString[];
+  public botPermissions: Discord.PermissionsString[];
   protected client: Client;
 
   public constructor(
@@ -28,7 +28,7 @@ export abstract class BaseCommand {
     category: CommandCategories,
     permissions: CommandPermissions[],
     requirements: ICommandRequirements,
-    botPermissions: Discord.PermissionString[]
+    botPermissions: Discord.PermissionsString[]
   ) {
     this.slashCommand = slashCommand;
     this.client = client;
@@ -38,51 +38,52 @@ export abstract class BaseCommand {
     this.requirements = requirements;
   }
 
-  public async runCommand(
+  public async onCommandInteraction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: ICommandContext
   ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runCommand");
+    throw new Error("Method not implemented. BaseCommand#onCommandInteraction");
   }
 
-  public async runAutocomplete(
+  public async onAutocompleteInteraction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.AutocompleteInteraction
   ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runAutocomplete");
+    throw new Error(
+      "Method not implemented. BaseCommand#onAutocompleteInteraction"
+    );
   }
 
-  public async runButton(
+  public async onButtonInteraction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.ButtonInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runButton");
   }
 
-  public async runContextMenu(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interaction: Discord.ContextMenuInteraction
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runContextMenu");
-  }
-
-  public async runMessageComponent(
+  public async onMessageComponentInteraction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.MessageComponentInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runMessageComponent");
   }
 
-  public async runSelectMenu(
+  public async onSelectMenuInteraction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interaction: Discord.SelectMenuInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runSelectMenu");
   }
 
-  public async runUserContextMenu(
+  public async onContextMenuCommand(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interaction: Discord.UserContextMenuInteraction
+    interaction: Discord.ContextMenuCommandInteraction
+  ): Promise<void> {
+    throw new Error("Method not implemented. BaseCommand#runContextMenu");
+  }
+  public async onUserContextCommand(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interaction: Discord.UserContextMenuCommandInteraction
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runUserContextMenu");
   }

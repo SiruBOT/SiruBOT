@@ -1,10 +1,10 @@
-import { CommandInteraction, type GuildMember } from "discord.js";
+import { ChatInputCommandInteraction, type GuildMember } from "discord.js";
 import { ICommandRequirements } from "../CommandTypes/ICommandRequirements";
 import { VoiceConnectedGuildMember } from "./VoiceConnectedGuildMember";
 
 export class HandledCommandInteraction<
   T extends ICommandRequirements = ICommandRequirements
-> extends CommandInteraction<"cached"> {
+> extends ChatInputCommandInteraction<"cached"> {
   public member: T["voiceStatus"]["voiceConnected"] extends true
     ? VoiceConnectedGuildMember
     : GuildMember;

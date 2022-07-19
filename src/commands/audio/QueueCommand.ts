@@ -38,11 +38,11 @@ export default class QueueCommand extends BaseCommand {
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       commandRequirements,
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({
+  public async onCommandInteraction({
     interaction,
   }: ICommandContext<typeof commandRequirements>): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(

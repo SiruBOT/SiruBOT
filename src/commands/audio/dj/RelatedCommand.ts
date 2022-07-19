@@ -12,13 +12,39 @@ export default class RepeatCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("related")
-      .setDescription("추천 영상 재생 기능을 설정해요")
+      .setNameLocalizations({
+        ko: "추천곡재생",
+      })
+      .setDescription("Turn on/off related song playback")
+      .setDescriptionLocalizations({
+        ko: "추천 영상 재생을 설정해요",
+      })
       .addStringOption((option) => {
         option
-          .setName("related_mode")
+          .setName("status")
+          .setNameLocalizations({
+            ko: "상태",
+          })
           .setDescription("Related playing mode")
-          .addChoice("On", "ON")
-          .addChoice("Off", "OFF");
+          .setDescriptionLocalizations({
+            ko: "추천 영상 재생 상태",
+          })
+          .addChoices(
+            {
+              name: "On",
+              value: "ON",
+              name_localizations: {
+                ko: "켜기",
+              },
+            },
+            {
+              name: "Off",
+              value: "OFF",
+              name_localizations: {
+                ko: "끄기",
+              },
+            }
+          );
         return option;
       });
     super(
@@ -35,13 +61,14 @@ export default class RepeatCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
-    const relatedMode: string | null =
-      interaction.options.getString("related_mode");
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext): Promise<void> {
+    const relatedMode: string | null = interaction.options.getString("status");
     if (!relatedMode) {
       const guildConfig: Guild =
         await this.client.databaseHelper.upsertAndFindGuild(

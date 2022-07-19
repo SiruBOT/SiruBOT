@@ -24,6 +24,7 @@ import {
 import { BUTTON_AWAIT_TIMEOUT } from "../../constant/TimeConstant";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 import { MessageUtil } from "../../utils/MessageUtil";
+import { ButtonStyle, ComponentType } from "discord.js";
 
 const commandRequirements = {
   audioNode: true,
@@ -45,11 +46,23 @@ export default class PlayCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("play")
-      .setDescription("노래나 재생 목록을 재생해요")
+      .setNameLocalizations({
+        ko: "재생",
+      })
+      .setDescription("Play a track or playlist")
+      .setDescriptionLocalizations({
+        ko: "재생 목록이나 노래를 재생해요.",
+      })
       .addStringOption((option) =>
         option
           .setName("query")
-          .setDescription("노래 검색어")
+          .setNameLocalizations({
+            ko: "검색어",
+          })
+          .setDescription("Query to search/play")
+          .setDescriptionLocalizations({
+            ko: "재생할 노래의 제목이나 URL을 입력해주세요.",
+          })
           .setAutocomplete(true)
           .setRequired(true)
       );
@@ -59,11 +72,11 @@ export default class PlayCommand extends BaseCommand {
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
       commandRequirements,
-      ["SEND_MESSAGES", "CONNECT", "SPEAK", "EMBED_LINKS"]
+      ["SendMessages", "Connect", "Speak", "EmbedLinks"]
     );
   }
 
-  public async runCommand(
+  public async onCommandInteraction(
     { interaction }: ICommandContext<typeof commandRequirements>,
     soundCloud = false
   ): Promise<void> {
@@ -173,20 +186,21 @@ export default class PlayCommand extends BaseCommand {
           const okButtonCustomId = "play_command_playlist_ok";
           const noButtonCustomId = "play_command_playlist_cancel";
           // Create ActionRow
-          const actionRow: Discord.MessageActionRow =
-            new Discord.MessageActionRow().addComponents(
-              new Discord.MessageButton()
+          const actionRow: Discord.ActionRowBuilder<Discord.ButtonBuilder> =
+            new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
+              new Discord.ButtonBuilder()
                 .setCustomId(okButtonCustomId)
                 .setEmoji(EMOJI_INBOX_TRAY)
-                .setStyle("SECONDARY"),
-              new Discord.MessageButton()
+                .setStyle(ButtonStyle.Secondary),
+              new Discord.ButtonBuilder()
                 .setCustomId(noButtonCustomId)
                 .setEmoji(EMOJI_X)
-                .setStyle("SECONDARY")
+                .setStyle(ButtonStyle.Secondary)
             );
           // Question message
-          const promptMessage: Discord.Message<true> =
+          const promptMessage: Discord.Message =
             await MessageUtil.followUpOrEditReply(interaction, {
+              fetchReply: true,
               content: enQueueState,
               components: [actionRow],
               embeds: [
@@ -220,7 +234,7 @@ export default class PlayCommand extends BaseCommand {
           try {
             const collectorInteraction: Discord.ButtonInteraction<Discord.CacheType> =
               await interaction.channel.awaitMessageComponent({
-                componentType: "BUTTON",
+                componentType: ComponentType.Button,
                 filter: buttonCollectorFilter,
                 time: BUTTON_AWAIT_TIMEOUT,
               });
@@ -328,7 +342,7 @@ export default class PlayCommand extends BaseCommand {
     return localeKey;
   }
 
-  public async runAutocomplete(
+  public async onAutocompleteInteraction(
     interaction: Discord.AutocompleteInteraction<Discord.CacheType>
   ): Promise<void> {
     const idealNode = this.client.audio.getNode();

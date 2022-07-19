@@ -59,6 +59,6 @@
   "COMMAND_PERMISSION_ERROR": "> ❎  이 기능은 ``{0}`` 권한이 필요해요.",
   "MISSING_USER_PERMISSIONS": "> ❎  이 명령어를 사용할 권한이 없어요.\n🏁  필요한 권한: {0}",
   "NO_NODES_AVAILABLE": "> 💡  사용 가능한 노드가 존재하지 않아요.",
-  "GUILD_CACHE_FAILED": "> ❌  길드를 캐시하는 도중 오류가 발생하였어요. 봇이 길드에 초대되어 있지 않은 것 같아요. ``{0}``\n```js\n{1}\n```",
+  "GUILD_CACHE_FAILED": "> ❌  길드를 캐시하는 도중 오류가 발생하였어요. 봇이 길드에 초대되어 있지 않은 것 같아요``{0}``",
   "JOIN_VOICE_FIRST": "> 📥  먼저 음성 채널에 접속해 주세요!"
 }

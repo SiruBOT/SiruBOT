@@ -30,8 +30,8 @@ services:
     build: .
     command: node ./build -d -s -c settings.yaml
     volumes:
-      - ./build:/opt/sirubot/build
-      - ./settings.yaml:/opt/sirubot/settings.yaml
+      - ${PWD}/build:/opt/sirubot/build
+      - ${PWD}/settings.yaml:/opt/sirubot/settings.yaml
     depends_on:
       - mariadb
       - mongodb

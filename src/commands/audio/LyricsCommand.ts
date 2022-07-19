@@ -37,12 +37,15 @@ export default class LyricsCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext): Promise<void> {
     await interaction.deferReply();
+    if (!interaction.isChatInputCommand()) return;
     const query: string = interaction.options.getString("query", true);
     const provider: MelonProvider = new MelonProvider();
     const searchResult: ILyricsSearchResult = await provider.search(query);
@@ -57,7 +60,7 @@ export default class LyricsCommand extends BaseCommand {
     resultEmbed.setTitle(`${lyrics.title}`);
     resultEmbed.setFooter({ text: lyrics.artist });
     if (lyrics.albumCover && typeof lyrics.albumCover === "string")
-      resultEmbed.setThumbnail(lyrics.albumCover as string);
+      await resultEmbed.setThumbnailAndColor(lyrics.albumCover as string);
     // if (lyrics.lyrics.length > 1024) {
     //   // Pagenation
     //   resultEmbed.setDescription("Pagenation required (lyrics > 1024)");
@@ -70,7 +73,7 @@ export default class LyricsCommand extends BaseCommand {
   }
 
   // Autocomplete Handler
-  public async runAutocomplete(
+  public async onAutocompleteInteraction(
     interaction: AutocompleteInteraction<CacheType>
   ): Promise<void> {
     const query: string | null = interaction.options.getString("query");

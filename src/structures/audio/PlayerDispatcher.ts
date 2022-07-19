@@ -78,7 +78,6 @@ export class PlayerDispatcher extends EventEmitter {
     }
   }
 
-  @BreakOnDestroyed()
   public async sendDisconnected(): Promise<void> {
     await this.audioMessage.sendMessage(
       await this.audioMessage.format("DISCONNECT_ERROR")
@@ -379,9 +378,9 @@ export class PlayerDispatcher extends EventEmitter {
   public async stopPlayer(): Promise<void> {
     await this.cleanStop();
     // Send Audio Message
-    await this.audioMessage.sendMessage({
-      content: await this.audioMessage.format("ENDED_PLAYBACK"),
-    });
+    await this.audioMessage.sendMessage(
+      await this.audioMessage.format("ENDED_PLAYBACK")
+    );
   }
 
   @BreakOnDestroyed()
@@ -394,9 +393,9 @@ export class PlayerDispatcher extends EventEmitter {
   @BreakOnDestroyed()
   private async handleError(exceptionId: string): Promise<void> {
     this.destroy();
-    await this.audioMessage.sendMessage({
-      content: await this.audioMessage.format("PLAYBACK_ERROR", exceptionId),
-    });
+    await this.audioMessage.sendMessage(
+      await this.audioMessage.format("PLAYBACK_ERROR", exceptionId)
+    );
   }
 
   public get destroyed(): boolean {

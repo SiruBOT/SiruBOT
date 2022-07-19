@@ -27,11 +27,13 @@ export default class StopCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );

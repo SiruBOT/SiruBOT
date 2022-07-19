@@ -3,12 +3,13 @@ import {
   CollectorFilter,
   CommandInteraction,
   InteractionReplyOptions,
+  InteractionUpdateOptions,
   Message,
-  MessageActionRow,
-  MessageActionRowComponentResolvable,
-  MessageButton,
-  MessageOptions,
-  MessagePayload,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import {
   EMOJI_NEXT,
@@ -18,7 +19,7 @@ import {
 import { PAGINATION_AWAIT_TIMEOUT } from "../constant/TimeConstant";
 import { MessageUtil } from "./MessageUtil";
 
-export type PageFnReturn = string | MessagePayload | MessageOptions;
+export type PageFnReturn = InteractionUpdateOptions;
 
 export type PageFn = (
   page: number,
@@ -41,7 +42,7 @@ export class Paginator {
   private previousBtnId: string;
   private nextBtnId: string;
   private stopBtnId: string;
-  private baseMessage: Message<true>;
+  private baseMessage: Message;
   constructor(paginatorOptions: PaginatorOptions) {
     this.pageFn = paginatorOptions.pageFn;
     this.baseCustomId = paginatorOptions.baseCustomId;
@@ -53,25 +54,26 @@ export class Paginator {
   }
 
   getActionRow(
-    additionalComponents?: MessageActionRowComponentResolvable[]
-  ): MessageActionRow {
-    const actionRow: MessageActionRow = new MessageActionRow();
+    additionalComponents?: MessageActionRowComponentBuilder[]
+  ): ActionRowBuilder<MessageActionRowComponentBuilder> {
+    const actionRow: ActionRowBuilder<MessageActionRowComponentBuilder> =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>();
     actionRow.addComponents(
       ...(this.totalPages !== 1
         ? [
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId(this.previousBtnId)
               .setEmoji(EMOJI_PREV)
-              .setStyle("SECONDARY")
+              .setStyle(ButtonStyle.Secondary)
               .setDisabled(this.currentPage === 1),
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId(this.stopBtnId)
               .setEmoji(EMOJI_STOP)
-              .setStyle("SECONDARY"),
-            new MessageButton()
+              .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
               .setCustomId(this.nextBtnId)
               .setEmoji(EMOJI_NEXT)
-              .setStyle("SECONDARY")
+              .setStyle(ButtonStyle.Secondary)
               .setDisabled(this.currentPage === this.totalPages),
           ]
         : []),
@@ -84,34 +86,28 @@ export class Paginator {
     const page = await this.pageFn(this.currentPage, this.totalPages, this);
     this.baseMessage = await MessageUtil.followUpOrEditReply(
       interaction,
-      this.pagePayload(page)
+      this.pagePayload(page) as InteractionReplyOptions
     );
     if (this.totalPages > 1) {
       await this.awaitButtons(interaction);
     }
   }
 
-  public pagePayload(
-    pageValue: PageFnReturn
-  ): MessagePayload | InteractionReplyOptions {
+  public pagePayload(pageValue: PageFnReturn): InteractionUpdateOptions & {
+    fetchReply: true;
+  } {
     const actionRow = this.getActionRow();
     if (actionRow.components.length > 0) {
-      switch (typeof pageValue) {
-        case "string":
-          return {
-            content: pageValue,
-            components: [actionRow],
-          };
-        default:
-          return Object.assign(
-            {
-              components: [actionRow],
-            },
-            pageValue
-          );
-      }
+      return {
+        components: [actionRow],
+        fetchReply: true,
+        ...[typeof pageValue === "string" ? { content: pageValue } : pageValue],
+      };
     } else {
-      return typeof pageValue === "string" ? { content: pageValue } : pageValue;
+      return {
+        ...[typeof pageValue === "string" ? { content: pageValue } : pageValue],
+        fetchReply: true,
+      };
     }
   }
 
@@ -126,7 +122,7 @@ export class Paginator {
     try {
       const collected: ButtonInteraction =
         await interaction.channel.awaitMessageComponent({
-          componentType: "BUTTON",
+          componentType: ComponentType.Button,
           filter: buttonCollectorFilter,
           time: PAGINATION_AWAIT_TIMEOUT,
           dispose: true,

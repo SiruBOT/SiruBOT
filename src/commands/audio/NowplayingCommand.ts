@@ -7,14 +7,25 @@ import {
 } from "../../types";
 import locale from "../../locales";
 import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
-import { Message, MessageActionRow, MessageButton } from "discord.js";
+import {
+  Message,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} from "discord.js";
 import { EMOJI_REFRESH } from "../../constant/MessageConstant";
 
 export default class NowplayingCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("nowplaying")
-      .setDescription("현재 재생 중인 곡의 정보를 보여드려요");
+      .setNameLocalizations({
+        ko: "재생정보",
+      })
+      .setDescription("Show the now playing track")
+      .setDescriptionLocalizations({
+        ko: "현재 재생 중인 곡의 정보를 보여드려요.",
+      });
     super(
       slashCommand,
       client,
@@ -29,21 +40,23 @@ export default class NowplayingCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES", "EMBED_LINKS"]
+      ["SendMessages", "EmbedLinks"]
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );
-    const actionRow: MessageActionRow = new MessageActionRow();
-    actionRow.addComponents(
-      new MessageButton()
-        .setEmoji(EMOJI_REFRESH)
-        .setStyle("SECONDARY")
-        .setCustomId("np_refresh")
-    );
+    const actionRow: ActionRowBuilder<ButtonBuilder> =
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setEmoji(EMOJI_REFRESH)
+          .setStyle(ButtonStyle.Secondary)
+          .setCustomId("np_refresh")
+      );
     const nowplayingMessage: Message<true> = await interaction.reply({
       components: [actionRow],
       content: locale.format(
@@ -60,5 +73,9 @@ export default class NowplayingCommand extends BaseCommand {
       fetchReply: true,
     });
     dispatcher.audioMessage.nowplayingMessage = nowplayingMessage;
+  }
+
+  public async onButtonInteraction() {
+    throw new Error("Update button implementation");
   }
 }

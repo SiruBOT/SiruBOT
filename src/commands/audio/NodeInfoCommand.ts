@@ -50,11 +50,13 @@ export default class NodeInfoCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({ interaction }: ICommandContext): Promise<void> {
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext): Promise<void> {
     const nodes: Node[] = [...this.client.audio.nodes.values()];
     const onlineNodes: Node[] = nodes.filter(
       (v) => v.state === Constants.State.CONNECTED
@@ -72,30 +74,37 @@ export default class NodeInfoCommand extends BaseCommand {
       `All nodes: **${nodes.length}** | Online nodes: **${onlineNodes.length}**\n` +
         `Total players: **${totalPlayers}** | Total playing players: **${totalPlayingPlayers}**`
     );
-    for (const node of nodes) {
-      const cpuStats = node?.stats?.cpu;
-      nodeInfoEmbed.addField(
-        `**${node.name}**`,
-        `State: **${STATE_STRING[node.state]}**\n` +
-          (node.state === Constants.State.CONNECTED)
-          ? `Players: **${node?.stats?.players ?? 0}**\n` +
-              `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
-              `Uptime: **${Formatter.humanizeSeconds(
-                node?.stats?.uptime ?? 0 / 1000
-              )}**\n` +
-              `Cores: **${cpuStats?.cores ?? "Not detected"}**\n` +
-              `Lavalink Load: **${this.formatLoad(
-                cpuStats?.lavalinkLoad
-              )}%**\n` +
-              `System Load: **${this.formatLoad(cpuStats?.systemLoad)}%**\n` +
-              `Used Memory: **${niceBytes(node?.stats?.memory.used ?? 0)}**\n` +
-              `Free Memory: **${niceBytes(node?.stats?.memory.free ?? 0)}**\n` +
-              `Frames Sent: **${node?.stats?.frameStats.sent ?? 0}**\n` +
-              `Frames Nulled: **${node?.stats?.frameStats.nulled ?? 0}**\n` +
-              `Frames Deficit: **${node?.stats?.frameStats.deficit ?? 0}**\n`
-          : ""
-      );
-    }
+    nodeInfoEmbed.addFields(
+      nodes.map((node) => {
+        const cpuStats = node?.stats?.cpu;
+        return {
+          name: `**${node.name}**`,
+          value:
+            `State: **${STATE_STRING[node.state]}**\n` +
+            (node.state === Constants.State.CONNECTED)
+              ? `Players: **${node?.stats?.players ?? 0}**\n` +
+                `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
+                `Uptime: **${Formatter.humanizeSeconds(
+                  node?.stats?.uptime ?? 0 / 1000
+                )}**\n` +
+                `Cores: **${cpuStats?.cores ?? "Not detected"}**\n` +
+                `Lavalink Load: **${this.formatLoad(
+                  cpuStats?.lavalinkLoad
+                )}%**\n` +
+                `System Load: **${this.formatLoad(cpuStats?.systemLoad)}%**\n` +
+                `Used Memory: **${niceBytes(
+                  node?.stats?.memory.used ?? 0
+                )}**\n` +
+                `Free Memory: **${niceBytes(
+                  node?.stats?.memory.free ?? 0
+                )}**\n` +
+                `Frames Sent: **${node?.stats?.frameStats.sent ?? 0}**\n` +
+                `Frames Nulled: **${node?.stats?.frameStats.nulled ?? 0}**\n` +
+                `Frames Deficit: **${node?.stats?.frameStats.deficit ?? 0}**\n`
+              : "",
+        };
+      })
+    );
     interaction.reply({ embeds: [nodeInfoEmbed] });
   }
 

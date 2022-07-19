@@ -13,14 +13,46 @@ export default class RepeatCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("repeat")
-      .setDescription("반복 기능을 설정해요")
+      .setNameLocalizations({
+        ko: "반복",
+      })
+      .setDescription("Sets the repeat mode")
+      .setDescriptionLocalizations({
+        ko: "반복 모드를 설정해요",
+      })
       .addStringOption((option) => {
         option
           .setName("repeat_mode")
-          .setDescription("Repeat mode")
-          .addChoice("Off", "0")
-          .addChoice("All", "1")
-          .addChoice("Single", "2");
+          .setNameLocalizations({
+            ko: "반복모드",
+          })
+          .setDescription("Repeat mode to set")
+          .setDescriptionLocalizations({
+            ko: "설정할 반복 모드",
+          })
+          .addChoices(
+            {
+              name: "Off",
+              value: "0",
+              name_localizations: {
+                ko: "끄기",
+              },
+            },
+            {
+              name: "All",
+              value: "1",
+              name_localizations: {
+                ko: "전체",
+              },
+            },
+            {
+              name: "One",
+              value: "2",
+              name_localizations: {
+                ko: "한곡",
+              },
+            }
+          );
         return option;
       });
     super(
@@ -37,16 +69,16 @@ export default class RepeatCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({
+  public async onCommandInteraction({
     interaction,
     userPermissions,
   }: ICommandContext): Promise<void> {
     const repeatMode: string | null =
-      interaction.options.getString("repeat_mode");
+      interaction.options.getString("repeat mode");
     if (!repeatMode || !userPermissions.includes(CommandPermissions.DJ)) {
       const guildConfig: Guild =
         await this.client.databaseHelper.upsertAndFindGuild(

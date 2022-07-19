@@ -7,6 +7,7 @@ import {
   CommandPermissions,
   IAudioTrack,
   ICommandContext,
+  ICommandRequirements,
   IGuildAudioData,
 } from "../../types";
 import locale from "../../locales";
@@ -42,14 +43,13 @@ export default class VolumeCommand extends BaseCommand {
           voiceConnected: true,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({
+  public async onCommandInteraction({
     interaction,
-    userPermissions,
-  }: ICommandContext): Promise<void> {
+  }: ICommandContext<ICommandRequirements>): Promise<void> {
     const forceSkip: boolean | null =
       interaction.options.getBoolean("forceskip");
     const skipTo: number | null = interaction.options.getInteger("to");

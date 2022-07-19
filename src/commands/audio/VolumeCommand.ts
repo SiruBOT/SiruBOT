@@ -13,11 +13,23 @@ export default class VolumeCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("volume")
-      .setDescription("볼륨을 설정하거나 볼 수 있어요")
+      .setNameLocalizations({
+        ko: "볼륨",
+      })
+      .setDescription("Set or view the volume of the player")
+      .setDescriptionLocalizations({
+        ko: "플레이어의 볼륨을 설정하거나 보실 수 있어요.",
+      })
       .addIntegerOption((option) => {
         return option
           .setName("volume")
-          .setDescription("볼륨 (1~150)")
+          .setNameLocalizations({
+            ko: "볼륨",
+          })
+          .setDescription("Volume (min: 1%, max: 150%)")
+          .setDescriptionLocalizations({
+            ko: "볼륨 (1~150%)",
+          })
           .setRequired(false);
       });
     super(
@@ -34,11 +46,11 @@ export default class VolumeCommand extends BaseCommand {
           voiceConnected: false,
         },
       },
-      ["SEND_MESSAGES"]
+      ["SendMessages"]
     );
   }
 
-  public async runCommand({
+  public async onCommandInteraction({
     interaction,
     userPermissions,
   }: ICommandContext): Promise<void> {
@@ -62,13 +74,15 @@ export default class VolumeCommand extends BaseCommand {
         throw new CommandPermissionError(CommandPermissions.DJ);
       // Max Volume = 150
       if (volume > 150) {
-        return await interaction.reply({
-          content: locale.format(interaction.locale, "VOLUME_CANNOT_OVER_MAX"),
-        });
+        await interaction.reply(
+          locale.format(interaction.locale, "VOLUME_CANNOT_OVER_MAX")
+        );
+        return;
       } else if (volume < 0) {
-        return await interaction.reply({
-          content: locale.format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW"),
-        });
+        await interaction.reply(
+          locale.format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW")
+        );
+        return;
       }
       const guildConfig: Guild =
         await this.client.databaseHelper.upsertAndFindGuild(

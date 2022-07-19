@@ -40,7 +40,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
   }
 
   clusterSpawned(cluster: Cluster): void {
-    const embed: Discord.MessageEmbed = this.infoEmbed();
+    const embed: Discord.EmbedBuilder = this.infoEmbed();
     embed.setTitle(
       `💡  Cluster spawned (${cluster.id + 1}/${cluster.manager.totalClusters})`
     ).setDescription(`
@@ -58,7 +58,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
   }
 
   clusterError(cluster: Cluster, error: Error): void {
-    const embed: Discord.MessageEmbed = this.warnEmbed();
+    const embed: Discord.EmbedBuilder = this.warnEmbed();
     embed.setTitle(`⚠️  Cluster Error #${cluster.id}`);
     embed.setDescription(
       codeBlock("ts", error.stack ?? "N/A, Check the console.")
@@ -67,20 +67,20 @@ export class WebhookNotifier extends Discord.WebhookClient {
   }
 
   clusterDeath(cluster: Cluster): void {
-    const embed: Discord.MessageEmbed = this.warnEmbed();
+    const embed: Discord.EmbedBuilder = this.warnEmbed();
     embed.setTitle(`⚠️  Cluster Death #${cluster.id}`);
     this.safeSendEmbed(embed, true);
   }
 
   clusterReady(cluster: Cluster, elapsedTime: number): void {
-    const embed: Discord.MessageEmbed = this.infoEmbed();
+    const embed: Discord.EmbedBuilder = this.infoEmbed();
     embed.setTitle(`✅  Cluster Ready #${cluster.id}`);
     embed.setDescription("Took **" + elapsedTime + "ms** to Ready");
     this.safeSendEmbed(embed, true);
   }
 
   async safeSendEmbed(
-    embed: Discord.MessageEmbed,
+    embed: Discord.EmbedBuilder,
     important = false
   ): Promise<void> {
     try {
