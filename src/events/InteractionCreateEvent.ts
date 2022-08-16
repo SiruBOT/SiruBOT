@@ -41,17 +41,14 @@ export default class InteractionCreateEvent extends BaseEvent {
     interaction: Discord.Interaction,
     transaction?: Transaction
   ) {
-    switch (interaction.type) {
-      case InteractionType.ApplicationCommand:
-        transaction?.setData("interactionType", "ApplicationCommand");
-        await this.handleCommand(interaction, transaction);
-        break;
-      case InteractionType.ApplicationCommandAutocomplete:
-        transaction?.setData(
-          "interactionType",
-          "ApplicationCommandAutocomplete"
-        );
-        await this.handleAutoComplete(interaction, transaction);
+    if (interaction.isChatInputCommand()) {
+      transaction?.setData("interactionType", "ChatInputCommandInteraction");
+      await this.handleChatInputCommandInteraction(interaction, transaction);
+      return;
+    }
+    if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+      transaction?.setData("interactionType", "ApplicationCommandAutocomplete");
+      await this.handleAutoComplete(interaction, transaction);
     }
   }
 
@@ -62,8 +59,8 @@ export default class InteractionCreateEvent extends BaseEvent {
   }
 
   // Handle command interaction type
-  private async handleCommand(
-    interaction: Discord.CommandInteraction,
+  private async handleChatInputCommandInteraction(
+    interaction: Discord.ChatInputCommandInteraction,
     transaction?: Transaction
   ): Promise<void> {
     this.log.info(
@@ -108,9 +105,6 @@ export default class InteractionCreateEvent extends BaseEvent {
       } else {
         transaction?.setData("isCached", "Already_Cached");
       }
-      // TODO: TEST?
-      if (!interaction.isChatInputCommand())
-        throw new Error("ChatInputCommand");
       // Start
       if (interaction.inCachedGuild()) {
         if (!interaction.guild.members.me) throw new Error("TODO: Handle this");

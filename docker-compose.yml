@@ -31,7 +31,9 @@ services:
     command: node ./build -d -s -c settings.yaml
     volumes:
       - ${PWD}/build:/opt/sirubot/build
-      - ${PWD}/settings.yaml:/opt/sirubot/settings.yaml
+      - type: bind
+        source: ${PWD}/settings.yaml
+        target: /opt/sirubot/settings.yaml
     depends_on:
       - mariadb
       - mongodb

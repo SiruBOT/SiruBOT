@@ -19,7 +19,11 @@ import {
 import { PAGINATION_AWAIT_TIMEOUT } from "../constant/TimeConstant";
 import { MessageUtil } from "./MessageUtil";
 
-export type PageFnReturn = InteractionUpdateOptions;
+export type PageFnReturn = InteractionUpdateOptions | string;
+
+type UpdateOptions = InteractionUpdateOptions & {
+  fetchReply: true;
+};
 
 export type PageFn = (
   page: number,
@@ -93,22 +97,24 @@ export class Paginator {
     }
   }
 
-  public pagePayload(pageValue: PageFnReturn): InteractionUpdateOptions & {
-    fetchReply: true;
-  } {
+  public pagePayload(pageValue: PageFnReturn): UpdateOptions {
     const actionRow = this.getActionRow();
-    if (actionRow.components.length > 0) {
-      return {
-        components: [actionRow],
-        fetchReply: true,
-        ...[typeof pageValue === "string" ? { content: pageValue } : pageValue],
-      };
+    let targetObj: UpdateOptions = {
+      fetchReply: true,
+    };
+    if (typeof pageValue === "string") {
+      targetObj.content = pageValue;
     } else {
-      return {
-        ...[typeof pageValue === "string" ? { content: pageValue } : pageValue],
-        fetchReply: true,
-      };
+      if (pageValue?.components && pageValue.components.length > 0) {
+        targetObj.components = pageValue.components?.concat(actionRow);
+      } else {
+        targetObj = Object.assign(targetObj, {
+          components: [actionRow],
+          ...pageValue,
+        });
+      }
     }
+    return targetObj;
   }
 
   public async awaitButtons(
@@ -170,8 +176,3 @@ export class Paginator {
     }
   }
 }
-
-/**
- * Example usage:
- *
- */

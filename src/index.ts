@@ -14,25 +14,6 @@ import { Routes, APIApplication } from "discord-api-types/v9";
 import { REST as DiscordREST } from "@discordjs/rest";
 import { Colors, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
 
-// fs.exists is deprecated
-async function exists(path: string): Promise<boolean> {
-  try {
-    await stat(path);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
-// read file when file exists & file extension == .yaml
-async function safeReadFile(path: string): Promise<string> {
-  const fileExists = await exists(path);
-  if (!fileExists) throw new Error(`File ${path} does not exist`);
-  if (typeof path == "string" && !path.endsWith(".yaml"))
-    throw new Error(`File ${path} is not a YAML file`);
-  return readFile(path, "utf-8");
-}
-
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
   description: "SiruBOT Boot CLI",
@@ -74,6 +55,25 @@ const log: Logger = new Logger({
 
 /* ---------------- BOOT CALL ---------------- */
 boot();
+
+// fs.exists is deprecated
+async function exists(path: string): Promise<boolean> {
+  try {
+    await stat(path);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// read file when file exists & file extension == .yaml
+async function safeReadFile(path: string): Promise<string> {
+  const fileExists = await exists(path);
+  if (!fileExists) throw new Error(`File ${path} does not exist`);
+  if (typeof path == "string" && !path.endsWith(".yaml"))
+  throw new Error(`File ${path} is not a YAML file`);
+  return readFile(path, "utf-8");
+}
 
 /* Async function for boot */
 async function boot() {
