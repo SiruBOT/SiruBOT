@@ -3,9 +3,10 @@ import { BaseEvent, Client } from "../structures";
 // import { PlayerDispatcher } from "../structures/audio/PlayerDispatcher";
 // import * as Sentry from "@sentry/node";
 
-export default class VoiceStateUpdateEvent extends BaseEvent {
+const eventName = "voiceStateUpdate" as const;
+export default class VoiceStateUpdateEvent extends BaseEvent<typeof eventName> {
   constructor(client: Client) {
-    super(client, "voiceStateUpdate");
+    super(client, eventName);
   }
 
   async run(oldState: VoiceState, newState: VoiceState): Promise<void> {

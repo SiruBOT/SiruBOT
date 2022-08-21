@@ -1,7 +1,9 @@
 import { BaseEvent, Client } from "../structures";
-export default class DebugEvent extends BaseEvent {
+
+const eventName = "debug" as const;
+export default class DebugEvent extends BaseEvent<typeof eventName> {
   constructor(client: Client) {
-    super(client, "debug");
+    super(client, eventName);
   }
 
   async run(debugMessage: string): Promise<void> {

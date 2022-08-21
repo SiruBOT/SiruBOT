@@ -4,10 +4,13 @@ import type { Transaction } from "@sentry/types";
 import { Logger } from "tslog";
 import { BaseEvent, type Client } from "../structures";
 
-export default class InteractionCreateEvent extends BaseEvent {
+const eventName = "messageCreate" as const;
+export default class InteractionCreateEvent extends BaseEvent<
+  typeof eventName
+> {
   private log: Logger;
   constructor(client: Client) {
-    super(client, "messageCreate");
+    super(client, eventName);
     this.log = client.log.getChildLogger({
       name: client.log.settings.name + "/MessageCreate",
     });

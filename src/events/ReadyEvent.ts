@@ -1,8 +1,10 @@
 import { ActivityType } from "discord.js";
 import { BaseEvent, Client } from "../structures";
-export default class ReadyEvent extends BaseEvent {
+
+const eventName = "ready" as const;
+export default class ReadyEvent extends BaseEvent<typeof eventName> {
   constructor(client: Client) {
-    super(client, "ready");
+    super(client, eventName);
   }
 
   async run(): Promise<void> {
