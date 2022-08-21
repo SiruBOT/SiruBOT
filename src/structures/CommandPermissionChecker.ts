@@ -20,8 +20,14 @@ const CommandPermissionsFilters: {
     options.settings.bot.owners.includes(options.guildMember.id),
   // DJ
   [CommandPermissions.DJ]: (options: PermissionFilterOptions): boolean => {
-    if (!options.guildConfig.djRoleId) return true;
-    return options.guildMember.roles.cache.has(options.guildConfig.djRoleId);
+    // TODO: roles Fetch 해서 가져오는 부분이 필요해보임 -> Await/Async 사용해야함
+    // TODO:    -> CommandPermissionChecker 를 async/await지원하게 만들고, onInteractionRe어쩌고에서
+    // TODO:    -> 이벤트에서 처리할때 await으로 처리해야함
+    if (!options.guildConfig.djRoleId) {
+      return options.guildMember.permissions.has("Administrator");
+    } else {
+      return options.guildMember.roles.cache.has(options.guildConfig.djRoleId);
+    }
   },
   // Default Permission
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
