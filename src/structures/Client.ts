@@ -17,7 +17,10 @@ class Client extends Discord.Client {
   public log: Logger;
 
   public commands: Discord.Collection<string, BaseCommand>;
-  public events: Discord.Collection<string, BaseEvent>;
+  public events: Discord.Collection<
+    string,
+    BaseEvent<keyof Discord.ClientEvents>
+  >;
   public databaseHelper: DatabaseHelper;
   public audio: AudioHandler;
 
@@ -54,7 +57,10 @@ class Client extends Discord.Client {
     this.log = log;
 
     this.commands = new Discord.Collection<string, BaseCommand>();
-    this.events = new Discord.Collection<string, BaseEvent>();
+    this.events = new Discord.Collection<
+      string,
+      BaseEvent<keyof Discord.ClientEvents>
+    >();
     this.databaseHelper = new DatabaseHelper(this);
   }
 
@@ -83,7 +89,7 @@ class Client extends Discord.Client {
 
   // When unhandled event error, log it and send it to Sentry
   private warpEventFunc(
-    eventInstance: BaseEvent
+    eventInstance: BaseEvent<keyof Discord.ClientEvents>
   ): (
     ...args: Discord.ClientEvents[keyof Discord.ClientEvents]
   ) => Promise<void> {
@@ -92,7 +98,6 @@ class Client extends Discord.Client {
     ) => {
       try {
         await eventInstance.run(...args);
-        // :thinking:
       } catch (err) {
         this.log.error("Unhandled event error from " + eventInstance.name);
         this.log.error(err);
@@ -114,7 +119,8 @@ class Client extends Discord.Client {
       const EventClass = await import(eventPath);
       if (!EventClass.default)
         throw new Error("Event file is missing default export\n" + eventPath);
-      const eventInstance: BaseEvent = new EventClass.default(this);
+      const eventInstance: BaseEvent<keyof Discord.ClientEvents> =
+        new EventClass.default(this);
       if (!(eventInstance instanceof BaseEvent))
         throw new Error("Event file is not extends BaseEvent\n" + eventPath);
       const eventFunc = this.warpEventFunc(eventInstance);
