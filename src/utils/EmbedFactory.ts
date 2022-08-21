@@ -1,20 +1,13 @@
 import { Client, User } from "discord.js";
 import { Formatter } from ".";
-import { version } from "../../package.json";
-import { BOT_NAME, DEFAULT_COLOR } from "../constant/MessageConstant";
+import { DEFAULT_COLOR } from "../constant/MessageConstant";
 import { ReusableFormatFunction } from "../locales/LocalePicker";
 import { IAudioTrack, IGuildAudioData } from "../types";
 import { ExtendedEmbed } from "./ExtendedEmbed";
 
 export class EmbedFactory {
   public static createEmbed(): ExtendedEmbed {
-    return new ExtendedEmbed()
-      .setFooter({ text: EmbedFactory.footerString })
-      .setColor(DEFAULT_COLOR);
-  }
-
-  public static get footerString(): string {
-    return `${BOT_NAME} - ${version}`;
+    return new ExtendedEmbed().setColor(DEFAULT_COLOR);
   }
 
   public static async getTrackEmbed(
@@ -37,19 +30,12 @@ export class EmbedFactory {
     }
     if (track.track.info.author) {
       embed.setFooter({
-        text: format(
-          "SOURCE",
-          track.track.info.author,
-          EmbedFactory.footerString
-        ),
+        text: format("SOURCE", track.track.info.author),
       });
     }
     embed
-      .setDescription(
-        `[${Formatter.formatTrack(track.track, format("LIVESTREAM"))}](${
-          track.track.info.uri
-        })`
-      )
+      .setTitle(`${Formatter.formatTrack(track.track, format("LIVESTREAM"))}`)
+      .setURL(track.track.info.uri)
       .setTrackThumbnail(track.track.info);
     return embed;
   }
@@ -94,13 +80,7 @@ export class EmbedFactory {
       );
       const footerItems: string[] = [];
       if (nowplaying.track.info.author) {
-        footerItems.push(
-          format(
-            "SOURCE",
-            nowplaying.track.info.author,
-            EmbedFactory.footerString
-          )
-        );
+        footerItems.push(format("SOURCE", nowplaying.track.info.author));
       }
       if (nowplaying.relatedTrack) {
         footerItems.push(format("TRACK_EMBED_RELATED"));

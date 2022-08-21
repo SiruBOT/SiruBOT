@@ -1,8 +1,8 @@
-import { ColorResolvable, EmbedBuilder } from "discord.js";
+import { ColorResolvable, EmbedBuilder, EmbedFooterOptions } from "discord.js";
 import { ShoukakuTrackInfo } from "../types/";
 import Vibrant from "node-vibrant";
-import { DEFAULT_COLOR } from "../constant/MessageConstant";
-
+import { BOT_NAME, DEFAULT_COLOR } from "../constant/MessageConstant";
+import { version } from "../../package.json";
 export class ExtendedEmbed extends EmbedBuilder {
   constructor() {
     super();
@@ -18,10 +18,18 @@ export class ExtendedEmbed extends EmbedBuilder {
 
   setTrackThumbnail(info: ShoukakuTrackInfo): this {
     if (info.sourceName === "youtube" && info.identifier) {
-      this.setThumbnail(
+      super.setThumbnail(
         `https://img.youtube.com/vi/${info.identifier}/maxresdefault.jpg`
       );
     }
+    return this;
+  }
+
+  setFooter(options: EmbedFooterOptions | null): this {
+    if (options?.text) {
+      options.text = options.text + " | " + BOT_NAME + " " + version;
+    }
+    super.setFooter(options);
     return this;
   }
 }
