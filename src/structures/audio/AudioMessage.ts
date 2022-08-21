@@ -80,17 +80,23 @@ export class AudioMessage {
     ) {
       try {
         this.log.debug(
-          `Trying to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id}...`
+          `Trying to edit message ${targetChannel.id}#${
+            lastMessage?.id ?? "Unknown"
+          }...`
         );
         await lastMessage.edit(options);
       } catch (e) {
         this.log.error(
-          `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} is message is deleted?`,
+          `Failed to edit message ${targetChannel.id}#${
+            lastMessage?.id ?? "Unknown"
+          } is message is deleted?`,
           e
         );
         Sentry.captureException(e);
         this.log.debug(
-          `Failed to edit message ${targetChannel.id}#${targetChannel.lastMessage?.id} trying to send message`
+          `Failed to edit message ${targetChannel.id}#${
+            lastMessage?.id ?? "Unknown"
+          } trying to send message`
         );
         const lastMsg: Message = await targetChannel.send(options);
         this.lastMessageId = lastMsg.id;
