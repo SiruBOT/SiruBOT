@@ -3,10 +3,19 @@ import { UpdateQuery, connect } from "mongoose";
 import { Logger } from "tslog";
 
 import { Client } from ".";
-import { User, Guild } from "../database/mysql/entities";
+import entities, { Guild, Metrics } from "../database/mysql/entities";
 import { GuildAudioDataModel } from "../database/mongodb/models";
 import { IGuildAudioData } from "../types";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+
+interface StatsMetricsArgs {
+  playingPlayers: number;
+  shardGuildCount: number;
+  websocketPing: number;
+  shardIds: number[];
+  clusterId: number;
+}
+
 export class DatabaseHelper {
   private log: Logger;
   protected client: Client;
@@ -23,7 +32,7 @@ export class DatabaseHelper {
     this.log.debug("Setup databases...");
     const mysqlConn: Connection = await createConnection({
       type: "mysql",
-      entities: [Guild, User],
+      entities,
       synchronize: true,
       ...this.client.settings.database.mysql,
       logging: this.client.bootStrapperArgs.debug,
@@ -70,7 +79,7 @@ export class DatabaseHelper {
       `Upsert Guild @ ${discordGuildId}`,
       Object.keys(data) ? data : "Empty data"
     );
-    const guildRepository: Repository<Guild> | undefined =
+    const guildRepository: Repository<Guild> =
       this.mysqlConn.getRepository(Guild);
     await guildRepository.upsert(
       {
@@ -83,5 +92,25 @@ export class DatabaseHelper {
       discordGuildId,
     });
     return returnResult;
+  }
+
+  async insertMetrics(options: StatsMetricsArgs) {
+    const {
+      clusterId,
+      playingPlayers,
+      shardGuildCount,
+      websocketPing,
+      shardIds,
+    } = options;
+    this.log.debug(`Insert metrics data @ ${clusterId}/${playingPlayers}`);
+    const metricsRepository: Repository<Metrics> =
+      this.mysqlConn.getRepository(Metrics);
+    await metricsRepository.insert({
+      clusterId,
+      playingPlayers,
+      shardGuildCount,
+      websocketPing,
+      shardIds,
+    });
   }
 }
