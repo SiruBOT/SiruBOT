@@ -4,14 +4,23 @@
 		{
 			"type": "typescript",
 			"tsconfig": "tsconfig.json",
+			"option": "watch",
 			"problemMatcher": [
-				"$tsc"
+				"$tsc-watch"
 			],
+			"group": "build",
+			"label": "tsc: watch - tsconfig.json"
+		},
+		{
+			"type": "npm",
+			"script": "build:ts",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
-			"label": "tsc: build - tsconfig.json"
+			"problemMatcher": [],
+			"label": "npm: build:ts",
+			"detail": "yarn run build:clean && tsc --project ./tsconfig.json"
 		}
 	]
 }

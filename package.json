@@ -50,7 +50,8 @@
     "lint:fix": "eslint --ext .ts ./src --fix",
     "build:ts": "yarn run build:clean && tsc --project ./tsconfig.json",
     "build:clean": "gulp clean",
-    "deploy:commands": "node ./build -d -r -c"
+    "build:deploy": "yarn run build:ts && yarn run deploy:commands",
+    "deploy:commands": "node ./build -d -r -c settings.yaml"
   },
   "repository": {
     "type": "git",
