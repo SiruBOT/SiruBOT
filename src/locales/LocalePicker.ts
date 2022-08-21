@@ -1,3 +1,10 @@
+import { locales } from "./index";
+
+export type STRING_KEYS =
+  | keyof typeof locales["en"]
+  | keyof typeof locales["ko"]
+  | string;
+
 export interface Locale {
   [key: string]: string;
 }
@@ -7,7 +14,10 @@ export interface LocalePickerOption {
   locales: { [key: string]: Locale };
 }
 
-export type ReusableFormatFunction = (key: string, ...args: string[]) => string;
+export type ReusableFormatFunction = (
+  key: STRING_KEYS,
+  ...args: string[]
+) => string;
 
 export class LocalePicker {
   public option: LocalePickerOption;
@@ -15,7 +25,7 @@ export class LocalePicker {
     this.option = option;
   }
 
-  public format(locale: string, key: string, ...args: string[]): string {
+  public format(locale: string, key: STRING_KEYS, ...args: string[]): string {
     let localeData: Locale | undefined = this.option.locales[locale];
     if (!localeData) {
       localeData = this.option.locales[this.option.fallBackLocale];
@@ -35,7 +45,7 @@ export class LocalePicker {
   }
 
   public getReusableFormatFunction(localeName: string): ReusableFormatFunction {
-    return (key: string, ...args: string[]): string => {
+    return (key: STRING_KEYS, ...args: string[]): string => {
       return this.format(localeName, key, ...args);
     };
   }
