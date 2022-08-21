@@ -47,7 +47,7 @@ parser.add_argument("-c", "--config", {
 // Parse Args
 const args: IBootStrapperArgs = parser.parse_args();
 // Logger setup
-const LOGGER_NAME = "Manager";
+const LOGGER_NAME = "BootStrapper";
 const log: Logger = new Logger({
   name: LOGGER_NAME,
   minLevel: args.debug ? "debug" : "info",
@@ -71,7 +71,7 @@ async function safeReadFile(path: string): Promise<string> {
   const fileExists = await exists(path);
   if (!fileExists) throw new Error(`File ${path} does not exist`);
   if (typeof path == "string" && !path.endsWith(".yaml"))
-  throw new Error(`File ${path} is not a YAML file`);
+    throw new Error(`File ${path} is not a YAML file`);
   return readFile(path, "utf-8");
 }
 
@@ -175,6 +175,7 @@ async function boot() {
       slashCommands.push(commandInstance.slashCommand.toJSON());
     }
 
+    // Replace All Slash commands
     await restClient.put(
       process.env.DEVGUILD
         ? Routes.applicationGuildCommands(
