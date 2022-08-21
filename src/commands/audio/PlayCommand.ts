@@ -65,6 +65,18 @@ export default class PlayCommand extends BaseCommand {
           })
           .setAutocomplete(true)
           .setRequired(true)
+      )
+      .addBooleanOption((option) =>
+        option
+          .setName("soundcloud")
+          .setNameLocalizations({
+            ko: "사운드클라우드",
+          })
+          .setDescription("Search query on soundcloud")
+          .setDescriptionLocalizations({
+            ko: "검색을 유튜브가 아닌 사운드클라우드에서 해요.",
+          })
+          .setRequired(false)
       );
     super(
       slashCommand,
@@ -76,10 +88,9 @@ export default class PlayCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction(
-    { interaction }: ICommandContext<typeof commandRequirements>,
-    soundCloud = false
-  ): Promise<void> {
+  public async onCommandInteraction({
+    interaction,
+  }: ICommandContext<typeof commandRequirements>): Promise<void> {
     await interaction.deferReply();
     // Join voice channel before playing
     if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
@@ -110,6 +121,7 @@ export default class PlayCommand extends BaseCommand {
     // Get ideal node, AudioNode 옵션이 true이기때문에 node 가 없을 수 없음
     const node = this.client.audio.getNode();
     if (!node) throw new Error("Ideal node not found");
+    const soundCloud = interaction.options.getBoolean("soundcloud", false);
     const searchResult = await this.fetchTracksCached(
       node,
       isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
@@ -152,8 +164,7 @@ export default class PlayCommand extends BaseCommand {
           // Selected track
           const selectedTrack: number =
             searchResult.playlistInfo.selectedTrack ?? 0;
-          // eslint-disable-next-line security/detect-object-injection
-          const track: Track = searchResult.tracks[selectedTrack];
+          const track: Track = searchResult.tracks[selectedTrack as number];
           // Slice tracks after selected track position
           const slicedPlaylist: Track[] = searchResult.tracks.slice(
             selectedTrack + 1, // Array starts 0
@@ -352,9 +363,10 @@ export default class PlayCommand extends BaseCommand {
     // 쿼리가 없거나 길이가 100이상이거나 URL일 경우 결과없음
     if (!query || query.length > 100 || isURL(query))
       return await interaction.respond([]);
+    const soundCloud = interaction.options.getBoolean("soundcloud", false);
     const searchResult = await this.fetchTracksCached(
       idealNode,
-      `ytsearch:${query}`
+      isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
     );
     // Search가 아니거나 검색 결과가 null 일 경우 결과 없음.
     // TODO 플레이리스트일경우 플레이리스트 추가, 한곡 추가, 등등, URL일경우 URL 정보 표시해주기

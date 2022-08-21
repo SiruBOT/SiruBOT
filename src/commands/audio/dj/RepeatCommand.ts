@@ -24,7 +24,7 @@ export default class RepeatCommand extends BaseCommand {
         option
           .setName("repeat_mode")
           .setNameLocalizations({
-            ko: "반복모드",
+            ko: "모드",
           })
           .setDescription("Repeat mode to set")
           .setDescriptionLocalizations({

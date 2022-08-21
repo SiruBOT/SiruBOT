@@ -34,8 +34,16 @@ const STATE_STRING = [
 export default class NodeInfoCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
-      .setName("nodeinfo")
-      .setDescription("봇의 음성 서버 정보를 보여드려요");
+      .setName("debuginfo")
+      .setNameLocalizations({
+        ko: "디버그",
+      })
+      .setDescription(
+        "Shows bot's debug info (Usally uses support identify errors)"
+      )
+      .setDescriptionLocalizations({
+        ko: "봇의 디버그 정보를 보여드려요. (대부분 봇의 오류를 파악하는데 사용되어요)",
+      });
     super(
       slashCommand,
       client,
@@ -93,14 +101,14 @@ export default class NodeInfoCommand extends BaseCommand {
                 )}%**\n` +
                 `System Load: **${this.formatLoad(cpuStats?.systemLoad)}%**\n` +
                 `Used Memory: **${niceBytes(
-                  node?.stats?.memory.used ?? 0
+                  node?.stats?.memory?.used ?? 0
                 )}**\n` +
                 `Free Memory: **${niceBytes(
-                  node?.stats?.memory.free ?? 0
+                  node?.stats?.memory?.free ?? 0
                 )}**\n` +
-                `Frames Sent: **${node?.stats?.frameStats.sent ?? 0}**\n` +
-                `Frames Nulled: **${node?.stats?.frameStats.nulled ?? 0}**\n` +
-                `Frames Deficit: **${node?.stats?.frameStats.deficit ?? 0}**\n`
+                `Frames Sent: **${node?.stats?.frameStats?.sent ?? 0}**\n` +
+                `Frames Nulled: **${node?.stats?.frameStats?.nulled ?? 0}**\n` +
+                `Frames Deficit: **${node?.stats?.frameStats?.deficit ?? 0}**\n`
               : "",
         };
       })

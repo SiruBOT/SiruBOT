@@ -12,7 +12,13 @@ export default class StopCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("stop")
-      .setDescription("재생 중인 노래를 정지해요");
+      .setNameLocalizations({
+        ko: "정지",
+      })
+      .setDescription("Stops the player and clean up guild queue.")
+      .setDescriptionLocalizations({
+        ko: "재생 중인 노래를 정지하고 대기열을 초기화해요.",
+      });
     super(
       slashCommand,
       client,

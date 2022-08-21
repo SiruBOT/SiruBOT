@@ -31,7 +31,13 @@ export default class QueueCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("queue")
-      .setDescription("대기열의 노래들을 보여드려요");
+      .setNameLocalizations({
+        ko: "큐",
+      })
+      .setDescription("Shows queued tracks of this guild")
+      .setDescriptionLocalizations({
+        ko: "이 서버의 노래 대기열을 보여드려요",
+      });
     super(
       slashCommand,
       client,
@@ -48,7 +54,6 @@ export default class QueueCommand extends BaseCommand {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
       interaction.guildId
     );
-    // Page Clousure Function
     // 큐가 없으면 nowplaying 있는지 확인하고 nowplaying보내기
     const audioData: IGuildAudioData =
       await dispatcher.queue.getGuildAudioData();
@@ -58,6 +63,7 @@ export default class QueueCommand extends BaseCommand {
       const queuePaginator = new Paginator({
         totalPages: Math.ceil(queue.length / SPLIT_SIZE),
         baseCustomId: "queue_command",
+        // Page Clousure Function
         pageFn: async (page: number, maxPage: number) => {
           const audioData: IGuildAudioData =
             await dispatcher.queue.getGuildAudioData();
@@ -69,8 +75,6 @@ export default class QueueCommand extends BaseCommand {
             audioData.queue,
             SPLIT_SIZE
           );
-          // Embed
-          const embed: ExtendedEmbed = EmbedFactory.createEmbed();
           const pageContent: string = chunked[page - 1]
             .map((track, index) => {
               // index = 1 ~ 10
@@ -84,28 +88,30 @@ export default class QueueCommand extends BaseCommand {
               }>`;
             })
             .join("\n");
-          embed.setTrackThumbnail(queue[0].track.info);
-          embed.setDescription(pageContent);
-          embed.setFooter({
-            text: locale.format(
-              interaction.locale,
-              "QUEUE_EMBED_FOOTER",
-              queue.length.toString(),
-              Formatter.humanizeSeconds(
-                queue
-                  .filter((track) => {
-                    return (
-                      track.track.info.length && !track.track.info.isStream
-                    );
-                  })
-                  .reduce((prev, bTrack) => {
-                    return prev + (bTrack.track.info.length ?? 0);
-                  }, 0) / 1000
+          // Embed
+          const embed: ExtendedEmbed = EmbedFactory.createEmbed()
+            .setTrackThumbnail(queue[0].track.info)
+            .setDescription(pageContent)
+            .setFooter({
+              text: locale.format(
+                interaction.locale,
+                "QUEUE_EMBED_FOOTER",
+                queue.length.toString(),
+                Formatter.humanizeSeconds(
+                  queue
+                    .filter((track) => {
+                      return (
+                        track.track.info.length && !track.track.info.isStream
+                      );
+                    })
+                    .reduce((prev, bTrack) => {
+                      return prev + (bTrack.track.info.length ?? 0);
+                    }, 0) / 1000
+                ),
+                page.toString(),
+                maxPage.toString()
               ),
-              page.toString(),
-              maxPage.toString()
-            ),
-          });
+            });
           if (audioData.nowPlaying) {
             const status: string[] = [];
             status.push(
@@ -162,6 +168,7 @@ export default class QueueCommand extends BaseCommand {
             };
           }
         },
+        // End of Page Function
       });
       await interaction.deferReply();
       await queuePaginator.start(interaction);

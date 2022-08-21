@@ -15,11 +15,23 @@ export default class LyricsCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("lyrics")
-      .setDescription("노래의 가사를 찾아드려요")
+      .setNameLocalizations({
+        ko: "가사",
+      })
+      .setDescription("Search lyrics from query")
+      .setDescriptionLocalizations({
+        ko: "검색어에서 노래 가사를 찾아드려요!",
+      })
       .addStringOption((option) => {
         return option
           .setName("query")
-          .setDescription("가사 검색어")
+          .setNameLocalizations({
+            ko: "검색어",
+          })
+          .setDescription("Query to search")
+          .setDescriptionLocalizations({
+            ko: "검색할 노래의 이름을 입력해주세요. 검색어에 아티스트명이 포함되어있다면 정확도가 높아져요.",
+          })
           .setAutocomplete(true)
           .setRequired(true);
       });
