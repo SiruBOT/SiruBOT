@@ -14,10 +14,13 @@ import { InteractionType } from "discord.js";
 const SYSTEM_MESSAGE_EPHEMERAL = false;
 const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
 
-export default class InteractionCreateEvent extends BaseEvent {
+const eventName = "interactionCreate" as const;
+export default class InteractionCreateEvent extends BaseEvent<
+  typeof eventName
+> {
   private log: Logger;
   constructor(client: Client) {
-    super(client, "interactionCreate");
+    super(client, eventName);
     this.log = client.log.getChildLogger({
       name: client.log.settings.name + "/InteractionHandler",
     });
@@ -70,19 +73,21 @@ export default class InteractionCreateEvent extends BaseEvent {
     const command: BaseCommand | undefined = this.client.commands.get(
       interaction.commandName
     );
+    // If command not exists
     if (!command) {
       this.log.warn(
         `Command not found (${this.generateCommandInfoString(interaction)})`
       );
       transaction?.setHttpStatus(404);
       transaction?.finish();
+      // Then, Reply UNKNOWN_COMMAND
       await interaction.reply({
         ephemeral: true,
         content: locale.format(interaction.locale, "UNKNOWN_COMMAND"),
       });
     } else {
+      // Starts handle command
       transaction?.setData("guildId", interaction.guildId);
-      // -------- Handle guild command interaction --------
       if (!interaction.inCachedGuild() && interaction.guildId) {
         this.log.debug(
           `Guild ${interaction.guildId} not cached. fetch Guild..`
@@ -90,6 +95,7 @@ export default class InteractionCreateEvent extends BaseEvent {
         try {
           await this.client.guilds.fetch(interaction.guildId);
         } catch (error) {
+          // If fetch guild failed.
           const exceptionId: string = Sentry.captureException(error);
           await interaction.reply({
             content: locale.format(
@@ -100,6 +106,7 @@ export default class InteractionCreateEvent extends BaseEvent {
           });
           transaction?.setData("error", "Guild_Cache_Failed");
           transaction?.finish();
+          // Ends method
           return;
         }
       } else {
@@ -108,7 +115,6 @@ export default class InteractionCreateEvent extends BaseEvent {
       // Start
       if (interaction.inCachedGuild()) {
         if (!interaction.guild.members.me) throw new Error("TODO: Handle this");
-        // Start of Handle Command
         try {
           // -------- Handle bot's permissions --------
           const missingPermissions: Discord.PermissionsString[] = [];
@@ -119,6 +125,7 @@ export default class InteractionCreateEvent extends BaseEvent {
               missingPermissions.push(guildPermission);
             }
           }
+          // Handle mimssing permissions
           if (missingPermissions.length > 0) {
             const permissionString: string = missingPermissions
               .map((p) => {
@@ -140,6 +147,7 @@ export default class InteractionCreateEvent extends BaseEvent {
             transaction?.setData("missingPermissions", permissionString);
             transaction?.setHttpStatus(401);
             transaction?.finish();
+            // Ends method
             return;
           }
 
@@ -156,12 +164,13 @@ export default class InteractionCreateEvent extends BaseEvent {
             throw new Error(
               "Fetch member, but member not found. " + interaction.user.id
             );
+          // Get user's permissions
           const userPermissions = CommandPermissionChecker.getPermissions({
             guildConfig,
             guildMember: member,
             settings: this.client.settings,
           });
-          // Command.permissions 중 userPermissions 에 한개라도 있으면 권한 있음, 없으면 권한 없음
+          // userPermissions에 command.permissions가 포함되어있는게 없다면 종료
           if (
             command.permissions.filter((e) => userPermissions.includes(e))
               .length === 0
@@ -248,6 +257,7 @@ export default class InteractionCreateEvent extends BaseEvent {
 
           // -------- Handle user voiceStatus --------
           if (requirements.voiceStatus) {
+            // TODO: Guild Default Channel
             // VoiceConnected
             // const defaultVoiceChannel: Discord.AnyChannel | undefined | null =
             //   this.client.channels.cache // 채널 캐시에 없다면 fetch
@@ -347,7 +357,9 @@ export default class InteractionCreateEvent extends BaseEvent {
               ),
             };
             try {
-              await interaction.reply(payload);
+              if (interaction.deferred) await interaction.editReply(payload);
+              else if (interaction.replied) await interaction.followUp(payload);
+              else await interaction.reply(payload);
             } catch (error) {
               this.log.warn(
                 `Failed to reply error message ${exceptionId}`,
@@ -385,6 +397,7 @@ export default class InteractionCreateEvent extends BaseEvent {
       try {
         await command.onAutocompleteInteraction(interaction);
       } catch (error) {
+        await interaction.respond([]);
         Sentry.captureException(error);
         this.log.error(
           `Failed to handle autocomplete command ${interaction.commandName}`,
