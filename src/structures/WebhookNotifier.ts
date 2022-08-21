@@ -24,18 +24,16 @@ export class WebhookNotifier extends Discord.WebhookClient {
   }
 
   infoEmbed(): ExtendedEmbed {
-    return this.buildEmbed().setColor(OK_COLOR);
+    return this.buildEmbed("Info").setColor(OK_COLOR);
   }
 
   warnEmbed(): ExtendedEmbed {
-    return this.buildEmbed().setColor(WARN_COLOR);
+    return this.buildEmbed("Warn").setColor(WARN_COLOR);
   }
 
-  buildEmbed(): ExtendedEmbed {
+  buildEmbed(level: string): ExtendedEmbed {
     const embed: ExtendedEmbed = EmbedFactory.createEmbed();
-    embed
-      .setFooter({ text: EmbedFactory.footerString })
-      .setTimestamp(new Date());
+    embed.setFooter({ text: level }).setTimestamp(new Date());
     return embed;
   }
 
