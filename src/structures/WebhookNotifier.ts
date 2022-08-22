@@ -1,4 +1,4 @@
-import Discord from "discord.js";
+import Discord, { Colors } from "discord.js";
 import type { Cluster } from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
 import { EmbedFactory } from "../utils";
@@ -29,6 +29,10 @@ export class WebhookNotifier extends Discord.WebhookClient {
 
   warnEmbed(): ExtendedEmbed {
     return this.buildEmbed("Warn").setColor(WARN_COLOR);
+  }
+
+  fatalEmbed(): ExtendedEmbed {
+    return this.buildEmbed("Fatal").setColor(Colors.Red);
   }
 
   buildEmbed(level: string): ExtendedEmbed {

@@ -111,7 +111,7 @@ async function boot() {
       webhookNotifier
         ?.safeSendEmbed(
           webhookNotifier
-            .buildEmbed()
+            .fatalEmbed()
             .setTitle("Fatal Error")
             .setColor(Colors.Red)
             .setDescription("FATAL " + err.stack?.slice(0, 1000)),
@@ -132,12 +132,12 @@ async function boot() {
     await updateSlashCommands();
     return;
   }
+
   if (args.shard) {
     // Autosharding async function
     await autoSharding();
   } else {
-    log.info("Booting single bot mode");
-    // TODO: Implement single bot mode
+    log.warn("Single bot mode is currently not supported. use --shard option.");
   }
 
   async function updateSlashCommands() {
