@@ -114,13 +114,18 @@ export class AudioHandler extends Shoukaku {
   public async getNowPlayingEmbed(guildId: string, localeName?: string) {
     const { guildLocale }: Guild =
       await this.client.databaseHelper.upsertAndFindGuild(guildId);
-    const { nowPlaying, position }: IGuildAudioData =
+    const { nowPlaying, position, queue }: IGuildAudioData =
       await this.client.databaseHelper.upsertGuildAudioData(guildId);
-    return await EmbedFactory.getNowplayingEmbed(
+    return await EmbedFactory.buildNowplayingEmbed(
       this.client,
       locale.getReusableFormatFunction(localeName ?? guildLocale),
       nowPlaying,
-      position
+      position,
+      queue.length,
+      queue
+        .filter((e) => !e.track.info.isStream)
+        .map((e) => e.track.info.length)
+        .reduce((a, b) => a + b, 0)
     );
   }
 
