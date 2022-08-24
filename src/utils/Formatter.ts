@@ -17,9 +17,11 @@ export class Formatter {
   /**
    * Convert seconds to readble format (like 00:00:00)
    * @param sec Seconds to covert
+   * @param ms Is input is miliseconds?
    * @returns {string} readable string
    */
-  public static humanizeSeconds(sec: number): string {
+  public static humanizeSeconds(sec: number, ms?: boolean): string {
+    if (ms) sec = sec / 1000;
     const hours = Math.floor(sec / 3600);
     const minutes = Math.floor(sec / 60) % 60;
     const seconds = Math.floor(sec % 60);

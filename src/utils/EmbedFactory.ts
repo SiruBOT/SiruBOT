@@ -34,13 +34,16 @@ export class EmbedFactory {
       });
     }
     embed
-      .setTitle(`${Formatter.formatTrack(track.track, format("LIVESTREAM"))}`)
-      .setURL(track.track.info.uri)
+      .setDescription(
+        `[${Formatter.formatTrack(track.track, format("LIVESTREAM"))}](${
+          track.track.info.uri
+        })`
+      )
       .setTrackThumbnail(track.track.info);
     return embed;
   }
 
-  public static async getNowplayingEmbed(
+  public static async buildNowplayingEmbed(
     client: Client,
     format: ReusableFormatFunction,
     nowplaying: IGuildAudioData["nowPlaying"],
@@ -90,7 +93,7 @@ export class EmbedFactory {
           format(
             "REMAIN_TRACKS",
             remainTracks.toString(),
-            Formatter.humanizeSeconds(remainTimes)
+            Formatter.humanizeSeconds(remainTimes, true)
           )
         );
       }
