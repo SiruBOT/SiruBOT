@@ -37,7 +37,7 @@ export default class StopCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(

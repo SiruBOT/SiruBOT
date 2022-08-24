@@ -20,11 +20,10 @@ import * as Sentry from "@sentry/node";
 import { AudioMessage } from "./AudioMessage";
 import { ReusableFormatFunction } from "../../locales/LocalePicker";
 import { Formatter } from "../../utils";
-import { EventEmitter } from "events";
 import { Guild } from "../../database/mysql/entities";
 import { BreakOnDestroyed } from "./PlayerDecorator";
 
-export class PlayerDispatcher extends EventEmitter {
+export class PlayerDispatcher {
   public audio: AudioHandler;
   public client: Client;
   public player: Player;
@@ -40,7 +39,6 @@ export class PlayerDispatcher extends EventEmitter {
     databaseHelper: DatabaseHelper,
     joinOptions: IJoinOptions
   ) {
-    super();
     this.audio = audio;
     this.client = audio.client;
     this.player = player;

@@ -88,7 +88,7 @@ export default class PlayCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext<typeof commandRequirements>): Promise<void> {
     await interaction.deferReply();
@@ -353,7 +353,7 @@ export default class PlayCommand extends BaseCommand {
     return localeKey;
   }
 
-  public async onAutocompleteInteraction(
+  public override async onAutocompleteInteraction(
     interaction: Discord.AutocompleteInteraction<Discord.CacheType>
   ): Promise<void> {
     const idealNode = this.client.audio.getNode();

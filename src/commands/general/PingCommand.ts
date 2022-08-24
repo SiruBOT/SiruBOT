@@ -37,7 +37,7 @@ export default class PingCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
     const pingEmbed: Discord.EmbedBuilder = EmbedFactory.createEmbed();

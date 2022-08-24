@@ -62,7 +62,7 @@ export default class NodeInfoCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
     const nodes: Node[] = [...this.client.audio.nodes.values()];

@@ -53,7 +53,7 @@ export default class LyricsCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
     await interaction.deferReply();
@@ -85,7 +85,7 @@ export default class LyricsCommand extends BaseCommand {
   }
 
   // Autocomplete Handler
-  public async onAutocompleteInteraction(
+  public override async onAutocompleteInteraction(
     interaction: AutocompleteInteraction<CacheType>
   ): Promise<void> {
     const query: string | null = interaction.options.getString("query");

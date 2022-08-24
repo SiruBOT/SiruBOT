@@ -1,14 +1,17 @@
+// Import sentry
+import * as Sentry from "@sentry/node";
+// Import @sentry/tracing
+import * as Tracing from "@sentry/tracing";
+// Import discord.js/sharding stuff
 import Discord, { GatewayIntentBits } from "discord.js";
 import Cluster from "discord-hybrid-sharding";
+// Import logger for logging
 import { Logger } from "tslog";
-import * as Sentry from "@sentry/node";
-import { RewriteFrames } from "@sentry/integrations";
-import * as SentryTracing from "@sentry/tracing";
-
+// Import structures
 import { Client } from "./structures";
 import * as URLUtils from "./utils/URLUtils";
-
 import type { ISettings, IBootStrapperArgs } from "./types";
+import { RewriteFrames } from "@sentry/integrations";
 
 let argvSettings: ISettings;
 let bootStrapperArgs: IBootStrapperArgs;
@@ -76,7 +79,8 @@ if (
       new RewriteFrames({
         root: global.__dirname,
       }),
-      new SentryTracing.Integrations.BrowserTracing(),
+      new Sentry.Integrations.Http({ tracing: true }),
+      new Tracing.Integrations.BrowserTracing(),
     ],
   });
   if (bootStrapperArgs.shard && client.cluster) {

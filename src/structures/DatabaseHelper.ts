@@ -1,7 +1,6 @@
 import { createConnection, Connection, Repository } from "typeorm";
 import { UpdateQuery, connect } from "mongoose";
 import { Logger } from "tslog";
-
 import { Client } from ".";
 import entities, { Guild, Metrics } from "../database/mysql/entities";
 import { GuildAudioDataModel } from "../database/mongodb/models";
@@ -49,7 +48,7 @@ export class DatabaseHelper {
     this.mongoose = mongoose;
   }
 
-  async upsertGuildAudioData(
+  public async upsertGuildAudioData(
     discordGuildId: string,
     query: UpdateQuery<IGuildAudioData> = {}
   ): Promise<IGuildAudioData> {
@@ -71,7 +70,7 @@ export class DatabaseHelper {
     return guildAudioData;
   }
 
-  async upsertAndFindGuild(
+  public async upsertAndFindGuild(
     discordGuildId: string,
     data: QueryDeepPartialEntity<Guild> = {}
   ): Promise<Guild> {
@@ -86,7 +85,9 @@ export class DatabaseHelper {
         discordGuildId,
         ...data,
       },
-      ["discordGuildId"]
+      {
+        conflictPaths: ["discordGuildId"],
+      }
     );
     const returnResult = await guildRepository.findOneOrFail({
       discordGuildId,
@@ -94,7 +95,7 @@ export class DatabaseHelper {
     return returnResult;
   }
 
-  async insertMetrics(options: StatsMetricsArgs) {
+  public async insertMetrics(options: StatsMetricsArgs) {
     const {
       clusterId,
       playingPlayers,

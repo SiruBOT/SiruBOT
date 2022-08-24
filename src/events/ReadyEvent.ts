@@ -7,7 +7,7 @@ export default class ReadyEvent extends BaseEvent<typeof eventName> {
     super(client, eventName);
   }
 
-  async run(): Promise<void> {
+  public override async run(): Promise<void> {
     const ActivityTypeStrMap: {
       [key: string]: Exclude<ActivityType, ActivityType.Custom>;
     } = {

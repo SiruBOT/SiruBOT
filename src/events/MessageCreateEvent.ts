@@ -16,9 +16,9 @@ export default class InteractionCreateEvent extends BaseEvent<
     });
   }
 
-  async run(message: Discord.Message): Promise<void> {
+  public override async run(message: Discord.Message): Promise<void> {
     if (message.content.startsWith(">>")) {
-      const transaction: Transaction = Sentry.startTransaction({
+      const transaction = Sentry.startTransaction({
         op: "messageCreate",
         name: "Message handler",
       });

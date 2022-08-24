@@ -6,7 +6,7 @@ export default class DebugEvent extends BaseEvent<typeof eventName> {
     super(client, eventName);
   }
 
-  async run(debugMessage: string): Promise<void> {
+  public override async run(debugMessage: string): Promise<void> {
     if (this.client.bootStrapperArgs.debug) this.client.log.debug(debugMessage);
   }
 }

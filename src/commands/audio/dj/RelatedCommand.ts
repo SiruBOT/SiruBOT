@@ -65,7 +65,7 @@ export default class RepeatCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
     const relatedMode: string | null = interaction.options.getString("status");

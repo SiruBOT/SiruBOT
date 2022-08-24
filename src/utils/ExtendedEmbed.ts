@@ -9,14 +9,14 @@ export class ExtendedEmbed extends EmbedBuilder {
   }
 
   // TODO: Experimental
-  async setThumbnailAndColor(url: string): Promise<this> {
+  public async setThumbnailAndColor(url: string): Promise<this> {
     const palette = await Vibrant.from(url).getPalette();
     this.setThumbnail(url);
     this.setColor((palette.Vibrant?.hex ?? DEFAULT_COLOR) as ColorResolvable);
     return this;
   }
 
-  setTrackThumbnail(info: ShoukakuTrackInfo): this {
+  public setTrackThumbnail(info: ShoukakuTrackInfo): this {
     if (info.sourceName === "youtube" && info.identifier) {
       super.setThumbnail(
         `https://img.youtube.com/vi/${info.identifier}/maxresdefault.jpg`
@@ -25,7 +25,7 @@ export class ExtendedEmbed extends EmbedBuilder {
     return this;
   }
 
-  setFooter(options: EmbedFooterOptions | null): this {
+  public override setFooter(options: EmbedFooterOptions | null): this {
     if (options?.text) {
       options.text = options.text + " | " + BOT_NAME + " " + version;
     }

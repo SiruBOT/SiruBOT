@@ -73,7 +73,7 @@ export default class RepeatCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
     userPermissions,
   }: ICommandContext): Promise<void> {

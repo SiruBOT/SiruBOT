@@ -5,7 +5,7 @@ import { VoiceConnectedGuildMember } from "./VoiceConnectedGuildMember";
 export class HandledCommandInteraction<
   T extends ICommandRequirements = ICommandRequirements
 > extends ChatInputCommandInteraction<"cached"> {
-  public member: T["voiceStatus"]["voiceConnected"] extends true
+  public override member: T["voiceStatus"]["voiceConnected"] extends true
     ? VoiceConnectedGuildMember
     : GuildMember;
 }
