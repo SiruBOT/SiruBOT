@@ -87,4 +87,9 @@ export abstract class BaseCommand {
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#runUserContextMenu");
   }
+
+  // Custom id for handling
+  public getCustomId(customId: string): string {
+    return `[${this.slashCommand.name};${customId};`;
+  }
 }

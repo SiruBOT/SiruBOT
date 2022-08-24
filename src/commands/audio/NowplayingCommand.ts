@@ -12,6 +12,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ButtonInteraction,
 } from "discord.js";
 import { EMOJI_REFRESH } from "../../constant/MessageConstant";
 
@@ -44,7 +45,7 @@ export default class NowplayingCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
@@ -55,7 +56,7 @@ export default class NowplayingCommand extends BaseCommand {
         new ButtonBuilder()
           .setEmoji(EMOJI_REFRESH)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId("np_refresh")
+          .setCustomId(this.getCustomId("np_refresh"))
       );
     const nowplayingMessage: Message<true> = await interaction.reply({
       components: [actionRow],
@@ -75,7 +76,8 @@ export default class NowplayingCommand extends BaseCommand {
     dispatcher.audioMessage.nowplayingMessage = nowplayingMessage;
   }
 
-  public async onButtonInteraction() {
-    throw new Error("Update button implementation");
+  public override async onButtonInteraction(interaction: ButtonInteraction) {
+    // TODO: Implement
+    await interaction.reply("Not implemented");
   }
 }

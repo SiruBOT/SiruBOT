@@ -26,10 +26,10 @@ export default class InteractionCreateEvent extends BaseEvent<
     });
   }
 
-  async run(interaction: Discord.Interaction): Promise<void> {
+  public override async run(interaction: Discord.Interaction): Promise<void> {
     const transaction: Transaction = Sentry.startTransaction({
-      op: "interactionCreate",
-      name: "Interaction handler",
+      op: "InteractionCreateEvent#run",
+      name: "InteractionCreateEvent",
     });
     transaction.setData("interactionType", interaction.type);
     transaction.setData("interactionLocale", interaction.locale);
@@ -44,6 +44,12 @@ export default class InteractionCreateEvent extends BaseEvent<
     interaction: Discord.Interaction,
     transaction?: Transaction
   ) {
+    if (interaction.applicationId !== this.client.user?.id) {
+      this.client.log.warn(
+        `Interaction application id mismatch. ${interaction.applicationId} ${this.client.user?.id}`
+      );
+      return;
+    }
     if (interaction.isChatInputCommand()) {
       transaction?.setData("interactionType", "ChatInputCommandInteraction");
       await this.handleChatInputCommandInteraction(interaction, transaction);
@@ -52,6 +58,12 @@ export default class InteractionCreateEvent extends BaseEvent<
     if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
       transaction?.setData("interactionType", "ApplicationCommandAutocomplete");
       await this.handleAutoComplete(interaction, transaction);
+      return;
+    }
+    if (interaction.isButton()) {
+      transaction?.setData("interactionType", "ButtonInteraction");
+      await this.handleButton(interaction, transaction);
+      return;
     }
   }
 
@@ -104,13 +116,13 @@ export default class InteractionCreateEvent extends BaseEvent<
               exceptionId
             ),
           });
-          transaction?.setData("error", "Guild_Cache_Failed");
+          transaction?.setData("error", "guild_cache_failed");
           transaction?.finish();
           // Ends method
           return;
         }
       } else {
-        transaction?.setData("isCached", "Already_Cached");
+        transaction?.setData("isCached", "already_cached");
       }
       // Start
       if (interaction.inCachedGuild()) {
@@ -406,5 +418,61 @@ export default class InteractionCreateEvent extends BaseEvent<
       }
       return;
     }
+  }
+
+  private async handleButton(
+    interaction: Discord.ButtonInteraction,
+    transaction?: Transaction
+  ) {
+    const customIdCheckRegex = /^[[a-z]+;\w+;$/g;
+    const commandNameRegex = /(?<=\[)(.*?)(?=;)/g;
+    const customIdRegex = /(?<=;)(.*?)(?=;)/g;
+    const commandName = interaction.customId.match(commandNameRegex)?.at(0);
+    const customId = interaction.customId.match(customIdRegex)?.at(0);
+    if (!customIdCheckRegex.test(interaction.customId)) {
+      transaction?.setHttpStatus(500);
+      transaction?.setData("error", "custom_id_regex_failed");
+      transaction?.setData("custom_id", interaction.customId);
+      transaction?.finish();
+      this.client.log.warn(
+        "Failed to handle button interaction, custom id pattern check failed."
+      );
+      return;
+    }
+    this.client.log.debug(`handleButton: ${commandName}/${customId}`);
+    // When command parse failed
+    if (!commandName) {
+      transaction?.setHttpStatus(500);
+      transaction?.setData("error", "command_name_not_found");
+      transaction?.finish();
+      this.client.log.warn(
+        "Failed to handle button interaction, command name not found."
+      );
+      return;
+    }
+    // When custom id parse failed
+    if (!customId) {
+      transaction?.setHttpStatus(500);
+      transaction?.setData("error", "custom_id_not_found");
+      transaction?.finish();
+      this.client.log.warn(
+        "Failed to handle button interaction, bot coudn't parse custom id."
+      );
+      return;
+    }
+    const command = this.client.commands.get(commandName);
+    // When command not found.
+    if (!command) {
+      transaction?.setHttpStatus(500);
+      transaction?.setData("error", "command_not_found");
+      transaction?.finish();
+      this.client.log.warn(
+        "Failed to handle button interaction, command name not found."
+      );
+      return;
+    }
+    // End Error handle
+    interaction.customId = customId;
+    await command?.onButtonInteraction(interaction);
   }
 }
