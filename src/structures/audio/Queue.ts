@@ -30,7 +30,9 @@ export class Queue {
   }
 
   public async pushTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(`Push track ${track.track.info.identifier}`);
+    this.log.debug(
+      `Push track ${track.track.info.identifier} @ ${this.guildId}`
+    );
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: track },
     });
@@ -46,7 +48,9 @@ export class Queue {
   }
 
   public async unshiftTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(`Push track ${track.track.info.identifier} with position 0`);
+    this.log.debug(
+      `Push track ${track.track.info.identifier} with position 0 @ ${this.guildId}`
+    );
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: [track], $position: 0 } },
     });
@@ -73,7 +77,7 @@ export class Queue {
   }
 
   public async setNowPlaying(track: IAudioTrack): Promise<IAudioTrack | null> {
-    this.log.debug(`Set nowplaying`);
+    this.log.debug(`Set nowplaying @ ${this.guildId}`);
     const updated = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
       { $set: { nowPlaying: track } }
@@ -88,15 +92,33 @@ export class Queue {
     return nowPlaying;
   }
 
+  // https://stackoverflow.com/questions/69070811/pop-many-first-n-items-in-mongo-db
   public async skipTo(to: number) {
-    this.log.debug(`Slice queue to ${to} tracks`);
-    this.databaseHelper.upsertGuildAudioData(this.guildId, {
-      $push: { queue: { $each: [], $slice: to } },
-    });
+    this.log.debug(`Slice queue tracks @ ${this.guildId} ${to}`);
+    await this.databaseHelper.upsertGuildAudioData(this.guildId, [
+      {
+        $set: {
+          queue: {
+            $filter: {
+              input: "$queue",
+              as: "z",
+              cond: {
+                $gte: [
+                  {
+                    $indexOfArray: ["$queue", "$$z"],
+                  },
+                  to, // 5 is n first item
+                ],
+              },
+            },
+          },
+        },
+      },
+    ]);
   }
 
   public async setPosition(position: number | null): Promise<IGuildAudioData> {
-    this.log.debug(`Update position to ${position}`);
+    this.log.debug(`Update position to ${position} @ ${this.guildId}`);
     return await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $set: {
         position: position,
