@@ -78,7 +78,7 @@ export default class RepeatCommand extends BaseCommand {
     userPermissions,
   }: ICommandContext): Promise<void> {
     const repeatMode: string | null =
-      interaction.options.getString("repeat mode");
+      interaction.options.getString("repeat_mode");
     if (!repeatMode || !userPermissions.includes(CommandPermissions.DJ)) {
       const guildConfig: Guild =
         await this.client.databaseHelper.upsertAndFindGuild(
