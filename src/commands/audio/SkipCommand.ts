@@ -227,7 +227,7 @@ export default class SkipCommand extends BaseCommand {
     const dispatcher = this.client.audio.getPlayerDispatcher(guildId);
     const voteButton = new ButtonBuilder()
       .setCustomId(this.getCustomId("voteskip_vote"))
-      .setLabel("건너뛰기")
+      .setEmoji("👍")
       .setStyle(ButtonStyle.Secondary);
     const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       voteButton
