@@ -29,11 +29,3 @@ Want to use your bot rather than host it? [Invite to your guild!](https://discor
  ```sh
  mv settings.inc.yml settings.yml
  ```
- 
-
-
-
-
-
-Bot notices, Updates, Maintains   
-[![Discord](https://discordapp.com/api/guilds/562920560955228176/embed.png?style=banner3)](https://discord.gg/invite/Np9X5VqPdF)
