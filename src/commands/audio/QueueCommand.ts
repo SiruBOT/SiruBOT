@@ -51,9 +51,8 @@ export default class QueueCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
   }: ICommandContext<typeof commandRequirements>): Promise<void> {
-    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
-      interaction.guildId
-    );
+    const dispatcher: PlayerDispatcher =
+      this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     // 큐가 없으면 nowplaying 있는지 확인하고 nowplaying보내기
     const audioData: IGuildAudioData =
       await dispatcher.queue.getGuildAudioData();

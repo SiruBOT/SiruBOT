@@ -59,7 +59,7 @@ export class AudioHandler extends Shoukaku {
     }
   }
 
-  public getPlayerDispatcher(guildId: string): PlayerDispatcher {
+  public getPlayerDispatcherOrfail(guildId: string): PlayerDispatcher {
     const dispatcher: PlayerDispatcher | undefined =
       this.dispatchers.get(guildId);
     if (!dispatcher)

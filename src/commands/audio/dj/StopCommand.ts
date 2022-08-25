@@ -40,9 +40,8 @@ export default class StopCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
   }: ICommandContext): Promise<void> {
-    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
-      interaction.guildId
-    );
+    const dispatcher: PlayerDispatcher =
+      this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     await interaction.reply({
       content: locale.format(interaction.locale, "CLEANED_AND_STOPPED"),
     });

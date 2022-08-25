@@ -115,9 +115,8 @@ export default class PlayCommand extends BaseCommand {
     // Handle play command
     const query: string = interaction.options.getString("query", true);
     // Get dispatcher
-    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
-      interaction.guildId
-    );
+    const dispatcher: PlayerDispatcher =
+      this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     // Get ideal node, AudioNode 옵션이 true이기때문에 node 가 없을 수 없음
     const node = this.client.audio.getNode();
     if (!node) throw new Error("Ideal node not found");

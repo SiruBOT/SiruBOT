@@ -10,8 +10,6 @@ export default class GuildUnavailableEvent extends BaseEvent<typeof eventName> {
     this.client.log.warn(
       `Guild @ ${guild.id} has been unavaliable. if dispatcher exists, stopping..`
     );
-    if (this.client.audio.hasPlayerDispatcher(guild.id)) {
-      this.client.audio.getPlayerDispatcher(guild.id).destroy();
-    }
+    this.client.audio.dispatchers.get(guild.id)?.destroy();
   }
 }

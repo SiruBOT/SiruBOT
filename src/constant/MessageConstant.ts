@@ -26,6 +26,7 @@ export const AUTOCOMPLETE_MAX_RESULT = 10;
 export const EMOJI_VOLUME_SMALL = "🔉";
 export const EMOJI_VOLUME_LOUD = "🔊";
 export const EMOJI_VOLUME_MUTE = "🔇";
+export const EMOJI_STAR = "⭐";
 /** Emojis (Controls) */
 export const EMOJI_PREV = "<:btn_left:955803837095088128>";
 export const EMOJI_NEXT = "<:btn_right:955803837254488074>";

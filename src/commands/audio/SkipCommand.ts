@@ -110,9 +110,8 @@ export default class SkipCommand extends BaseCommand {
     );
     const skipTo: number | null = interaction.options.getInteger("to", false);
 
-    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
-      interaction.guildId
-    );
+    const dispatcher: PlayerDispatcher =
+      this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     const { queue }: IGuildAudioData =
       await dispatcher.queue.getGuildAudioData();
     const nowplaying = await dispatcher.queue.getNowPlaying();
@@ -224,7 +223,7 @@ export default class SkipCommand extends BaseCommand {
     member: GuildMember,
     track: Track
   ) {
-    const dispatcher = this.client.audio.getPlayerDispatcher(guildId);
+    const dispatcher = this.client.audio.getPlayerDispatcherOrfail(guildId);
     const voteButton = new ButtonBuilder()
       .setCustomId(this.getCustomId("voteskip_vote"))
       .setEmoji("👍")

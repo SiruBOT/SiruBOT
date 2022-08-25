@@ -91,7 +91,7 @@ export default class VolumeCommand extends BaseCommand {
         );
       try {
         this.client.audio
-          .getPlayerDispatcher(interaction.guildId)
+          .getPlayerDispatcherOrfail(interaction.guildId)
           .setVolumePercent(guildConfig.volume);
       } catch {}
       await interaction.reply({
