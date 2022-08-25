@@ -1,16 +1,19 @@
 import { IGuildAudioData, IAudioTrack } from "../../types";
 import { Logger } from "tslog";
 import { DatabaseHelper } from "..";
+import { VoteSkip } from "./VoteSkip";
 
 export class Queue {
   private log: Logger;
   private databaseHelper: DatabaseHelper;
   private guildId: string;
+  public voteSkip: VoteSkip;
 
   constructor(guildId: string, databaseHelper: DatabaseHelper, log: Logger) {
     this.log = log.getChildLogger({ name: log.settings.name });
     this.guildId = guildId;
     this.databaseHelper = databaseHelper;
+    this.voteSkip = new VoteSkip();
   }
 
   public async cleanQueue(): Promise<IGuildAudioData> {
@@ -61,6 +64,8 @@ export class Queue {
     const beforeShift = await this.databaseHelper.upsertGuildAudioData(
       this.guildId
     );
+    this.voteSkip.clearSkippers(); // 한곡이 끝날때마다 shiftTrack이 되기 때문에 스킵 유저 초기화를 여기에서 처리해주면 됨
+    // BeforeShift = shifted track
     if (!beforeShift.queue[0]) {
       this.log.debug(
         `Shift track from ${this.guildId} (Queue is empty. returning null)`
