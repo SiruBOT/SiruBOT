@@ -326,17 +326,17 @@ export class PlayerDispatcher {
     const playingMessage: string = position
       ? format(
           "RESUMED_PLAYING",
-          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"), true),
-          Formatter.humanizeSeconds(position / 1000)
+          Formatter.formatTrack(toPlay.track, format("LIVESTREAM")),
+          Formatter.humanizeSeconds(position, true)
         )
       : toPlay.relatedTrack
       ? format(
           "PLAYING_NOW_RELATED",
-          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"), true)
+          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"))
         )
       : format(
           "PLAYING_NOW",
-          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"), true)
+          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"))
         );
     await this.audioMessage.sendMessage(playingMessage);
     await this.queue.setNowPlaying(toPlay);
@@ -351,14 +351,12 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  public async skipTrack(
-    to: number | null = null
-  ): Promise<void | IAudioTrack> {
+  public async skipTrack(to?: number): Promise<void | IAudioTrack> {
     if (!to) {
-      this.log.debug("Skipped track");
+      this.log.debug(`Skipped track @ ${this.guildId}`);
       return await this.playNextTrack();
     } else {
-      this.log.debug(`Skip to #${to}`);
+      this.log.debug(`Skip to #${to} @ ${this.guildId}`);
       await this.queue.skipTo(to);
       return await this.playNextTrack();
     }

@@ -48,7 +48,7 @@ export default class QueueCommand extends BaseCommand {
     );
   }
 
-  public async onCommandInteraction({
+  public override async onCommandInteraction({
     interaction,
   }: ICommandContext<typeof commandRequirements>): Promise<void> {
     const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
@@ -57,7 +57,7 @@ export default class QueueCommand extends BaseCommand {
     // 큐가 없으면 nowplaying 있는지 확인하고 nowplaying보내기
     const audioData: IGuildAudioData =
       await dispatcher.queue.getGuildAudioData();
-    const { queue, nowPlaying, position } = audioData;
+    const { queue } = audioData;
     // trackplaying 이 true이기 때문에 nowplaying 은 체크할 필요 없음
     if (queue.length > 0) {
       const queuePaginator = new Paginator({
@@ -81,7 +81,7 @@ export default class QueueCommand extends BaseCommand {
               // page = 1 ~ end
               return `\`\`#${index + 1 + (page - 1) * 10} [${
                 track.track.info.length
-                  ? Formatter.humanizeSeconds(track.track.info.length / 1000)
+                  ? Formatter.humanizeSeconds(track.track.info.length, true)
                   : "N/A"
               }]\`\` | **${track.track.info.title ?? "N/A"}** <@${
                 track.requesterUserId
@@ -106,7 +106,8 @@ export default class QueueCommand extends BaseCommand {
                     })
                     .reduce((prev, bTrack) => {
                       return prev + (bTrack.track.info.length ?? 0);
-                    }, 0) / 1000
+                    }, 0),
+                  true
                 ),
                 page.toString(),
                 maxPage.toString()
@@ -139,12 +140,13 @@ export default class QueueCommand extends BaseCommand {
             status.push(
               `**[${
                 audioData.position
-                  ? `${Formatter.humanizeSeconds(audioData.position / 1000)}`
+                  ? `${Formatter.humanizeSeconds(audioData.position, true)}`
                   : "N/A"
               } / ${
                 audioData.nowPlaying.track.info.length
                   ? Formatter.humanizeSeconds(
-                      audioData.nowPlaying.track.info.length / 1000
+                      audioData.nowPlaying.track.info.length,
+                      true
                     )
                   : "N/A"
               }]**`
@@ -154,7 +156,9 @@ export default class QueueCommand extends BaseCommand {
               `**${Formatter.formatTrack(
                 audioData.nowPlaying.track,
                 locale.format(interaction.locale, "LIVESTREAM"),
-                false
+                {
+                  showLength: false,
+                }
               )}**\n` +
               status.join(" | ");
             return {
@@ -181,11 +185,9 @@ export default class QueueCommand extends BaseCommand {
           dispatcher.player.connection.channelId ?? "N/A"
         ),
         embeds: [
-          await EmbedFactory.getNowplayingEmbed(
-            this.client,
-            locale.getReusableFormatFunction(interaction.locale),
-            nowPlaying,
-            position
+          await this.client.audio.getNowPlayingEmbed(
+            interaction.guildId,
+            interaction.locale
           ),
         ],
       });

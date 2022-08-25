@@ -93,7 +93,8 @@ export default class NodeInfoCommand extends BaseCommand {
               ? `Players: **${node?.stats?.players ?? 0}**\n` +
                 `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
                 `Uptime: **${Formatter.humanizeSeconds(
-                  node?.stats?.uptime ?? 0 / 1000
+                  node?.stats?.uptime ?? 0,
+                  true
                 )}**\n` +
                 `Cores: **${cpuStats?.cores ?? "Not detected"}**\n` +
                 `Lavalink Load: **${this.formatLoad(

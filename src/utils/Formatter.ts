@@ -13,6 +13,11 @@ import {
   PROGRESS_BAR_END_MIDDLE_WHITE,
 } from "../constant/MessageConstant";
 const PROGRESS_BAR_EMOJI_COUNT = 10;
+
+export interface FormatTrackOptions {
+  showLength?: boolean;
+  withMarkdownUri?: boolean;
+}
 export class Formatter {
   /**
    * Convert seconds to readble format (like 00:00:00)
@@ -41,7 +46,7 @@ export class Formatter {
   public static formatTrack(
     track: Track,
     streamString = "Live Stream",
-    showLength = true
+    options?: FormatTrackOptions
   ): string {
     const {
       title,
@@ -52,17 +57,26 @@ export class Formatter {
       length?: number;
       isStream?: boolean;
     } = track.info;
-    return `${title ?? "No title"} ${
-      showLength
-        ? `[${
-            length
-              ? isStream
-                ? streamString
-                : this.humanizeSeconds(length / 1000)
-              : "N/A"
-          }]`
-        : ""
-    }`;
+    const { showLength, withMarkdownUri } = options ?? {
+      showLength: true,
+      withMarkdownUri: false,
+    }; // Default value;
+    return (
+      (withMarkdownUri ? "[" : "") +
+      `${title ?? "No title"} ${
+        showLength
+          ? `[${
+              length
+                ? isStream
+                  ? streamString
+                  : this.humanizeSeconds(length, true)
+                : "N/A"
+            }]`
+          : ""
+      }` +
+      (withMarkdownUri ? "]" : "") +
+      (withMarkdownUri ? `(${track.info.uri})` : "")
+    );
   }
 
   static progressBar(percent: number) {

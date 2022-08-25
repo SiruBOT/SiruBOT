@@ -57,11 +57,12 @@ export class EmbedFactory {
       const trackLength: number = nowplaying.track.info.length ?? 0;
       const currentPosition: number = position ?? 0;
       const readablePosition: string = Formatter.humanizeSeconds(
-        currentPosition / 1000
+        currentPosition,
+        true
       );
       const readableTrackLength: string = nowplaying.track.info.isStream
         ? `[${format("LIVESTREAM")}]`
-        : Formatter.humanizeSeconds(trackLength / 1000);
+        : Formatter.humanizeSeconds(trackLength, true);
       const trackEmbed: ExtendedEmbed = await this.getTrackEmbed(
         client,
         format,
@@ -70,7 +71,9 @@ export class EmbedFactory {
       const formattedTrack = `**${Formatter.formatTrack(
         nowplaying.track,
         format("LIVESTREAM"),
-        false
+        {
+          showLength: false,
+        }
       )}**`;
       const progressBar: string = Formatter.progressBar(
         currentPosition / trackLength

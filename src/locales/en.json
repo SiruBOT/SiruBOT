@@ -1,5 +1,5 @@
 {
-	"AVALIABLE_ONLY_PLAYING": "❎  This command can only be used while playing a song.",
+	"AVAILABLE_ONLY_PLAYING": "❎  This command can only be used while playing a song.",
 	"CLEANED_AND_STOPPED": "👋  Cleared the queue and stopped playing.",
 	"COMMAND_HANDLE_ERROR": "❌  An error occurred while executing the command. ``{0}``\njs\n{1}\n",
 	"COMMAND_MISSING_PERMISSIONS": "❎ Bot doesn't have enough permissions to run that command!\n🏁  Required Permissions: {0}",

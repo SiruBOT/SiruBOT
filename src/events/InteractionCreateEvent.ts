@@ -11,8 +11,8 @@ import { CommandPermissionChecker } from "../structures/CommandPermissionChecker
 import { CommandPermissionError } from "../structures/errors/CommandPermissionError";
 import { InteractionType } from "discord.js";
 
-const SYSTEM_MESSAGE_EPHEMERAL = false;
-const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
+export const SYSTEM_MESSAGE_EPHEMERAL = false;
+export const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
 
 const eventName = "interactionCreate" as const;
 export default class InteractionCreateEvent extends BaseEvent<
@@ -257,7 +257,7 @@ export default class InteractionCreateEvent extends BaseEvent<
                 ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
                 content: locale.format(
                   interaction.locale,
-                  "AVALIABLE_ONLY_PLAYING"
+                  "AVAILABLE_ONLY_PLAYING"
                 ),
               });
               transaction?.setData("endReason", "TrackNotPlaying");
@@ -473,6 +473,11 @@ export default class InteractionCreateEvent extends BaseEvent<
     }
     // End Error handle
     interaction.customId = customId;
-    await command?.onButtonInteraction(interaction);
+    try {
+      await command?.onButtonInteraction(interaction);
+    } catch (error) {
+      Sentry.captureException(error);
+      this.client.log.error(error);
+    }
   }
 }
