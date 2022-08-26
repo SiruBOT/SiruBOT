@@ -8,14 +8,24 @@ import {
 import locale from "../../locales";
 import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import {
-  Message,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ButtonInteraction,
+  InteractionUpdateOptions,
+  InteractionReplyOptions,
 } from "discord.js";
-import { EMOJI_REFRESH } from "../../constant/MessageConstant";
+import { EMOJI_REFRESH, EMOJI_STAR } from "../../constant/MessageConstant";
 
+const commandRequirements = {
+  audioNode: true,
+  trackPlaying: true,
+  voiceStatus: {
+    listenStatus: false,
+    sameChannel: false,
+    voiceConnected: false,
+  },
+} as const;
 export default class NowplayingCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
@@ -32,52 +42,73 @@ export default class NowplayingCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: true,
-        trackPlaying: true,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      commandRequirements,
       ["SendMessages", "EmbedLinks"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
-    const dispatcher: PlayerDispatcher = this.client.audio.getPlayerDispatcher(
-      interaction.guildId
+  }: ICommandContext<typeof commandRequirements>): Promise<void> {
+    await interaction.reply(
+      await this.getNowplayingPayload(
+        interaction.guildId,
+        interaction.locale,
+        this.client.audio.dispatchers.get(interaction.guildId)
+      )
     );
+  }
+
+  public override async onButtonInteraction(interaction: ButtonInteraction) {
+    if (!interaction.guild || !interaction.guildId) return;
+    switch (interaction.customId) {
+      case "np_refresh":
+        await interaction.update(
+          await this.getNowplayingPayload(
+            interaction.guildId,
+            interaction.locale,
+            this.client.audio.dispatchers.get(interaction.guildId)
+          )
+        );
+        break;
+      case "np_favorite":
+        // TODO: Playlist Command
+        await interaction.reply("Will add to favorite");
+        break;
+    }
+  }
+
+  private buildActionRow(): ActionRowBuilder<ButtonBuilder> {
     const actionRow: ActionRowBuilder<ButtonBuilder> =
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setEmoji(EMOJI_REFRESH)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId(this.getCustomId("np_refresh"))
+          .setCustomId(this.getCustomId("np_refresh")),
+        new ButtonBuilder()
+          .setEmoji(EMOJI_STAR)
+          .setStyle(ButtonStyle.Secondary)
+          .setCustomId(this.getCustomId("np_favorite"))
       );
-    const nowplayingMessage: Message<true> = await interaction.reply({
-      components: [actionRow],
-      content: locale.format(
-        interaction.locale,
-        "NOWPLAYING_TITLE",
-        dispatcher.player.connection.channelId ?? "N/A"
-      ),
-      embeds: [
-        await this.client.audio.getNowPlayingEmbed(
-          interaction.guildId,
-          interaction.locale
-        ),
-      ],
-      fetchReply: true,
-    });
-    dispatcher.audioMessage.nowplayingMessage = nowplayingMessage;
+    return actionRow;
   }
 
-  public override async onButtonInteraction(interaction: ButtonInteraction) {
-    // TODO: Implement
-    await interaction.reply("Not implemented");
+  private async getNowplayingPayload(
+    guildId: string,
+    localeName: string,
+    dispatcher?: PlayerDispatcher
+  ): Promise<InteractionUpdateOptions & InteractionReplyOptions> {
+    return {
+      components: [this.buildActionRow()],
+      content: dispatcher
+        ? locale.format(
+            localeName,
+            "NOWPLAYING_TITLE",
+            dispatcher.player.connection.channelId ?? "0"
+          )
+        : "",
+      embeds: [await this.client.audio.getNowPlayingEmbed(guildId, localeName)],
+      fetchReply: true,
+    };
   }
 }
