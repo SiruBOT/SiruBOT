@@ -62,27 +62,28 @@ export class Paginator {
   ): ActionRowBuilder<MessageActionRowComponentBuilder> {
     const actionRow: ActionRowBuilder<MessageActionRowComponentBuilder> =
       new ActionRowBuilder<MessageActionRowComponentBuilder>();
-    actionRow.addComponents(
-      ...(this.totalPages !== 1
-        ? [
-            new ButtonBuilder()
-              .setCustomId(this.previousBtnId)
-              .setEmoji(EMOJI_PREV)
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(this.currentPage === 1),
-            new ButtonBuilder()
-              .setCustomId(this.stopBtnId)
-              .setEmoji(EMOJI_STOP)
-              .setStyle(ButtonStyle.Secondary),
-            new ButtonBuilder()
-              .setCustomId(this.nextBtnId)
-              .setEmoji(EMOJI_NEXT)
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(this.currentPage === this.totalPages),
-          ]
-        : []),
-      ...(additionalComponents ?? [])
-    );
+    if (this.totalPages !== 1) {
+      actionRow.addComponents(
+        new ButtonBuilder()
+          .setCustomId(this.previousBtnId)
+          .setEmoji(EMOJI_PREV)
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(this.currentPage === 1),
+        new ButtonBuilder()
+          .setCustomId(this.stopBtnId)
+          .setEmoji(EMOJI_STOP)
+          .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId(this.nextBtnId)
+          .setEmoji(EMOJI_NEXT)
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(this.currentPage === this.totalPages)
+      );
+    }
+
+    if (additionalComponents) {
+      actionRow.addComponents(...additionalComponents);
+    }
     return actionRow;
   }
 
@@ -99,22 +100,33 @@ export class Paginator {
 
   public pagePayload(pageValue: PageFnReturn): UpdateOptions {
     const actionRow = this.getActionRow();
-    let targetObj: UpdateOptions = {
-      fetchReply: true,
-    };
     if (typeof pageValue === "string") {
-      targetObj.content = pageValue;
+      return {
+        content: pageValue,
+        fetchReply: true,
+      };
     } else {
+      // Custom components 가 있다면 어레이를 합쳐서 처리함
       if (pageValue?.components && pageValue.components.length > 0) {
-        targetObj.components = pageValue.components?.concat(actionRow);
-      } else {
-        targetObj = Object.assign(targetObj, {
-          components: [actionRow],
+        return {
           ...pageValue,
-        });
+          components: [actionRow, ...pageValue.components],
+          fetchReply: true,
+        };
+      } else if (actionRow.components.length <= 0) {
+        // 아니라면 그냥 페이지 값들과 component 추가해서 보내기
+        return {
+          ...pageValue,
+          fetchReply: true,
+        };
+      } else {
+        return {
+          ...pageValue,
+          components: [actionRow],
+          fetchReply: true,
+        };
       }
     }
-    return targetObj;
   }
 
   public async awaitButtons(
@@ -154,6 +166,7 @@ export class Paginator {
           await this.awaitButtons(interaction);
           break;
         }
+
         case this.stopBtnId: {
           await collected.update({
             components: [],
