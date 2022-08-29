@@ -12,9 +12,8 @@ SiruBOT Github Repository
 Want to use your bot rather than host it? [Invite to your guild!](https://discordapp.com/api/oauth2/authorize?client_id=426722888293548032&permissions=277062404416&scope=bot+applications.commands)
 
 ## Selfhost
- TL;DR
  1. Create your discord application
- 2. Change docker-compose
+ 2. Change following lines in docker-compose.yml
  ```yml
  # docker-compose.yml / mongodb
    environment:
