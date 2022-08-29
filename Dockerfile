@@ -1,5 +1,7 @@
-# sudo docker run your/nice:tag npm run "bot:noshard, bot:shard, slash-commands:run, all:shard, all:noshard, ci, test"
 FROM node:lts-stretch-slim
-WORKDIR /sirubot
+WORKDIR /opt/sirubot
 COPY . .
-RUN yarn install
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y
+RUN yarn install && yarn run build:ts
+CMD [ "node", "./build" ]
