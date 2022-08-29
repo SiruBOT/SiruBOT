@@ -27,12 +27,14 @@ export class PlayerDispatcher {
   public audio: AudioHandler;
   public client: Client;
   public player: Player;
-  private guildId: string;
-  private _destroyed: boolean;
   public queue: Queue;
   public audioMessage: AudioMessage;
-  private databaseHelper: DatabaseHelper;
   public log: Logger;
+  public playedRelatedTracks: string[];
+
+  private guildId: string;
+  private _destroyed: boolean;
+  private databaseHelper: DatabaseHelper;
   constructor(
     audio: AudioHandler,
     player: Player,
@@ -43,10 +45,7 @@ export class PlayerDispatcher {
     this.client = audio.client;
     this.player = player;
     this.guildId = player.connection.guildId;
-    this._destroyed = false;
-    this.log = this.client.log.getChildLogger({
-      name: this.client.log.settings.name + "/PlayerDispatcher/" + this.guildId,
-    });
+    this.queue = new Queue(this.guildId, this.databaseHelper, this.log);
     this.databaseHelper = databaseHelper;
     this.audioMessage = new AudioMessage(
       this.client,
@@ -55,7 +54,10 @@ export class PlayerDispatcher {
       this.databaseHelper,
       this.log
     );
-    this.queue = new Queue(this.guildId, this.databaseHelper, this.log);
+    this._destroyed = false;
+    this.log = this.client.log.getChildLogger({
+      name: this.client.log.settings.name + "/PlayerDispatcher/" + this.guildId,
+    });
   }
 
   @BreakOnDestroyed()
