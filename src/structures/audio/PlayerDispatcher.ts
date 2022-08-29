@@ -286,7 +286,7 @@ export class PlayerDispatcher {
     const guildConfig = await this.databaseHelper.upsertAndFindGuild(
       this.guildId
     );
-    const { position, positionUpdatedAt }: IGuildAudioData =
+    const { position }: IGuildAudioData =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
     if (!nowPlaying || nowPlaying?.track.info.isStream || !position) {
       this.log.debug(
@@ -296,17 +296,7 @@ export class PlayerDispatcher {
       );
       return this.playNextTrack();
     }
-    const calculatedPos: number =
-      position +
-      (positionUpdatedAt.getTime() <= 0
-        ? 0
-        : new Date().getTime() - positionUpdatedAt.getTime());
-    this.log.debug(
-      `Approximately Calculated nowplaying position: ${calculatedPos}`
-    );
-    const resumePosition: number =
-      calculatedPos > (nowPlaying.track.info.length ?? 0) ? 0 : calculatedPos;
-    await this.playTrack(nowPlaying, guildConfig.volume, resumePosition);
+    await this.playTrack(nowPlaying, guildConfig.volume, position);
     return nowPlaying;
   }
 
