@@ -294,10 +294,10 @@
     "@sentry/types" "7.11.1"
     tslib "^1.9.3"
 
-"@sirubot/yt-related-scraper@^0.3.1-alpha.2":
-  version "0.3.1-alpha.2"
-  resolved "https://registry.yarnpkg.com/@sirubot/yt-related-scraper/-/yt-related-scraper-0.3.1-alpha.2.tgz#9aa72cc46b485114ddd0f6b6bb117a3255847232"
-  integrity sha512-FHrL5fJF3ybh6XUbWeTRQ06IcjaumVPSqo5O28FizrkrF1ncr9uFkLSGQV1ZVssESkN6uUWz7U1/vcdTDxH73Q==
+"@sirubot/yt-related-scraper@^0.3.1-alpha.31":
+  version "0.3.1-alpha.31"
+  resolved "https://registry.yarnpkg.com/@sirubot/yt-related-scraper/-/yt-related-scraper-0.3.1-alpha.31.tgz#ee5bf0a9b67310ac7340f97250b41dbd92c47aa0"
+  integrity sha512-sKIf2hn9a4zrbkmnSEmx6z70qjQkVC1jl9iJpEuaBE5BWDWyBqSKv8YaZ/Y6tUv6N2OoyS/iFZGUohAQUTXBOA==
   dependencies:
     abort-controller "^3.0.0"
     ip "^1.1.5"
