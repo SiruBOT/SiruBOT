@@ -20,6 +20,8 @@ export class DatabaseHelper {
   protected client: Client;
   public mysqlConn: Connection;
   public mongoose: typeof import("mongoose") | undefined;
+  private _isReady = false;
+
   constructor(client: Client) {
     this.client = client;
     this.log = this.client.log.getChildLogger({
@@ -46,12 +48,20 @@ export class DatabaseHelper {
       }
     );
     this.mongoose = mongoose;
+
+    this._isReady =
+      mysqlConn.isConnected && mongoose.connection.readyState == 1;
+    if (!this._isReady)
+      throw new Error(
+        "Database initialize failed. please check your settings."
+      );
   }
 
   public async upsertGuildAudioData(
     discordGuildId: string,
     query: UpdateQuery<IGuildAudioData> = {}
   ): Promise<IGuildAudioData> {
+    if (!this._isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert GuildAudioData @ ${discordGuildId}`,
       Object.keys(query) ? query : "Empty query"
@@ -74,6 +84,7 @@ export class DatabaseHelper {
     discordGuildId: string,
     data: QueryDeepPartialEntity<Guild> = {}
   ): Promise<Guild> {
+    if (!this._isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert Guild @ ${discordGuildId}`,
       Object.keys(data) ? data : "Empty data"
@@ -96,6 +107,7 @@ export class DatabaseHelper {
   }
 
   public async insertMetrics(options: StatsMetricsArgs) {
+    if (!this._isReady) throw new Error("DatabaseHelper is not ready.");
     const {
       clusterId,
       playingPlayers,

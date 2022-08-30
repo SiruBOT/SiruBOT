@@ -1,6 +1,6 @@
 import { MessagePayload, Message, Channel } from "discord.js";
 import { Logger } from "tslog";
-import { Client, DatabaseHelper } from "..";
+import { Client } from "..";
 import { Guild } from "../../database/mysql/entities";
 import { ReusableFormatFunction } from "../../locales/LocalePicker";
 import * as Sentry from "@sentry/node";
@@ -10,21 +10,13 @@ export class AudioMessage {
   private client: Client;
   private guildId: string;
   private channelId: string;
-  private lastMessageId: string | undefined;
-  private databaseHelper: DatabaseHelper;
+  private lastMessageId: string;
   public nowplayingMessage?: Message<true>;
   private log: Logger;
-  constructor(
-    client: Client,
-    guildId: string,
-    channelId: string,
-    databaseHelper: DatabaseHelper,
-    log: Logger
-  ) {
+  constructor(client: Client, guildId: string, channelId: string, log: Logger) {
     this.client = client;
     this.guildId = guildId;
     this.channelId = channelId;
-    this.databaseHelper = databaseHelper;
     this.log = log.getChildLogger({
       name: log.settings.name + "/AudioMessage",
     });
@@ -32,9 +24,8 @@ export class AudioMessage {
 
   public async format(key: string, ...args: string[]): Promise<string> {
     this.log.debug(`Format key ${key} with guild config ${this.guildId}`);
-    const guildConfig: Guild = await this.databaseHelper.upsertAndFindGuild(
-      this.guildId
-    );
+    const guildConfig: Guild =
+      await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
     return locale.format(guildConfig.guildLocale, key, ...args);
   }
 
@@ -42,16 +33,15 @@ export class AudioMessage {
     this.log.debug(
       `Get reusable format function (for reduce db query) ${this.guildId}`
     );
-    const guildConfig: Guild = await this.databaseHelper.upsertAndFindGuild(
-      this.guildId
-    );
+    const guildConfig: Guild =
+      await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
     return locale.getReusableFormatFunction(guildConfig.guildLocale);
   }
 
   public async sendMessage(options: string | MessagePayload): Promise<void> {
     this.log.debug(`Send audio message to guild ${this.guildId}...`);
     const { textChannelId, sendAudioMessages }: Guild =
-      await this.databaseHelper.upsertAndFindGuild(this.guildId);
+      await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
     if (!sendAudioMessages) {
       this.log.warn(
         `Guild ${this.guildId} disabled audio messages, ignoreing...`

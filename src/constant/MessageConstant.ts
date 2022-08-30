@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-export const BOT_NAME = "Siru";
+export const BOT_NAME = "치노봇";
 
 /** Colors */
 export const DEFAULT_COLOR = "#FFDAFF";
@@ -22,7 +22,7 @@ export const EMOJI_PLAY_STATE: { [index: number]: string } = {
 export const EMOJI_PLAYLIST = "🗃️";
 export const EMOJI_X = "❌";
 export const EMOJI_INBOX_TRAY = "📥";
-export const AUTOCOMPLETE_MAX_RESULT = 10;
+export const AUTOCOMPLETE_MAX_RESULT = 25;
 export const EMOJI_VOLUME_SMALL = "🔉";
 export const EMOJI_VOLUME_LOUD = "🔊";
 export const EMOJI_VOLUME_MUTE = "🔇";

@@ -3,28 +3,25 @@ import { Player } from "shoukaku";
 import { Logger } from "tslog";
 import { PlayerDispatcher } from "./PlayerDispatcher";
 import { IJoinOptions } from "../../types";
+import { Client } from "../Client";
 
 export class PlayerDispatcherFactory {
-  public audio: AudioHandler;
-  private log: Logger;
-  constructor(audio: AudioHandler) {
-    this.audio = audio;
-    this.log = this.audio.getLoggerInstance();
+  public client: Client;
+  constructor(client: Client) {
+    this.client = client;
   }
 
   async createPlayerDispatcher(
     player: Player,
     joinOptions: IJoinOptions
   ): Promise<PlayerDispatcher> {
-    const databaseHelper = this.audio.client.databaseHelper;
     const playerDispatcher = new PlayerDispatcher(
-      this.audio,
+      this.client,
       player,
-      databaseHelper,
       joinOptions
     );
     playerDispatcher.registerPlayerEvent();
-    this.log.debug(
+    this.client.log.info(
       `PlayerDispatcher successfully created @ ${player.connection.guildId}/${player.connection.channelId}`
     );
     return playerDispatcher;
