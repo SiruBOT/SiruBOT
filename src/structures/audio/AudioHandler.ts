@@ -44,7 +44,7 @@ export class AudioHandler extends Shoukaku {
     }
     this.relatedScraper = new Scraper({ log: this.log });
     this.dispatchers = new Map<string, PlayerDispatcher>();
-    this.playerDispatcherFactory = new PlayerDispatcherFactory(this);
+    this.playerDispatcherFactory = new PlayerDispatcherFactory(this.client);
     this.setupEvents();
   }
 

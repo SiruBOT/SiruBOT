@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import * as Sentry from "@sentry/node";
 import * as Discord from "discord.js";
-import LRU from "lru-cache";
-import { Node, Track, LavalinkResponse } from "shoukaku";
+import { Track } from "shoukaku";
 import { BaseCommand, Client } from "../../structures";
 import {
   CommandCategories,
@@ -25,6 +24,8 @@ import { BUTTON_AWAIT_TIMEOUT } from "../../constant/TimeConstant";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 import { MessageUtil } from "../../utils/MessageUtil";
 import { ButtonStyle, ComponentType } from "discord.js";
+import { fetch } from "undici";
+import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../events/InteractionCreateEvent";
 
 const commandRequirements = {
   audioNode: true,
@@ -37,12 +38,6 @@ const commandRequirements = {
 } as const;
 
 export default class PlayCommand extends BaseCommand {
-  // Autocomplete URL -> Playcommand cache, short ttl
-  private searchCache: LRU<string, LavalinkResponse> = new LRU({
-    ttl: 1000 * 30, // 30 seconds
-    max: 100, // Max items
-    updateAgeOnGet: true, // extend ttl on get
-  });
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
       .setName("play")
@@ -91,7 +86,20 @@ export default class PlayCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
   }: ICommandContext<typeof commandRequirements>): Promise<void> {
-    await interaction.deferReply();
+    // Handle play command
+    const query: string = interaction.options.getString("query", true);
+    // AutoComplete 값 없는 경우 required여도 빈 값이 넘어올 수 있음
+    if (query.length <= 0) {
+      await interaction.reply({
+        ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+        content:
+          "> " +
+          locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
+      });
+      return;
+    } else {
+      await interaction.deferReply();
+    }
     // Join voice channel before playing
     if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
       const { voice }: { voice: VoiceConnectedGuildMemberVoiceState } =
@@ -112,8 +120,6 @@ export default class PlayCommand extends BaseCommand {
       }
     }
 
-    // Handle play command
-    const query: string = interaction.options.getString("query", true);
     // Get dispatcher
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
@@ -121,8 +127,7 @@ export default class PlayCommand extends BaseCommand {
     const node = this.client.audio.getNode();
     if (!node) throw new Error("Ideal node not found");
     const soundCloud = interaction.options.getBoolean("soundcloud", false);
-    const searchResult = await this.fetchTracksCached(
-      node,
+    const searchResult = await node.rest.resolve(
       isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
     );
     if (!searchResult) throw new Error("Search result not found");
@@ -355,73 +360,81 @@ export default class PlayCommand extends BaseCommand {
   public override async onAutocompleteInteraction(
     interaction: Discord.AutocompleteInteraction<Discord.CacheType>
   ): Promise<void> {
-    const idealNode = this.client.audio.getNode();
-    // 노드가 없다면 결과없음 반환
-    if (!idealNode) return await interaction.respond([]);
-    const query: string | null = interaction.options.getString("query");
-    // 쿼리가 없거나 길이가 100이상이거나 URL일 경우 결과없음
-    if (!query || query.length > 100 || isURL(query))
-      return await interaction.respond([]);
     const soundCloud = interaction.options.getBoolean("soundcloud", false);
-    const searchResult = await this.fetchTracksCached(
-      idealNode,
-      isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
-    );
-    // Search가 아니거나 검색 결과가 null 일 경우 결과 없음.
-    // TODO 플레이리스트일경우 플레이리스트 추가, 한곡 추가, 등등, URL일경우 URL 정보 표시해주기
-    if (!searchResult || searchResult.loadType !== "SEARCH_RESULT")
-      return await interaction.respond([]);
-    return interaction.respond(
-      searchResult.tracks
-        .map((v: Track) => {
-          return {
-            name: v.info.title
-              ? v.info.title.length > 100
-                ? v.info.title.slice(0, 90) + "..."
-                : v.info.title
-              : "N/A",
-            value: v.info.uri ?? query.slice(0, 100),
-          };
-        })
-        .slice(0, AUTOCOMPLETE_MAX_RESULT)
-    );
-  }
-
-  private async fetchTracksCached(
-    node: Node,
-    query: string
-  ): Promise<LavalinkResponse | null> {
-    const cacheKey = `${node.name}-${query}`;
-    const searchCache: LavalinkResponse | undefined =
-      this.searchCache.get(cacheKey);
-    if (searchCache) {
-      this.client.log.debug(
-        `Cache hit for ${cacheKey} with ${searchCache.tracks.length} tracks`
-      );
-      return searchCache;
-    } else {
-      const trackList = await node.rest.resolve(query);
-      if (!trackList) return null;
-      this.client.log.debug(
-        `Cache miss for ${cacheKey} with ${trackList.tracks.length} tracks, caching search results & tracks`
-      );
-      this.searchCache.set(cacheKey, trackList);
-      if (trackList.tracks.length > 0) {
-        trackList.tracks.forEach((v: Track) => {
-          if (v.info.uri) {
-            const fakeTrackListForCache: LavalinkResponse = {
-              loadType: "SEARCH_RESULT",
-              playlistInfo: {},
-              tracks: [v],
-            };
-            this.searchCache.set(
-              `${node.name}-${v.info.uri}`,
-              fakeTrackListForCache
-            );
-          }
-        });
+    const query: string | null = interaction.options.getString("query");
+    if (!query) {
+      await interaction.respond([
+        {
+          name: locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
+          value: "",
+        },
+      ]);
+      return;
+    }
+    if (!soundCloud) {
+      // Response structure
+      // [][0] -> query input
+      // [][1] -> suggestions[]
+      // [][2] -> ?
+      interface YTSuggestResponse {
+        [index: number]: string | string[];
+        0: string;
+        1: string[];
       }
-      return trackList;
+      const ytAutocomplete = (await fetch(
+        "https://suggestqueries-clients6.youtube.com/complete/search?client=firefox&ds=yt&xhr=t&q=" +
+          query,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "text/plain; charset=UTF-8",
+          },
+        }
+      ).then((res) => res.json())) as YTSuggestResponse;
+
+      if (!ytAutocomplete?.[1]) {
+        await interaction.respond([]);
+        return;
+      }
+
+      await interaction.respond(
+        ytAutocomplete[1]
+          .map((name) => {
+            return {
+              name: name.length > 100 ? name.slice(0, 90) + "..." : name,
+              value: name.length > 100 ? name.slice(0, 90) + "..." : name,
+            };
+          })
+          .slice(0, AUTOCOMPLETE_MAX_RESULT)
+      );
+      return;
+    } else {
+      // SoundCloud Autocomplete handle
+      const idealNode = this.client.audio.getNode();
+      // 노드가 없다면 결과없음 반환
+      if (!idealNode) return await interaction.respond([]);
+      const searchResult = await idealNode.rest.resolve("scsearch:" + query);
+      // Search가 아니거나 검색 결과가 null 일 경우 결과 없음.
+      // TODO 플레이리스트일경우 플레이리스트 추가, 한곡 추가, 등등, URL일경우 URL 정보 표시해주기
+      if (!searchResult || searchResult.loadType !== "SEARCH_RESULT") {
+        await interaction.respond([]);
+        return;
+      }
+      await interaction.respond(
+        searchResult.tracks
+          .map((v: Track) => {
+            return {
+              name: v.info.title
+                ? v.info.title.length > 100
+                  ? v.info.title.slice(0, 90) + "..."
+                  : v.info.title
+                : "N/A",
+              value: v.info.uri ?? query.slice(0, 100),
+            };
+          })
+          .slice(0, AUTOCOMPLETE_MAX_RESULT)
+      );
+      return;
     }
   }
 }

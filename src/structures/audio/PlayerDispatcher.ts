@@ -1,4 +1,3 @@
-import { AudioHandler } from "./AudioHandler";
 import { Client } from "../Client";
 import { Queue } from "./Queue";
 import {
@@ -15,7 +14,6 @@ import {
   IJoinOptions,
   RepeatMode,
 } from "../../types";
-import { DatabaseHelper } from "..";
 import * as Sentry from "@sentry/node";
 import { AudioMessage } from "./AudioMessage";
 import { ReusableFormatFunction } from "../../locales/LocalePicker";
@@ -24,38 +22,29 @@ import { Guild } from "../../database/mysql/entities";
 import { BreakOnDestroyed } from "./PlayerDecorator";
 
 export class PlayerDispatcher {
-  public audio: AudioHandler;
   public client: Client;
   public player: Player;
-  private guildId: string;
-  private _destroyed: boolean;
   public queue: Queue;
   public audioMessage: AudioMessage;
-  private databaseHelper: DatabaseHelper;
   public log: Logger;
-  constructor(
-    audio: AudioHandler,
-    player: Player,
-    databaseHelper: DatabaseHelper,
-    joinOptions: IJoinOptions
-  ) {
-    this.audio = audio;
-    this.client = audio.client;
+  public playedRelatedTracks: string[];
+
+  private guildId: string;
+  private _destroyed = false;
+  constructor(client: Client, player: Player, joinOptions: IJoinOptions) {
+    this.client = client;
     this.player = player;
-    this.guildId = player.connection.guildId;
-    this._destroyed = false;
+    this.guildId = this.player.connection.guildId;
     this.log = this.client.log.getChildLogger({
       name: this.client.log.settings.name + "/PlayerDispatcher/" + this.guildId,
     });
-    this.databaseHelper = databaseHelper;
+    this.queue = new Queue(this.guildId, this.client.databaseHelper, this.log);
     this.audioMessage = new AudioMessage(
       this.client,
       this.guildId,
       joinOptions.textChannelId,
-      this.databaseHelper,
       this.log
     );
-    this.queue = new Queue(this.guildId, this.databaseHelper, this.log);
   }
 
   @BreakOnDestroyed()
@@ -113,7 +102,7 @@ export class PlayerDispatcher {
       case "FINISHED":
         try {
           const guildConfig: Guild =
-            await this.databaseHelper.upsertAndFindGuild(this.guildId);
+            await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
           if (guildConfig.repeat !== RepeatMode.OFF) {
             this.log.debug(`Trying handle repeat ${guildConfig.repeat}`);
             await this.handleRepeat(guildConfig.repeat);
@@ -184,9 +173,8 @@ export class PlayerDispatcher {
   @BreakOnDestroyed()
   private async playNextTrack(): Promise<IAudioTrack | void> {
     this.log.debug(`Playing next track`);
-    const guildConfig: Guild = await this.databaseHelper.upsertAndFindGuild(
-      this.guildId
-    );
+    const guildConfig: Guild =
+      await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
     const toPlay: IAudioTrack | null = await this.queue.shiftTrack();
     if (toPlay) {
       await this.playTrack(toPlay, guildConfig.volume);
@@ -228,7 +216,9 @@ export class PlayerDispatcher {
       // Handle related
       try {
         const relatedVideo: IAudioTrack | null =
-          await this.audio.getRelatedVideo(beforeTrack.track.info.identifier);
+          await this.client.audio.getRelatedVideo(
+            beforeTrack.track.info.identifier
+          );
         if (!relatedVideo) {
           // 추천 영상을 찾지 못했어요.
           await this.audioMessage.sendMessage(format("RELATED_FAILED"));
@@ -283,11 +273,11 @@ export class PlayerDispatcher {
   @BreakOnDestroyed()
   private async resumeNowPlaying(nowPlaying: IAudioTrack) {
     // Player track = null, DB nowplaying = exists
-    const guildConfig = await this.databaseHelper.upsertAndFindGuild(
+    const guildConfig = await this.client.databaseHelper.upsertAndFindGuild(
       this.guildId
     );
     const { position }: IGuildAudioData =
-      await this.databaseHelper.upsertGuildAudioData(this.guildId);
+      await this.client.databaseHelper.upsertGuildAudioData(this.guildId);
     if (!nowPlaying || nowPlaying?.track.info.isStream || !position) {
       this.log.debug(
         nowPlaying?.track.info.isStream
@@ -391,8 +381,8 @@ export class PlayerDispatcher {
   public destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
     this._destroyed = true;
-    this.audio.deletePlayerDispatcher(this.guildId);
-    this.audio.players.delete(this.guildId);
+    this.client.audio.deletePlayerDispatcher(this.guildId);
+    this.client.audio.players.delete(this.guildId);
     this.player.connection.disconnect();
   }
 }

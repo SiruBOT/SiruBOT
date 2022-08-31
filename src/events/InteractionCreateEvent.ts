@@ -409,7 +409,7 @@ export default class InteractionCreateEvent extends BaseEvent<
       try {
         await command.onAutocompleteInteraction(interaction);
       } catch (error) {
-        await interaction.respond([]);
+        if (!interaction.responded) await interaction.respond([]);
         Sentry.captureException(error);
         this.log.error(
           `Failed to handle autocomplete command ${interaction.commandName}`,

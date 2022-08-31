@@ -15,4 +15,4 @@ jobs:
       -
         name: Build the docker image
         
-        run: "echo Branch: ${BRANCH_NAME} Hash: ${{ github.sha }} && docker build -t sannoob/sirubot:${BRANCH_NAME}-${{ github.sha }} -f ./Dockerfile ."
+        run: "echo Branch: ${BRANCH_NAME} Hash: ${{ github.sha }} && docker build -t sannoob/sirubot:${{ github.sha }} -f ./Dockerfile ."

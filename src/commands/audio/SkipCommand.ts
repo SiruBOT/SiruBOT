@@ -25,6 +25,7 @@ import { EmbedFactory } from "../../utils/EmbedFactory";
 import { Formatter } from "../../utils";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../events/InteractionCreateEvent";
 import { Track } from "shoukaku";
+import { AUTOCOMPLETE_MAX_RESULT } from "../../constant/MessageConstant";
 
 /**
  * SkipCommand 조건
@@ -368,7 +369,7 @@ export default class SkipCommand extends BaseCommand {
         : Math.max(skipTo ?? 1, 1);
     await interaction.respond(
       queue
-        .slice(start - 1, start + 24) // Array starts 0..
+        .slice(start - 1, start + AUTOCOMPLETE_MAX_RESULT - 1) // Array starts 0..
         .map(
           (e, index) =>
             `#${start + index} ` + // Start + Index
