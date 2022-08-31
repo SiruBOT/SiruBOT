@@ -8,7 +8,7 @@
     "@sentry/integrations": "^7.11.1",
     "@sentry/node": "^7.11.1",
     "@sentry/tracing": "^7.11.1",
-    "@sirubot/yt-related-scraper": "^0.3.1-alpha.31",
+    "@sirubot/yt-related-scraper": "^0.3.2",
     "argparse": "^2.0.1",
     "discord-api-types": "^0.29.0",
     "discord-hybrid-sharding": "meister03/discord-hybrid-sharding",
