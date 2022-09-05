@@ -1,6 +1,4 @@
-import { AudioHandler } from "./AudioHandler";
 import { Player } from "shoukaku";
-import { Logger } from "tslog";
 import { PlayerDispatcher } from "./PlayerDispatcher";
 import { IJoinOptions } from "../../types";
 import { Client } from "../Client";
