@@ -126,7 +126,12 @@ export default class InteractionCreateEvent extends BaseEvent<
       }
       // Start
       if (interaction.inCachedGuild()) {
-        if (!interaction.guild.members.me) throw new Error("TODO: Handle this");
+        if (!interaction.guild.members.me) {
+          await interaction.reply(
+            locale.format(interaction.locale, "BOT_INVITE_FIRST")
+          );
+          return;
+        }
         try {
           // -------- Handle bot's permissions --------
           const missingPermissions: Discord.PermissionsString[] = [];
