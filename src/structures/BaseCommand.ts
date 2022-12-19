@@ -1,4 +1,7 @@
-import type { SlashCommandBuilder } from "@discordjs/builders";
+import type {
+  SlashCommandBuilder,
+  SlashCommandSubcommandsOnlyBuilder,
+} from "@discordjs/builders";
 import type * as Discord from "discord.js";
 import type { Client } from ".";
 import type {
@@ -9,10 +12,9 @@ import type {
 } from "../types";
 
 export abstract class BaseCommand {
-  public slashCommand: Omit<
-    SlashCommandBuilder,
-    "addSubcommand" | "addSubcommandGroup"
-  >;
+  public slashCommand:
+    | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+    | SlashCommandSubcommandsOnlyBuilder;
   public category: CommandCategories;
   public permissions: CommandPermissions[];
   public requirements: ICommandRequirements;
@@ -20,10 +22,9 @@ export abstract class BaseCommand {
   protected client: Client;
 
   public constructor(
-    slashCommand: Omit<
-      SlashCommandBuilder,
-      "addSubcommand" | "addSubcommandGroup"
-    >,
+    slashCommand:
+      | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+      | SlashCommandSubcommandsOnlyBuilder,
     client: Client,
     category: CommandCategories,
     permissions: CommandPermissions[],

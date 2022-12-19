@@ -276,11 +276,27 @@ export default class InteractionCreateEvent extends BaseEvent<
           if (requirements.voiceStatus) {
             // TODO: Guild Default Channel
             // VoiceConnected
-            // const defaultVoiceChannel: Discord.AnyChannel | undefined | null =
-            //   this.client.channels.cache // 채널 캐시에 없다면 fetch
-            //     .filter((ch) => ch.type === "GUILD_VOICE")
-            //     .get(guildConfig.voiceChannelId) ??
-            //   (await this.client.channels.fetch(guildConfig.voiceChannelId));
+            if (
+              requirements.voiceStatus.voiceConnected &&
+              guildConfig.voiceChannelId
+            ) {
+              const guildVoiceChannel = await interaction.guild.channels.fetch(
+                guildConfig.voiceChannelId
+              );
+              if (
+                guildVoiceChannel &&
+                interaction.member.voice.channelId != guildVoiceChannel.id
+              ) {
+                await interaction.reply(
+                  locale.format(
+                    interaction.locale,
+                    "GUILD_DEFAULT_VCHANNEL",
+                    guildVoiceChannel.id
+                  )
+                );
+                return;
+              }
+            }
             if (
               requirements.voiceStatus.voiceConnected &&
               !member.voice.channelId
