@@ -65,12 +65,6 @@ export class PlayerDispatcher {
     }
   }
 
-  public async sendDisconnected(): Promise<void> {
-    await this.audioMessage.sendMessage(
-      await this.audioMessage.format("DISCONNECT_ERROR")
-    );
-  }
-
   @BreakOnDestroyed()
   private async onUpdate(data: PlayerUpdate) {
     const { position, connected } = data.state;
@@ -88,6 +82,7 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async onException(exception: TrackExceptionEvent) {
+    // TODO: 플레이어 핸들이 안되어 있음
     this.log.error(`Error while playback`, exception);
     Sentry.captureException(exception);
   }
@@ -149,6 +144,19 @@ export class PlayerDispatcher {
     await this.queue.pushTrack(track);
     await this.playOrResumeOrNothing();
     return track;
+  }
+
+  public async sendDisconnected(): Promise<void> {
+    await this.audioMessage.sendMessage(
+      await this.audioMessage.format("DISCONNECT_ERROR")
+    );
+  }
+
+  public async seekTo(seekTo: number): Promise<this> {
+    this.log.debug(`Seek player to ${seekTo}`);
+    this.player.seekTo(seekTo);
+    await this.queue.setPosition(seekTo);
+    return this;
   }
 
   @BreakOnDestroyed()

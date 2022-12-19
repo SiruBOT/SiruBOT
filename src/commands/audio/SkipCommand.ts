@@ -25,7 +25,10 @@ import { EmbedFactory } from "../../utils/EmbedFactory";
 import { Formatter } from "../../utils";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../events/InteractionCreateEvent";
 import { Track } from "shoukaku";
-import { AUTOCOMPLETE_MAX_RESULT } from "../../constant/MessageConstant";
+import {
+  AUTOCOMPLETE_MAX_RESULT,
+  SKIP_EMOJI,
+} from "../../constant/MessageConstant";
 
 /**
  * SkipCommand 조건
@@ -119,12 +122,14 @@ export default class SkipCommand extends BaseCommand {
     const nextTrack: IAudioTrack | undefined = queue.at(0);
     // 건너뛸 곡이 없는 경우
     if (!nextTrack) {
+      // TODO: 추천 영상일경우 건너뛸지 물어보기
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
         content: locale.format(interaction.locale, "SKIP_NO_NEXT"),
       });
       return;
     }
+    // forceSkip이거나 skipTo 인 경우 DJ권한 확인
     if (
       (forceSkip || skipTo != null) &&
       userPermissions.includes(CommandPermissions.DJ)
@@ -189,11 +194,11 @@ export default class SkipCommand extends BaseCommand {
     } else {
       // skip 명령어를 치면 투표한걸로 간주함
       dispatcher.queue.voteSkip.addSkipper(interaction.member.id);
-      const isVoteSkipSkipped = await this.checkSkip(
+      const voteSkippable = await this.checkSkip(
         dispatcher,
         interaction.member.voice.channel
       );
-      if (isVoteSkipSkipped) {
+      if (voteSkippable) {
         await interaction.reply(this.buildSkippedPayload(interaction.locale));
       } else {
         await interaction.reply(
@@ -227,7 +232,20 @@ export default class SkipCommand extends BaseCommand {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(guildId);
     const voteButton = new ButtonBuilder()
       .setCustomId(this.getCustomId("voteskip_vote"))
-      .setEmoji("👍")
+      .setEmoji(SKIP_EMOJI)
+      .setLabel(
+        locale.format(
+          localeName,
+          "SKIP_BUTTON_LABEL",
+          `${
+            dispatcher.queue.voteSkip.getVotedMembers(
+              member.voice.channel as VoiceBasedChannel
+            ).size
+          }/${dispatcher.queue.voteSkip.getNumberOfVotesRequired(
+            member.voice.channel as VoiceBasedChannel
+          )}` // 투표하기 (votedMembers / requiredMembers)
+        )
+      )
       .setStyle(ButtonStyle.Secondary);
     const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       voteButton
@@ -248,19 +266,7 @@ export default class SkipCommand extends BaseCommand {
           )
         )
       )
-      .setTrackThumbnail(track.info)
-      .setFooter({
-        text: locale.format(
-          localeName,
-          "SKIP_VOTE_EMBED_FOOTER",
-          dispatcher.queue.voteSkip
-            .getVotedMembers(member.voice.channel as VoiceBasedChannel)
-            .size.toString(),
-          dispatcher.queue.voteSkip
-            .getNumberOfVotesRequired(member.voice.channel as VoiceBasedChannel)
-            .toString()
-        ),
-      });
+      .setTrackThumbnail(track.info);
     return {
       components: [actionRow],
       embeds: [trackEmbed],
@@ -330,11 +336,11 @@ export default class SkipCommand extends BaseCommand {
     }
     dispatcher.queue.voteSkip.addSkipper(interaction.user.id);
     // skip 명령어를 치면 투표한걸로 간주함
-    const isVoteSkipSkipped = await this.checkSkip(
+    const voteSkippable = await this.checkSkip(
       dispatcher,
       member.voice.channel
     );
-    if (isVoteSkipSkipped) {
+    if (voteSkippable) {
       await interaction.update(this.buildSkippedPayload(interaction.locale));
     } else {
       await interaction.update(
