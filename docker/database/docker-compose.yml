@@ -1,8 +1,10 @@
-version: "3.9"  # optional since v1.27.0
+version: "3"
 # Services
 services:
   # MongoDB
   mongodb:
+    labels:
+      - "traefik.enable=false"
     ports:
       - "27017:27017"
     image: mongo:latest
@@ -15,6 +17,8 @@ services:
       - mongodb_datadir:/data/db
   # MariaDB
   mariadb:
+    labels:
+      - "traefik.enable=false"
     ports:
       - "3306:3306"
     image: mariadb:latest
@@ -25,22 +29,7 @@ services:
       MARIADB_DATABASE: siru
     volumes:
       - mariadb_datadir:/var/lib/mysql
-  # SiruBOT Client
-  sirubot:
-    build: .
-    command: node ./build -d -s -c settings.yaml
-    volumes:
-      - ${PWD}/build:/opt/sirubot/build
-      - type: bind
-        source: ${PWD}/settings.yaml
-        target: /opt/sirubot/settings.yaml
-    depends_on:
-      - mariadb
-      - mongodb
-    links:
-      - mongodb
-      - mariadb
-
+      
 # Volumes
 volumes:
   mongodb_datadir:
