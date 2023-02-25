@@ -1,5 +1,5 @@
 <h1 align="center">
-SiruBOT Github Repository
+SiruBOT GitHub Repository
 
 ![Node version](https://img.shields.io/badge/node-%3E%3D16.9-brightgreen)
 ![GitHub](https://img.shields.io/github/license/SiruBOT/SiruBOT)
