@@ -1,4 +1,4 @@
-import { createConnection, Connection, Repository } from "typeorm";
+import { createConnection, DataSource, Repository } from "typeorm";
 import { UpdateQuery, connect } from "mongoose";
 import { Logger } from "tslog";
 import { Client } from ".";
@@ -18,7 +18,7 @@ interface StatsMetricsArgs {
 export class DatabaseHelper {
   private log: Logger;
   protected client: Client;
-  public mysqlConn: Connection;
+  public mySqlDataSource: DataSource;
   public mongoose: typeof import("mongoose") | undefined;
   private _isReady = false;
 
@@ -31,14 +31,12 @@ export class DatabaseHelper {
 
   public async setup() {
     this.log.debug("Setup databases...");
-    const mysqlConn: Connection = await createConnection({
+    this.mySqlDataSource = new DataSource({
       type: "mysql",
       entities,
-      synchronize: true,
       ...this.client.settings.database.mysql,
       logging: this.client.bootStrapperArgs.debug,
     });
-    this.mysqlConn = mysqlConn;
 
     const mongoose: typeof import("mongoose") = await connect(
       this.client.settings.database.mongodb.url,
@@ -49,12 +47,18 @@ export class DatabaseHelper {
     );
     this.mongoose = mongoose;
 
-    this._isReady =
-      mysqlConn.isConnected && mongoose.connection.readyState == 1;
     if (!this._isReady)
       throw new Error(
         "Database initialize failed. please check your settings."
       );
+  }
+
+  get isReady() {
+    return (
+      this.mySqlDataSource.isInitialized &&
+      this.mongoose &&
+      this.mongoose.connection.readyState == 1
+    );
   }
 
   public async upsertGuildAudioData(
@@ -90,7 +94,7 @@ export class DatabaseHelper {
       Object.keys(data) ? data : "Empty data"
     );
     const guildRepository: Repository<Guild> =
-      this.mysqlConn.getRepository(Guild);
+      this.mySqlDataSource.getRepository(Guild);
     await guildRepository.upsert(
       {
         discordGuildId,
@@ -101,7 +105,9 @@ export class DatabaseHelper {
       }
     );
     const returnResult = await guildRepository.findOneOrFail({
-      discordGuildId,
+      where: {
+        discordGuildId,
+      },
     });
     return returnResult;
   }
@@ -117,7 +123,7 @@ export class DatabaseHelper {
     } = options;
     this.log.debug(`Insert metrics data @ ${clusterId}/${playingPlayers}`);
     const metricsRepository: Repository<Metrics> =
-      this.mysqlConn.getRepository(Metrics);
+      this.mySqlDataSource.getRepository(Metrics);
     await metricsRepository.insert({
       clusterId,
       playingPlayers,

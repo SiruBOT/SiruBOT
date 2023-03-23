@@ -1,6 +1,6 @@
 {
   "name": "sirubot",
-  "version": "4.1.0-hotfix.1",
+  "version": "4.1.1",
   "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
@@ -13,8 +13,10 @@
     "argparse": "^2.0.1",
     "discord-api-types": "^0.29.0",
     "discord-hybrid-sharding": "meister03/discord-hybrid-sharding",
-    "discord.js": "^14.3.0",
+    "discord.js": "^14.8.0",
     "fast-glob": "^3.2.11",
+    "fastify": "^4.15.0",
+    "git-last-commit": "^1.0.1",
     "lru-cache": "^7.8.1",
     "mongoose": "^6.2.6",
     "mysql2": "^2.3.3",
@@ -23,7 +25,7 @@
     "shoukaku": "^3.1.2",
     "slyrics": "^1.0.2",
     "tslog": "^3.3.2",
-    "typeorm": "^0.2.45",
+    "typeorm": "^0.3.12",
     "undici": "^4.15.1",
     "yaml": "^1.10.2"
   },
@@ -31,6 +33,7 @@
     "@types/argparse": "^2.0.10",
     "@types/ip": "^1.1.0",
     "@types/lru-cache": "^7.6.1",
+    "@types/node": "^18.15.5",
     "@types/node-fetch": "^2.6.1",
     "@types/yaml": "^1.9.7",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
@@ -52,6 +55,7 @@
     "build:ts": "yarn run build:clean && tsc --project ./tsconfig.json",
     "build:clean": "yarn run gulp clean",
     "build:deploy": "yarn run build:ts && yarn run deploy:commands",
+    "deploy:clean": "node ./build -d -r -c settings.yaml -clean",
     "deploy:commands": "node ./build -d -r -c settings.yaml"
   },
   "repository": {
