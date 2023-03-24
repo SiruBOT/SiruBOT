@@ -1,6 +1,6 @@
 export enum CommandPermissions {
-  BOTOWNER = "BotOwner",
-  ADMIN = "Admin",
+  BOTOWNER = "BOTOWNER",
+  ADMIN = "ADMIN",
   DJ = "DJ",
-  EVERYONE = "Everyone",
+  EVERYONE = "EVERYONE",
 }

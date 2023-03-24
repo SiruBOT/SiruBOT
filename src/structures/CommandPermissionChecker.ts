@@ -16,8 +16,9 @@ export type PermissionFilterContext = PermissionCheckOptions & {
 };
 
 export interface PermissionCheckResult {
-  success: boolean;
+  isFulfilled: boolean;
   notFulfilledPermissions: CommandPermissions[];
+  fulfilledPermissions: CommandPermissions[];
 }
 
 export class CommandPermissionChecker {
@@ -35,6 +36,7 @@ export class CommandPermissionChecker {
     options: PermissionCheckOptions
   ): Promise<PermissionCheckResult> {
     const notFulfilledPermissions: CommandPermissions[] = [];
+    const fulfilledPermissions: CommandPermissions[] = [];
     for (const perm of options.permissionsCheckTo) {
       const checkRes: boolean = await CommandPermissionConditions({
         ...options,
@@ -42,10 +44,12 @@ export class CommandPermissionChecker {
         client: this.client,
       });
       if (!checkRes) notFulfilledPermissions.push(perm);
+      else fulfilledPermissions.push(perm);
     }
     return {
-      success: notFulfilledPermissions.length == 0,
+      isFulfilled: notFulfilledPermissions.length == 0,
       notFulfilledPermissions,
+      fulfilledPermissions,
     };
   }
 }

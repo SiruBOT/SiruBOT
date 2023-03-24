@@ -4,12 +4,8 @@ import type {
 } from "@discordjs/builders";
 import type * as Discord from "discord.js";
 import type { Client } from ".";
-import type {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-  ICommandRequirements,
-} from "../types";
+import type { CommandCategories, ICommandContext } from "../types";
+import { CommandPermissions } from "../types/CommandTypes/CommandPermissions";
 
 export abstract class BaseCommand {
   public slashCommand:
@@ -17,7 +13,7 @@ export abstract class BaseCommand {
     | SlashCommandSubcommandsOnlyBuilder;
   public category: CommandCategories;
   public permissions: CommandPermissions[];
-  public requirements: ICommandRequirements;
+  public requirements: number;
   public botPermissions: Discord.PermissionsString[];
   protected client: Client;
 
@@ -28,7 +24,7 @@ export abstract class BaseCommand {
     client: Client,
     category: CommandCategories,
     permissions: CommandPermissions[],
-    requirements: ICommandRequirements,
+    requirements: number,
     botPermissions: Discord.PermissionsString[]
   ) {
     this.slashCommand = slashCommand;
@@ -41,7 +37,7 @@ export abstract class BaseCommand {
 
   public async onCommandInteraction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: ICommandContext
+    context: ICommandContext<boolean>
   ): Promise<void> {
     throw new Error("Method not implemented. BaseCommand#onCommandInteraction");
   }

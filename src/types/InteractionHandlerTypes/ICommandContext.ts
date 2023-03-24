@@ -1,12 +1,6 @@
-import {
-  CommandPermissions,
-  HandledCommandInteraction,
-  ICommandRequirements,
-} from "../";
+import { CommandPermissions, HandledCommandInteraction } from "../";
 
-export interface ICommandContext<
-  T extends ICommandRequirements = ICommandRequirements
-> {
-  interaction: HandledCommandInteraction<T>;
+export interface ICommandContext<VoiceConnected extends boolean = false> {
+  interaction: HandledCommandInteraction<VoiceConnected>;
   userPermissions: CommandPermissions[];
 }

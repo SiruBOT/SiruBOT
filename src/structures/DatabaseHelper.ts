@@ -1,4 +1,4 @@
-import { createConnection, DataSource, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { UpdateQuery, connect } from "mongoose";
 import { Logger } from "tslog";
 import { Client } from ".";
@@ -20,7 +20,6 @@ export class DatabaseHelper {
   protected client: Client;
   public mySqlDataSource: DataSource;
   public mongoose: typeof import("mongoose") | undefined;
-  private _isReady = false;
 
   constructor(client: Client) {
     this.client = client;
@@ -36,7 +35,9 @@ export class DatabaseHelper {
       entities,
       ...this.client.settings.database.mysql,
       logging: this.client.bootStrapperArgs.debug,
+      synchronize: true,
     });
+    await this.mySqlDataSource.initialize();
 
     const mongoose: typeof import("mongoose") = await connect(
       this.client.settings.database.mongodb.url,
@@ -47,7 +48,7 @@ export class DatabaseHelper {
     );
     this.mongoose = mongoose;
 
-    if (!this._isReady)
+    if (!this.isReady)
       throw new Error(
         "Database initialize failed. please check your settings."
       );
@@ -65,7 +66,7 @@ export class DatabaseHelper {
     discordGuildId: string,
     query: UpdateQuery<IGuildAudioData> = {}
   ): Promise<IGuildAudioData> {
-    if (!this._isReady) throw new Error("DatabaseHelper is not ready.");
+    if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert GuildAudioData @ ${discordGuildId}`,
       Object.keys(query) ? query : "Empty query"
@@ -88,7 +89,7 @@ export class DatabaseHelper {
     discordGuildId: string,
     data: QueryDeepPartialEntity<Guild> = {}
   ): Promise<Guild> {
-    if (!this._isReady) throw new Error("DatabaseHelper is not ready.");
+    if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert Guild @ ${discordGuildId}`,
       Object.keys(data) ? data : "Empty data"
@@ -113,7 +114,7 @@ export class DatabaseHelper {
   }
 
   public async insertMetrics(options: StatsMetricsArgs) {
-    if (!this._isReady) throw new Error("DatabaseHelper is not ready.");
+    if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     const {
       clusterId,
       playingPlayers,

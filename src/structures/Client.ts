@@ -119,10 +119,12 @@ class Client extends Discord.Client {
       const EventClass = await import(eventPath);
       if (!EventClass.default)
         throw new Error("Event file is missing default export\n" + eventPath);
+
       const eventInstance: BaseEvent<keyof Discord.ClientEvents> =
         new EventClass.default(this);
       if (!(eventInstance instanceof BaseEvent))
         throw new Error("Event file is not extends BaseEvent\n" + eventPath);
+
       const eventFunc = this.warpEventFunc(eventInstance);
       this.on(eventInstance.name, eventFunc);
       this.events.set(eventInstance.name, eventInstance);
