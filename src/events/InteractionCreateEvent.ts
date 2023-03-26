@@ -225,14 +225,16 @@ export default class InteractionCreateEvent extends BaseEvent<
         );
       //#endregion
 
-      //#region  Check user permissions fulfill command permissions
-      const userPermissions = await this.permChecker.check({
+      //#region  Check user permission
+      const userPermissions = await this.permChecker.getUserPermissions({
         guildMember: member,
         guildConfig,
-        permissionsCheckTo: command.permissions,
       });
-      // If user's permission does not fulfill command's permission
-      if (!userPermissions.isFulfilled) {
+      if (
+        command.permissions.some((e) =>
+          userPermissions.notFulfilledPermissions.includes(e)
+        ) // 충족되지 않은 권한중에 커맨드에서 필요한 권한이 있다면 명령어 사용 불가
+      ) {
         span.setData("endReason", "commandPermissionsNotFulfilled");
         span.setData(
           "missingPermissions",

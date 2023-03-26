@@ -5,7 +5,6 @@ import { CommandPermissions } from "../types/CommandTypes/CommandPermissions";
 import { CommandPermissionConditions } from "../types/CommandTypes/CommandPermissionConditions";
 
 export interface PermissionCheckOptions {
-  permissionsCheckTo: CommandPermissions[];
   guildMember: GuildMember;
   guildConfig: Guild;
 }
@@ -16,7 +15,6 @@ export type PermissionFilterContext = PermissionCheckOptions & {
 };
 
 export interface PermissionCheckResult {
-  isFulfilled: boolean;
   notFulfilledPermissions: CommandPermissions[];
   fulfilledPermissions: CommandPermissions[];
 }
@@ -32,12 +30,14 @@ export class CommandPermissionChecker {
    * @param {PermissionCheckOptions} options
    * @returns {Promise<PermissionCheckResult>}
    */
-  public async check(
+  public async getUserPermissions(
     options: PermissionCheckOptions
   ): Promise<PermissionCheckResult> {
     const notFulfilledPermissions: CommandPermissions[] = [];
     const fulfilledPermissions: CommandPermissions[] = [];
-    for (const perm of options.permissionsCheckTo) {
+    for (const perm of Object.keys(
+      CommandPermissions
+    ) as CommandPermissions[]) {
       const checkRes: boolean = await CommandPermissionConditions({
         ...options,
         permission: perm,
@@ -47,7 +47,6 @@ export class CommandPermissionChecker {
       else fulfilledPermissions.push(perm);
     }
     return {
-      isFulfilled: notFulfilledPermissions.length == 0,
       notFulfilledPermissions,
       fulfilledPermissions,
     };
