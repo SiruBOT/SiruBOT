@@ -8,17 +8,8 @@ import {
   ICommandContext,
 } from "../../../types";
 import { Formatter } from "../../../utils";
+import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
 import { decode, TrackInfo } from "@lavalink/encoding";
-
-const commandRequirements = {
-  audioNode: true,
-  trackPlaying: true,
-  voiceStatus: {
-    listenStatus: true,
-    sameChannel: true,
-    voiceConnected: true,
-  },
-} as const;
 
 export default class SeekCommand extends BaseCommand {
   constructor(client: Client) {
@@ -48,14 +39,18 @@ export default class SeekCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.DJ],
-      commandRequirements,
+      CommandRequirements.AUDIO_NODE |
+        CommandRequirements.TRACK_PLAYING |
+        CommandRequirements.LISTEN_STATUS |
+        CommandRequirements.VOICE_SAME_CHANNEL |
+        CommandRequirements.VOICE_CONNECTED,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext<typeof commandRequirements>): Promise<void> {
+  }: ICommandContext<true>): Promise<void> {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(
       interaction.guildId
     );

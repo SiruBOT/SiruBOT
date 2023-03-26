@@ -7,6 +7,7 @@ import {
 } from "../../../types";
 import locale from "../../../locales";
 import { Guild } from "../../../database/mysql/entities";
+import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
 
 export default class RepeatCommand extends BaseCommand {
   constructor(client: Client) {
@@ -52,15 +53,7 @@ export default class RepeatCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.DJ],
-      {
-        audioNode: false,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.NOTHING,
       ["SendMessages"]
     );
   }

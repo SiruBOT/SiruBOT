@@ -15,17 +15,9 @@ import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 import { Paginator } from "../../utils/Paginator";
 import locale from "../../locales";
 import { EMOJI_PLAY_STATE, EMOJI_REPEAT } from "../../constant/MessageConstant";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 
 const SPLIT_SIZE = 10;
-const commandRequirements = {
-  audioNode: true,
-  trackPlaying: true,
-  voiceStatus: {
-    listenStatus: false,
-    sameChannel: false,
-    voiceConnected: false,
-  },
-} as const;
 
 export default class QueueCommand extends BaseCommand {
   constructor(client: Client) {
@@ -43,14 +35,14 @@ export default class QueueCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      commandRequirements,
+      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext<typeof commandRequirements>): Promise<void> {
+  }: ICommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     // 큐가 없으면 nowplaying 있는지 확인하고 nowplaying보내기

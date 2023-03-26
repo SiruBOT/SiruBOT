@@ -16,16 +16,8 @@ import {
   InteractionReplyOptions,
 } from "discord.js";
 import { EMOJI_REFRESH, EMOJI_STAR } from "../../constant/MessageConstant";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 
-const commandRequirements = {
-  audioNode: true,
-  trackPlaying: true,
-  voiceStatus: {
-    listenStatus: false,
-    sameChannel: false,
-    voiceConnected: false,
-  },
-} as const;
 export default class NowplayingCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
@@ -42,14 +34,14 @@ export default class NowplayingCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      commandRequirements,
+      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
       ["SendMessages", "EmbedLinks"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext<typeof commandRequirements>): Promise<void> {
+  }: ICommandContext): Promise<void> {
     await interaction.reply(
       await this.getNowplayingPayload(
         interaction.guildId,

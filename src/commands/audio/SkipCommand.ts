@@ -16,6 +16,7 @@ import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import {
   CommandCategories,
   CommandPermissions,
+  HandledCommandInteraction,
   IAudioTrack,
   ICommandContext,
   IGuildAudioData,
@@ -29,6 +30,7 @@ import {
   AUTOCOMPLETE_MAX_RESULT,
   SKIP_EMOJI,
 } from "../../constant/MessageConstant";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 
 /**
  * SkipCommand 조건
@@ -44,15 +46,12 @@ import {
  *    - 관리자 체크 / DJ체크
  */
 
-const commandRequirements = {
-  audioNode: true,
-  trackPlaying: true,
-  voiceStatus: {
-    listenStatus: true,
-    sameChannel: true,
-    voiceConnected: true,
-  },
-} as const;
+type SkipContext = {
+  interaction: HandledCommandInteraction<true>;
+  dispatcher: PlayerDispatcher;
+  queue: IAudioTrack[];
+  nextTrack: IAudioTrack;
+};
 export default class SkipCommand extends BaseCommand {
   constructor(client: Client) {
     // Build slash command info
@@ -93,13 +92,17 @@ export default class SkipCommand extends BaseCommand {
           .setRequired(false)
           .setAutocomplete(true);
       });
+
     // Command Info
     super(
       slashCommand,
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      commandRequirements,
+      CommandRequirements.TRACK_PLAYING |
+        CommandRequirements.AUDIO_NODE |
+        CommandRequirements.VOICE_SAME_CHANNEL |
+        CommandRequirements.VOICE_CONNECTED,
       ["SendMessages"]
     );
   }
@@ -107,13 +110,7 @@ export default class SkipCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
     userPermissions,
-  }: ICommandContext<typeof commandRequirements>): Promise<void> {
-    const forceSkip: boolean | null = interaction.options.getBoolean(
-      "forceskip",
-      false
-    );
-    const skipTo: number | null = interaction.options.getInteger("to", false);
-
+  }: ICommandContext<true>): Promise<void> {
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     const { queue }: IGuildAudioData =
@@ -129,69 +126,20 @@ export default class SkipCommand extends BaseCommand {
       });
       return;
     }
-    // forceSkip이거나 skipTo 인 경우 DJ권한 확인
+    // Forceskip 있다면 "forceskip", to 있다면 "to", 둘다 없다면 null
+    const subCommand: string | null = interaction.options.getBoolean(
+      "forceskip",
+      false
+    )
+      ? "forceskip"
+      : interaction.options.getInteger("to", false)
+      ? "to"
+      : null;
+    // Force, Jump 명령어를 안쓰거나, 명령어를 썼지만 권한이 없는 경우 일반 voteSkip 으로 간주
     if (
-      (forceSkip || skipTo != null) &&
-      userPermissions.includes(CommandPermissions.DJ)
+      !subCommand ||
+      (subCommand && !userPermissions.includes(CommandPermissions.DJ))
     ) {
-      if (skipTo && skipTo > 0) {
-        // skipTo가 있고 0보다 큰 경우
-        // skipTo starts 1, but array starts 0 (skipTo >= 1)
-        const skipToTrack: IAudioTrack | undefined = queue.at(skipTo - 1);
-        if (!skipToTrack) {
-          // 스킵할게 없으면
-          await interaction.reply({
-            content: locale.format(
-              interaction.locale,
-              "SKIP_NO_SELECTED",
-              skipTo.toString()
-            ),
-          });
-          return;
-        } else {
-          // skipTo 처리
-          await dispatcher.skipTrack(skipTo - 1);
-          await interaction.reply({
-            content: locale.format(
-              interaction.locale,
-              "SKIP_TO_JUMP",
-              interaction.member.displayName,
-              skipTo.toString()
-            ),
-            embeds: [
-              await EmbedFactory.getTrackEmbed(
-                this.client,
-                locale.getReusableFormatFunction(interaction.locale),
-                skipToTrack
-              ),
-            ],
-          });
-          return;
-        }
-      } else {
-        // skipTo 혹은 forceSkip일때 넘어오고, skipTo가 아니라면 실행되는 코드 = forceSkip
-        await dispatcher.skipTrack();
-        await interaction.reply({
-          content: locale.format(
-            interaction.locale,
-            "SKIPPED_TRACK_FORCE",
-            interaction.member.displayName
-          ),
-          embeds: [
-            await EmbedFactory.getTrackEmbed(
-              this.client,
-              locale.getReusableFormatFunction(interaction.locale),
-              nextTrack
-            ),
-          ],
-        });
-      }
-    } else if (forceSkip || skipTo) {
-      await interaction.reply({
-        content: locale.format(interaction.locale, "SKIP_NO_PERMISSIONS"),
-      });
-      return;
-    } else {
       // skip 명령어를 치면 투표한걸로 간주함
       dispatcher.queue.voteSkip.addSkipper(interaction.member.id);
       const voteSkippable = await this.checkSkip(
@@ -210,7 +158,71 @@ export default class SkipCommand extends BaseCommand {
           )
         );
       }
+    } else if (subCommand === "forceskip") {
+      // 강제스킵 핸들
+      await this.forceSkip({ interaction, dispatcher, queue, nextTrack });
+    } else if (subCommand === "to") {
+      // skipTo 핸들
+      await this.skipTo({ interaction, dispatcher, queue, nextTrack });
     }
+  }
+
+  private async forceSkip({
+    interaction,
+    dispatcher,
+    nextTrack,
+  }: SkipContext): Promise<void> {
+    await dispatcher.skipTrack();
+    await interaction.reply({
+      content: locale.format(
+        interaction.locale,
+        "SKIPPED_TRACK_FORCE",
+        interaction.member.displayName
+      ),
+      embeds: [
+        await EmbedFactory.getTrackEmbed(
+          this.client,
+          locale.getReusableFormatFunction(interaction.locale),
+          nextTrack
+        ),
+      ],
+    });
+  }
+
+  private async skipTo({
+    interaction,
+    dispatcher,
+    queue,
+  }: SkipContext): Promise<void> {
+    const skipTo = interaction.options.getInteger("to", true);
+    const skipToTrack: IAudioTrack | undefined = queue.at(skipTo - 1);
+    // 점프할 곡이 없다면
+    if (!skipToTrack) {
+      await interaction.reply({
+        ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+        content: locale.format(interaction.locale, "SKIP_NO_SELECTED"),
+      });
+      return;
+    }
+    // 점프할 곡이 있으면
+    // skipTo 처리
+    await dispatcher.skipTrack(skipTo - 1);
+    await interaction.reply({
+      content: locale.format(
+        interaction.locale,
+        "SKIP_TO_JUMP",
+        interaction.member.displayName,
+        skipTo.toString()
+      ),
+      embeds: [
+        await EmbedFactory.getTrackEmbed(
+          this.client,
+          locale.getReusableFormatFunction(interaction.locale),
+          skipToTrack
+        ),
+      ],
+    });
+    return;
   }
 
   private buildSkippedPayload(
@@ -223,6 +235,7 @@ export default class SkipCommand extends BaseCommand {
     };
   }
 
+  // Skip 버튼 페이로드 만들기
   private buildVoteSkipPayload(
     localeName: string,
     guildId: string,
@@ -274,6 +287,7 @@ export default class SkipCommand extends BaseCommand {
     };
   }
 
+  // 절반이 넘어가면 스킵하는 코드
   private async checkSkip(
     dispatcher: PlayerDispatcher,
     voiceChannel: VoiceBasedChannel

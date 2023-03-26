@@ -6,7 +6,10 @@ import {
   CommandPermissions,
   ICommandContext,
 } from "../../types";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 import { EmbedFactory } from "../../utils";
+import locale from "../../locales/";
+import { fetch } from "undici";
 
 export default class PingCommand extends BaseCommand {
   constructor(client: Client) {
@@ -24,15 +27,7 @@ export default class PingCommand extends BaseCommand {
       client,
       CommandCategories.GENERAL,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: false,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.NOTHING,
       ["SendMessages"]
     );
   }
@@ -41,12 +36,24 @@ export default class PingCommand extends BaseCommand {
     interaction,
   }: ICommandContext): Promise<void> {
     const pingEmbed: Discord.EmbedBuilder = EmbedFactory.createEmbed();
-    await interaction.deferReply();
-    pingEmbed.setDescription(
-      `Discord -> BOT -> Discord | ${
-        new Date().getTime() - interaction.createdTimestamp
-      }ms\nDiscord <-> BOT | ${this.client.ws.ping}ms`
+
+    const deferReply = await interaction.deferReply({ fetchReply: true });
+    const deferReplyTime = Math.round(
+      deferReply.createdTimestamp - interaction.createdTimestamp
     );
+
+    pingEmbed.setDescription(
+      locale.format(
+        interaction.locale,
+        "PING_PONG_EMBED",
+        interaction.member.displayName,
+        (deferReplyTime / 1000).toFixed(2),
+        deferReplyTime.toString(),
+        (this.client.ws.ping / 1000).toFixed(2),
+        this.client.ws.ping.toString()
+      )
+    );
+
     await interaction.editReply({ embeds: [pingEmbed] });
   }
 }

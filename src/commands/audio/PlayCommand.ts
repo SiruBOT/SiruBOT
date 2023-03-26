@@ -14,7 +14,6 @@ import {
 import locale from "../../locales";
 import { isURL, Formatter, EmbedFactory } from "../../utils";
 import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
-import { AudioTools } from "../../structures/audio/AudioTools";
 import {
   AUTOCOMPLETE_MAX_RESULT,
   EMOJI_INBOX_TRAY,
@@ -22,20 +21,10 @@ import {
 } from "../../constant/MessageConstant";
 import { BUTTON_AWAIT_TIMEOUT } from "../../constant/TimeConstant";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
-import { MessageUtil } from "../../utils/MessageUtil";
 import { ButtonStyle, ComponentType } from "discord.js";
 import { fetch } from "undici";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../events/InteractionCreateEvent";
-
-const commandRequirements = {
-  audioNode: true,
-  trackPlaying: false,
-  voiceStatus: {
-    listenStatus: true,
-    sameChannel: false, // false or true
-    voiceConnected: true,
-  },
-} as const;
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 
 export default class PlayCommand extends BaseCommand {
   constructor(client: Client) {
@@ -78,14 +67,16 @@ export default class PlayCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      commandRequirements,
+      CommandRequirements.AUDIO_NODE |
+        CommandRequirements.VOICE_SAME_CHANNEL |
+        CommandRequirements.LISTEN_STATUS,
       ["SendMessages", "Connect", "Speak", "EmbedLinks"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext<typeof commandRequirements>): Promise<void> {
+  }: ICommandContext<true>): Promise<void> {
     // Handle play command
     const query: string = interaction.options.getString("query", true);
     // AutoComplete 값 없는 경우 required여도 빈 값이 넘어올 수 있음
@@ -97,8 +88,6 @@ export default class PlayCommand extends BaseCommand {
           locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
       });
       return;
-    } else {
-      await interaction.deferReply();
     }
     // Join voice channel before playing
     if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
@@ -119,7 +108,9 @@ export default class PlayCommand extends BaseCommand {
         );
       }
     }
-
+    await interaction.reply(
+      locale.format(interaction.locale, "PLAY_SEARCHING")
+    );
     // Get dispatcher
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
@@ -134,12 +125,12 @@ export default class PlayCommand extends BaseCommand {
     // Search result
     switch (searchResult.loadType) {
       case "LOAD_FAILED":
-        await MessageUtil.followUpOrEditReply(interaction, {
+        await interaction.editReply({
           content: locale.format(interaction.locale, "LOAD_FAILED"),
         });
         break;
       case "NO_MATCHES":
-        await MessageUtil.followUpOrEditReply(interaction, {
+        await interaction.editReply({
           content: locale.format(interaction.locale, "NO_MATCHES"),
         });
         break;
@@ -147,7 +138,7 @@ export default class PlayCommand extends BaseCommand {
       case "PLAYLIST_LOADED":
         // Only playlist url
         if (searchResult.playlistInfo?.selectedTrack === -1) {
-          await MessageUtil.followUpOrEditReply(interaction, {
+          await interaction.editReply({
             content: locale.format(
               interaction.locale,
               "PLAYLIST_ADD",
@@ -157,9 +148,14 @@ export default class PlayCommand extends BaseCommand {
             ),
           });
           await dispatcher.addTracks(
-            searchResult.tracks.map((e: Track) =>
-              AudioTools.getAudioTrack(e, interaction.user.id)
-            )
+            searchResult.tracks.map((e: Track) => {
+              return {
+                track: e,
+                requesterUserId: interaction.user.id,
+                relatedTrack: false,
+                repeated: false,
+              };
+            })
           );
         } else {
           // Handles videoId with playlistId
@@ -213,28 +209,29 @@ export default class PlayCommand extends BaseCommand {
                 .setStyle(ButtonStyle.Secondary)
             );
           // Question message
-          const promptMessage: Discord.Message =
-            await MessageUtil.followUpOrEditReply(interaction, {
-              fetchReply: true,
-              content: enQueueState,
-              components: [actionRow],
-              embeds: [
-                EmbedFactory.createEmbed()
-                  .setTitle(locale.format(interaction.locale, "PLAYLIST"))
-                  .setDescription(
-                    locale.format(
-                      interaction.locale,
-                      "INCLUDES_PLAYLIST",
-                      slicedPlaylist.length.toString()
-                    )
+          const promptMessage: Discord.Message = await interaction.editReply({
+            content: enQueueState,
+            components: [actionRow],
+            embeds: [
+              EmbedFactory.createEmbed()
+                .setTitle(locale.format(interaction.locale, "PLAYLIST"))
+                .setDescription(
+                  locale.format(
+                    interaction.locale,
+                    "INCLUDES_PLAYLIST",
+                    slicedPlaylist.length.toString()
                   )
-                  .setTrackThumbnail(track.info),
-              ],
-            });
+                )
+                .setTrackThumbnail(track.info),
+            ],
+          });
           // Add selected track without playlist
-          await dispatcher.addTrack(
-            AudioTools.getAudioTrack(track, interaction.user.id)
-          );
+          await dispatcher.addTrack({
+            track,
+            requesterUserId: interaction.user.id,
+            relatedTrack: false,
+            repeated: false,
+          });
           // Check interaction does not have channel
           if (!interaction.channel)
             throw new Error("Interaction channel not found.");
@@ -284,9 +281,14 @@ export default class PlayCommand extends BaseCommand {
                 });
                 // Add sliced playlist
                 await dispatcher.addTracks(
-                  slicedPlaylist.map((e: Track) =>
-                    AudioTools.getAudioTrack(e, interaction.user.id)
-                  )
+                  slicedPlaylist.map((e: Track) => {
+                    return {
+                      track: e,
+                      requesterUserId: interaction.user.id,
+                      relatedTrack: false,
+                      repeated: false,
+                    };
+                  })
                 );
               }
             } else {
@@ -332,7 +334,7 @@ export default class PlayCommand extends BaseCommand {
           locale.getReusableFormatFunction(interaction.locale),
           addTo
         );
-        await MessageUtil.followUpOrEditReply(interaction, {
+        await interaction.editReply({
           content: locale.format(
             interaction.locale,
             this.willPlayingOrEnqueued(

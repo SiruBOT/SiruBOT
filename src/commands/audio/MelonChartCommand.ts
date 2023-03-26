@@ -5,6 +5,7 @@ import {
   CommandPermissions,
   ICommandContext,
 } from "../../types";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 
 export default class LyricsCommand extends BaseCommand {
   constructor(client: Client) {
@@ -22,15 +23,7 @@ export default class LyricsCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: false,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.NOTHING,
       ["SendMessages"]
     );
   }

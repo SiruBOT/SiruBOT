@@ -6,6 +6,7 @@ import {
   CommandPermissions,
   ICommandContext,
 } from "../../../types";
+import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
 import locale from "../../../locales";
 
 export default class StopCommand extends BaseCommand {
@@ -24,15 +25,7 @@ export default class StopCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.DJ],
-      {
-        audioNode: true,
-        trackPlaying: true,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
       ["SendMessages"]
     );
   }

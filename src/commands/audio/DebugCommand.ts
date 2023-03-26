@@ -7,6 +7,7 @@ import {
   CommandPermissions,
   ICommandContext,
 } from "../../types";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 import { EmbedFactory, Formatter } from "../../utils";
 import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
 
@@ -49,15 +50,7 @@ export default class NodeInfoCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: true,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.NOTHING,
       ["SendMessages"]
     );
   }

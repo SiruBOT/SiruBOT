@@ -10,6 +10,7 @@ import locale from "../../locales";
 import { AutocompleteInteraction, CacheType } from "discord.js";
 import { EmbedFactory } from "../../utils";
 import { AUTOCOMPLETE_MAX_RESULT } from "../../constant/MessageConstant";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 
 export default class LyricsCommand extends BaseCommand {
   constructor(client: Client) {
@@ -40,15 +41,7 @@ export default class LyricsCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: false,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.NOTHING,
       ["SendMessages"]
     );
   }
@@ -63,7 +56,7 @@ export default class LyricsCommand extends BaseCommand {
     const searchResult: ILyricsSearchResult = await provider.search(query);
     if (searchResult.entries.length <= 0) {
       await interaction.editReply(
-        locale.format(interaction.locale, "LYRICS_SEARCH_NOT_FOUND")
+        locale.format(interaction.locale, "LYRICS_NOT_FOUND")
       );
       return;
     }
@@ -73,14 +66,24 @@ export default class LyricsCommand extends BaseCommand {
     resultEmbed.setFooter({ text: lyrics.artist });
     if (lyrics.albumCover && typeof lyrics.albumCover === "string")
       await resultEmbed.setThumbnailAndColor(lyrics.albumCover as string);
-    // if (lyrics.lyrics.length > 1024) {
-    //   // Pagenation
-    //   resultEmbed.setDescription("Pagenation required (lyrics > 1024)");
-    // } else {
-    resultEmbed.setDescription(
-      lyrics.lyrics ?? locale.format(interaction.locale, "LYRICS_NAN")
-    );
-    // }
+    // 결과 텍스트
+    let resultText =
+      lyrics.lyrics ??
+      locale.format(
+        interaction.locale,
+        "LYRICS_NAN",
+        lyrics.artist + "-" + lyrics.title
+      );
+
+    // 가사가 길다면 링크로 대체
+    if (lyrics.lyrics?.length && lyrics.lyrics.length > 2048)
+      resultText = locale.format(
+        interaction.locale,
+        "LYRICS_TOO_LONG",
+        lyrics.artist + "-" + lyrics.title,
+        lyrics.url
+      );
+    resultEmbed.setDescription(resultText);
     await interaction.editReply({ embeds: [resultEmbed] });
   }
 
@@ -89,7 +92,13 @@ export default class LyricsCommand extends BaseCommand {
     interaction: AutocompleteInteraction<CacheType>
   ): Promise<void> {
     const query: string | null = interaction.options.getString("query");
-    if (!query) return;
+    if (!query)
+      return await interaction.respond([
+        {
+          name: locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
+          value: "",
+        },
+      ]);
     const provider: MelonProvider = new MelonProvider();
     const searchResult: ILyricsSearchResult = await provider.search(query);
     if (searchResult.entries.length > 0 && !interaction.responded) {
@@ -104,8 +113,6 @@ export default class LyricsCommand extends BaseCommand {
           })
           .slice(0, AUTOCOMPLETE_MAX_RESULT)
       );
-    } else {
-      await interaction.respond([]);
     }
   }
 }

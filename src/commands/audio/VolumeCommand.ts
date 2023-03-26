@@ -8,7 +8,7 @@ import {
 } from "../../types";
 import { Formatter } from "../../utils";
 import locale from "../../locales";
-import { CommandPermissionError } from "../../structures/errors/CommandPermissionError";
+import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
 export default class VolumeCommand extends BaseCommand {
   constructor(client: Client) {
     const slashCommand = new SlashCommandBuilder()
@@ -37,15 +37,7 @@ export default class VolumeCommand extends BaseCommand {
       client,
       CommandCategories.MUSIC,
       [CommandPermissions.EVERYONE],
-      {
-        audioNode: false,
-        trackPlaying: false,
-        voiceStatus: {
-          listenStatus: false,
-          sameChannel: false,
-          voiceConnected: false,
-        },
-      },
+      CommandRequirements.NOTHING,
       ["SendMessages"]
     );
   }
@@ -69,39 +61,43 @@ export default class VolumeCommand extends BaseCommand {
         ),
       });
       return;
-    } else {
-      if (!userPermissions.includes(CommandPermissions.DJ))
-        throw new CommandPermissionError(CommandPermissions.DJ);
-      // Max Volume = 150
-      if (volume > 150) {
-        await interaction.reply(
-          locale.format(interaction.locale, "VOLUME_CANNOT_OVER_MAX")
-        );
-        return;
-      } else if (volume < 0) {
-        await interaction.reply(
-          locale.format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW")
-        );
-        return;
-      }
-      const guildConfig: Guild =
-        await this.client.databaseHelper.upsertAndFindGuild(
-          interaction.guildId,
-          { volume }
-        );
-      try {
-        this.client.audio
-          .getPlayerDispatcherOrfail(interaction.guildId)
-          .setVolumePercent(guildConfig.volume);
-      } catch {}
-      await interaction.reply({
-        content: locale.format(
-          interaction.locale,
-          "CHANGED_VOLUME",
-          Formatter.volumeEmoji(guildConfig.volume),
-          guildConfig.volume.toString()
-        ),
-      });
     }
+
+    if (volume && !userPermissions.includes(CommandPermissions.DJ)) {
+      await interaction.reply({
+        content: locale.format(interaction.locale, "MUSIC_DJ_FEATURE"),
+      });
+      return;
+    }
+
+    // Max Volume = 150
+    if (volume > 150) {
+      await interaction.reply(
+        locale.format(interaction.locale, "VOLUME_CANNOT_OVER_MAX")
+      );
+      return;
+    } else if (volume < 0) {
+      await interaction.reply(
+        locale.format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW")
+      );
+      return;
+    }
+    const guildConfig: Guild =
+      await this.client.databaseHelper.upsertAndFindGuild(interaction.guildId, {
+        volume,
+      });
+    try {
+      this.client.audio
+        .getPlayerDispatcherOrfail(interaction.guildId)
+        .setVolumePercent(guildConfig.volume);
+    } catch {}
+    await interaction.reply({
+      content: locale.format(
+        interaction.locale,
+        "CHANGED_VOLUME",
+        Formatter.volumeEmoji(guildConfig.volume),
+        guildConfig.volume.toString()
+      ),
+    });
   }
 }
