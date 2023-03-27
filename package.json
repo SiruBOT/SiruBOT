@@ -53,6 +53,7 @@
     "lint:fix": "eslint --ext .ts ./src --fix",
     "build:ts": "yarn run build:clean && tsc --project ./tsconfig.json",
     "build:clean": "yarn run gulp clean",
+    "build:watch": "yarn run gulp clean && yarn run tsc --watch",
     "build:deploy": "yarn run build:ts && yarn run deploy:commands",
     "deploy:clean": "node ./build -d -r -c settings.yaml -clean",
     "deploy:commands": "node ./build -d -r -c settings.yaml"
