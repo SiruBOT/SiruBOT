@@ -9,6 +9,8 @@ import type { IBootStrapperArgs, ISettings } from "../types";
 import { AudioHandler } from "./audio/AudioHandler";
 import { BaseEvent, DatabaseHelper } from "./";
 import { MESSAGE_CACHE_SWEEPER_INTERVAL } from "../constant/ClientConstant";
+import { ClientStats } from "../types/ClientStats";
+
 class Client extends Discord.Client {
   public settings: ISettings;
   public bootStrapperArgs: IBootStrapperArgs;
@@ -154,6 +156,38 @@ class Client extends Discord.Client {
         );
       this.commands.set(commandInstance.slashCommand.name, commandInstance);
     }
+  }
+
+  private statsInfo(): ClientStats {
+    return {
+      discordStats: {
+        cachedGuilds: this.guilds.cache.size,
+        cachedUsers: this.users.cache.size,
+        cachedChannels: this.channels.cache.size,
+      },
+      audioStats: {
+        audioDispatchers: this.audio.dispatchers.size,
+        audioNodes: [...this.audio.nodes.values()].map((e) => {
+          return {
+            name: e.name,
+            players: e.players.size,
+            usageByDispatchers:
+              this.audio.dispatchers.size > 0
+                ? (e.players.size / this.audio.dispatchers.size) * 100
+                : 0,
+            state: ["CONNECTING", "CONNECTED", "DISCONNECTING", "DISCONNECTED"][
+              e.state
+            ],
+            reconnects: e.reconnects,
+            stats: e.stats,
+          };
+        }),
+      },
+      websocketStatus: {
+        wsStatus: this.ws.status,
+        wsLatency: this.ws.ping,
+      },
+    };
   }
 }
 

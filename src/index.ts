@@ -13,6 +13,7 @@ import { BaseCommand, Client, WebhookNotifier } from "./structures";
 import { Routes, APIApplication } from "discord-api-types/v9";
 import { REST as DiscordREST } from "@discordjs/rest";
 import { Colors, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
+import Fastify from "fastify";
 
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
@@ -24,24 +25,41 @@ parser.add_argument("-r", "--register", {
   help: "Update slash commands",
   default: false,
   action: "store_true",
+  required: false,
+});
+
+parser.add_argument("-clean", "--clean-commands", {
+  help: "Clean commands",
+  default: false,
+  action: "store_true",
+  required: false,
 });
 
 parser.add_argument("-s", "--shard", {
   help: "Enable auto sharding",
   default: false,
   action: "store_true",
+  required: false,
 });
 
 parser.add_argument("-d", "--debug", {
   help: "Enable debug logging",
   default: false,
   action: "store_true",
+  required: false,
 });
 
 parser.add_argument("-c", "--config", {
   help: "Config file path",
   default: false,
   required: true,
+});
+
+parser.add_argument("-api", "--experimental-api", {
+  help: "Enable experimental api",
+  default: false,
+  action: "store_true",
+  required: false,
 });
 
 // Parse Args
@@ -90,6 +108,9 @@ async function boot() {
 
   const fileContent: string = await safeReadFile(args.config);
   const parsedConfig: ISettings = yaml.parse(fileContent);
+  const restClient = new DiscordREST({ version: "9" });
+  restClient.setToken(parsedConfig.bot.token);
+
   let webhookNotifier: WebhookNotifier | undefined;
 
   if (parsedConfig.webhook) {
@@ -133,6 +154,11 @@ async function boot() {
     return;
   }
 
+  if (args.clean_commands) {
+    await cleanSlashCommands();
+    return;
+  }
+
   if (args.shard) {
     // Autosharding async function
     await autoSharding();
@@ -140,16 +166,47 @@ async function boot() {
     log.warn("Single bot mode is currently not supported. use --shard option.");
   }
 
+  async function cleanSlashCommands() {
+    log.warn("This option will delete all slash commands in your application.");
+    log.debug("Fetch application info from applicationInfo endpoint..");
+    // Get applicationCommands from discord api (Old thing)
+    const applicationInfo: APIApplication = (await restClient.get(
+      Routes.oauth2CurrentApplication()
+    )) as APIApplication;
+    if (!applicationInfo) throw new Error("Application info not found");
+    // Replace All Slash commands
+    await restClient.put(
+      process.env.DEVGUILD
+        ? Routes.applicationGuildCommands(
+            applicationInfo.id,
+            process.env.DEVGUILD
+          )
+        : Routes.applicationCommands(applicationInfo.id),
+      {
+        body: [],
+      }
+    );
+    const publishAt: string = process.env.DEVGUILD
+      ? "applicationGuildCommands (/) at " + process.env.DEVGUILD
+      : "applicationCommands (/)";
+    const logStr = `All slash commands cleared on ${publishAt}`;
+    log.info(logStr);
+    webhookNotifier?.safeSendEmbed(
+      webhookNotifier
+        .warnEmbed()
+        .setTitle(`🗒️ Commands cleared`)
+        .setDescription(logStr)
+    );
+  }
+
   async function updateSlashCommands() {
-    const restClient = new DiscordREST({ version: "9" });
-    restClient.setToken(parsedConfig.bot.token);
     log.info("Update slash commands...");
     log.debug("Fetch global commands info from applicationCommands endpoint..");
     // Get applicationCommands from discord api (Old thing)
     const applicationInfo: APIApplication = (await restClient.get(
       Routes.oauth2CurrentApplication()
     )) as APIApplication;
-    if (!applicationInfo) throw new Error("ApplicationInfo not found");
+    if (!applicationInfo) throw new Error("Application info not found");
 
     const commandFiles: string[] = await FastGlob(
       Client.generateGlobPattern("commands")
@@ -200,6 +257,7 @@ async function boot() {
     );
   }
 
+  //#region AutoSharding
   async function autoSharding() {
     log.info("Auto sharding enabled, booting shards...");
     try {
@@ -274,8 +332,40 @@ async function boot() {
         }); // Spawn
       });
       clusterManager.spawn({ timeout: -1 });
+
+      // Start Web Server
+      if (args.experimental_api) {
+        const fastify = Fastify({ logger: true });
+
+        fastify.get("/status", async () => {
+          const clusters = [...clusterManager.clusters.values()];
+          const clustersInfo = [];
+          const statusInfo = await clusterManager.broadcastEval(
+            "this.statsInfo()"
+          );
+          for (const cluster of clusters) {
+            clustersInfo.push({
+              clusterId: cluster.id,
+              heartbeat: cluster.heartbeat,
+              ready: cluster.ready,
+              shardIds: cluster.manager.shardList,
+              ...statusInfo[cluster.id],
+            });
+          }
+          const status = {
+            clusterCount: clusterManager.totalClusters,
+            clusterSize: clusters.length,
+            clustersInfo,
+          };
+          return status;
+        });
+
+        await fastify.listen({ port: 3000 });
+        log.info("Experimental API server started on port 3000");
+      }
     } catch (err) {
       log.error(err);
     }
-  } // AutoSharding
+  }
+  //#endregion
 }

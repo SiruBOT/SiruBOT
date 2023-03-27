@@ -3,4 +3,6 @@ export interface IBootStrapperArgs {
   shard: boolean;
   config: string;
   debug: boolean;
+  clean_commands: boolean;
+  experimental_api: boolean;
 }
