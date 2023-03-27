@@ -1,11 +1,20 @@
-import { ColorResolvable, EmbedBuilder, EmbedFooterOptions } from "discord.js";
-import { ShoukakuTrackInfo } from "../types/";
 import Vibrant from "node-vibrant";
+import { ColorResolvable, EmbedBuilder, EmbedFooterOptions } from "discord.js";
+import { getLastCommit } from "git-last-commit";
+import { ShoukakuTrackInfo } from "../types/";
 import { BOT_NAME, DEFAULT_COLOR } from "../constant/MessageConstant";
 import { version } from "../../package.json";
+
 export class ExtendedEmbed extends EmbedBuilder {
+  private versionInfo: string;
   constructor() {
     super();
+    this.versionInfo = version;
+    getLastCommit((err, commit) => {
+      if (!err)
+        this.versionInfo = `${version} (${commit.branch}-${commit.shortHash})`;
+      else throw err;
+    });
   }
 
   // TODO: Experimental
@@ -27,7 +36,7 @@ export class ExtendedEmbed extends EmbedBuilder {
 
   public override setFooter(options: EmbedFooterOptions | null): this {
     if (options?.text) {
-      options.text = options.text + " | " + BOT_NAME + " " + version;
+      options.text = options.text + " | " + BOT_NAME + " " + this.versionInfo;
     }
     super.setFooter(options);
     return this;
