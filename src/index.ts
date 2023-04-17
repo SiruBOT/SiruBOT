@@ -62,6 +62,12 @@ parser.add_argument("-api", "--experimental-api", {
   required: false,
 });
 
+parser.add_argument("-p", "--port", {
+  help: "Port for experimental api",
+  default: 3000,
+  required: false,
+});
+
 // Parse Args
 const args: IBootStrapperArgs = parser.parse_args();
 // Logger setup
@@ -337,7 +343,7 @@ async function boot() {
       if (args.experimental_api) {
         const fastify = Fastify({ logger: true });
 
-        fastify.get("/status", async () => {
+        fastify.get("/stats", async () => {
           const clusters = [...clusterManager.clusters.values()];
           const clustersInfo = [];
           const statusInfo = await clusterManager.broadcastEval(
@@ -348,7 +354,6 @@ async function boot() {
               clusterId: cluster.id,
               heartbeat: cluster.heartbeat,
               ready: cluster.ready,
-              shardIds: cluster.manager.shardList,
               ...statusInfo[cluster.id],
             });
           }
@@ -360,8 +365,10 @@ async function boot() {
           return status;
         });
 
-        await fastify.listen({ port: 3000 });
-        log.info("Experimental API server started on port 3000");
+        await fastify.listen({ port: args.port ?? 3000 });
+        log.info(
+          "Experimental API server started on port " + args.port ?? 3000
+        );
       }
     } catch (err) {
       log.error(err);

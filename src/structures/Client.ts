@@ -165,6 +165,7 @@ class Client extends Discord.Client {
         cachedUsers: this.users.cache.size,
         cachedChannels: this.channels.cache.size,
       },
+      shardIds: this.shard?.ids ?? [0],
       audioStats: {
         audioDispatchers: this.audio.dispatchers.size,
         audioNodes: [...this.audio.nodes.values()].map((e) => {

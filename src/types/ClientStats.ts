@@ -10,6 +10,7 @@ export interface AudioNodeStats {
 }
 
 export interface ClientStats {
+  shardIds: number[];
   discordStats: {
     cachedGuilds: number;
     cachedUsers: number;

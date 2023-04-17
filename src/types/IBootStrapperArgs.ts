@@ -5,4 +5,5 @@ export interface IBootStrapperArgs {
   debug: boolean;
   clean_commands: boolean;
   experimental_api: boolean;
+  port: number;
 }
