@@ -12,7 +12,14 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": false,
-        "noImplicitOverride": true
+        "noImplicitOverride": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"],
+            "@/utils/*": ["src/utils/*"],
+            "@/constants/*": ["src/constants/*"],
+            "@/structures/*": ["src/structures/*"],
+        }
     },
     "include": [
         "src/**/*.ts"
