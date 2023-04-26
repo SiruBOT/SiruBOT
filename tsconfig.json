@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ES2021",
+        "target": "ESNext",
         "module": "CommonJS",
         "sourceMap": true,
         "noImplicitAny": true,
@@ -18,7 +18,7 @@
             "@/*": ["src/*"],
             "@/utils/*": ["src/utils/*"],
             "@/constants/*": ["src/constants/*"],
-            "@/structures/*": ["src/structures/*"],
+            "@/structures/*": ["src/structures/*"]
         }
     },
     "include": [
