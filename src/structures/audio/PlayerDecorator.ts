@@ -1,19 +1,18 @@
-import { PlayerDispatcher } from "./PlayerDispatcher";
+import { PlayerDispatcher } from "@/structures/audio";
 
-function BreakOnDestroyed() {
+export function BreakOnDestroyed() {
   return function (
     _target: object,
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
     const origDescriptor = descriptor.value;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     descriptor.value = function (...args: any[]) {
       if (!(this instanceof PlayerDispatcher))
         throw new Error(
           "This decorator can only be used with PlayerDispatcher class methods."
         );
-      const methodParentClass: PlayerDispatcher = this as PlayerDispatcher;
+      const methodParentClass = this as PlayerDispatcher;
       methodParentClass.log.debug(
         `@BreakOnDestroyed() ${propertyKey} method called.`,
         methodParentClass.destroyed
@@ -24,11 +23,8 @@ function BreakOnDestroyed() {
           methodParentClass.destroyed
         );
         return;
-      } else {
-        return origDescriptor.apply(this, args);
       }
+      return origDescriptor.apply(this, args);
     };
   };
 }
-
-export { BreakOnDestroyed };
