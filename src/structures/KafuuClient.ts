@@ -109,7 +109,10 @@ class KafuuClient extends Discord.Client {
   }
 
   private async loadEvents() {
-    const eventsPattern: string = generateGlobPattern(joinPath(__dirname, "../"), "events");
+    const eventsPattern: string = generateGlobPattern(
+      joinPath(__dirname, "../"),
+      "events"
+    );
     this.log.debug("Loading events with pattern: " + eventsPattern);
     const events: string[] = await FastGlob(eventsPattern);
     this.log.info(`Found ${events.length} events.`);
@@ -131,7 +134,10 @@ class KafuuClient extends Discord.Client {
   }
 
   private async loadCommands() {
-    const commandsPattern: string = generateGlobPattern(joinPath(__dirname, "../"), "commands");
+    const commandsPattern: string = generateGlobPattern(
+      joinPath(__dirname, "../"),
+      "commands"
+    );
 
     this.log.debug("Loading commands with pattern: " + commandsPattern);
     const commandFiles: string[] = await FastGlob(commandsPattern);

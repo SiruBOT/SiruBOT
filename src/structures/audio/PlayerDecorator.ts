@@ -7,7 +7,7 @@ export function BreakOnDestroyed() {
     descriptor: PropertyDescriptor
   ) {
     const origDescriptor = descriptor.value;
-    descriptor.value = function (...args: any[]) {
+    descriptor.value = function (...args: unknown[]) {
       if (!(this instanceof PlayerDispatcher))
         throw new Error(
           "This decorator can only be used with PlayerDispatcher class methods."

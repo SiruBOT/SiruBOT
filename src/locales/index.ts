@@ -10,13 +10,12 @@ export const locales = {
 
 export const fallBackLocale = "ko" as const;
 
-const picker =  new LocalePicker({
+const picker = new LocalePicker({
   fallBackLocale,
   locales: locales as unknown as LocaleObject,
 });
 
-
-
 export const format = picker.format.bind(picker);
 // export const = picker.
-export const getReusableFormatFunction = picker.getReusableFormatFunction.bind(picker);
+export const getReusableFormatFunction =
+  picker.getReusableFormatFunction.bind(picker);

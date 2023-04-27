@@ -45,11 +45,7 @@ export default class NowplayingCommand extends BaseCommand {
     interaction,
   }: KafuuCommandContext): Promise<void> {
     await interaction.reply(
-      await this.getNowplayingPayload(
-        interaction.guildId,
-        interaction.locale,
-        this.client.audio.dispatchers.get(interaction.guildId)
-      )
+      await this.getNowplayingPayload(interaction.guildId, interaction.locale)
     );
   }
 
@@ -60,8 +56,7 @@ export default class NowplayingCommand extends BaseCommand {
         await interaction.update(
           await this.getNowplayingPayload(
             interaction.guildId,
-            interaction.locale,
-            this.client.audio.dispatchers.get(interaction.guildId)
+            interaction.locale
           )
         );
         break;
@@ -89,8 +84,7 @@ export default class NowplayingCommand extends BaseCommand {
 
   private async getNowplayingPayload(
     guildId: string,
-    localeName: string,
-    dispatcher?: PlayerDispatcher
+    localeName: string
   ): Promise<InteractionUpdateOptions & InteractionReplyOptions> {
     return {
       components: [this.buildActionRow()],

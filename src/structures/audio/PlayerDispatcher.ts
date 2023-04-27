@@ -292,12 +292,12 @@ export class PlayerDispatcher {
   private async resumeNowPlaying(
     nowPlaying: KafuuAudioTrack,
     position: number
-  ){
+  ) {
     // Player track = null, DB nowplaying = exists
     const guildConfig = await this.client.databaseHelper.upsertAndFindGuild(
       this.guildId
     );
-    if (nowPlaying.info.isStream)  {
+    if (nowPlaying.info.isStream) {
       this.log.debug(`Nowplaying is stream, skipping...`);
       return this.playNextTrack();
     }
