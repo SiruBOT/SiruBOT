@@ -1,4 +1,4 @@
-import { NodeStats } from "shoukaku";
+import type { NodeStats } from "shoukaku";
 
 export interface AudioNodeStats {
   name: string;

@@ -1,23 +1,12 @@
-import { locales } from "./index";
-
-export type STRING_KEYS =
-  | keyof typeof locales["en"]
-  | keyof typeof locales["ko"]
-  | string;
-
-export interface Locale {
-  [key: string]: string;
-}
-
-export interface LocalePickerOption {
-  fallBackLocale: string;
-  locales: { [key: string]: Locale };
-}
-
-export type ReusableFormatFunction = (
-  key: STRING_KEYS,
-  ...args: string[]
-) => string;
+/* eslint-disable security/detect-object-injection */
+import { Locale } from "discord.js";
+import { LocaleData } from "@/types/locales";
+import { fallBackLocale } from "@/locales";
+import {
+  LocalePickerOption,
+  ReusableFormatFunc,
+  STRING_KEYS,
+} from "@/types/locales";
 
 export class LocalePicker {
   public option: LocalePickerOption;
@@ -25,26 +14,18 @@ export class LocalePicker {
     this.option = option;
   }
 
-  public format(locale: string, key: STRING_KEYS, ...args: string[]): string {
-    let localeData: Locale | undefined = this.option.locales[locale];
-    if (!localeData) {
-      localeData = this.option.locales[this.option.fallBackLocale];
-    }
-    const valueData: string | undefined = localeData?.[key];
-    if (!valueData) {
-      return `${locale}.${key}`;
-    }
-    // {0} {1} {2} to {args[0]} {args[1]} {args[2]}
-    return valueData.replace(/{(\d+)}/g, (match, number) => {
-      return typeof args[number] !== "undefined" ? args[number] : match;
-    });
+  public format(locale: Locale, key: STRING_KEYS, ...args: string[]): string {
+    let localeData: LocaleData | undefined = this.option.locales[locale];
+    localeData ??= this.option.locales[fallBackLocale];
+
+    return localeData?.[key]
+      ? localeData?.[key].replace(/{(\d+)}/g, (match, number) => {
+          return typeof args[number] !== "undefined" ? args[number] : match;
+        })
+      : `${locale}.${key}`;
   }
 
-  public addLocale(localeName: string, localeData: Locale): void {
-    this.option.locales[localeName] = localeData;
-  }
-
-  public getReusableFormatFunction(localeName: string): ReusableFormatFunction {
+  public getReusableFormatFunction(localeName: Locale): ReusableFormatFunc {
     return (key: STRING_KEYS, ...args: string[]): string => {
       return this.format(localeName, key, ...args);
     };
