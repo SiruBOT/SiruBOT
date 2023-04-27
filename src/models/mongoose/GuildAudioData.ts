@@ -1,14 +1,10 @@
-// Impl
-// queue: { type: Array, default: [] },
-// nowplaying: { type: Object, default: { track: null } },
-
-// nowplayingPosition: { type: Number, default: 0 }, Redis
 import { Document, Schema, model } from "mongoose";
-import { IGuildAudioData } from "../../../types/";
+import { GuildAudioData } from "@/types/models/audio";
 
-export interface GuildAudioDataDocument extends IGuildAudioData, Document {}
+export interface GuildAudioDataDocument extends GuildAudioData, Document {}
 
-const GuildAudioDataSchema: Schema<GuildAudioDataDocument> =
+export default model<GuildAudioData>(
+  "GuildAudioData",
   new Schema<GuildAudioDataDocument>(
     {
       discordGuildId: {
@@ -33,6 +29,5 @@ const GuildAudioDataSchema: Schema<GuildAudioDataDocument> =
       },
     },
     { timestamps: true }
-  );
-
-export default model<IGuildAudioData>("GuildAudioData", GuildAudioDataSchema);
+  )
+);
