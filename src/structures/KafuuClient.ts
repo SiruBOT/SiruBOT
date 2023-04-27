@@ -1,19 +1,23 @@
-import * as Discord from "discord.js";
-import path from "path";
+import Discord from "discord.js";
 import FastGlob from "fast-glob";
 import * as Sentry from "@sentry/node";
-import { BaseCommand } from "./";
 import type Cluster from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
-import type { IBootStrapperArgs, ISettings } from "../types";
+
+import { BaseCommand } from "./";
 import { AudioHandler } from "./audio/AudioHandler";
 import { BaseEvent, DatabaseHelper } from "./";
-import { MESSAGE_CACHE_SWEEPER_INTERVAL } from "../constant/ClientConstant";
-import { ClientStats } from "../types/ClientStats";
 
-class Client extends Discord.Client {
-  public settings: ISettings;
-  public bootStrapperArgs: IBootStrapperArgs;
+import type { KafuuBootStrapperArgs } from "@/types/bootstrapper";
+import { MESSAGE_CACHE_SWEEPER_INTERVAL } from "@/constants/time";
+import { ClientStats } from "@/types/stats";
+import { KafuuSettings } from "@/types/settings";
+import { generateGlobPattern } from "@/utils/formatter";
+import { join as joinPath } from "path";
+
+class KafuuClient extends Discord.Client {
+  public settings: KafuuSettings;
+  public bootStrapperArgs: KafuuBootStrapperArgs;
 
   public cluster?: Cluster.Client;
   public log: Logger;
@@ -29,8 +33,8 @@ class Client extends Discord.Client {
   public constructor(
     clientOptions: Discord.ClientOptions,
     log: Logger,
-    botSettings: ISettings,
-    bootStrapperArgs: IBootStrapperArgs
+    botSettings: KafuuSettings,
+    bootStrapperArgs: KafuuBootStrapperArgs
   ) {
     // Discord#ClientOptions
     super({
@@ -82,13 +86,6 @@ class Client extends Discord.Client {
     }
   }
 
-  public static generateGlobPattern(dirName: string): string {
-    return path // Create pattern for dirName files
-      .join(__dirname, "..", "..", "src", dirName, "**/*.js")
-      .split("\\")
-      .join("/");
-  }
-
   // When unhandled event error, log it and send it to Sentry
   private warpEventFunc(
     eventInstance: BaseEvent<keyof Discord.ClientEvents>
@@ -112,7 +109,7 @@ class Client extends Discord.Client {
   }
 
   private async loadEvents() {
-    const eventsPattern: string = Client.generateGlobPattern("events");
+    const eventsPattern: string = generateGlobPattern(joinPath(__dirname, "../"), "events");
     this.log.debug("Loading events with pattern: " + eventsPattern);
     const events: string[] = await FastGlob(eventsPattern);
     this.log.info(`Found ${events.length} events.`);
@@ -134,7 +131,7 @@ class Client extends Discord.Client {
   }
 
   private async loadCommands() {
-    const commandsPattern: string = Client.generateGlobPattern("commands");
+    const commandsPattern: string = generateGlobPattern(joinPath(__dirname, "../"), "commands");
 
     this.log.debug("Loading commands with pattern: " + commandsPattern);
     const commandFiles: string[] = await FastGlob(commandsPattern);
@@ -192,4 +189,4 @@ class Client extends Discord.Client {
   }
 }
 
-export { Client };
+export { KafuuClient };
