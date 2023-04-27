@@ -1,27 +1,34 @@
-import * as Discord from "discord.js";
-import * as Sentry from "@sentry/node";
-import type { Transaction } from "@sentry/types";
-import { type BaseCommand, BaseEvent, type Client } from "../structures";
+// Logger, Shoukaku Constants
 import { Logger } from "tslog";
-import { Guild } from "../database/mysql/entities";
-import { CommandPermissionChecker } from "../structures/CommandPermissionChecker";
-import { Span } from "@sentry/tracing";
-import locale from "../locales";
-import { CommandRequirements } from "../types/CommandTypes/CommandRequirements";
 import { Constants } from "shoukaku";
 
-export const SYSTEM_MESSAGE_EPHEMERAL = false;
-export const COMMAND_WARN_MESSAGE_EPHEMERAL = true;
+// import discord.js
+import * as Discord from "discord.js";
+// Import Sentry.io stuff
+import * as Sentry from "@sentry/node";
+import type { Transaction } from "@sentry/types";
+import { Span } from "@sentry/tracing";
 
-const eventName = "interactionCreate" as const;
-export default class InteractionCreateEvent extends BaseEvent<
-  typeof eventName
-> {
+// Import structures
+import { type BaseCommand, BaseEvent, type KafuuClient } from "@/structures";
+// Import database models
+import { TypeORMGuild } from "@/models/typeorm";
+// Import  command flags, permission checker
+import { getUserPermissions } from "@/utils/permission";
+import { KafuuCommandFlags } from "@/types/command";
+// Import bot constants
+import {
+  COMMAND_WARN_MESSAGE_EPHEMERAL,
+  SYSTEM_MESSAGE_EPHEMERAL,
+} from "@/constants/events/InteractionCreateEvent";
+// Import locales
+import { STRING_KEYS } from "@/types/locales";
+import { format } from "@/locales";
+
+export default class InteractionCreateEvent extends BaseEvent<"interactionCreate"> {
   private log: Logger;
-  private permChecker: CommandPermissionChecker;
-  constructor(client: Client) {
-    super(client, eventName);
-    this.permChecker = new CommandPermissionChecker(client);
+  constructor(client: KafuuClient) {
+    super(client, "interactionCreate");
     this.log = client.log.getChildLogger({
       name: client.log.settings.name + "/InteractionHandler",
     });
@@ -118,18 +125,19 @@ export default class InteractionCreateEvent extends BaseEvent<
         // 알수 없는 명령어에요.
         await interaction.reply({
           ephemeral: true,
-          content: locale.format(interaction.locale, "UNKNOWN_COMMAND"),
+          content: format(interaction.locale, "UNKNOWN_COMMAND"),
         });
         return;
       }
 
+      // 명령어가 길드에서 실행된게 아니라면
       if (!interaction.inGuild()) {
         span.setHttpStatus(500);
         span.setData("endReason", "notInGuild");
         span.finish();
         transaction.finish();
         await interaction.reply({
-          content: locale.format(interaction.locale, "NOT_IN_GUILD"),
+          content: format(interaction.locale, "NOT_IN_GUILD"),
         });
         return;
       }
@@ -141,12 +149,15 @@ export default class InteractionCreateEvent extends BaseEvent<
         );
         try {
           // 길드 가져오기 시도
-          await this.client.guilds.fetch(interaction.guildId);
+          this.client.guilds.cache.set(
+            interaction.guildId,
+            await this.client.guilds.fetch(interaction.guildId)
+          );
         } catch (error) {
           // 길드 가져오기에 실패했다면
           const excepId = Sentry.captureException(error);
           await interaction.reply({
-            content: locale.format(interaction.locale, "GUILD_CACHE_FAILED"),
+            content: format(interaction.locale, "GUILD_CACHE_FAILED"),
           });
           span.setHttpStatus(500);
           span.setData("endReason", "guildCacheFailed");
@@ -166,9 +177,7 @@ export default class InteractionCreateEvent extends BaseEvent<
         span.setHttpStatus(500);
         span.setData("endReason", "applicatonCommandOnly");
         transaction.finish();
-        await interaction.reply(
-          locale.format(interaction.locale, "BOT_INVITE_FIRST")
-        );
+        await interaction.reply(format(interaction.locale, "BOT_INVITE_FIRST"));
         return;
       }
       //#endregion
@@ -188,12 +197,15 @@ export default class InteractionCreateEvent extends BaseEvent<
         const permStr = missingPermissions
           .map(
             // 현지화된 이름으로 권한 이름을 바꿔줌
-            (e) => "``" + locale.format(interaction.locale, "PERM_" + e) + "``"
+            (e) =>
+              "``" +
+              format(interaction.locale, ("PERM_" + e) as STRING_KEYS) +
+              "``"
           )
           .join(", ");
         await interaction.reply({
           ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
-          content: locale.format(
+          content: format(
             interaction.locale,
             "MISSING_BOT_PERMISSIONS",
             permStr
@@ -210,7 +222,7 @@ export default class InteractionCreateEvent extends BaseEvent<
       //#endregion
 
       //#region  Check member, guild config
-      const guildConfig: Guild =
+      const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId
         );
@@ -226,9 +238,10 @@ export default class InteractionCreateEvent extends BaseEvent<
       //#endregion
 
       //#region  Check user permission
-      const userPermissions = await this.permChecker.getUserPermissions({
+      const userPermissions = await getUserPermissions({
         guildMember: member,
         guildConfig,
+        client: this.client,
       });
       if (
         command.permissions.some((e) =>
@@ -246,19 +259,22 @@ export default class InteractionCreateEvent extends BaseEvent<
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content:
             userPermissions.notFulfilledPermissions.length === 1 // 필요한 권한이 1개라면
-              ? locale.format(
+              ? format(
                   interaction.locale, // 단일 구문으로 출력 (ex: COMMAND_MISSING_USER_DJ
-                  "COMMAND_MISSING_USER_PERMISSION_" +
-                    userPermissions.notFulfilledPermissions[0]
+                  ("COMMAND_MISSING_USER_PERMISSION_" +
+                    userPermissions.notFulfilledPermissions[0]) as STRING_KEYS
                 )
-              : locale.format(
+              : format(
                   interaction.locale, // 여러개라면 (ex: COMMAND_MISSING_USER_PERMISSIONS
                   "COMMAND_MISSING_USER_PERMISSIONS",
                   userPermissions.notFulfilledPermissions
                     .map(
                       (e) =>
                         "``" +
-                        locale.format(interaction.locale, "PERMISSIONS_" + e) +
+                        format(
+                          interaction.locale,
+                          ("PERMISSIONS_" + e) as STRING_KEYS
+                        ) +
                         "``" // 권한 이름을 현지화
                     )
                     .join(", ")
@@ -294,7 +310,7 @@ export default class InteractionCreateEvent extends BaseEvent<
           transaction.finish();
           await interaction.reply({
             ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-            content: locale.format(
+            content: format(
               interaction.locale,
               "DEFAULT_TEXT_CHANNEL",
               defaultTextChannel.id
@@ -314,7 +330,7 @@ export default class InteractionCreateEvent extends BaseEvent<
           transaction.finish();
           await interaction.reply({
             ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-            content: locale.format(
+            content: format(
               interaction.locale,
               "DEFAULT_VOICE_CHANNEL",
               defaultVoiceChannel.id
@@ -329,7 +345,7 @@ export default class InteractionCreateEvent extends BaseEvent<
       const commandRequirements = command.requirements;
       //#region 오디오 노드 있을때만 사용 가능한 명령어 처리
       if (
-        commandRequirements & CommandRequirements.AUDIO_NODE &&
+        commandRequirements & KafuuCommandFlags.AUDIO_NODE &&
         [...this.client.audio.nodes.values()].filter(
           (e) => e.state == Constants.State.CONNECTED
         ).length == 0
@@ -339,7 +355,7 @@ export default class InteractionCreateEvent extends BaseEvent<
         transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-          content: locale.format(interaction.locale, "NO_NODES_AVAILABLE"),
+          content: format(interaction.locale, "NO_NODES_AVAILABLE"),
         });
         return;
       }
@@ -347,7 +363,7 @@ export default class InteractionCreateEvent extends BaseEvent<
 
       //#region 노래 재생 중에만 사용 가능한 명령어 처리
       if (
-        commandRequirements & CommandRequirements.TRACK_PLAYING &&
+        commandRequirements & KafuuCommandFlags.TRACK_PLAYING &&
         !this.client.audio.hasPlayerDispatcher(interaction.guildId)
       ) {
         span.setData("endReason", "availableOnlyPlaying");
@@ -355,7 +371,7 @@ export default class InteractionCreateEvent extends BaseEvent<
         transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-          content: locale.format(interaction.locale, "AVAILABLE_ONLY_PLAYING"),
+          content: format(interaction.locale, "AVAILABLE_ONLY_PLAYING"),
         });
         return;
       }
@@ -363,7 +379,7 @@ export default class InteractionCreateEvent extends BaseEvent<
 
       //#region 사용자가 음성 채널에 접속했을 떄에 사용 가능한 명령어
       if (
-        commandRequirements & CommandRequirements.VOICE_CONNECTED &&
+        commandRequirements & KafuuCommandFlags.VOICE_CONNECTED &&
         !member.voice.channelId
       ) {
         span.setData("endReason", "availableOnlyVoice");
@@ -371,7 +387,7 @@ export default class InteractionCreateEvent extends BaseEvent<
         transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-          content: locale.format(interaction.locale, "JOIN_VOICE_FIRST"),
+          content: format(interaction.locale, "JOIN_VOICE_FIRST"),
         });
         return;
       }
@@ -379,7 +395,7 @@ export default class InteractionCreateEvent extends BaseEvent<
 
       //#region  같은 음성 채널에 접속해있는지 확인
       if (
-        commandRequirements & CommandRequirements.VOICE_SAME_CHANNEL &&
+        commandRequirements & KafuuCommandFlags.VOICE_SAME_CHANNEL &&
         member.voice.channelId &&
         interaction.guild.members.me.voice.channelId &&
         member.voice.channelId !== interaction.guild.members.me.voice.channelId
@@ -389,7 +405,7 @@ export default class InteractionCreateEvent extends BaseEvent<
         transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-          content: locale.format(
+          content: format(
             interaction.locale,
             "SAME_VOICE_CHANNEL",
             interaction.guild.members.me.voice.channelId
@@ -401,7 +417,7 @@ export default class InteractionCreateEvent extends BaseEvent<
 
       //#region 듣기 켜져있는지 확인
       if (
-        commandRequirements & CommandRequirements.LISTEN_STATUS &&
+        commandRequirements & KafuuCommandFlags.LISTEN_STATUS &&
         member.voice.channelId &&
         member.voice.deaf
       ) {
@@ -410,7 +426,7 @@ export default class InteractionCreateEvent extends BaseEvent<
         transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-          content: locale.format(interaction.locale, "LISTEN_FIRST"),
+          content: format(interaction.locale, "LISTEN_FIRST"),
         });
         return;
       }
@@ -442,7 +458,7 @@ export default class InteractionCreateEvent extends BaseEvent<
       const exceptionId: string = Sentry.captureException(error);
       const payload: Discord.InteractionReplyOptions = {
         ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "COMMAND_HANDLE_ERROR"),
+        content: format(interaction.locale, "COMMAND_HANDLE_ERROR"),
       };
       span.setData("endReason", "error");
       span.setData("exceptionId", exceptionId);
