@@ -1,6 +1,6 @@
 {
   "name": "sirubot",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
@@ -17,6 +17,7 @@
     "fast-glob": "^3.2.11",
     "fastify": "^4.15.0",
     "git-last-commit": "^1.0.1",
+    "module-alias": "^2.2.2",
     "mongoose": "^6.2.6",
     "mysql2": "^3.2.0",
     "node-vibrant": "^3.2.1-alpha.1",
@@ -24,7 +25,7 @@
     "shoukaku": "^3.3.1",
     "slyrics": "^1.0.2",
     "tslog": "^3.3.2",
-    "typeorm": "^0.3.12",
+    "typeorm": "^0.3.15",
     "undici": "^4.15.1",
     "yaml": "^1.10.2"
   },
@@ -35,8 +36,9 @@
     "@types/node": "^18.15.5",
     "@types/node-fetch": "^2.6.1",
     "@types/yaml": "^1.9.7",
-    "@typescript-eslint/eslint-plugin": "^5.15.0",
-    "@typescript-eslint/parser": "^5.15.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@typescript-eslint/scope-manager": "^5.59.1",
     "del": "^6.0.0",
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
@@ -46,7 +48,7 @@
     "gulp": "^4.0.2",
     "prettier": "^2.6.0",
     "tsc-watch": "^4.6.2",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   },
   "scripts": {
     "lint": "eslint --ext .ts ./src",
@@ -57,6 +59,15 @@
     "build:deploy": "yarn run build:ts && yarn run deploy:commands",
     "deploy:clean": "node ./build -d -r -c settings.yaml -clean",
     "deploy:commands": "node ./build -d -r -c settings.yaml"
+  },
+  "_moduleAliases": {
+    "@/": "build/src",
+    "@/utils": "build/src/utils",
+    "@/constants": "build/src/constants",
+    "@/structures": "build/src/structures",
+    "@/types": "build/src/types",
+    "@/locales": "build/src/locales",
+    "@/models": "build/src/models"
   },
   "repository": {
     "type": "git",

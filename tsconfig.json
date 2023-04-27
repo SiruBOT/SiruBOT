@@ -3,22 +3,25 @@
         "target": "ESNext",
         "module": "CommonJS",
         "sourceMap": true,
-        "noImplicitAny": true,
         "strict": true,
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "outDir": "./build",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "outDir": "./build",
         "strictPropertyInitialization": false,
         "noImplicitOverride": true,
         "baseUrl": ".",
+        "lib": ["ESNext"],
         "paths": {
             "@/*": ["src/*"],
             "@/utils/*": ["src/utils/*"],
             "@/constants/*": ["src/constants/*"],
-            "@/structures/*": ["src/structures/*"]
+            "@/structures/*": ["src/structures/*"],
+            "@/models/*": ["src/models/*"],
+            "@/types/*": ["src/types/*"],
+            "@/locales/*": ["src/locales/*"]
         }
     },
     "include": [
