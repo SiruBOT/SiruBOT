@@ -1,16 +1,15 @@
 import { GuildMember, Collection, Role } from "discord.js";
-import { PermissionFilterContext } from "../../structures/CommandPermissionChecker";
-import { CommandPermissions } from "./CommandPermissions";
+import {
+  KafuuCommandPermission,
+  KafuuCommandPermissionCheckContext,
+  KafuuCommandPermissionCheckOptions,
+  KafuuPermissionCheckResult,
+} from "@/types/command";
 
-/**
- *  CommandPermissionConditions
- * @param {PermissionFilterContext} ctx - 확인할 역할이 포함되어있는 Context
- * @returns {Promise<boolean>}
- */
-export async function CommandPermissionConditions(
-  ctx: PermissionFilterContext
+export async function KafuuCommandPermissionCondition(
+  ctx: KafuuCommandPermissionCheckContext
 ): Promise<boolean> {
-  const { ADMIN, BOTOWNER, DJ, EVERYONE } = CommandPermissions;
+  const { ADMIN, BOTOWNER, DJ, EVERYONE } = KafuuCommandPermission;
 
   switch (ctx.permission) {
     case ADMIN:
@@ -46,4 +45,28 @@ export async function CommandPermissionConditions(
     case EVERYONE: // 항상 True
       return true;
   } // Switch-Case 의 끝
+}
+
+/**
+ *  Check if the user has the required permissions
+ */
+export async function getUserPermissions(
+  options: KafuuCommandPermissionCheckOptions
+): Promise<KafuuPermissionCheckResult> {
+  const notFulfilledPermissions: KafuuCommandPermission[] = [];
+  const fulfilledPermissions: KafuuCommandPermission[] = [];
+  for (const perm of Object.keys(
+    KafuuCommandPermission
+  ) as KafuuCommandPermission[]) {
+    const checkRes: boolean = await KafuuCommandPermissionCondition({
+      ...options,
+      permission: perm,
+    });
+    if (!checkRes) notFulfilledPermissions.push(perm);
+    else fulfilledPermissions.push(perm);
+  }
+  return {
+    notFulfilledPermissions,
+    fulfilledPermissions,
+  };
 }

@@ -11,13 +11,8 @@ import {
   ComponentType,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import {
-  EMOJI_NEXT,
-  EMOJI_PREV,
-  EMOJI_STOP,
-} from "../constant/MessageConstant";
-import { PAGINATION_AWAIT_TIMEOUT } from "../constant/TimeConstant";
-import { MessageUtil } from "./MessageUtil";
+import { EMOJI_NEXT, EMOJI_PREV, EMOJI_STOP } from "@/constants/message";
+import { PAGINATION_AWAIT_TIMEOUT } from "@/constants/time";
 
 export type PageFnReturn = InteractionUpdateOptions | string;
 
@@ -89,7 +84,7 @@ export class Paginator {
 
   public async start(interaction: CommandInteraction<"cached">): Promise<void> {
     const page = await this.pageFn(this.currentPage, this.totalPages, this);
-    this.baseMessage = await MessageUtil.followUpOrEditReply(
+    this.baseMessage = await this.followUpOrEditReply(
       interaction,
       this.pagePayload(page) as InteractionReplyOptions
     );
@@ -186,6 +181,16 @@ export class Paginator {
       } else {
         throw error;
       }
+    }
+  }
+  private followUpOrEditReply(
+    interaction: CommandInteraction<"cached">,
+    payload: InteractionReplyOptions
+  ) {
+    if (interaction.replied) {
+      return interaction.editReply(payload);
+    } else {
+      return interaction.followUp(payload);
     }
   }
 }
