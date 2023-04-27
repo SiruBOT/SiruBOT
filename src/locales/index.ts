@@ -1,15 +1,22 @@
-import { LocalePicker } from "./LocalePicker";
-import en from "./en.json";
+import { LocalePicker } from "@/locales/LocalePicker";
+import { LocaleObject } from "@/types/locales";
 import ko from "./ko.json";
+import en from "./en.json";
 
 export const locales = {
-  en,
-  ko,
+  ko: ko,
+  en: en,
 };
 
-const picker: LocalePicker = new LocalePicker({
-  fallBackLocale: "ko",
-  locales,
+export const fallBackLocale = "ko" as const;
+
+const picker =  new LocalePicker({
+  fallBackLocale,
+  locales: locales as unknown as LocaleObject,
 });
 
-export default picker;
+
+
+export const format = picker.format.bind(picker);
+// export const = picker.
+export const getReusableFormatFunction = picker.getReusableFormatFunction.bind(picker);
