@@ -9,8 +9,7 @@
   "extends": [
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
-    "plugin:security/recommended",
-    "plugin:@typescript-eslint/scope-manager"
+    "plugin:security/recommended"
   ],
   "rules": {
     "prettier/prettier": [
