@@ -2210,11 +2210,6 @@ gifwrap@^0.9.2:
     image-q "^4.0.0"
     omggif "^1.0.10"
 
-git-last-commit@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/git-last-commit/-/git-last-commit-1.0.1.tgz#749323f09e8317c2c2878f99eeffff33650c3d57"
-  integrity sha512-FDSgeMqa7GnJDxt/q0AbrxbfeTyxp4ImxEw1e4nw6NUHA5FMhFUq33dTXI4Xdgcj1VQ1q5QLWF6WxFrJ8KCBOg==
-
 glob-parent@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-3.1.0.tgz#9e6af6299d8d3bd2bd40430832bd113df906c5ae"

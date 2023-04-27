@@ -1,6 +1,5 @@
 import Vibrant from "node-vibrant";
 import { EmbedBuilder, ColorResolvable, EmbedFooterOptions } from "discord.js";
-import { getLastCommit } from "git-last-commit";
 import { ShoukakuTrackInfo } from "shoukaku";
 
 import { ReusableFormatFunc } from "@/types/locales";
@@ -14,18 +13,14 @@ import {
   emojiProgressBar,
 } from "@/utils/formatter";
 
+import { getGitHash } from "@/utils/version";
 import { version } from "../../package.json";
 
+const versionInfo = `${version} (${getGitHash()})`;
+
 export class ExtendedEmbed extends EmbedBuilder {
-  private versionInfo: string;
   constructor() {
     super();
-    this.versionInfo = version;
-    getLastCommit((err, commit) => {
-      if (!err)
-        this.versionInfo = `${version} (${commit.branch}-${commit.shortHash})`;
-      else throw err;
-    });
   }
 
   // TODO: Experimental
@@ -45,9 +40,13 @@ export class ExtendedEmbed extends EmbedBuilder {
     return this;
   }
 
-  public override setFooter(options: EmbedFooterOptions | null): this {
+  public override setFooter(options?: EmbedFooterOptions | null): this {
     if (options?.text) {
-      options.text = options.text + " | " + BOT_NAME + " " + this.versionInfo;
+      options.text = options.text + " | " + BOT_NAME + " " + versionInfo;
+    } else {
+      options = {
+        text: BOT_NAME + " " + versionInfo,
+      };
     }
     super.setFooter(options);
     return this;
