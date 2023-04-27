@@ -7,19 +7,17 @@ import {
   BaseEntity,
   Unique,
 } from "typeorm";
-import { RepeatMode } from "../../../types";
+import { KafuuRepeatMode } from "@/types/audio";
+import { Locale } from "discord.js";
 
 @Entity()
 @Unique(["discordGuildId"])
-export class Guild extends BaseEntity {
+export class TypeORMGuild extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") // Internal id
   uuid: string;
 
   @Column({ name: "discord_guild_id" }) // Discord Guild ID
   discordGuildId: string;
-
-  @Column({ name: "guild_locale", default: "ko" })
-  guildLocale: string;
 
   @Column({
     type: "text",
@@ -37,6 +35,14 @@ export class Guild extends BaseEntity {
   }) // Default voice channel
   textChannelId: string | null;
 
+  @Column({
+    type: "text",
+    name: "guild_locale",
+    nullable: false,
+    default: "ko",
+  })
+  guildLocale: Locale;
+
   @Column({ name: "send_audio_messages", default: true }) // Send message when a song updates
   sendAudioMessages: boolean;
 
@@ -44,7 +50,7 @@ export class Guild extends BaseEntity {
   djRoleId: string | null;
 
   @Column({ default: 0 }) // 0 = disabled, 1 = repeat all, 2 = repeat single
-  repeat: RepeatMode;
+  repeat: KafuuRepeatMode;
 
   @Column({ name: "play_related", default: false }) // Play related songs
   playRelated: boolean;

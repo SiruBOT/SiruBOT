@@ -10,7 +10,7 @@ import {
 
 @Entity()
 @Unique(["discordUserId"])
-export class User extends BaseEntity {
+export class TypeORMUser extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") // Internal id
   uuid: string;
 

@@ -9,7 +9,7 @@ import {
 
 @Entity()
 @Unique(["id"])
-export class Metrics extends BaseEntity {
+export class TypeORMMetrics extends BaseEntity {
   @PrimaryGeneratedColumn("increment") // Internal id
   id: number;
 
