@@ -1,19 +1,21 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../structures";
-import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import { ILyricsSearchResult, MelonProvider } from "slyrics";
-import locale from "../../locales";
 import { AutocompleteInteraction, CacheType } from "discord.js";
-import { EmbedFactory } from "../../utils";
-import { AUTOCOMPLETE_MAX_RESULT } from "../../constant/MessageConstant";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+import { SlashCommandBuilder } from "@discordjs/builders";
+
+import { ILyricsSearchResult, MelonProvider } from "slyrics";
+
+import { BaseCommand, KafuuClient } from "@/structures";
+import {
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { EmbedFactory } from "@/utils/embed";
+import { AUTOCOMPLETE_MAX_RESULT } from "@/constants/message";
+import { format } from "@/locales";
 
 export default class LyricsCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("lyrics")
       .setNameLocalizations({
@@ -31,7 +33,7 @@ export default class LyricsCommand extends BaseCommand {
           })
           .setDescription("Query to search")
           .setDescriptionLocalizations({
-            ko: "검색할 노래의 이름을 입력해주세요. 검색어에 아티스트명이 포함되어있다면 정확도가 높아져요.",
+            ko: "검색할 노래의 이름을 입력해주세요, 검색어에 아티스트명이 포함되어 있다면 정확도가 높아져요.",
           })
           .setAutocomplete(true)
           .setRequired(true);
@@ -39,16 +41,16 @@ export default class LyricsCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     await interaction.deferReply();
     if (!interaction.isChatInputCommand()) return;
     const query: string = interaction.options.getString("query", true);
@@ -56,7 +58,7 @@ export default class LyricsCommand extends BaseCommand {
     const searchResult: ILyricsSearchResult = await provider.search(query);
     if (searchResult.entries.length <= 0) {
       await interaction.editReply(
-        locale.format(interaction.locale, "LYRICS_NOT_FOUND")
+        format(interaction.locale, "LYRICS_NOT_FOUND")
       );
       return;
     }
@@ -69,7 +71,7 @@ export default class LyricsCommand extends BaseCommand {
     // 결과 텍스트
     let resultText =
       lyrics.lyrics ??
-      locale.format(
+      format(
         interaction.locale,
         "LYRICS_NAN",
         lyrics.artist + "-" + lyrics.title
@@ -77,7 +79,7 @@ export default class LyricsCommand extends BaseCommand {
 
     // 가사가 길다면 링크로 대체
     if (lyrics.lyrics?.length && lyrics.lyrics.length > 2048)
-      resultText = locale.format(
+      resultText = format(
         interaction.locale,
         "LYRICS_TOO_LONG",
         lyrics.artist + "-" + lyrics.title,
@@ -95,7 +97,7 @@ export default class LyricsCommand extends BaseCommand {
     if (!query)
       return await interaction.respond([
         {
-          name: locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
+          name: format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
           value: "",
         },
       ]);

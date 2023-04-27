@@ -1,14 +1,14 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../structures";
+import { BaseCommand, KafuuClient } from "@/structures";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
 
 export default class LyricsCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("melonchart")
       .setNameLocalizations({
@@ -21,16 +21,16 @@ export default class LyricsCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     await interaction.deferReply();
   }
 }

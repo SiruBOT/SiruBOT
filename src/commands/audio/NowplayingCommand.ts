@@ -1,11 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../structures";
-import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import locale from "../../locales";
+import { BaseCommand, KafuuClient } from "@/structures";
+
+import { format } from "@/locales";
 import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import {
   ActionRowBuilder,
@@ -14,12 +10,18 @@ import {
   ButtonInteraction,
   InteractionUpdateOptions,
   InteractionReplyOptions,
+  Locale,
 } from "discord.js";
-import { EMOJI_REFRESH, EMOJI_STAR } from "../../constant/MessageConstant";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+import { EMOJI_REFRESH, EMOJI_STAR } from "@/constants/message";
+import {
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
 
 export default class NowplayingCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("nowplaying")
       .setNameLocalizations({
@@ -32,16 +34,16 @@ export default class NowplayingCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
       ["SendMessages", "EmbedLinks"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     await interaction.reply(
       await this.getNowplayingPayload(
         interaction.guildId,
@@ -92,14 +94,12 @@ export default class NowplayingCommand extends BaseCommand {
   ): Promise<InteractionUpdateOptions & InteractionReplyOptions> {
     return {
       components: [this.buildActionRow()],
-      content: dispatcher
-        ? locale.format(
-            localeName,
-            "NOWPLAYING_TITLE",
-            dispatcher.player.connection.channelId ?? "0"
-          )
-        : "",
-      embeds: [await this.client.audio.getNowPlayingEmbed(guildId, localeName)],
+      embeds: [
+        await this.client.audio.getNowPlayingEmbed(
+          guildId,
+          localeName as Locale
+        ),
+      ],
       fetchReply: true,
     };
   }

@@ -1,33 +1,40 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+// Import Sentry, discord.js, undici, shoukaku, @discordjs/builders
 import * as Sentry from "@sentry/node";
 import * as Discord from "discord.js";
+import { fetch } from "undici";
 import { Track } from "shoukaku";
-import { BaseCommand, Client } from "../../structures";
+import { SlashCommandBuilder } from "@discordjs/builders";
+// Import structures
+import { BaseCommand, KafuuClient } from "@/structures";
+import { PlayerDispatcher } from "@/structures/audio";
+import { format, getReusableFormatFunction } from "@/locales";
+// Import types
 import {
-  CommandCategories,
-  CommandPermissions,
-  IAudioTrack,
-  ICommandContext,
-  IGuildAudioData,
-  VoiceConnectedGuildMemberVoiceState,
-} from "../../types";
-import locale from "../../locales";
-import { isURL, Formatter, EmbedFactory } from "../../utils";
-import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { VoiceConnectedGuildMemberVoiceState } from "@/types/member";
+import { KafuuAudioTrack } from "@/types/audio";
+import { GuildAudioData } from "@/types/models/audio";
+import { STRING_KEYS } from "@/types/locales";
+// Import utils
+import { isURL } from "@/utils/url";
+import { formatTrack } from "@/utils/formatter";
+import { EmbedFactory } from "@/utils/embed";
+import { ExtendedEmbed } from "@/utils/embed";
+
 import {
   AUTOCOMPLETE_MAX_RESULT,
   EMOJI_INBOX_TRAY,
   EMOJI_X,
-} from "../../constant/MessageConstant";
-import { BUTTON_AWAIT_TIMEOUT } from "../../constant/TimeConstant";
-import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
-import { ButtonStyle, ComponentType } from "discord.js";
-import { fetch } from "undici";
-import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../events/InteractionCreateEvent";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+} from "@/constants/message";
+import { BUTTON_AWAIT_TIMEOUT } from "@/constants/time";
+import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
 
 export default class PlayCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("play")
       .setNameLocalizations({
@@ -65,18 +72,18 @@ export default class PlayCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.AUDIO_NODE |
-        CommandRequirements.VOICE_SAME_CHANNEL |
-        CommandRequirements.LISTEN_STATUS,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.AUDIO_NODE |
+        KafuuCommandFlags.VOICE_SAME_CHANNEL |
+        KafuuCommandFlags.LISTEN_STATUS,
       ["SendMessages", "Connect", "Speak", "EmbedLinks"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext<true>): Promise<void> {
+  }: KafuuCommandContext<true>): Promise<void> {
     // Handle play command
     const query: string = interaction.options.getString("query", true);
     // AutoComplete 값 없는 경우 required여도 빈 값이 넘어올 수 있음
@@ -84,8 +91,7 @@ export default class PlayCommand extends BaseCommand {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
         content:
-          "> " +
-          locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
+          "> " + format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
       });
       return;
     }
@@ -104,13 +110,11 @@ export default class PlayCommand extends BaseCommand {
         // Handle joinChannel exception
         const exceptionId: string = Sentry.captureException(error);
         await interaction.editReply(
-          locale.format(interaction.locale, "FAILED_JOIN", exceptionId)
+          format(interaction.locale, "FAILED_JOIN", exceptionId)
         );
       }
     }
-    await interaction.reply(
-      locale.format(interaction.locale, "PLAY_SEARCHING")
-    );
+    await interaction.reply(format(interaction.locale, "PLAY_SEARCHING"));
     // Get dispatcher
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
@@ -126,12 +130,12 @@ export default class PlayCommand extends BaseCommand {
     switch (searchResult.loadType) {
       case "LOAD_FAILED":
         await interaction.editReply({
-          content: locale.format(interaction.locale, "LOAD_FAILED"),
+          content: format(interaction.locale, "LOAD_FAILED"),
         });
         break;
       case "NO_MATCHES":
         await interaction.editReply({
-          content: locale.format(interaction.locale, "NO_MATCHES"),
+          content: format(interaction.locale, "NO_MATCHES"),
         });
         break;
       // Playlist Handle
@@ -139,19 +143,19 @@ export default class PlayCommand extends BaseCommand {
         // Only playlist url
         if (searchResult.playlistInfo?.selectedTrack === -1) {
           await interaction.editReply({
-            content: locale.format(
+            content: format(
               interaction.locale,
               "PLAYLIST_ADD",
               searchResult.playlistInfo?.name ??
-                locale.format(interaction.locale, "UNKNOWN"),
+                format(interaction.locale, "UNKNOWN"),
               searchResult.tracks.length.toString()
             ),
           });
           await dispatcher.addTracks(
             searchResult.tracks.map((e: Track) => {
               return {
-                track: e,
-                requesterUserId: interaction.user.id,
+                ...e,
+                requestUserId: interaction.user.id,
                 relatedTrack: false,
                 repeated: false,
               };
@@ -159,7 +163,7 @@ export default class PlayCommand extends BaseCommand {
           );
         } else {
           // Handles videoId with playlistId
-          const guildAudioData: IGuildAudioData =
+          const guildAudioData: GuildAudioData =
             await dispatcher.queue.getGuildAudioData();
           // Selected track
           const selectedTrack: number =
@@ -176,21 +180,15 @@ export default class PlayCommand extends BaseCommand {
               guildAudioData.nowPlaying,
               guildAudioData.queue.length
             ) === "WILL_PLAYING"
-              ? locale.format(
+              ? format(
                   interaction.locale,
                   "WILL_PLAYING",
-                  Formatter.formatTrack(
-                    track,
-                    locale.format(interaction.locale, "LIVESTREAM")
-                  )
+                  formatTrack(track, format(interaction.locale, "LIVESTREAM"))
                 )
-              : locale.format(
+              : format(
                   interaction.locale,
                   "ENQUEUED_TRACK",
-                  Formatter.formatTrack(
-                    track,
-                    locale.format(interaction.locale, "LIVESTREAM")
-                  ),
+                  formatTrack(track, format(interaction.locale, "LIVESTREAM")),
                   (guildAudioData.queue.length + 1).toString()
                 );
           // Set Custom Id
@@ -202,11 +200,11 @@ export default class PlayCommand extends BaseCommand {
               new Discord.ButtonBuilder()
                 .setCustomId(okButtonCustomId)
                 .setEmoji(EMOJI_INBOX_TRAY)
-                .setStyle(ButtonStyle.Secondary),
+                .setStyle(Discord.ButtonStyle.Secondary),
               new Discord.ButtonBuilder()
                 .setCustomId(noButtonCustomId)
                 .setEmoji(EMOJI_X)
-                .setStyle(ButtonStyle.Secondary)
+                .setStyle(Discord.ButtonStyle.Secondary)
             );
           // Question message
           const promptMessage: Discord.Message = await interaction.editReply({
@@ -214,9 +212,9 @@ export default class PlayCommand extends BaseCommand {
             components: [actionRow],
             embeds: [
               EmbedFactory.createEmbed()
-                .setTitle(locale.format(interaction.locale, "PLAYLIST"))
+                .setTitle(format(interaction.locale, "PLAYLIST"))
                 .setDescription(
-                  locale.format(
+                  format(
                     interaction.locale,
                     "INCLUDES_PLAYLIST",
                     slicedPlaylist.length.toString()
@@ -227,8 +225,8 @@ export default class PlayCommand extends BaseCommand {
           });
           // Add selected track without playlist
           await dispatcher.addTrack({
-            track,
-            requesterUserId: interaction.user.id,
+            ...track,
+            requestUserId: interaction.user.id,
             relatedTrack: false,
             repeated: false,
           });
@@ -246,7 +244,7 @@ export default class PlayCommand extends BaseCommand {
           try {
             const collectorInteraction: Discord.ButtonInteraction<Discord.CacheType> =
               await interaction.channel.awaitMessageComponent({
-                componentType: ComponentType.Button,
+                componentType: Discord.ComponentType.Button,
                 filter: buttonCollectorFilter,
                 time: BUTTON_AWAIT_TIMEOUT,
               });
@@ -266,13 +264,13 @@ export default class PlayCommand extends BaseCommand {
                   components: [],
                   embeds: [
                     EmbedFactory.createEmbed()
-                      .setTitle(locale.format(interaction.locale, "PLAYLIST"))
+                      .setTitle(format(interaction.locale, "PLAYLIST"))
                       .setDescription(
-                        locale.format(
+                        format(
                           interaction.locale,
                           "PLAYLIST_ADDED_NOEMOJI",
                           searchResult.playlistInfo?.name ??
-                            locale.format(interaction.locale, "UNKNOWN"),
+                            format(interaction.locale, "UNKNOWN"),
                           slicedPlaylist.length.toString()
                         )
                       )
@@ -283,8 +281,8 @@ export default class PlayCommand extends BaseCommand {
                 await dispatcher.addTracks(
                   slicedPlaylist.map((e: Track) => {
                     return {
-                      track: e,
-                      requesterUserId: interaction.user.id,
+                      ...e,
+                      requestUserId: interaction.user.id,
                       relatedTrack: false,
                       repeated: false,
                     };
@@ -321,26 +319,26 @@ export default class PlayCommand extends BaseCommand {
       // Enqueue first of search result or track
       case "SEARCH_RESULT":
       case "TRACK_LOADED":
-        const guildAudioData: IGuildAudioData =
+        const guildAudioData: GuildAudioData =
           await dispatcher.queue.getGuildAudioData();
-        const addTo: IAudioTrack = {
-          requesterUserId: interaction.user.id,
-          track: searchResult.tracks[0],
+        const addTo: KafuuAudioTrack = {
+          requestUserId: interaction.user.id,
+          ...searchResult.tracks[0],
           relatedTrack: false,
           repeated: false,
         };
         const trackEmbed: ExtendedEmbed = await EmbedFactory.getTrackEmbed(
           this.client,
-          locale.getReusableFormatFunction(interaction.locale),
+          getReusableFormatFunction(interaction.locale),
           addTo
         );
         await interaction.editReply({
-          content: locale.format(
+          content: format(
             interaction.locale,
-            this.willPlayingOrEnqueued(
+            (this.willPlayingOrEnqueued(
               guildAudioData.nowPlaying,
               guildAudioData.queue.length
-            ) + "_TITLE",
+            ) + "_TITLE") as STRING_KEYS,
             (guildAudioData.queue.length + 1).toString()
           ),
           embeds: [trackEmbed],
@@ -351,7 +349,7 @@ export default class PlayCommand extends BaseCommand {
   }
 
   private willPlayingOrEnqueued(
-    nowplaying: IAudioTrack | null,
+    nowplaying: KafuuAudioTrack | null,
     queueLength: number
   ): string {
     const localeKey: string =
@@ -367,7 +365,7 @@ export default class PlayCommand extends BaseCommand {
     if (!query) {
       await interaction.respond([
         {
-          name: locale.format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
+          name: format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_QUERY"),
           value: "",
         },
       ]);

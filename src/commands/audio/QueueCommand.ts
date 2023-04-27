@@ -1,26 +1,28 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../structures";
-import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
+import { SlashCommandBuilder } from "discord.js";
+
+import { BaseCommand, KafuuClient } from "@/structures";
+import { PlayerDispatcher } from "@/structures/audio";
+import { EMOJI_PLAY_STATE, EMOJI_REPEAT } from "@/constants/message";
 import {
-  CommandCategories,
-  CommandPermissions,
-  IAudioTrack,
-  ICommandContext,
-  IGuildAudioData,
-} from "../../types";
-import { Guild } from "../../database/mysql/entities/Guild";
-import { EmbedFactory, Formatter } from "../../utils";
-import { ArrayUtil } from "../../utils/ArrayUtil";
-import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
-import { Paginator } from "../../utils/Paginator";
-import locale from "../../locales";
-import { EMOJI_PLAY_STATE, EMOJI_REPEAT } from "../../constant/MessageConstant";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { GuildAudioData } from "@/types/models/audio";
+import { TypeORMGuild } from "@/models/typeorm";
+import { ExtendedEmbed, EmbedFactory } from "@/utils/embed";
+import { Paginator } from "@/utils/paginator";
+import { chunkArray } from "@/utils/array";
+import { formatTrack, humanizeSeconds, volumeEmoji } from "@/utils/formatter";
+import { KafuuAudioTrack } from "@/types/audio";
+import { STRING_KEYS } from "@/types/locales";
+import { format } from "@/locales";
 
 const SPLIT_SIZE = 10;
 
 export default class QueueCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("queue")
       .setNameLocalizations({
@@ -33,20 +35,20 @@ export default class QueueCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     // 큐가 없으면 nowplaying 있는지 확인하고 nowplaying보내기
-    const audioData: IGuildAudioData =
+    const audioData: GuildAudioData =
       await dispatcher.queue.getGuildAudioData();
     const { queue } = audioData;
     // trackplaying 이 true이기 때문에 nowplaying 은 체크할 필요 없음
@@ -56,13 +58,13 @@ export default class QueueCommand extends BaseCommand {
         baseCustomId: "queue_command",
         // Page Clousure Function
         pageFn: async (page: number, maxPage: number) => {
-          const audioData: IGuildAudioData =
+          const audioData: GuildAudioData =
             await dispatcher.queue.getGuildAudioData();
-          const guildConfig: Guild =
+          const guildConfig: TypeORMGuild =
             await this.client.databaseHelper.upsertAndFindGuild(
               interaction.guildId
             );
-          const chunked: IAudioTrack[][] = ArrayUtil.chunkArray(
+          const chunked: KafuuAudioTrack[][] = chunkArray(
             audioData.queue,
             SPLIT_SIZE
           );
@@ -71,32 +73,30 @@ export default class QueueCommand extends BaseCommand {
               // index = 1 ~ 10
               // page = 1 ~ end
               return `\`\`#${index + 1 + (page - 1) * 10} [${
-                track.track.info.length
-                  ? Formatter.humanizeSeconds(track.track.info.length, true)
+                track.info.length
+                  ? humanizeSeconds(track.info.length, true)
                   : "N/A"
-              }]\`\` | **${track.track.info.title ?? "N/A"}** <@${
-                track.requesterUserId
+              }]\`\` | **${track.info.title ?? "N/A"}** <@${
+                track.requestUserId
               }>`;
             })
             .join("\n");
           // Embed
           const embed: ExtendedEmbed = EmbedFactory.createEmbed()
-            .setTrackThumbnail(queue[0].track.info)
+            .setTrackThumbnail(queue[0].info)
             .setDescription(pageContent)
             .setFooter({
-              text: locale.format(
+              text: format(
                 interaction.locale,
                 "QUEUE_EMBED_FOOTER",
                 queue.length.toString(),
-                Formatter.humanizeSeconds(
+                humanizeSeconds(
                   queue
                     .filter((track) => {
-                      return (
-                        track.track.info.length && !track.track.info.isStream
-                      );
+                      return track.info.length && !track.info.isStream;
                     })
                     .reduce((prev, bTrack) => {
-                      return prev + (bTrack.track.info.length ?? 0);
+                      return prev + (bTrack.info.length ?? 0);
                     }, 0),
                   true
                 ),
@@ -109,44 +109,41 @@ export default class QueueCommand extends BaseCommand {
             status.push(
               `${
                 EMOJI_PLAY_STATE[
-                  this.client.audio.getPlayingState(interaction.guildId)
+                  this.client.audio.playingState(interaction.guildId)
                 ]
-              } **${locale.format(
+              } **${format(
                 interaction.locale,
-                "PLAYING_STATE_" +
-                  this.client.audio.getPlayingState(interaction.guildId)
+                ("PLAYING_STATE_" +
+                  this.client.audio.playingState(
+                    interaction.guildId
+                  )) as STRING_KEYS
               )}**`
             );
             status.push(
-              `${EMOJI_REPEAT[guildConfig.repeat]} **${locale.format(
+              `${EMOJI_REPEAT[guildConfig.repeat]} **${format(
                 interaction.locale,
-                "REPEAT_" + guildConfig.repeat
+                ("REPEAT_" + guildConfig.repeat) as STRING_KEYS
               )}**`
             );
             status.push(
-              `${Formatter.volumeEmoji(guildConfig.volume)} **${
-                guildConfig.volume
-              }%**`
+              `${volumeEmoji(guildConfig.volume)} **${guildConfig.volume}%**`
             );
             status.push(
               `**[${
                 audioData.position
-                  ? `${Formatter.humanizeSeconds(audioData.position, true)}`
+                  ? `${humanizeSeconds(audioData.position, true)}`
                   : "N/A"
               } / ${
-                audioData.nowPlaying.track.info.length
-                  ? Formatter.humanizeSeconds(
-                      audioData.nowPlaying.track.info.length,
-                      true
-                    )
+                audioData.nowPlaying.info.length
+                  ? humanizeSeconds(audioData.nowPlaying.info.length, true)
                   : "N/A"
               }]**`
             );
             const npInfo: string =
               "> " +
-              `**${Formatter.formatTrack(
-                audioData.nowPlaying.track,
-                locale.format(interaction.locale, "LIVESTREAM"),
+              `**${formatTrack(
+                audioData.nowPlaying,
+                format(interaction.locale, "LIVESTREAM"),
                 {
                   showLength: false,
                 }
@@ -159,7 +156,7 @@ export default class QueueCommand extends BaseCommand {
           } else {
             return {
               embeds: [],
-              content: locale.format(interaction.locale, "NOWPLAYING_NONE"),
+              content: format(interaction.locale, "NOWPLAYING_NONE"),
             };
           }
         },
@@ -170,7 +167,7 @@ export default class QueueCommand extends BaseCommand {
     } else {
       await interaction.deferReply();
       await interaction.editReply({
-        content: locale.format(
+        content: format(
           interaction.locale,
           "NOWPLAYING_TITLE",
           dispatcher.player.connection.channelId ?? "N/A"

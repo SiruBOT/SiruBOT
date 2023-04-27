@@ -1,18 +1,19 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../../events/InteractionCreateEvent";
-import locale from "../../../locales";
-import { BaseCommand, Client } from "../../../structures";
+
+import { BaseCommand, KafuuClient } from "@/structures";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../../types";
-import { Formatter } from "../../../utils";
-import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { format } from "@/locales";
+import { humanizeSeconds } from "@/utils/formatter";
 import { decode, TrackInfo } from "@lavalink/encoding";
+import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
 
 export default class SeekCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("seek")
       .setNameLocalizations({
@@ -37,20 +38,20 @@ export default class SeekCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.DJ],
-      CommandRequirements.AUDIO_NODE |
-        CommandRequirements.TRACK_PLAYING |
-        CommandRequirements.LISTEN_STATUS |
-        CommandRequirements.VOICE_SAME_CHANNEL |
-        CommandRequirements.VOICE_CONNECTED,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.DJ],
+      KafuuCommandFlags.AUDIO_NODE |
+        KafuuCommandFlags.TRACK_PLAYING |
+        KafuuCommandFlags.LISTEN_STATUS |
+        KafuuCommandFlags.VOICE_SAME_CHANNEL |
+        KafuuCommandFlags.VOICE_CONNECTED,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext<true>): Promise<void> {
+  }: KafuuCommandContext<true>): Promise<void> {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(
       interaction.guildId
     );
@@ -58,7 +59,7 @@ export default class SeekCommand extends BaseCommand {
     if (decodedTrack.isStream) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "SEEK_LIVESTREAM"),
+        content: format(interaction.locale, "SEEK_LIVESTREAM"),
       });
       return;
     }
@@ -92,10 +93,10 @@ export default class SeekCommand extends BaseCommand {
     if (seekTo >= decodedTrack.length) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(
+        content: format(
           interaction.locale,
           "SEEK_MAX_LENGTH",
-          Formatter.humanizeSeconds(seekTo, true)
+          humanizeSeconds(seekTo, true)
         ),
       });
       return;
@@ -103,17 +104,17 @@ export default class SeekCommand extends BaseCommand {
     if (seekTo <= 0) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "SEEK_MIN_LENGTH"),
+        content: format(interaction.locale, "SEEK_MIN_LENGTH"),
       });
       return;
     }
     await dispatcher.seekTo(seekTo);
     await interaction.reply({
-      content: locale.format(
+      content: format(
         interaction.locale,
         "SEEK_SUCCESS",
         seekOperation == "-" ? "⏪" : "⏩",
-        Formatter.humanizeSeconds(seekTo, true)
+        humanizeSeconds(seekTo, true)
       ),
       embeds: [
         await this.client.audio.getNowPlayingEmbed(
