@@ -1,19 +1,29 @@
+import "module-alias/register";
 import yaml from "yaml";
 import Cluster from "discord-hybrid-sharding";
-import { ArgumentParser } from "argparse";
-import { stat, readFile } from "fs/promises";
-import { Logger } from "tslog";
-import { fetch, Response } from "undici";
-import FastGlob from "fast-glob";
 
-import { version, name } from "../package.json";
-import type { IBootStrapperArgs, ISettings, IGatewayResponse } from "./types";
-import { BaseCommand, Client, WebhookNotifier } from "./structures";
-
+import { Colors, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
 import { Routes, APIApplication } from "discord-api-types/v9";
 import { REST as DiscordREST } from "@discordjs/rest";
-import { Colors, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
+
+import { ArgumentParser } from "argparse";
+import { stat, readFile } from "fs/promises";
+
+import { Logger } from "tslog";
+import FastGlob from "fast-glob";
+import { fetch, Response } from "undici";
+
+import { BaseCommand } from "@/structures";
+import { WebhookNotifier } from "@/utils/webhooknotifier";
 import Fastify from "fastify";
+import { generateGlobPattern } from "@/utils/formatter";
+import type {
+  KafuuBootStrapperArgs,
+  DiscordGatewayResponse,
+} from "@/types/bootstrapper";
+import type { KafuuSettings } from "@/types/settings";
+
+import { version, name } from "../package.json";
 
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
@@ -69,7 +79,7 @@ parser.add_argument("-p", "--port", {
 });
 
 // Parse Args
-const args: IBootStrapperArgs = parser.parse_args();
+const args: KafuuBootStrapperArgs = parser.parse_args();
 // Logger setup
 const LOGGER_NAME = "BootStrapper";
 const log: Logger = new Logger({
@@ -113,7 +123,7 @@ async function boot() {
   log.debug(`Loading config from ${args.config}`);
 
   const fileContent: string = await safeReadFile(args.config);
-  const parsedConfig: ISettings = yaml.parse(fileContent);
+  const parsedConfig: KafuuSettings = yaml.parse(fileContent);
   const restClient = new DiscordREST({ version: "9" });
   restClient.setToken(parsedConfig.bot.token);
 
@@ -215,7 +225,7 @@ async function boot() {
     if (!applicationInfo) throw new Error("Application info not found");
 
     const commandFiles: string[] = await FastGlob(
-      Client.generateGlobPattern("commands")
+      generateGlobPattern(__dirname, "commands")
     );
     const slashCommands: RESTPostAPIApplicationCommandsJSONBody[] = [];
     log.info(`Found ${commandFiles.length} commands`);
@@ -285,7 +295,7 @@ async function boot() {
             gatewayFetch.statusText
         );
       // Cast gateway response to IGatewayResponse
-      const gatewayJson = (await gatewayFetch.json()) as IGatewayResponse;
+      const gatewayJson = (await gatewayFetch.json()) as DiscordGatewayResponse;
       log.debug(
         `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`
       );
