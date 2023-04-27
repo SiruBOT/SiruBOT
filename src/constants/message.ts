@@ -28,6 +28,7 @@ export const EMOJI_VOLUME_LOUD = "🔊";
 export const EMOJI_VOLUME_MUTE = "🔇";
 export const EMOJI_STAR = "⭐";
 export const SKIP_EMOJI = "⏩";
+
 /** Emojis (Controls) */
 export const EMOJI_PREV = "<:btn_left:955803837095088128>";
 export const EMOJI_NEXT = "<:btn_right:955803837254488074>";
