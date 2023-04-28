@@ -1,8 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommand, KafuuClient } from "@/structures";
 
-import { format } from "@/locales";
-import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
 import {
   ActionRowBuilder,
   ButtonBuilder,

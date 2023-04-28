@@ -16,7 +16,6 @@ import {
   KafuuRepeatMode,
 } from "@/types/audio";
 import { AudioMessage, BreakOnDestroyed, Queue } from "@/structures/audio";
-import { GuildAudioData } from "@/types/models/audio";
 import { ReusableFormatFunc } from "@/types/locales";
 
 import { formatTrack, humanizeSeconds } from "@/utils/formatter";
