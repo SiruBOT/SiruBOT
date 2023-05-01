@@ -24,6 +24,7 @@ import type {
 import type { KafuuSettings } from "@/types/settings";
 
 import { version, name } from "../package.json";
+import { getGitHash } from "./utils/version";
 
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
@@ -112,15 +113,19 @@ async function safeReadFile(path: string): Promise<string> {
 /* Async function for boot */
 async function boot() {
   // Read config file
-  log.info(`${name} version: ${version}, log level: ${log.settings.minLevel}`);
-  log.debug(
+  log.info(
+    `${name} version: ${version} (${getGitHash()}), log level: ${
+      log.settings.minLevel
+    } NODE_ENV=${process.env.NODE_ENV}`
+  );
+  log.info(
     `config file: ${args.config}, shard: ${
       args.shard ? "Auto sharding enabled" : "Auto sharding disabled"
     }, debug: ${
       args.debug ? "Debug logging enabled" : "Debug logging disabled"
     }`
   );
-  log.debug(`Loading config from ${args.config}`);
+  log.info(`Loading config from ${args.config}`);
 
   const fileContent: string = await safeReadFile(args.config);
   const parsedConfig: KafuuSettings = yaml.parse(fileContent);

@@ -1,7 +1,9 @@
 import type { KafuuClient } from "@/structures";
 import type { TypeORMGuild } from "@/models/typeorm";
-import type { GuildMember } from "discord.js";
+import type { ButtonInteraction, GuildMember } from "discord.js";
 import type { HandledCommandInteraction } from "@/types/interaction";
+import { BaseInteraction } from "discord.js";
+
 // Enum for command categories
 export enum KafuuCommandCategory {
   GENERAL = "General",
@@ -29,10 +31,24 @@ export enum KafuuCommandFlags {
 }
 
 // Interface for command context
-export interface KafuuCommandContext<VoiceConnected extends boolean = false> {
-  interaction: HandledCommandInteraction<VoiceConnected>;
-  userPermissions: KafuuCommandPermission[]; // Array of user permissions
+
+export interface KafuuContext<InteractionType extends BaseInteraction> {
+  interaction: InteractionType;
+  userPermissions: KafuuCommandPermission[];
 }
+export type KafuuCommandContext<VoiceConnected extends boolean = false> =
+  KafuuContext<HandledCommandInteraction<VoiceConnected>>;
+
+export interface KafuuButtonContext extends KafuuContext<ButtonInteraction> {
+  buttonInfo: KafuuButtonInfo;
+  args: string[];
+}
+
+export type KafuuButtonInfo = {
+  commandName: string;
+  customId: string;
+  args: string[];
+};
 
 export type KafuuCommandPermissionCheckOptions = Omit<
   KafuuCommandPermissionCheckContext,

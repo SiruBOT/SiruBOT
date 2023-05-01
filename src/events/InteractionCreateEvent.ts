@@ -15,7 +15,7 @@ import { type BaseCommand, BaseEvent, type KafuuClient } from "@/structures";
 import { TypeORMGuild } from "@/models/typeorm";
 // Import  command flags, permission checker
 import { getUserPermissions } from "@/utils/permission";
-import { KafuuCommandFlags } from "@/types/command";
+import { KafuuButtonInfo, KafuuCommandFlags } from "@/types/command";
 // Import bot constants
 import {
   COMMAND_WARN_MESSAGE_EPHEMERAL,
@@ -526,60 +526,88 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     interaction: Discord.ButtonInteraction,
     transaction: Transaction
   ) {
-    const customIdCheckRegex = /^[[a-z]+;\w+;$/g;
-    const commandNameRegex = /(?<=\[)(.*?)(?=;)/g;
-    const customIdRegex = /(?<=;)(.*?)(?=;)/g;
-    const commandName = interaction.customId.match(commandNameRegex)?.at(0);
-    const customId = interaction.customId.match(customIdRegex)?.at(0);
-    if (!customIdCheckRegex.test(interaction.customId)) {
-      transaction.setHttpStatus(500);
-      transaction.setData("error", "custom_id_regex_failed");
-      transaction.setData("custom_id", interaction.customId);
+    const span: Span = transaction.startChild({
+      op: "InteractionCreateEvent#handleButton",
+      description: "Handle button interaction",
+    });
+    span.setData("customId", interaction.customId);
+
+    const buttonMeta = interaction.customId.split(";");
+
+    if (buttonMeta.length < 2) {
+      span.setHttpStatus(400);
+      span.setData("endReason", "buttonMetaInvalid");
+      span.finish();
       transaction.finish();
       this.client.log.warn(
-        "Failed to handle button interaction, custom id pattern check failed."
+        "Failed to handle button interaction, invalid button meta."
       );
+      await interaction.update({
+        content: "Invalid button meta.",
+      });
       return;
     }
-    this.client.log.debug(`handleButton: ${commandName}/${customId}`);
-    // When command parse failed
-    if (!commandName) {
-      transaction.setHttpStatus(500);
-      transaction.setData("error", "command_name_not_found");
-      transaction.finish();
-      this.client.log.warn(
-        "Failed to handle button interaction, command name not found."
-      );
-      return;
-    }
-    // When custom id parse failed
-    if (!customId) {
-      transaction.setHttpStatus(500);
-      transaction.setData("error", "custom_id_not_found");
-      transaction.finish();
-      this.client.log.warn(
-        "Failed to handle button interaction, bot coudn't parse custom id."
-      );
-      return;
-    }
-    const command = this.client.commands.get(commandName);
-    // When command not found.
+
+    const buttonInfo: KafuuButtonInfo = {
+      commandName: buttonMeta[0],
+      customId: buttonMeta[1],
+      args: buttonMeta.slice(2),
+    };
+
+    this.log.debug(
+      `Button received, Interaction id: ${interaction.id} custom id: ${interaction.customId}, args: ${buttonInfo.args}, customId: ${buttonInfo.customId}, commandName: ${buttonInfo.commandName}`
+    );
+
+    const command = this.client.commands.get(buttonInfo.commandName);
     if (!command) {
-      transaction.setHttpStatus(500);
-      transaction.setData("error", "command_not_found");
+      span.setHttpStatus(500);
+      span.setData("endReason", "commandNotFound");
+      span.finish();
       transaction.finish();
       this.client.log.warn(
         "Failed to handle button interaction, command name not found."
       );
       return;
     }
-    // End Error handle
-    interaction.customId = customId;
+
+    const member: Discord.GuildMember | undefined =
+      interaction.guild?.members.cache.get(interaction.user.id) ??
+      (await interaction.guild?.members.fetch(interaction.user.id));
+
+    if (!member || !interaction.inGuild()) {
+      await interaction.update({
+        content: format(interaction.locale, "NOT_IN_GUILD"),
+        components: [],
+      });
+      return;
+    }
+
+    const userPermissions = await getUserPermissions({
+      client: this.client,
+      guildConfig: await this.client.databaseHelper.upsertAndFindGuild(
+        interaction.guildId
+      ),
+      guildMember: member,
+    });
+
     try {
-      await command?.onButtonInteraction(interaction);
+      await command.onButtonInteraction({
+        interaction,
+        userPermissions: userPermissions.fulfilledPermissions,
+        args: buttonInfo.args,
+        buttonInfo,
+      });
     } catch (error) {
-      Sentry.captureException(error);
-      this.client.log.error(error);
+      this.log.error(
+        `Failed to handle button ${buttonInfo.commandName}`,
+        error
+      );
+      const exceptionId = Sentry.captureException(error);
+      span.setData("endReason", "error");
+      span.setData("exceptionId", exceptionId);
+      span.setHttpStatus(500);
+      span.finish();
+      transaction.finish();
     }
   }
 }

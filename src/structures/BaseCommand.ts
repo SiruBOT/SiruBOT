@@ -6,6 +6,7 @@ import type {
 import type * as Discord from "discord.js";
 import type { KafuuClient } from ".";
 import type {
+  KafuuButtonContext,
   KafuuCommandCategory,
   KafuuCommandContext,
 } from "@/types/command";
@@ -62,9 +63,7 @@ export abstract class BaseCommand {
   }
 
   // Define an asynchronous method named onButtonInteraction
-  public async onButtonInteraction(
-    interaction: Discord.ButtonInteraction
-  ): Promise<void> {
+  public async onButtonInteraction(context: KafuuButtonContext): Promise<void> {
     // Throw an error if the method is not implemented
     throw new Error("Method not implemented. BaseCommand#runButton");
   }
@@ -102,8 +101,8 @@ export abstract class BaseCommand {
   }
 
   // Define a method named getCustomId
-  public getCustomId(customId: string): string {
+  public getCustomId(customId: string, ...args: string[]): string {
     // Return a string with the name of the slash command and the custom ID
-    return `[${this.slashCommand.name};${customId};`;
+    return this.slashCommand.name + ";" + customId + ";" + args.join(";");
   }
 }

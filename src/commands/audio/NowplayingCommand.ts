@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import { EMOJI_REFRESH, EMOJI_STAR } from "@/constants/message";
 import {
+  KafuuButtonContext,
   KafuuCommandCategory,
   KafuuCommandContext,
   KafuuCommandFlags,
@@ -47,9 +48,12 @@ export default class NowplayingCommand extends BaseCommand {
     );
   }
 
-  public override async onButtonInteraction(interaction: ButtonInteraction) {
+  public override async onButtonInteraction({
+    interaction,
+    buttonInfo,
+  }: KafuuButtonContext) {
     if (!interaction.guild || !interaction.guildId) return;
-    switch (interaction.customId) {
+    switch (buttonInfo.customId) {
       case "np_refresh":
         await interaction.update(
           await this.getNowplayingPayload(

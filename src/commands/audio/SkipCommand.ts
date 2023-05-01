@@ -15,6 +15,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { Track } from "shoukaku";
 
 import {
+  KafuuButtonContext,
   KafuuCommandCategory,
   KafuuCommandContext,
   KafuuCommandFlags,
@@ -295,8 +296,11 @@ export default class SkipCommand extends BaseCommand {
     }
   }
 
-  public override async onButtonInteraction(interaction: ButtonInteraction) {
-    switch (interaction.customId) {
+  public override async onButtonInteraction({
+    interaction,
+    buttonInfo,
+  }: KafuuButtonContext) {
+    switch (buttonInfo.customId) {
       case "voteskip_vote":
         await this.handleVoteSkipButton(interaction);
         break;
