@@ -6,9 +6,11 @@ import type {
 import type * as Discord from "discord.js";
 import type { KafuuClient } from ".";
 import type {
-  KafuuButtonContext,
   KafuuCommandCategory,
   KafuuCommandContext,
+  KafuuButtonContext,
+  KafuuRoleSelectMenuContext,
+  KafuuMessageComponentCustomIdOptions,
 } from "@/types/command";
 import { KafuuCommandPermission } from "@/types/command";
 
@@ -68,6 +70,14 @@ export abstract class BaseCommand {
     throw new Error("Method not implemented. BaseCommand#runButton");
   }
 
+  // Define an asynchronous method named onButtonInteraction
+  public async onRoleSelectMenuInteraction(
+    context: KafuuRoleSelectMenuContext
+  ): Promise<void> {
+    // Throw an error if the method is not implemented
+    throw new Error("Method not implemented. BaseCommand#runButton");
+  }
+
   // Define an asynchronous method named onMessageComponentInteraction
   public async onMessageComponentInteraction(
     interaction: Discord.MessageComponentInteraction
@@ -101,8 +111,14 @@ export abstract class BaseCommand {
   }
 
   // Define a method named getCustomId
-  public getCustomId(customId: string, ...args: string[]): string {
+  public getCustomId({
+    customId,
+    args,
+    executorId,
+  }: Omit<KafuuMessageComponentCustomIdOptions, "commandName">): string {
     // Return a string with the name of the slash command and the custom ID
-    return this.slashCommand.name + ";" + customId + ";" + args.join(";");
+    return `${this.slashCommand.name}:${customId}:${executorId ?? ""};${
+      args ? args.join(";") : ""
+    }`;
   }
 }
