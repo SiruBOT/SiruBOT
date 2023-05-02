@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 export const BOT_NAME = "치노봇";
+export const DASHBOARD_URL= "https://dash.cocochino.cafe/dashboard/";
 
 /** Colors */
 export const DEFAULT_COLOR = "#FFDAFF";
@@ -28,6 +29,10 @@ export const EMOJI_VOLUME_LOUD = "🔊";
 export const EMOJI_VOLUME_MUTE = "🔇";
 export const EMOJI_STAR = "⭐";
 export const SKIP_EMOJI = "⏩";
+export const EMOJI_BACK = "◀️";
+export const SPARKLES_EMOJI = "✨";
+
+export const PAGE_SPLIT_SIZE = 10;
 
 /** Emojis (Controls) */
 export const EMOJI_PREV = "<:btn_left:955803837095088128>";
