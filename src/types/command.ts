@@ -2,6 +2,7 @@ import type { KafuuClient } from "@/structures";
 import type { TypeORMGuild } from "@/models/typeorm";
 import type {
   ButtonInteraction,
+  CacheType,
   GuildMember,
   RoleSelectMenuInteraction,
 } from "discord.js";
@@ -37,7 +38,7 @@ export enum KafuuCommandFlags {
 
 // Interface for command context
 export interface KafuuBaseInteractionContext<
-  InteractionType extends BaseInteraction
+  InteractionType extends BaseInteraction<CacheType>
 > {
   interaction: InteractionType;
   userPermissions: KafuuCommandPermission[];
@@ -46,14 +47,16 @@ export interface KafuuBaseInteractionContext<
 export type KafuuCommandContext<VoiceConnected extends boolean = false> =
   KafuuBaseInteractionContext<HandledCommandInteraction<VoiceConnected>>;
 
-export type KafuuButtonContext =
-  KafuuMessageComponentContext<ButtonInteraction>;
+export type KafuuButtonContext = KafuuMessageComponentContext<
+  ButtonInteraction<CacheType>
+>;
 
-export type KafuuRoleSelectMenuContext =
-  KafuuMessageComponentContext<RoleSelectMenuInteraction>;
+export type KafuuRoleSelectMenuContext = KafuuMessageComponentContext<
+  RoleSelectMenuInteraction<CacheType>
+>;
 
 interface KafuuMessageComponentContext<
-  InteractionType extends MessageComponentInteraction
+  InteractionType extends MessageComponentInteraction<CacheType>
 > extends KafuuBaseInteractionContext<InteractionType> {
   customInfo: KafuuMessageComponentCustomIdOptions;
 }
