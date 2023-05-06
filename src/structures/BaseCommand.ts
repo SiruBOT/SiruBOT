@@ -46,72 +46,38 @@ export abstract class BaseCommand {
     this.requirements = requirements;
   }
 
-  // Define an asynchronous method named onCommandInteraction
-  public async onCommandInteraction(
+  public abstract onCommandInteraction(
     context: KafuuCommandContext<boolean>
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#onCommandInteraction");
-  }
+  ): Promise<void>;
 
-  // Define an asynchronous method named onAutocompleteInteraction
-  public async onAutocompleteInteraction(
+  public onAutocompleteInteraction?(
     interaction: Discord.AutocompleteInteraction
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error(
-      "Method not implemented. BaseCommand#onAutocompleteInteraction"
-    );
-  }
+  ): Promise<void>;
 
-  // Define an asynchronous method named onButtonInteraction
-  public async onButtonInteraction(context: KafuuButtonContext): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#runButton");
-  }
+  public onButtonInteraction?(context: KafuuButtonContext): Promise<void>;
 
-  // Define an asynchronous method named onButtonInteraction
-  public async onRoleSelectMenuInteraction(
+  public onRoleSelectMenuInteraction?(
     context: KafuuRoleSelectMenuContext
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#runButton");
-  }
+  ): Promise<void>;
 
-  // Define an asynchronous method named onMessageComponentInteraction
-  public async onMessageComponentInteraction(
+  public onMessageComponentInteraction?(
     interaction: Discord.MessageComponentInteraction
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#runMessageComponent");
-  }
+  ): Promise<void>;
 
-  // Define an asynchronous method named onSelectMenuInteraction
-  public async onSelectMenuInteraction(
+  public onSelectMenuInteraction?(
     interaction: Discord.SelectMenuInteraction
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#runSelectMenu");
-  }
+  ): Promise<void>;
 
-  // Define an asynchronous method named onContextMenuCommand
-  public async onContextMenuCommand(
+  public onContextMenuCommand?(
     interaction: Discord.ContextMenuCommandInteraction
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#runContextMenu");
-  }
+  ): Promise<void>;
 
-  // Define an asynchronous method named onUserContextCommand
-  public async onUserContextCommand(
+  public onUserContextCommand?(
     interaction: Discord.UserContextMenuCommandInteraction
-  ): Promise<void> {
-    // Throw an error if the method is not implemented
-    throw new Error("Method not implemented. BaseCommand#runUserContextMenu");
-  }
+  ): Promise<void>;
 
-  // Define a method named getCustomId
-  public getCustomId({
+  // Message Component custom id template: [commandName]:[customId]:[executorId];[args];[args];[args]
+  protected getCustomId({
     customId,
     args,
     executorId,

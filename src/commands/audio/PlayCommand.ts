@@ -220,7 +220,7 @@ export default class PlayCommand extends BaseCommand {
                     slicedPlaylist.length.toString()
                   )
                 )
-                .setTrackThumbnail(track.info),
+                .setTrackThumbnail(track),
             ],
           });
           // Add selected track without playlist
@@ -274,7 +274,7 @@ export default class PlayCommand extends BaseCommand {
                           slicedPlaylist.length.toString()
                         )
                       )
-                      .setTrackThumbnail(track.info),
+                      .setTrackThumbnail(track),
                   ],
                 });
                 // Add sliced playlist

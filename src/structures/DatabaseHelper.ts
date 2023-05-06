@@ -36,7 +36,7 @@ export class DatabaseHelper {
       entities,
       ...this.client.settings.database.mysql,
       logging: this.client.bootStrapperArgs.debug,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV === "production" ? false : true,
     });
     await this.mySqlDataSource.initialize();
 

@@ -5,7 +5,6 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ButtonInteraction,
   InteractionUpdateOptions,
   InteractionReplyOptions,
   Locale,
@@ -50,10 +49,10 @@ export default class NowplayingCommand extends BaseCommand {
 
   public override async onButtonInteraction({
     interaction,
-    buttonInfo,
+    customInfo: { customId },
   }: KafuuButtonContext) {
     if (!interaction.guild || !interaction.guildId) return;
-    switch (buttonInfo.customId) {
+    switch (customId) {
       case "np_refresh":
         await interaction.update(
           await this.getNowplayingPayload(
@@ -75,11 +74,11 @@ export default class NowplayingCommand extends BaseCommand {
         new ButtonBuilder()
           .setEmoji(EMOJI_REFRESH)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId(this.getCustomId("np_refresh")),
+          .setCustomId(this.getCustomId({ customId: "np_refresh" })),
         new ButtonBuilder()
           .setEmoji(EMOJI_STAR)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId(this.getCustomId("np_favorite"))
+          .setCustomId(this.getCustomId({ customId: "np_favorite" }))
       );
     return actionRow;
   }

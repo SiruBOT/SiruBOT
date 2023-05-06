@@ -15,7 +15,10 @@ import { type BaseCommand, BaseEvent, type KafuuClient } from "@/structures";
 import { TypeORMGuild } from "@/models/typeorm";
 // Import  command flags, permission checker
 import { getUserPermissions } from "@/utils/permission";
-import { KafuuButtonInfo, KafuuCommandFlags } from "@/types/command";
+import {
+  KafuuCommandFlags,
+  KafuuMessageComponentCustomIdOptions,
+} from "@/types/command";
 // Import bot constants
 import {
   COMMAND_WARN_MESSAGE_EPHEMERAL,
@@ -82,8 +85,8 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       await this.handleChatInputCommandInteraction(interaction, transaction);
     if (interaction.isAutocomplete())
       await this.handleAutoComplete(interaction, transaction);
-    if (interaction.isButton())
-      await this.handleButton(interaction, transaction);
+    if (interaction.isMessageComponent())
+      await this.handleMessageComponent(interaction, transaction);
   }
 
   private cmdInfoStr(interaction: Discord.CommandInteraction): string {
@@ -502,7 +505,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       return;
     }
     try {
-      await command.onAutocompleteInteraction(interaction);
+      await command.onAutocompleteInteraction?.(interaction);
       span.setData("endReson", "ok");
       span.setHttpStatus(200);
       span.finish();
@@ -522,51 +525,84 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     }
   }
 
-  private async handleButton(
-    interaction: Discord.ButtonInteraction,
+  private parseCustomId(
+    interaction: Discord.MessageComponentInteraction
+  ): KafuuMessageComponentCustomIdOptions | null {
+    // [commandName]:[customId]:[executorId?];[ARG1];[ARG2];[ARG3];[ARG...];
+    // [commandName]:[customId]:;[ARG1];[ARG2];[ARG3];[ARG...];
+    const handlerInfo = interaction.customId.trim().split(":");
+    const args = interaction.customId.trim().split(";");
+    if (handlerInfo.length < 2) return null; // When commandName
+
+    return {
+      commandName: handlerInfo[0], // command Name
+      customId: handlerInfo[1], // custom id
+      executorId:
+        handlerInfo[2].split(";")[0].length == 0
+          ? undefined
+          : handlerInfo[2].split(";")[0], // Remove last semicolon if exists
+      args: args.slice(1, args.length - 1), // Remove last semicolon,
+    };
+  }
+
+  private async handleMessageComponent(
+    interaction: Discord.MessageComponentInteraction,
     transaction: Transaction
   ) {
+    this.log.debug(
+      `MessageComponent received, Interaction id: ${interaction.id} custom id: ${interaction.customId}`
+    );
     const span: Span = transaction.startChild({
-      op: "InteractionCreateEvent#handleButton",
-      description: "Handle button interaction",
+      op: "InteractionCreateEvent#handleMessageComponent",
+      description: "Handle message component interaction",
     });
     span.setData("customId", interaction.customId);
 
-    const buttonMeta = interaction.customId.split(";");
-
-    if (buttonMeta.length < 2) {
+    const parsedCustomId = this.parseCustomId(interaction);
+    if (!parsedCustomId) {
       span.setHttpStatus(400);
-      span.setData("endReason", "buttonMetaInvalid");
+      span.setData("endReason", "invalidCustomId");
       span.finish();
       transaction.finish();
-      this.client.log.warn(
-        "Failed to handle button interaction, invalid button meta."
-      );
+      this.client.log.warn("Failed to handle interaction, invalid custom id.");
       await interaction.update({
-        content: "Invalid button meta.",
+        content: format(interaction.locale, "INVALID_CUSTOM_ID"),
       });
       return;
     }
 
-    const buttonInfo: KafuuButtonInfo = {
-      commandName: buttonMeta[0],
-      customId: buttonMeta[1],
-      args: buttonMeta.slice(2),
-    };
+    // remove me in production environment
+    await interaction.channel?.send({
+      content: interaction.customId + "\n" + JSON.stringify(parsedCustomId),
+    });
 
-    this.log.debug(
-      `Button received, Interaction id: ${interaction.id} custom id: ${interaction.customId}, args: ${buttonInfo.args}, customId: ${buttonInfo.customId}, commandName: ${buttonInfo.commandName}`
-    );
+    if (
+      parsedCustomId.executorId &&
+      parsedCustomId.executorId != interaction.user.id
+    ) {
+      span.setHttpStatus(403);
+      span.setData("endReason", "invalidExecutor");
+      span.finish();
+      transaction.finish();
+      this.client.log.warn("Failed to handle interaction, invalid executor.");
+      await interaction.update({
+        content: format(interaction.locale, "INTERACTION_ONLY_SAME_EXECUTOR"),
+      });
+      return;
+    }
 
-    const command = this.client.commands.get(buttonInfo.commandName);
+    const command = this.client.commands.get(parsedCustomId.commandName);
     if (!command) {
-      span.setHttpStatus(500);
+      span.setHttpStatus(404);
       span.setData("endReason", "commandNotFound");
       span.finish();
       transaction.finish();
       this.client.log.warn(
-        "Failed to handle button interaction, command name not found."
+        "Failed to handle message component interaction, command name not found."
       );
+      await interaction.update({
+        content: format(interaction.locale, "INVALID_CUSTOM_ID"),
+      });
       return;
     }
 
@@ -575,6 +611,13 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       (await interaction.guild?.members.fetch(interaction.user.id));
 
     if (!member || !interaction.inGuild()) {
+      span.setHttpStatus(403);
+      span.setData("endReason", "notInGuild");
+      span.finish();
+      transaction.finish();
+      this.client.log.warn(
+        "Failed to handle message component interaction, user not in guild."
+      );
       await interaction.update({
         content: format(interaction.locale, "NOT_IN_GUILD"),
         components: [],
@@ -591,15 +634,36 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     });
 
     try {
-      await command.onButtonInteraction({
-        interaction,
-        userPermissions: userPermissions.fulfilledPermissions,
-        args: buttonInfo.args,
-        buttonInfo,
-      });
+      switch (true) {
+        case interaction.isRoleSelectMenu():
+          await command.onRoleSelectMenuInteraction?.({
+            interaction: interaction as Discord.RoleSelectMenuInteraction,
+            userPermissions: userPermissions.fulfilledPermissions,
+            customInfo: parsedCustomId,
+          });
+          break;
+        case interaction.isButton():
+          await command.onButtonInteraction?.({
+            interaction:
+              interaction as Discord.ButtonInteraction<Discord.CacheType>,
+            userPermissions: userPermissions.fulfilledPermissions,
+            customInfo: parsedCustomId,
+          });
+          break;
+        default:
+          span.setHttpStatus(400);
+          span.setData("endReason", "invalidComponentType");
+          span.finish();
+          transaction.finish();
+          Sentry.captureEvent({ message: "Invalid component type" });
+          this.client.log.warn(
+            "Failed to handle message component interaction, invalid component type."
+          );
+      }
+      this.log.info(`Handled message component: ${interaction.customId}`);
     } catch (error) {
       this.log.error(
-        `Failed to handle button ${buttonInfo.commandName}`,
+        `Failed to handle message component ${interaction.componentType} ${parsedCustomId.commandName}`,
         error
       );
       const exceptionId = Sentry.captureException(error);

@@ -9,7 +9,7 @@ import {
 } from "@/types/command";
 import { format } from "@/locales";
 import { humanizeSeconds } from "@/utils/formatter";
-import { decode, TrackInfo } from "@lavalink/encoding";
+import { decode, TrackInfo } from "@sirubot/lavalink-encoding";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
 
 export default class SeekCommand extends BaseCommand {
@@ -78,7 +78,7 @@ export default class SeekCommand extends BaseCommand {
     let seekTo: number | typeof NaN = this.parseTime(seekInput);
     // 파싱에 실패한 경우
     if (Number.isNaN(seekTo)) {
-      await interaction.reply("NaN seek Position");
+      await interaction.reply(format(interaction.locale, "SEEK_NAN_DURATION"));
       return;
     }
     // 특정 위치로 이동 = seekOperation = null -> seekTo 그대로 적용

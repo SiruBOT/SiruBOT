@@ -244,7 +244,7 @@ export default class SkipCommand extends BaseCommand {
   ) {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(guildId);
     const voteButton = new ButtonBuilder()
-      .setCustomId(this.getCustomId("voteskip_vote"))
+      .setCustomId(this.getCustomId({ customId: "voteskip_vote" }))
       .setEmoji(SKIP_EMOJI)
       .setLabel(
         format(
@@ -275,7 +275,7 @@ export default class SkipCommand extends BaseCommand {
           })
         )
       )
-      .setTrackThumbnail(track.info);
+      .setTrackThumbnail(track);
     return {
       components: [actionRow],
       embeds: [trackEmbed],
@@ -298,9 +298,9 @@ export default class SkipCommand extends BaseCommand {
 
   public override async onButtonInteraction({
     interaction,
-    buttonInfo,
+    customInfo: { customId },
   }: KafuuButtonContext) {
-    switch (buttonInfo.customId) {
+    switch (customId) {
       case "voteskip_vote":
         await this.handleVoteSkipButton(interaction);
         break;
