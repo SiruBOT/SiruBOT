@@ -237,13 +237,6 @@
     "@babel/runtime" "^7.7.2"
     regenerator-runtime "^0.13.3"
 
-"@lavalink/encoding@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@lavalink/encoding/-/encoding-0.1.2.tgz#cc6ad2727836ed290bcc2fe74f452e06e7229bf7"
-  integrity sha512-cUhsKYBw91+2H4wPfKCi1i9dyQmXGCcNvsNe3Sgy67ZrjsQ29hNLLEBIotBIxPMPWTFZtQcja5QFL99UNvjv0w==
-  dependencies:
-    base64-js "^1.3.1"
-
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -355,6 +348,13 @@
   dependencies:
     "@sentry/types" "7.45.0"
     tslib "^1.9.3"
+
+"@sirubot/lavalink-encoding@^0.1.2-spotify":
+  version "0.1.2-spotify"
+  resolved "https://registry.yarnpkg.com/@sirubot/lavalink-encoding/-/lavalink-encoding-0.1.2-spotify.tgz#fdb7924ad1ee7da94a500f562ab5d3298c7d77aa"
+  integrity sha512-dAYIsTODZDHVqHZRZb9wEiXWqmvFkGXzeD7RfP2mqi0ov5Q/4G38eYPzPLI9xDh7JKujOrfmKY30RS4QESn3Lw==
+  dependencies:
+    base64-js "^1.3.1"
 
 "@sirubot/yt-related-scraper@^0.3.21":
   version "0.3.21"

@@ -5,10 +5,10 @@
   "main": "./src/index.js",
   "dependencies": {
     "@discordjs/rest": "^0.3.0",
-    "@lavalink/encoding": "^0.1.2",
     "@sentry/integrations": "^7.45.0",
     "@sentry/node": "^7.45.0",
     "@sentry/tracing": "^7.45.0",
+    "@sirubot/lavalink-encoding": "^0.1.2-spotify",
     "@sirubot/yt-related-scraper": "^0.3.21",
     "argparse": "^2.0.1",
     "discord-api-types": "^0.29.0",

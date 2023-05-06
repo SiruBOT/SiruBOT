@@ -1,6 +1,6 @@
 import Vibrant from "node-vibrant";
 import { EmbedBuilder, ColorResolvable, EmbedFooterOptions } from "discord.js";
-import { ShoukakuTrackInfo } from "shoukaku";
+import { Track } from "shoukaku";
 
 import { ReusableFormatFunc } from "@/types/locales";
 import { DEFAULT_COLOR, BOT_NAME } from "@/constants/message";
@@ -15,6 +15,7 @@ import {
 
 import { getGitHash } from "@/utils/version";
 import { version } from "../../package.json";
+import { decode } from "@sirubot/lavalink-encoding";
 
 const versionInfo = `${version} (${getGitHash()})`;
 
@@ -31,12 +32,17 @@ export class ExtendedEmbed extends EmbedBuilder {
     return this;
   }
 
-  public setTrackThumbnail(info: ShoukakuTrackInfo): this {
+  public setTrackThumbnail({ info, track }: Track): this {
     if (info.sourceName === "youtube" && info.identifier) {
       super.setThumbnail(
         `https://img.youtube.com/vi/${info.identifier}/maxresdefault.jpg`
       );
     }
+    if (info.sourceName === "spotify") {
+      const { spotifyInfo } = decode(track);
+      spotifyInfo?.thumbnail && super.setThumbnail(spotifyInfo.thumbnail);
+    }
+
     return this;
   }
 
@@ -85,7 +91,7 @@ export class EmbedFactory {
       .setDescription(
         `[${formatTrack(track, format("LIVESTREAM"))}](${track.info.uri})`
       )
-      .setTrackThumbnail(track.info);
+      .setTrackThumbnail(track);
     return embed;
   }
 
