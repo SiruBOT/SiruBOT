@@ -27,7 +27,7 @@ export class Queue {
     return cleanedData;
   }
 
-  public async getQueue(): Promise<KafuuAudioTrack[]> {
+  public async getTracks(): Promise<KafuuAudioTrack[]> {
     this.log.debug(`Get queue from ${this.guildId}`);
     const { queue }: { queue: KafuuAudioTrack[] } =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
@@ -122,6 +122,19 @@ export class Queue {
         },
       },
     ]);
+  }
+
+  public async shuffleTrack(): Promise<number> {
+    this.log.debug(`Shuffle queue tracks @ ${this.guildId}`);
+    const { queue }: { queue: KafuuAudioTrack[] } =
+      await this.databaseHelper.upsertGuildAudioData(this.guildId);
+    const shuffled = queue.sort(() => Math.random() - 0.5);
+    await this.databaseHelper.upsertGuildAudioData(this.guildId, {
+      $set: {
+        queue: shuffled,
+      },
+    });
+    return shuffled.length;
   }
 
   public async setPosition(position: number | null): Promise<GuildAudioData> {

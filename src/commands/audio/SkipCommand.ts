@@ -319,7 +319,7 @@ export default class SkipCommand extends BaseCommand {
       });
       return;
     }
-    const queue = await dispatcher.queue.getQueue();
+    const queue = await dispatcher.queue.getTracks();
     const nowplaying = await dispatcher.queue.getNowPlaying();
     const nextTrack = queue.at(0);
     if (!nextTrack) {
