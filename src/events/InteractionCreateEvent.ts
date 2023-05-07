@@ -572,11 +572,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       return;
     }
 
-    // remove me in production environment
-    await interaction.channel?.send({
-      content: interaction.customId + "\n" + JSON.stringify(parsedCustomId),
-    });
-
     if (
       parsedCustomId.executorId &&
       parsedCustomId.executorId != interaction.user.id
