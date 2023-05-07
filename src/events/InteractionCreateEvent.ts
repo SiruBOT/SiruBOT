@@ -528,20 +528,21 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   private parseCustomId(
     interaction: Discord.MessageComponentInteraction
   ): KafuuMessageComponentCustomIdOptions | null {
-    // [commandName]:[customId]:[executorId?];[ARG1];[ARG2];[ARG3];[ARG...];
-    // [commandName]:[customId]:;[ARG1];[ARG2];[ARG3];[ARG...];
+    // [commandName]:[customId]:[executorId?];[ARG1];[ARG2];[ARG3];[ARG...]
+    // [commandName]:[customId]:;[ARG1];[ARG2];[ARG3];[ARG...]
     const handlerInfo = interaction.customId.trim().split(":");
     const args = interaction.customId.trim().split(";");
     if (handlerInfo.length < 2) return null; // When commandName
 
     return {
-      commandName: handlerInfo[0], // command Name
-      customId: handlerInfo[1], // custom id
+      commandName: handlerInfo[0],
+      customId: handlerInfo[1],
       executorId:
         handlerInfo[2].split(";")[0].length == 0
           ? undefined
-          : handlerInfo[2].split(";")[0], // Remove last semicolon if exists
-      args: args.slice(1, args.length - 1), // Remove last semicolon,
+          : handlerInfo[2].split(";")[0],
+      args:
+        args.slice(1, args.length)[0] == "" ? [] : args.slice(1, args.length),
     };
   }
 

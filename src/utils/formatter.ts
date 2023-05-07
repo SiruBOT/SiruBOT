@@ -15,6 +15,7 @@ import {
 } from "@/constants/message";
 import { FormatTrackOptions } from "@/types/utils/formatter";
 import { PROGRESS_BAR_EMOJI_COUNT } from "@/constants/utils/formatter";
+import { KafuuMessageComponentCustomIdOptions } from "@/types/command";
 
 /**
  * Convert seconds to readble format (like 00:00:00)
@@ -119,4 +120,16 @@ export function emojiProgressBar(percent: number) {
   }
 
   return str; // Return the progress bar emoji string
+}
+
+export function getCustomId({
+  commandName,
+  customId,
+  args,
+  executorId,
+}: KafuuMessageComponentCustomIdOptions): string {
+  // Return a string with the name of the slash command and the custom ID
+  return `${commandName}:${customId}:${executorId ?? ""};${
+    args ? args.join(";") : ""
+  }`;
 }

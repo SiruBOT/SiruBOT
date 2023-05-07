@@ -13,6 +13,7 @@ import type {
   KafuuMessageComponentCustomIdOptions,
 } from "@/types/command";
 import { KafuuCommandPermission } from "@/types/command";
+import { getCustomId } from "@/utils/formatter";
 
 // Define an abstract class named BaseCommand
 export abstract class BaseCommand {
@@ -77,14 +78,13 @@ export abstract class BaseCommand {
   ): Promise<void>;
 
   // Message Component custom id template: [commandName]:[customId]:[executorId];[args];[args];[args]
-  protected getCustomId({
-    customId,
-    args,
-    executorId,
-  }: Omit<KafuuMessageComponentCustomIdOptions, "commandName">): string {
+  protected getCustomId(
+    option: Omit<KafuuMessageComponentCustomIdOptions, "commandName">
+  ): string {
     // Return a string with the name of the slash command and the custom ID
-    return `${this.slashCommand.name}:${customId}:${executorId ?? ""};${
-      args ? args.join(";") : ""
-    }`;
+    return getCustomId({
+      commandName: this.slashCommand.name,
+      ...option,
+    });
   }
 }
