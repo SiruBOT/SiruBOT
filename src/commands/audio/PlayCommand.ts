@@ -76,7 +76,8 @@ export default class PlayCommand extends BaseCommand {
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.AUDIO_NODE |
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
-        KafuuCommandFlags.LISTEN_STATUS,
+        KafuuCommandFlags.LISTEN_STATUS |
+        KafuuCommandFlags.VOICE_CONNECTED,
       ["SendMessages", "Connect", "Speak", "EmbedLinks"]
     );
   }
