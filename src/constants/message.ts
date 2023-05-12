@@ -30,9 +30,10 @@ export const EMOJI_VOLUME_MUTE = "🔇";
 export const EMOJI_STAR = "⭐";
 export const SKIP_EMOJI = "⏩";
 export const EMOJI_BACK = "◀️";
+export const EMOJI_TRASH = "🗑️";
 export const SPARKLES_EMOJI = "✨";
 
-export const PAGE_SPLIT_SIZE = 10;
+export const PAGE_CHUNK_SIZE = 10;
 
 /** Emojis (Controls) */
 export const EMOJI_PREV = "<:btn_left:955803837095088128>";

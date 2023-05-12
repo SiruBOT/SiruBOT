@@ -108,6 +108,12 @@
 	"SETTINGS_DJ_PANEL_TITLE": "🔧 DJ 설정",
 	"SETTINGS_DJ_PANEL_DESCRIPTION": "DJ 역할을 설정하면, 해당 역할을 가진 사용자나, 관리자만이 노래를 건너뛰거나, 반복 모드를 변경할 수 있어요.",
 	"SETTINGS_DJ_PANEL_SELECT_PLACEHOLDER": "DJ 역할을 선택해주세요.",
+	"SETTINGS_DJ_ROLE_MANAGED_ROLE": "자동으로 관리되는 역할은 DJ 역할로 설정할 수 없어요.",
+	"SETTINGS_DJ_NO_ADMIN": "관리자 권한을 가진 사용자만이 DJ 역할을 설정할 수 있어요.",
+	"SETTINGS_DJ_REMOVE": "DJ 역할 제거",
+
+	"SETTINGS_MUSIC_PANEL_TITLE": "🎧 음악 설정",
+	"SETTINGS_MUSIC_PANEL_DESCRIPTION": "음악 설정은 음악 재생에 관련된 설정을 변경할 수 있어요.",
 
 	"SETTINGS_BACK_BUTTON": "뒤로가기",
 	"SETTINGS_MAIN_BUTTONS_GOTO_DJ": "DJ 설정",
