@@ -113,6 +113,10 @@
 	"SETTINGS_MAIN_BUTTONS_GOTO_DJ": "DJ 설정",
 	"SETTINGS_MAIN_BUTTONS_GOTO_MUSIC": "음악 설정",
 	"SETTINGS_MAIN_BUTTONS_GOTO_CHANNELS": "채널 설정",
+
+	"MELON_DATA_NOT_EXISTS": "> :melon:  멜론 차트 데이터가 존재하지 않아요.",
+	"MELON_CHART_TITLE": "{0} - 멜론 차트",
+
 	"UNKNOWN": "알수 없음",
 
 	"VOLUME": "볼륨",

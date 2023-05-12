@@ -380,7 +380,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       }
       //#endregion
 
-      //#region 사용자가 음성 채널에 접속했을 떄에 사용 가능한 명령어
+      //#region 사용자가 음성 채널에 접속되어 있을 때만 사용 가능한 명령어
       if (
         commandRequirements & KafuuCommandFlags.VOICE_CONNECTED &&
         !member.voice.channelId
