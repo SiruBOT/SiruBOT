@@ -18,7 +18,7 @@
     "fast-glob": "^3.2.11",
     "fastify": "^4.15.0",
     "module-alias": "^2.2.2",
-    "mongoose": "^6.2.6",
+    "mongoose": "^7.1.1",
     "mysql2": "^3.2.0",
     "node-vibrant": "^3.2.1-alpha.1",
     "reflect-metadata": "^0.1.13",
@@ -27,7 +27,7 @@
     "tslog": "^3.3.2",
     "typeorm": "^0.3.15",
     "undici": "^4.15.1",
-    "yaml": "^1.10.2"
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "@types/argparse": "^2.0.10",
