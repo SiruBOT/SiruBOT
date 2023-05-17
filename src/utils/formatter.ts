@@ -1,5 +1,6 @@
 import path from "path";
 import { Track } from "shoukaku";
+import { MelonChartDates } from "@sirubot/melon-chart-api";
 import {
   EMOJI_VOLUME_LOUD,
   EMOJI_VOLUME_SMALL,
@@ -16,6 +17,7 @@ import {
 import { FormatTrackOptions } from "@/types/utils/formatter";
 import { PROGRESS_BAR_EMOJI_COUNT } from "@/constants/utils/formatter";
 import { KafuuMessageComponentCustomIdOptions } from "@/types/command";
+import { Locale } from "discord.js";
 
 /**
  * Convert seconds to readble format (like 00:00:00)
@@ -132,4 +134,35 @@ export function getCustomId({
   return `${commandName}:${customId}:${executorId ?? ""};${
     args ? args.join(";") : ""
   }`;
+}
+
+export function melonDateToString(
+  date: MelonChartDates,
+  locale: Locale
+): string {
+  let result = "";
+  switch (true) {
+    // Realtime
+    case date.start == date.end && date.start.length == 10:
+      result = `${date.start.slice(0, 4)}년 ${date.start.slice(
+        4,
+        6
+      )}월 ${date.start.slice(6, 8)}일 ${date.start.slice(8, 10)}시`;
+      break;
+    // Daily
+    case date.start == date.end && date.start.length == 8:
+      result = `${date.start.slice(0, 4)}년 ${date.start.slice(
+        4,
+        6
+      )}월 ${date.start.slice(6, 8)}일`;
+      break;
+    // Weekly
+    case date.start != date.end && date.start.length == 8:
+      result = `${date.start.slice(0, 4)}년 ${date.start.slice(4, 6)}월`;
+      break;
+
+    default:
+      result = date.start + " ~ " + date.end;
+  }
+  return result;
 }
