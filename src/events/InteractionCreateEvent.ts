@@ -581,7 +581,8 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       span.finish();
       transaction.finish();
       this.client.log.warn("Failed to handle interaction, invalid executor.");
-      await interaction.update({
+      await interaction.reply({
+        ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
         content: format(interaction.locale, "INTERACTION_ONLY_SAME_EXECUTOR"),
       });
       return;
@@ -638,10 +639,16 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
             customInfo: parsedCustomId,
           });
           break;
+        case interaction.isChannelSelectMenu():
+          await command.onChannelSelectMenuInteraction?.({
+            interaction: interaction as Discord.ChannelSelectMenuInteraction,
+            userPermissions: userPermissions.fulfilledPermissions,
+            customInfo: parsedCustomId,
+          });
+          break;
         case interaction.isButton():
           await command.onButtonInteraction?.({
-            interaction:
-              interaction as Discord.ButtonInteraction<Discord.CacheType>,
+            interaction: interaction as Discord.ButtonInteraction,
             userPermissions: userPermissions.fulfilledPermissions,
             customInfo: parsedCustomId,
           });
