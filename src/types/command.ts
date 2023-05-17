@@ -3,6 +3,7 @@ import type { TypeORMGuild } from "@/models/typeorm";
 import type {
   ButtonInteraction,
   CacheType,
+  ChannelSelectMenuInteraction,
   GuildMember,
   RoleSelectMenuInteraction,
 } from "discord.js";
@@ -53,6 +54,10 @@ export type KafuuButtonContext = KafuuMessageComponentContext<
 
 export type KafuuRoleSelectMenuContext = KafuuMessageComponentContext<
   RoleSelectMenuInteraction<CacheType>
+>;
+
+export type KafuuChannelSelectMenuContext = KafuuMessageComponentContext<
+  ChannelSelectMenuInteraction<CacheType>
 >;
 
 interface KafuuMessageComponentContext<
