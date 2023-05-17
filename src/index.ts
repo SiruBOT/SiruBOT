@@ -2,7 +2,11 @@ import "module-alias/register";
 import yaml from "yaml";
 import Cluster from "discord-hybrid-sharding";
 
-import { Colors, RESTPostAPIApplicationCommandsJSONBody } from "discord.js";
+import {
+  Colors,
+  RESTPostAPIApplicationCommandsJSONBody,
+  version as DJSVersion,
+} from "discord.js";
 import { Routes, APIApplication } from "discord-api-types/v9";
 import { REST as DiscordREST } from "@discordjs/rest";
 
@@ -23,8 +27,8 @@ import type {
 } from "@/types/bootstrapper";
 import type { KafuuSettings } from "@/types/settings";
 
-import { version, name } from "../package.json";
-import { getGitHash } from "./utils/version";
+import { version, name, dependencies } from "../package.json";
+import { getGitBranch, getGitHash } from "./utils/version";
 
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
@@ -112,6 +116,32 @@ async function safeReadFile(path: string): Promise<string> {
 
 /* Async function for boot */
 async function boot() {
+  const banner = `
+
+  ######   #### ########  ##     ## ########   #######  ######## 
+  ##    ##  ##  ##     ## ##     ## ##     ## ##     ##    ##    
+  ##        ##  ##     ## ##     ## ##     ## ##     ##    ##    
+   ######   ##  ########  ##     ## ########  ##     ##    ##    
+        ##  ##  ##   ##   ##     ## ##     ## ##     ##    ##    
+  ##    ##  ##  ##    ##  ##     ## ##     ## ##     ##    ##    
+   ######  #### ##     ##  #######  ########   #######     ##       
+                                                                    
+ %NAME% - %VERSION% (%GIT_BRANCH%/%GIT_HASH%)
+ Discord.JS: ${DJSVersion}
+ Shoukaku: ${dependencies.shoukaku}
+
+ %NODE_ENV% mode (%LOG_LEVEL%)
+`;
+  log.info(
+    banner
+      .replace("%VERSION%", version)
+      .replace("%NAME%", name)
+      .replace("%GIT_HASH%", getGitHash())
+      .replace("%GIT_BRANCH%", getGitBranch())
+      .replace("%NODE_ENV%", process.env.NODE_ENV || "development")
+      .replace("%LOG_LEVEL%", log.settings.minLevel)
+  );
+
   // Read config file
   log.info(
     `${name} version: ${version} (${getGitHash()}), log level: ${
