@@ -9,10 +9,13 @@ import {
   Locale,
   RoleSelectMenuBuilder,
   InteractionUpdateOptions,
+  ChannelSelectMenuBuilder,
+  ChannelType,
 } from "discord.js";
 import { BaseCommand, KafuuClient } from "@/structures";
 import {
   KafuuButtonContext,
+  KafuuChannelSelectMenuContext,
   KafuuCommandCategory,
   KafuuCommandContext,
   KafuuCommandFlags,
@@ -25,19 +28,40 @@ import {
   BOT_NAME,
   DASHBOARD_URL,
   EMOJI_BACK,
+  EMOJI_STAR,
   EMOJI_TRASH,
   SPARKLES_EMOJI,
 } from "@/constants/message";
 import { EMOJI_REPEAT } from "@/constants/message";
-import { volumeEmoji } from "@/utils/formatter";
 import { STRING_KEYS } from "@/types/locales";
-import {
-  COMMAND_WARN_MESSAGE_EPHEMERAL,
-  SYSTEM_MESSAGE_EPHEMERAL,
-} from "@/constants/events/InteractionCreateEvent";
+import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
 import { MessageComponentRenderContext } from "@/types/utils";
+import { KafuuRepeatMode } from "@/types/audio";
 
-type SettingsPageNames = "main" | "dj" | "music" | "channels";
+const PAGES = {
+  MAIN: "main",
+  DJ: "dj",
+  MUSIC: "music",
+  CHANNELS: "channels",
+} as const;
+
+const CUSTOM_IDS = {
+  GOTO_DJ: "goto_" + PAGES.DJ,
+  GOTO_MUSIC: "goto_" + PAGES.MUSIC,
+  GOTO_CHANNELS: "goto_" + PAGES.CHANNELS,
+  DJ_ROLE_SET: PAGES.DJ + "_role_set",
+  GOTO_MAIN: "goto_" + PAGES.MAIN,
+  DJ_ROLE_RESET: PAGES.DJ + "_role_reset",
+  DEFAULT_TEXT_SET: "default_text_set",
+  DEFAULT_VOICE_SET: "default_voice_set",
+  TEXT_RESET: "text_reset",
+  VOICE_RESET: "voice_reset",
+  MUSIC_PLAYMESSAGE_TOGGLE: "playmessage_toggle",
+  MUSIC_RELATED_TOGGLE: "related_toggle",
+  MUSIC_REPEAT_SET: "repeat_set",
+};
+
+type SettingsPageNames = typeof PAGES[keyof typeof PAGES];
 
 type RenderOptions = {
   page: SettingsPageNames;
@@ -69,11 +93,12 @@ class SettingsCommand extends BaseCommand {
     );
   }
 
+  //#region Handlers
   public override async onCommandInteraction({
     interaction,
   }: KafuuCommandContext): Promise<void> {
     const payload = await this.render<true>({
-      page: "main",
+      page: PAGES.MAIN,
       context: {
         guild: interaction.guild,
         member: interaction.member,
@@ -86,7 +111,7 @@ class SettingsCommand extends BaseCommand {
   // Define an asynchronous method named onButtonInteraction
   public override async onButtonInteraction({
     interaction,
-    customInfo: { customId },
+    customInfo: { customId, args },
     userPermissions,
   }: KafuuButtonContext): Promise<void> {
     if (!interaction.guild || !interaction.guildId) return;
@@ -99,36 +124,94 @@ class SettingsCommand extends BaseCommand {
       });
       return;
     }
+
+    let pageName = "";
     // SettingsCommand custom id name rule
     if (customId.startsWith("goto_")) {
       // goto_{pageName}
-      const pageName = customId.split("_")[1];
-      const payload = await this.render<false>({
-        page: pageName as SettingsPageNames,
-        context: {
-          guild: interaction.guild,
-          member: interaction.member as GuildMember,
-          locale: interaction.locale,
-        },
-      });
-      await interaction.update(payload);
-      return;
+      pageName = customId.split("_")[1];
+    } else {
+      switch (customId) {
+        // Reset DJ Role
+        case CUSTOM_IDS.DJ_ROLE_RESET:
+          await this.client.databaseHelper.upsertAndFindGuild(
+            interaction.guildId,
+            {
+              djRoleId: null,
+            }
+          );
+          pageName = PAGES.DJ;
+          break;
+        // Reset Default Text Channel
+        case CUSTOM_IDS.TEXT_RESET:
+          await this.client.databaseHelper.upsertAndFindGuild(
+            interaction.guildId,
+            {
+              textChannelId: null,
+            }
+          );
+          pageName = PAGES.CHANNELS;
+          break;
+        // Reset Default Voice Channel
+        case CUSTOM_IDS.VOICE_RESET:
+          await this.client.databaseHelper.upsertAndFindGuild(
+            interaction.guildId,
+            {
+              voiceChannelId: null,
+            }
+          );
+          pageName = PAGES.CHANNELS;
+          break;
+        // Toggle Play Message
+        case CUSTOM_IDS.MUSIC_PLAYMESSAGE_TOGGLE:
+          const sendAudioMessagesArg = args?.[0];
+          if (sendAudioMessagesArg) {
+            await this.client.databaseHelper.upsertAndFindGuild(
+              interaction.guildId,
+              {
+                sendAudioMessages: JSON.parse(sendAudioMessagesArg),
+              }
+            );
+          }
+          pageName = PAGES.MUSIC;
+          break;
+        // Toggle Play Related Videos
+        case CUSTOM_IDS.MUSIC_RELATED_TOGGLE:
+          const sendRelatedVideosArg = args?.[0];
+          if (sendRelatedVideosArg) {
+            await this.client.databaseHelper.upsertAndFindGuild(
+              interaction.guildId,
+              {
+                playRelated: JSON.parse(sendRelatedVideosArg),
+              }
+            );
+          }
+          pageName = PAGES.MUSIC;
+          break;
+        case CUSTOM_IDS.MUSIC_REPEAT_SET:
+          const repeatArg = args?.[0];
+          if (repeatArg) {
+            await this.client.databaseHelper.upsertAndFindGuild(
+              interaction.guildId,
+              {
+                repeat: Number(repeatArg),
+              }
+            );
+          }
+          pageName = PAGES.MUSIC;
+          break;
+      }
     }
-    if (customId == "dj_role_reset") {
-      await this.client.databaseHelper.upsertAndFindGuild(interaction.guildId, {
-        djRoleId: null,
-      });
-      const payload = await this.render<false>({
-        context: {
-          guild: interaction.guild,
-          locale: interaction.locale,
-          member: interaction.member as GuildMember,
-        },
-        page: "dj",
-      });
-      await interaction.update(payload);
-      return;
-    }
+
+    const payload = await this.render<false>({
+      page: pageName as SettingsPageNames,
+      context: {
+        guild: interaction.guild,
+        member: interaction.member as GuildMember,
+        locale: interaction.locale,
+      },
+    });
+    await interaction.update(payload);
   }
 
   public override async onRoleSelectMenuInteraction({
@@ -145,8 +228,9 @@ class SettingsCommand extends BaseCommand {
       });
       return;
     }
+
     // Managed role check
-    const role = interaction.roles.first(); // Nullable
+    const role = interaction.roles.first();
     if (role && role.managed) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
@@ -165,24 +249,75 @@ class SettingsCommand extends BaseCommand {
           locale: interaction.locale,
           member: interaction.member as GuildMember,
         },
-        page: "dj",
+        page: PAGES.DJ,
       });
       await interaction.update(payload);
       return;
     }
   }
 
+  public override async onChannelSelectMenuInteraction({
+    interaction,
+    userPermissions,
+    customInfo: { customId },
+  }: KafuuChannelSelectMenuContext) {
+    if (!interaction.guild || !interaction.guildId) return;
+    if (!interaction.member || !interaction.user) return;
+    // RoleSelectMenu, If interaction user does not have permission 'admin' reject the interaction
+    if (!userPermissions.includes(KafuuCommandPermission.ADMIN)) {
+      await interaction.reply({
+        ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
+        content: format(interaction.locale, "INTERACTION_ONLY_ADMIN"),
+      });
+      return;
+    }
+
+    const toSet = interaction.channels.first();
+
+    switch (customId) {
+      case CUSTOM_IDS.DEFAULT_TEXT_SET:
+        await this.client.databaseHelper.upsertAndFindGuild(
+          interaction.guild.id,
+          {
+            textChannelId: toSet?.id ? toSet.id : null,
+          }
+        );
+        break;
+      case CUSTOM_IDS.DEFAULT_VOICE_SET:
+        await this.client.databaseHelper.upsertAndFindGuild(
+          interaction.guild.id,
+          {
+            voiceChannelId: toSet?.id ? toSet.id : null,
+          }
+        );
+        break;
+    }
+
+    const payload = await this.render<false>({
+      context: {
+        guild: interaction.guild,
+        locale: interaction.locale,
+        member: interaction.member as GuildMember,
+      },
+      page: PAGES.CHANNELS,
+    });
+    await interaction.update(payload);
+    return;
+  }
+  //#endregion
+
+  // Menu
   private async render<IsReply extends boolean>(
     opts: RenderOptions
   ): ReplyOrUpdate<IsReply> {
     switch (opts.page) {
-      case "main":
+      case PAGES.MAIN:
         return await this.renderMain<IsReply>(opts);
-      case "dj":
+      case PAGES.DJ:
         return await this.renderDJ(opts);
-      case "music":
+      case PAGES.MUSIC:
         return await this.renderMusic(opts);
-      case "channels":
+      case PAGES.CHANNELS:
         return await this.renderChannels(opts);
     }
   }
@@ -196,7 +331,6 @@ class SettingsCommand extends BaseCommand {
       repeat,
       sendAudioMessages,
       textChannelId,
-      volume,
       voiceChannelId,
     } = await this.client.databaseHelper.upsertAndFindGuild(guild.id); // Query the database for the guild's settings
     const mainEmbed = this.createSettingsEmbed({ locale, guild });
@@ -232,10 +366,6 @@ class SettingsCommand extends BaseCommand {
         format(locale, "SETTINGS_MAIN_FIELDS_REPEAT", EMOJI_REPEAT[repeat]),
         format(locale, ("REPEAT_" + repeat) as STRING_KEYS),
       ],
-      [
-        format(locale, "SETTINGS_MAIN_FIELDS_VOLUME", volumeEmoji(volume)),
-        `**${volume.toString()}**%`,
-      ],
     ];
     //#endregion
     //#region buttons
@@ -244,7 +374,7 @@ class SettingsCommand extends BaseCommand {
         .setLabel(format(locale, "SETTINGS_MAIN_BUTTONS_GOTO_DJ"))
         .setCustomId(
           this.getCustomId({
-            customId: "goto_dj",
+            customId: CUSTOM_IDS.GOTO_DJ,
             executorId: member.id,
           })
         )
@@ -253,14 +383,20 @@ class SettingsCommand extends BaseCommand {
       new ButtonBuilder()
         .setLabel(format(locale, "SETTINGS_MAIN_BUTTONS_GOTO_MUSIC"))
         .setCustomId(
-          this.getCustomId({ customId: "goto_music", executorId: member.id })
+          this.getCustomId({
+            customId: CUSTOM_IDS.GOTO_MUSIC,
+            executorId: member.id,
+          })
         )
         .setEmoji("🎵")
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setLabel(format(locale, "SETTINGS_MAIN_BUTTONS_GOTO_CHANNELS"))
         .setCustomId(
-          this.getCustomId({ customId: "goto_channels", executorId: member.id })
+          this.getCustomId({
+            customId: CUSTOM_IDS.GOTO_CHANNELS,
+            executorId: member.id,
+          })
         )
         .setEmoji("📑")
         .setStyle(ButtonStyle.Secondary),
@@ -313,7 +449,10 @@ class SettingsCommand extends BaseCommand {
       ]);
     const roleSelectMenu = new RoleSelectMenuBuilder()
       .setCustomId(
-        this.getCustomId({ customId: "dj_role_set", executorId: member.id })
+        this.getCustomId({
+          customId: CUSTOM_IDS.DJ_ROLE_SET,
+          executorId: member.id,
+        })
       )
       .setMaxValues(1)
       .setMinValues(1)
@@ -321,7 +460,10 @@ class SettingsCommand extends BaseCommand {
     const buttons = [
       new ButtonBuilder()
         .setCustomId(
-          this.getCustomId({ customId: "goto_main", executorId: member.id })
+          this.getCustomId({
+            customId: CUSTOM_IDS.GOTO_MAIN,
+            executorId: member.id,
+          })
         )
         .setLabel(format(locale, "SETTINGS_BACK_BUTTON"))
         .setEmoji(EMOJI_BACK)
@@ -329,7 +471,7 @@ class SettingsCommand extends BaseCommand {
       new ButtonBuilder()
         .setCustomId(
           this.getCustomId({
-            customId: "dj_role_reset",
+            customId: CUSTOM_IDS.DJ_ROLE_RESET,
             executorId: member.id,
           })
         )
@@ -355,8 +497,14 @@ class SettingsCommand extends BaseCommand {
   private async renderMusic<IsReply extends boolean>({
     context: { locale, guild, member },
   }: RenderOptions): ReplyOrUpdate<IsReply> {
-    const { sendAudioMessages, playRelated, repeat, volume } =
+    const { sendAudioMessages, playRelated, repeat } =
       await this.client.databaseHelper.upsertAndFindGuild(guild.id);
+    const nextRepeat =
+      repeat === KafuuRepeatMode.OFF
+        ? KafuuRepeatMode.ALL
+        : repeat === KafuuRepeatMode.ALL
+        ? KafuuRepeatMode.SINGLE
+        : KafuuRepeatMode.OFF;
     return {
       embeds: [
         this.createSettingsEmbed({
@@ -365,47 +513,94 @@ class SettingsCommand extends BaseCommand {
         })
           .setTitle(format(locale, "SETTINGS_MUSIC_PANEL_TITLE"))
           .setDescription(format(locale, "SETTINGS_MUSIC_PANEL_DESCRIPTION"))
-          .addFields(
-            [
-              {
-                name: format(locale, "SETTINGS_MAIN_FIELDS_PLAYMESSAGE"),
-                value: format(locale, sendAudioMessages ? "ON" : "OFF"),
-              },
-              {
-                name: format(locale, "SETTINGS_MAIN_FIELDS_RELATED"),
-                value: format(locale, playRelated ? "ON" : "OFF"),
-              },
-              {
+          .addFields([
+            {
+              name: format(locale, "SETTINGS_MAIN_FIELDS_PLAYMESSAGE"),
+              value: format(locale, sendAudioMessages ? "ON" : "OFF"),
+            },
+            {
+              name: format(locale, "SETTINGS_MAIN_FIELDS_RELATED"),
+              value: format(locale, playRelated ? "ON" : "OFF"),
+            },
+            {
+              // eslint-disable-next-line security/detect-object-injection
+              name: format(
+                locale,
+                "SETTINGS_MAIN_FIELDS_REPEAT",
                 // eslint-disable-next-line security/detect-object-injection
-                name: format(
-                  locale,
-                  "SETTINGS_MAIN_FIELDS_REPEAT",
-                  // eslint-disable-next-line security/detect-object-injection
-                  EMOJI_REPEAT[repeat]
-                ),
-                value: format(locale, ("REPEAT_" + repeat) as STRING_KEYS),
-              },
-              {
-                name: format(
-                  locale,
-                  "SETTINGS_MAIN_FIELDS_VOLUME",
-                  volumeEmoji(volume)
-                ),
-                value: `**${volume.toString()}**%`,
-              },
-            ].map((e) => {
-              return { ...e, inline: true };
-            })
-          ),
+                EMOJI_REPEAT[repeat]
+              ),
+              value: format(locale, ("REPEAT_" + repeat) as STRING_KEYS),
+            },
+          ]),
       ],
       components: [
         new ActionRowBuilder<ButtonBuilder>().addComponents([
           new ButtonBuilder()
             .setCustomId(
-              this.getCustomId({ customId: "goto_main", executorId: member.id })
+              this.getCustomId({
+                customId: CUSTOM_IDS.MUSIC_PLAYMESSAGE_TOGGLE,
+                args: [`${!sendAudioMessages}`],
+              })
+            )
+            .setLabel(
+              format(
+                locale,
+                sendAudioMessages
+                  ? "SETTINGS_MUSIC_PLAYMESSAGE_BTN_OFF"
+                  : "SETTINGS_MUSIC_PLAYMESSAGE_BTN_ON"
+              )
+            )
+            .setEmoji("📨")
+            .setStyle(
+              sendAudioMessages ? ButtonStyle.Secondary : ButtonStyle.Primary
+            ),
+          new ButtonBuilder()
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.MUSIC_RELATED_TOGGLE,
+                args: [`${!playRelated}`],
+              })
+            )
+            .setLabel(
+              format(
+                locale,
+                playRelated
+                  ? "SETTINGS_MUSIC_RELATED_BTN_OFF"
+                  : "SETTINGS_MUSIC_RELATED_BTN_ON"
+              )
+            )
+            .setEmoji(EMOJI_STAR)
+            .setStyle(
+              playRelated ? ButtonStyle.Secondary : ButtonStyle.Primary
+            ),
+        ]),
+        new ActionRowBuilder<ButtonBuilder>().addComponents([
+          new ButtonBuilder()
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.GOTO_MAIN,
+                executorId: member.id,
+              })
             )
             .setLabel(format(locale, "SETTINGS_BACK_BUTTON"))
             .setEmoji(EMOJI_BACK)
+            .setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder()
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.MUSIC_REPEAT_SET,
+                args: [`${nextRepeat}`],
+              })
+            )
+            .setLabel(
+              format(
+                locale,
+                ("SETTINGS_MUSIC_REPEAT_BTN_" + nextRepeat) as STRING_KEYS
+              )
+            )
+            // eslint-disable-next-line security/detect-object-injection
+            .setEmoji(EMOJI_REPEAT[nextRepeat])
             .setStyle(ButtonStyle.Secondary),
         ]),
       ],
@@ -413,12 +608,108 @@ class SettingsCommand extends BaseCommand {
   }
 
   private async renderChannels<IsReply extends boolean>({
-    context: { locale, guild },
+    context: { locale, guild, member },
   }: RenderOptions): ReplyOrUpdate<IsReply> {
-    const mainEmbed = EmbedFactory.createEmbed();
-    const mainActionRow = new ActionRowBuilder<ButtonBuilder>();
-
-    return {};
+    const { textChannelId, voiceChannelId } =
+      await this.client.databaseHelper.upsertAndFindGuild(guild.id);
+    const [textChannel, voiceChannel] = await Promise.all([
+      textChannelId ? guild.channels.fetch(textChannelId) : null,
+      voiceChannelId ? guild.channels.fetch(voiceChannelId) : null,
+    ]);
+    return {
+      embeds: [
+        this.createSettingsEmbed({
+          locale,
+          guild,
+        })
+          .setTitle(format(locale, "SETTINGS_CHANNELS_PANEL_TITLE"))
+          .setDescription(format(locale, "SETTINGS_CHANNELS_PANEL_DESCRIPTION"))
+          .addFields(
+            [
+              {
+                name: format(locale, "SETTINGS_MAIN_FIELDS_TEXTCH"),
+                value: textChannel
+                  ? `<#${textChannel.id}>`
+                  : format(locale, "SETTINGS_TEXTCH_NONE"),
+              },
+              {
+                name: format(locale, "SETTINGS_MAIN_FIELDS_VOICECH"),
+                value: voiceChannel
+                  ? `<#${voiceChannel.id}>`
+                  : format(locale, "SETTINGS_VOICECH_NONE"),
+              },
+            ].map((e) => {
+              return { ...e, inline: true };
+            })
+          ),
+      ],
+      components: [
+        new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents([
+          new ChannelSelectMenuBuilder()
+            .setPlaceholder(
+              format(locale, "SETTINGS_CHANNELS_TEXT_PLACEHOLDER")
+            )
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.DEFAULT_TEXT_SET,
+                executorId: member.id,
+              })
+            )
+            .setChannelTypes(ChannelType.GuildText)
+            .setMaxValues(1)
+            .setMinValues(0),
+        ]),
+        new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents([
+          new ChannelSelectMenuBuilder()
+            .setPlaceholder(
+              format(locale, "SETTINGS_CHANNELS_VOICE_PLACEHOLDER")
+            )
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.DEFAULT_VOICE_SET,
+                executorId: member.id,
+              })
+            )
+            .setChannelTypes(ChannelType.GuildVoice)
+            .setMaxValues(1)
+            .setMinValues(0),
+        ]),
+        new ActionRowBuilder<ButtonBuilder>().addComponents([
+          new ButtonBuilder()
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.GOTO_MAIN,
+                executorId: member.id,
+              })
+            )
+            .setLabel(format(locale, "SETTINGS_BACK_BUTTON"))
+            .setEmoji(EMOJI_BACK)
+            .setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder()
+            .setEmoji(EMOJI_TRASH)
+            .setLabel(format(locale, "SETTINGS_CHANNELS_REMOVE_TEXT"))
+            .setStyle(ButtonStyle.Danger)
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.TEXT_RESET,
+                executorId: member.id,
+              })
+            )
+            .setDisabled(!textChannel),
+          new ButtonBuilder()
+            .setEmoji(EMOJI_TRASH)
+            .setLabel(format(locale, "SETTINGS_CHANNELS_REMOVE_VOICE"))
+            .setStyle(ButtonStyle.Danger)
+            .setCustomId(
+              this.getCustomId({
+                customId: CUSTOM_IDS.VOICE_RESET,
+                executorId: member.id,
+              })
+            )
+            .setDisabled(!voiceChannel),
+        ]),
+      ],
+    };
   }
 
   private createSettingsEmbed({
