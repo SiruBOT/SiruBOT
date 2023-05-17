@@ -11,6 +11,7 @@ import type {
   KafuuButtonContext,
   KafuuRoleSelectMenuContext,
   KafuuMessageComponentCustomIdOptions,
+  KafuuChannelSelectMenuContext,
 } from "@/types/command";
 import { KafuuCommandPermission } from "@/types/command";
 import { getCustomId } from "@/utils/formatter";
@@ -51,15 +52,19 @@ export abstract class BaseCommand {
     context: KafuuCommandContext<boolean>
   ): Promise<void>;
 
+  public onChannelSelectMenuInteraction?(
+    context: KafuuChannelSelectMenuContext
+  ): Promise<void>;
+
+  public onRoleSelectMenuInteraction?(
+    context: KafuuRoleSelectMenuContext
+  ): Promise<void>;
+
   public onAutocompleteInteraction?(
     interaction: Discord.AutocompleteInteraction
   ): Promise<void>;
 
   public onButtonInteraction?(context: KafuuButtonContext): Promise<void>;
-
-  public onRoleSelectMenuInteraction?(
-    context: KafuuRoleSelectMenuContext
-  ): Promise<void>;
 
   public onMessageComponentInteraction?(
     interaction: Discord.MessageComponentInteraction
