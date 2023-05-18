@@ -27,7 +27,7 @@ export class PlayerDispatcher {
   public queue: Queue;
   public audioMessage: AudioMessage;
   public log: Logger;
-  public playedRelatedTracks: string[];
+  public playedYoutubeTracks: string[];
 
   private guildId: string;
   private _destroyed = false;
@@ -49,6 +49,7 @@ export class PlayerDispatcher {
       joinOptions.textChannelId,
       this.log
     );
+    this.playedYoutubeTracks = [];
     this.setupDispatcher();
   }
 
@@ -63,11 +64,36 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async onClosed(reason: WebSocketClosedEvent) {
-    this.log.warn("Websocket closed", reason || "No reason");
-    this.destroy();
-    const friendlyErrorCodes = [4014];
-    if (friendlyErrorCodes.includes(reason.code)) {
-      await this.sendDisconnected();
+    const friendlyErrorCode = 4014;
+    const resumeErrorCode = 4006;
+    const reasonString = Object.entries(reason)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(", ");
+    switch (reason.code) {
+      case friendlyErrorCode:
+        this.log.warn(
+          "Websocket closed, disconncted from user, (friendlyErrorCode) " +
+            reasonString
+        );
+        this.destroy();
+        await this.sendDisconnected();
+        break;
+      case resumeErrorCode:
+        this.log.warn(
+          "Websocket closed,  may be lavalink resume" + reasonString
+        );
+        break;
+      default:
+        this.log.warn("Websocket closed, unknown reason, " + reasonString);
+        this.destroy();
+        Sentry.captureEvent({
+          message:
+            "Unknown websocket closed event. " +
+            reason.code +
+            " " +
+            reasonString,
+        });
+        break;
     }
   }
 
@@ -75,7 +101,10 @@ export class PlayerDispatcher {
   private async onUpdate(data: PlayerUpdate) {
     const { position, connected } = data.state;
     if (!position) {
-      this.log.debug(`PlayerUpdate data is not containing position data.`);
+      this.log.debug(
+        `PlayerUpdate data is not containing position data.`,
+        data
+      );
     } else {
       this.log.debug(
         `Update position data to ${
