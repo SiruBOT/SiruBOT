@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x] # Node.JS 16.x, 18.x 버전에서 빌드합니다
+        node-version: [18.x] # Node.JS 18.x 버전에서 빌드합니다
 
     steps:
     - 

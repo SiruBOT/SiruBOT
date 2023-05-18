@@ -1,17 +1,20 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../../structures";
+
+import { BaseCommand, KafuuClient } from "@/structures";
+import { TypeORMGuild } from "@/models/typeorm";
+
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../../types";
-import locale from "../../../locales";
-import { Guild } from "../../../database/mysql/entities";
-import { EMOJI_REPEAT } from "../../../constant/MessageConstant";
-import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { EMOJI_REPEAT } from "@/constants/message";
+import { format } from "@/locales";
+import { STRING_KEYS } from "@/types/locales";
 
 export default class RepeatCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("repeat")
       .setNameLocalizations({
@@ -59,9 +62,9 @@ export default class RepeatCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.DJ],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.DJ],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
@@ -69,40 +72,40 @@ export default class RepeatCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
     userPermissions,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const repeatMode: string | null =
       interaction.options.getString("repeat_mode");
-    if (!repeatMode || !userPermissions.includes(CommandPermissions.DJ)) {
-      const guildConfig: Guild =
+    if (!repeatMode || !userPermissions.includes(KafuuCommandPermission.DJ)) {
+      const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId
         );
       await interaction.reply({
-        content: locale.format(
+        content: format(
           interaction.locale,
           "REPEAT_STATE",
           EMOJI_REPEAT[guildConfig.repeat], // EMOJI_REPEAT => OFF: "EMOJI", RepeatModeString => (number like string): "OFF"
-          locale.format(
+          format(
             interaction.locale,
-            "REPEAT_" + guildConfig.repeat.toString()
+            ("REPEAT_" + guildConfig.repeat.toString()) as STRING_KEYS
           )
         ),
       });
       return;
     } else {
-      const guildConfig: Guild =
+      const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId,
           { repeat: parseInt(repeatMode) }
         );
       await interaction.reply({
-        content: locale.format(
+        content: format(
           interaction.locale,
           "REPEAT_SET",
           EMOJI_REPEAT[guildConfig.repeat],
-          locale.format(
+          format(
             interaction.locale,
-            "REPEAT_" + guildConfig.repeat.toString()
+            ("REPEAT_" + guildConfig.repeat.toString()) as STRING_KEYS
           )
         ),
       });

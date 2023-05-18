@@ -1,25 +1,25 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../structures";
-import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import locale from "../../locales";
-import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
+import { BaseCommand, KafuuClient } from "@/structures";
+
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ButtonInteraction,
   InteractionUpdateOptions,
   InteractionReplyOptions,
+  Locale,
 } from "discord.js";
-import { EMOJI_REFRESH, EMOJI_STAR } from "../../constant/MessageConstant";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+import { EMOJI_REFRESH, EMOJI_STAR } from "@/constants/message";
+import {
+  KafuuButtonContext,
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
 
 export default class NowplayingCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("nowplaying")
       .setNameLocalizations({
@@ -32,34 +32,32 @@ export default class NowplayingCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
       ["SendMessages", "EmbedLinks"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     await interaction.reply(
-      await this.getNowplayingPayload(
-        interaction.guildId,
-        interaction.locale,
-        this.client.audio.dispatchers.get(interaction.guildId)
-      )
+      await this.getNowplayingPayload(interaction.guildId, interaction.locale)
     );
   }
 
-  public override async onButtonInteraction(interaction: ButtonInteraction) {
+  public override async onButtonInteraction({
+    interaction,
+    customInfo: { customId },
+  }: KafuuButtonContext) {
     if (!interaction.guild || !interaction.guildId) return;
-    switch (interaction.customId) {
+    switch (customId) {
       case "np_refresh":
         await interaction.update(
           await this.getNowplayingPayload(
             interaction.guildId,
-            interaction.locale,
-            this.client.audio.dispatchers.get(interaction.guildId)
+            interaction.locale
           )
         );
         break;
@@ -76,30 +74,27 @@ export default class NowplayingCommand extends BaseCommand {
         new ButtonBuilder()
           .setEmoji(EMOJI_REFRESH)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId(this.getCustomId("np_refresh")),
+          .setCustomId(this.getCustomId({ customId: "np_refresh" })),
         new ButtonBuilder()
           .setEmoji(EMOJI_STAR)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId(this.getCustomId("np_favorite"))
+          .setCustomId(this.getCustomId({ customId: "np_favorite" }))
       );
     return actionRow;
   }
 
   private async getNowplayingPayload(
     guildId: string,
-    localeName: string,
-    dispatcher?: PlayerDispatcher
+    localeName: string
   ): Promise<InteractionUpdateOptions & InteractionReplyOptions> {
     return {
       components: [this.buildActionRow()],
-      content: dispatcher
-        ? locale.format(
-            localeName,
-            "NOWPLAYING_TITLE",
-            dispatcher.player.connection.channelId ?? "0"
-          )
-        : "",
-      embeds: [await this.client.audio.getNowPlayingEmbed(guildId, localeName)],
+      embeds: [
+        await this.client.audio.getNowPlayingEmbed(
+          guildId,
+          localeName as Locale
+        ),
+      ],
       fetchReply: true,
     };
   }

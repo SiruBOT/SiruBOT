@@ -1,20 +1,23 @@
-// Import sentry
-import * as Sentry from "@sentry/node";
-// Import @sentry/tracing
-import * as Tracing from "@sentry/tracing";
-// Import discord.js/sharding stuff
+// Import module-alias for path alias
+import "module-alias/register";
+// Import discord.js stuff
 import Discord, { GatewayIntentBits } from "discord.js";
 import Cluster from "discord-hybrid-sharding";
-// Import logger for logging
-import { Logger } from "tslog";
-// Import structures
-import { Client } from "./structures";
-import * as URLUtils from "./utils/URLUtils";
-import type { ISettings, IBootStrapperArgs } from "./types";
-import { RewriteFrames } from "@sentry/integrations";
 
-let argvSettings: ISettings;
-let bootStrapperArgs: IBootStrapperArgs;
+// Import Sentry stuff
+import * as Sentry from "@sentry/node";
+import * as Tracing from "@sentry/tracing";
+import { RewriteFrames } from "@sentry/integrations";
+import { Logger } from "tslog";
+
+// Import Kafuu
+import { KafuuClient } from "@/structures";
+import { isURL } from "@/utils/url";
+import type { KafuuBootStrapperArgs } from "@/types/bootstrapper";
+import type { KafuuSettings } from "@/types/settings";
+
+let argvSettings: KafuuSettings;
+let bootStrapperArgs: KafuuBootStrapperArgs;
 
 try {
   argvSettings = JSON.parse(process.argv[2]);
@@ -59,17 +62,19 @@ if (bootStrapperArgs.shard) {
 }
 
 log.debug("Create client instance");
-const client = new Client(clientOptions, log, argvSettings, bootStrapperArgs);
+const client = new KafuuClient(
+  clientOptions,
+  log,
+  argvSettings,
+  bootStrapperArgs
+);
 
 if (bootStrapperArgs.shard) {
   log.debug("Sharding enabled. Set Client.cluster to Cluster.Client");
   client.cluster = new Cluster.Client(client);
 }
 
-if (
-  argvSettings?.sentryDsn &&
-  URLUtils.isURL(argvSettings.sentryDsn as string)
-) {
+if (argvSettings?.sentryDsn && isURL(argvSettings.sentryDsn as string)) {
   log.info(`Sentry enabled, DSN: ${argvSettings.sentryDsn}`);
   Sentry.init({
     dsn: argvSettings.sentryDsn,

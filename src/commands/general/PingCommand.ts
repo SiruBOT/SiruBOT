@@ -1,18 +1,20 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+// Import discord.js and SlashCommandBuilder
 import * as Discord from "discord.js";
-import { BaseCommand, Client } from "../../structures";
+import { SlashCommandBuilder } from "@discordjs/builders";
+
+// Import necessary modules and types
+import { BaseCommand, KafuuClient } from "@/structures";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
-import { EmbedFactory } from "../../utils";
-import locale from "../../locales/";
-import { fetch } from "undici";
+  KafuuCommandCategory,
+  KafuuCommandPermission,
+  KafuuCommandContext,
+} from "@/types/command";
+import { KafuuCommandFlags } from "@/types/command";
+import { EmbedFactory } from "@/utils/embed";
+import { format } from "@/locales";
 
 export default class PingCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("ping")
       .setNameLocalizations({
@@ -25,16 +27,16 @@ export default class PingCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.GENERAL,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.GENERAL,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const pingEmbed: Discord.EmbedBuilder = EmbedFactory.createEmbed();
 
     const deferReply = await interaction.deferReply({ fetchReply: true });
@@ -43,7 +45,7 @@ export default class PingCommand extends BaseCommand {
     );
 
     pingEmbed.setDescription(
-      locale.format(
+      format(
         interaction.locale,
         "PING_PONG_EMBED",
         interaction.member.displayName,

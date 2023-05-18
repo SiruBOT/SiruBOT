@@ -1,5 +1,6 @@
-import { Client } from "../Client";
-import { Queue } from "./Queue";
+import { Logger } from "tslog";
+import * as Sentry from "@sentry/node";
+
 import {
   PlayerUpdate,
   Player,
@@ -7,31 +8,34 @@ import {
   TrackExceptionEvent,
   WebSocketClosedEvent,
 } from "shoukaku";
-import { Logger } from "tslog";
+
+import { KafuuClient } from "@/structures/KafuuClient";
 import {
-  IAudioTrack,
-  IGuildAudioData,
-  IJoinOptions,
-  RepeatMode,
-} from "../../types";
-import * as Sentry from "@sentry/node";
-import { AudioMessage } from "./AudioMessage";
-import { ReusableFormatFunction } from "../../locales/LocalePicker";
-import { Formatter } from "../../utils";
-import { Guild } from "../../database/mysql/entities";
-import { BreakOnDestroyed } from "./PlayerDecorator";
+  KafuuAudioTrack,
+  KafuuJoinOptions,
+  KafuuRepeatMode,
+} from "@/types/audio";
+import { AudioMessage, BreakOnDestroyed, Queue } from "@/structures/audio";
+import { ReusableFormatFunc } from "@/types/locales";
+
+import { formatTrack, humanizeSeconds } from "@/utils/formatter";
+import { TypeORMGuild } from "@/models/typeorm";
 
 export class PlayerDispatcher {
-  public client: Client;
+  public client: KafuuClient;
   public player: Player;
   public queue: Queue;
   public audioMessage: AudioMessage;
   public log: Logger;
-  public playedRelatedTracks: string[];
+  public playedYoutubeTracks: string[];
 
   private guildId: string;
   private _destroyed = false;
-  constructor(client: Client, player: Player, joinOptions: IJoinOptions) {
+  constructor(
+    client: KafuuClient,
+    player: Player,
+    joinOptions: KafuuJoinOptions
+  ) {
     this.client = client;
     this.player = player;
     this.guildId = this.player.connection.guildId;
@@ -45,10 +49,13 @@ export class PlayerDispatcher {
       joinOptions.textChannelId,
       this.log
     );
+    this.playedYoutubeTracks = [];
+    this.setupDispatcher();
   }
 
   @BreakOnDestroyed()
-  registerPlayerEvent() {
+  private setupDispatcher() {
+    this.log.debug("Setup dispatcher events..");
     this.player.on("closed", (...args) => this.onClosed(...args));
     this.player.on("end", (...args) => this.onEnd(...args));
     this.player.on("update", (...args) => this.onUpdate(...args));
@@ -57,11 +64,36 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async onClosed(reason: WebSocketClosedEvent) {
-    this.log.warn(`Websocket closed`, reason || "No reason");
-    this.destroy();
-    const friendlyErrorCodes = [4014];
-    if (friendlyErrorCodes.includes(reason.code)) {
-      await this.sendDisconnected();
+    const friendlyErrorCode = 4014;
+    const resumeErrorCode = 4006;
+    const reasonString = Object.entries(reason)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(", ");
+    switch (reason.code) {
+      case friendlyErrorCode:
+        this.log.warn(
+          "Websocket closed, disconncted from user, (friendlyErrorCode) " +
+            reasonString
+        );
+        this.destroy();
+        await this.sendDisconnected();
+        break;
+      case resumeErrorCode:
+        this.log.warn(
+          "Websocket closed,  may be lavalink resume" + reasonString
+        );
+        break;
+      default:
+        this.log.warn("Websocket closed, unknown reason, " + reasonString);
+        this.destroy();
+        Sentry.captureEvent({
+          message:
+            "Unknown websocket closed event. " +
+            reason.code +
+            " " +
+            reasonString,
+        });
+        break;
     }
   }
 
@@ -69,7 +101,10 @@ export class PlayerDispatcher {
   private async onUpdate(data: PlayerUpdate) {
     const { position, connected } = data.state;
     if (!position) {
-      this.log.debug(`PlayerUpdate data is not containing position data.`);
+      this.log.debug(
+        `PlayerUpdate data is not containing position data.`,
+        data
+      );
     } else {
       this.log.debug(
         `Update position data to ${
@@ -85,6 +120,7 @@ export class PlayerDispatcher {
     // TODO: 플레이어 핸들이 안되어 있음
     this.log.error(`Error while playback`, exception);
     Sentry.captureException(exception);
+    this.destroy();
   }
 
   @BreakOnDestroyed()
@@ -96,9 +132,9 @@ export class PlayerDispatcher {
     switch (trackEndEvent.reason) {
       case "FINISHED":
         try {
-          const guildConfig: Guild =
+          const guildConfig: TypeORMGuild =
             await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
-          if (guildConfig.repeat !== RepeatMode.OFF) {
+          if (guildConfig.repeat !== KafuuRepeatMode.OFF) {
             this.log.debug(`Trying handle repeat ${guildConfig.repeat}`);
             await this.handleRepeat(guildConfig.repeat);
             return;
@@ -131,7 +167,7 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  public async addTracks(tracks: IAudioTrack[]): Promise<number> {
+  public async addTracks(tracks: KafuuAudioTrack[]): Promise<number> {
     this.log.debug(`Add tracks ${tracks.length}`);
     await this.queue.pushTracks(tracks);
     await this.playOrResumeOrNothing();
@@ -139,8 +175,8 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  public async addTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(`Add track ${track.track.info.identifier}`);
+  public async addTrack(track: KafuuAudioTrack): Promise<KafuuAudioTrack> {
+    this.log.debug(`Add track ${track.info.identifier}`);
     await this.queue.pushTrack(track);
     await this.playOrResumeOrNothing();
     return track;
@@ -160,35 +196,36 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  public async playOrResumeOrNothing(): Promise<IAudioTrack | void> {
-    const { nowPlaying, queue } = await this.queue.getGuildAudioData();
-    if (nowPlaying && !this.player.track) {
+  public async playOrResumeOrNothing(): Promise<KafuuAudioTrack | void> {
+    const { nowPlaying, queue, position } =
+      await this.queue.getGuildAudioData();
+    if (nowPlaying && position && !this.player.track) {
       this.log.debug(
         `Database nowplaying is exists, but player is not. resuming`
       );
-      return await this.resumeNowPlaying(nowPlaying);
-    } else if (!this.player.track && queue.length > 0) {
-      this.log.debug(`Player is nothing to playing, playing next track`);
-      return await this.playNextTrack();
-    } else {
-      this.log.debug(
-        `This player is already playing. just push track to queue`
-      );
-      return;
+      return await this.resumeNowPlaying(nowPlaying, position);
     }
+    if (!this.player.track && queue.length > 0) {
+      this.log.debug(
+        `Player is nothing to playing but next track exists playing next track`
+      );
+      return await this.playNextTrack();
+    }
+    this.log.debug(`This player is already playing. just push track to queue`);
+    return;
   }
 
   @BreakOnDestroyed()
-  private async playNextTrack(): Promise<IAudioTrack | void> {
+  private async playNextTrack(): Promise<KafuuAudioTrack | void> {
     this.log.debug(`Playing next track`);
-    const guildConfig: Guild =
+    const guildConfig: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
-    const toPlay: IAudioTrack | null = await this.queue.shiftTrack();
+    const toPlay: KafuuAudioTrack | null = await this.queue.shiftTrack();
     if (toPlay) {
       await this.playTrack(toPlay, guildConfig.volume);
       return toPlay;
     } else if (
-      guildConfig.repeat === RepeatMode.OFF &&
+      guildConfig.repeat === KafuuRepeatMode.OFF &&
       guildConfig.playRelated
     ) {
       this.log.debug(
@@ -205,52 +242,52 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async playRelated(): Promise<void> {
-    // Related track handle
-    const beforeTrack: IAudioTrack | null = await this.queue.getNowPlaying();
-    const format: ReusableFormatFunction =
+    const format: ReusableFormatFunc =
       await this.audioMessage.getReusableFormatFunction();
-    if (
-      !beforeTrack ||
-      beforeTrack.track.info.sourceName !== "youtube" ||
-      !beforeTrack.track.info.identifier
-    ) {
-      // Youtube only message send & clean disconnect
+    const beforeTrack = await this.queue.getNowPlaying();
+    // 이전 트랙이 없거나, 이전 트랙이 유튜브가 아니면 종료
+    if (!beforeTrack || beforeTrack.info.sourceName != "youtube") {
       this.log.debug(
-        "beforeTrack is not youtube video or beforeTrack is not exists. Stop & clean PlayerDispatcher"
+        `Before track is not exists or identifier is not exists. Stop & clean PlayerDispatcher`
       );
       await this.audioMessage.sendMessage(format("RELATED_ONLY_YOUTUBE"));
       await this.cleanStop();
-    } else {
-      // Handle related
-      try {
-        const relatedVideo: IAudioTrack | null =
-          await this.client.audio.getRelatedVideo(
-            beforeTrack.track.info.identifier
-          );
-        if (!relatedVideo) {
-          // 추천 영상을 찾지 못했어요.
-          await this.audioMessage.sendMessage(format("RELATED_FAILED"));
-          await this.cleanStop();
-        } else {
-          // Play Next Track
-          await this.queue.pushTrack(relatedVideo);
-          await this.playNextTrack();
-        }
-      } catch (error) {
-        const exceptionId: string = Sentry.captureException(error);
-        this.log.error("Failed to scrape related video.", error);
-        // 추천 영상을 가져오는 도중 오류가 발생했어요! 노래를 종료할게요.
+      return;
+    }
+    try {
+      // Try scrape related video
+      const relatedSearchResult = await this.client.audio.getRelatedVideo(
+        beforeTrack.info.identifier
+      );
+      // When related video is not exists, stop player
+      if (!relatedSearchResult) {
+        await this.audioMessage.sendMessage(format("RELATED_FAILED"));
         await this.cleanStop();
-        await this.audioMessage.sendMessage(
-          format("RELATED_SCRAPE_ERROR", exceptionId)
-        );
+        return;
       }
+      // Push related video to queue
+      await this.queue.pushTrack(relatedSearchResult);
+      // Play next track
+      await this.playNextTrack();
+      return;
+    } catch (error) {
+      // When scrape related video is failed, stop player and capture Exception
+      const exceptionId: string = Sentry.captureException(error);
+      this.log.error("Failed to scrape related video.", error);
+      // Send error message
+      await this.audioMessage.sendMessage(
+        format("RELATED_SCRAPE_ERROR", exceptionId)
+      );
+      await this.cleanStop();
+      return;
     }
   }
 
   @BreakOnDestroyed()
-  private async handleRepeat(repeatStatus: RepeatMode): Promise<void> {
-    const beforeTrack: IAudioTrack | null = await this.queue.getNowPlaying();
+  private async handleRepeat(repeatStatus: KafuuRepeatMode): Promise<void> {
+    const beforeTrack: KafuuAudioTrack | null =
+      await this.queue.getNowPlaying();
+    // When before track is not exists, just play next track
     if (!beforeTrack) {
       this.log.debug(
         "Tried handle repeat but, beforeTrack is not exists. Trying play next track."
@@ -259,15 +296,16 @@ export class PlayerDispatcher {
       return;
     }
     switch (repeatStatus) {
-      case RepeatMode.ALL:
-        beforeTrack.repeated = true;
-        await this.queue.pushTrack(beforeTrack);
-        await this.playNextTrack();
+      // When all repeat is enabled, just re-enqueue nowplaying track and play next track
+      case KafuuRepeatMode.ALL:
+        beforeTrack.repeated = true; // Set track info to repeated to true
+        await this.queue.pushTrack(beforeTrack); // Add track to queue
+        await this.playNextTrack(); // Play next track
         this.log.debug(
-          `(Repeat.ALL) Successfully re-enqueued nowplaying to queue & invoke playNextTrack.`
+          `Successfully re-enqueued nowplaying to queue & invoke playNextTrack @ ${this.guildId}`
         );
         break;
-      case RepeatMode.SINGLE:
+      case KafuuRepeatMode.SINGLE:
         beforeTrack.repeated = true;
         await this.queue.unshiftTrack(beforeTrack);
         await this.playNextTrack();
@@ -279,19 +317,16 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  private async resumeNowPlaying(nowPlaying: IAudioTrack) {
+  private async resumeNowPlaying(
+    nowPlaying: KafuuAudioTrack,
+    position: number
+  ) {
     // Player track = null, DB nowplaying = exists
     const guildConfig = await this.client.databaseHelper.upsertAndFindGuild(
       this.guildId
     );
-    const { position }: IGuildAudioData =
-      await this.client.databaseHelper.upsertGuildAudioData(this.guildId);
-    if (!nowPlaying || nowPlaying?.track.info.isStream || !position) {
-      this.log.debug(
-        nowPlaying?.track.info.isStream
-          ? `Nowplaying is stream or position is not exist, skipping...`
-          : `Nowplaying data not found. but resumeNowplaying option provided. trying without resumeNowPlaying`
-      );
+    if (nowPlaying.info.isStream) {
+      this.log.debug(`Nowplaying is stream, skipping...`);
       return this.playNextTrack();
     }
     await this.playTrack(nowPlaying, guildConfig.volume, position);
@@ -300,7 +335,7 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async playTrack(
-    toPlay: IAudioTrack,
+    trackToPlay: KafuuAudioTrack,
     volume: number,
     position?: number
   ): Promise<Player> {
@@ -309,28 +344,25 @@ export class PlayerDispatcher {
         position ? "with position " + position : ""
       }`
     );
-    const format: ReusableFormatFunction =
+    const format: ReusableFormatFunc =
       await this.audioMessage.getReusableFormatFunction();
     const playingMessage: string = position
       ? format(
           "RESUMED_PLAYING",
-          Formatter.formatTrack(toPlay.track, format("LIVESTREAM")),
-          Formatter.humanizeSeconds(position, true)
+          formatTrack(trackToPlay, format("LIVESTREAM")),
+          humanizeSeconds(position, true)
         )
-      : toPlay.relatedTrack
+      : trackToPlay.relatedTrack
       ? format(
           "PLAYING_NOW_RELATED",
-          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"))
+          formatTrack(trackToPlay, format("LIVESTREAM"))
         )
-      : format(
-          "PLAYING_NOW",
-          Formatter.formatTrack(toPlay.track, format("LIVESTREAM"))
-        );
+      : format("PLAYING_NOW", formatTrack(trackToPlay, format("LIVESTREAM")));
     await this.audioMessage.sendMessage(playingMessage);
-    await this.queue.setNowPlaying(toPlay);
+    await this.queue.setNowPlaying(trackToPlay);
     this.setVolumePercent(volume);
     return this.player.playTrack({
-      track: toPlay.track.track,
+      track: trackToPlay.track,
       options: {
         startTime: position,
         noReplace: false,
@@ -339,7 +371,7 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  public async skipTrack(to?: number): Promise<void | IAudioTrack> {
+  public async skipTrack(to?: number): Promise<void | KafuuAudioTrack> {
     if (!to) {
       this.log.debug(`Skipped track @ ${this.guildId}`);
       return await this.playNextTrack();

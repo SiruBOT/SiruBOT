@@ -1,9 +1,9 @@
 import { ActivityType } from "discord.js";
-import { BaseEvent, Client } from "../structures";
+import { BaseEvent, KafuuClient } from "../structures";
 
 const eventName = "ready" as const;
 export default class ReadyEvent extends BaseEvent<typeof eventName> {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     super(client, eventName);
   }
 

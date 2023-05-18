@@ -1,33 +1,43 @@
 import * as Sentry from "@sentry/node";
 import { Shoukaku, Connectors } from "shoukaku";
 import { Logger } from "tslog";
-import { IJoinOptions } from "../../types/audio/IJoinOptions";
-import { Client } from "../Client";
-import { PlayerDispatcher } from "./PlayerDispatcher";
-import { PlayerDispatcherFactory } from "./PlayerDispatcherFactory";
+
 import {
   IRelatedVideo,
   RoutePlanner,
   Scraper,
 } from "@sirubot/yt-related-scraper";
-import { IAudioTrack, IGuildAudioData, PlayingState } from "../../types";
-import { EmbedFactory } from "../../utils";
-import { Guild } from "../../database/mysql/entities";
-import locale from "../../locales";
+
+import {
+  KafuuAudioTrack,
+  KafuuJoinOptions,
+  KafuuPlayingState,
+} from "@/types/audio";
+import { KafuuClient } from "@/structures";
+import { PlayerDispatcher, PlayerDispatcherFactory } from "@/structures/audio";
+import { EmbedFactory } from "@/utils/embed";
+import { GuildAudioData } from "@/types/models/audio";
+
+import { getReusableFormatFunction } from "@/locales";
+import { Locale } from "discord.js";
 
 export class AudioHandler extends Shoukaku {
-  public client: Client;
+  public client: KafuuClient;
   private log: Logger;
   private playerDispatcherFactory: PlayerDispatcherFactory;
   public dispatchers: Map<string, PlayerDispatcher>;
   public relatedScraper: Scraper;
   public routePlanner?: RoutePlanner;
 
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     super(new Connectors.DiscordJS(client), client.settings.audio.nodes, {
       resumeTimeout: 60000,
       moveOnDisconnect: true,
       reconnectTries: 10,
+      resume: true,
+      resumeByLibrary: true,
+      resumeKey: `// TODO: ResumeKey`,
+      alwaysSendResumeKey: true,
     });
     this.client = client;
     this.log = this.client.log.getChildLogger({
@@ -45,18 +55,18 @@ export class AudioHandler extends Shoukaku {
     this.relatedScraper = new Scraper({ log: this.log });
     this.dispatchers = new Map<string, PlayerDispatcher>();
     this.playerDispatcherFactory = new PlayerDispatcherFactory(this.client);
-    this.setupEvents();
+    this.setupHandler();
   }
 
-  public getPlayingState(guildId: string): PlayingState {
+  public playingState(guildId: string): KafuuPlayingState {
     const dispatcher: PlayerDispatcher | undefined =
       this.dispatchers.get(guildId);
-    if (dispatcher && dispatcher.player.track) {
-      if (dispatcher.player.paused) return PlayingState.PAUSED;
-      else return PlayingState.PLAYING;
-    } else {
-      return PlayingState.NOTPLAYING;
+    if (dispatcher?.player.track) {
+      return dispatcher.player.paused
+        ? KafuuPlayingState.PAUSED
+        : KafuuPlayingState.PLAYING;
     }
+    return KafuuPlayingState.NOTPLAYING;
   }
 
   public getPlayerDispatcherOrfail(guildId: string): PlayerDispatcher {
@@ -72,7 +82,7 @@ export class AudioHandler extends Shoukaku {
   }
 
   public async joinChannel(
-    joinOptions: IJoinOptions
+    joinOptions: KafuuJoinOptions
   ): Promise<PlayerDispatcher> {
     const idealNode = this.getNode();
     if (!idealNode) throw new Error("Ideal node not found");
@@ -86,7 +96,7 @@ export class AudioHandler extends Shoukaku {
         joinOptions
       );
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
-    await dispatcher.playOrResumeOrNothing();
+    // await dispatcher.playOrResumeOrNothing();;
     return dispatcher;
   }
 
@@ -111,25 +121,25 @@ export class AudioHandler extends Shoukaku {
     return guildId;
   }
 
-  public async getNowPlayingEmbed(guildId: string, localeName?: string) {
-    const { guildLocale }: Guild =
-      await this.client.databaseHelper.upsertAndFindGuild(guildId);
-    const { nowPlaying, position, queue }: IGuildAudioData =
+  public async getNowPlayingEmbed(guildId: string, localeName?: Locale) {
+    const { nowPlaying, position, queue }: GuildAudioData =
       await this.client.databaseHelper.upsertGuildAudioData(guildId);
     return await EmbedFactory.buildNowplayingEmbed(
       this.client,
-      locale.getReusableFormatFunction(localeName ?? guildLocale),
+      getReusableFormatFunction(localeName ?? Locale.Korean),
       nowPlaying,
       position,
       queue.length,
       queue
-        .filter((e) => !e.track.info.isStream)
-        .map((e) => e.track.info.length)
+        .filter((e) => !e.info.isStream)
+        .map((e) => e.info.length)
         .reduce((a, b) => a + b, 0)
     );
   }
 
-  public async getRelatedVideo(videoId: string): Promise<IAudioTrack | null> {
+  public async getRelatedVideo(
+    videoId: string
+  ): Promise<KafuuAudioTrack | null> {
     const scrapeResult: IRelatedVideo[] | null =
       await this.relatedScraper.scrape(videoId, this?.routePlanner);
     if (!scrapeResult || scrapeResult.length <= 0) return null;
@@ -144,20 +154,24 @@ export class AudioHandler extends Shoukaku {
     const track = searchResult.tracks.at(0);
     if (!track) return null;
     return {
-      requesterUserId: this.client.isReady() ? this.client.user.id : "",
+      requestUserId: this.client.isReady() ? this.client.user.id : "",
       relatedTrack: true,
       repeated: false,
-      track,
+      ...track,
     };
   }
 
-  private setupEvents() {
-    this.on("ready", (name, resumed) =>
+  private setupHandler() {
+    this.on("ready", (name, resumed) => {
       this.log.info(
         `Lavalink Node: ${name} is now connected`,
         `This connection is ${resumed ? "resumed" : "a new connection"}`
-      )
-    );
+      );
+      if (resumed) {
+        this.log.info("Resuming players...");
+        this.resumePlayers();
+      }
+    });
     this.on("error", (name, error) => {
       this.log.error(error);
       Sentry.captureException(error, { tags: { node: name } });
@@ -179,7 +193,16 @@ export class AudioHandler extends Shoukaku {
     );
   }
 
-  public getLoggerInstance(): Logger {
-    return this.log;
+  private resumePlayers(): void {
+    // Query updatedAt < 1min ago
+    // Testing Stuff
+    if (process.env.NODE_ENV == "development") {
+      this.joinChannel({
+        channelId: "1096224923120324741",
+        shardId: 0,
+        guildId: "1096224922226933862",
+        textChannelId: "1100985233068806174",
+      });
+    }
   }
 }

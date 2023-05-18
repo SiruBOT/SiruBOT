@@ -1,32 +1,45 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
 } from "@discordjs/builders";
 import type * as Discord from "discord.js";
-import type { Client } from ".";
-import type { CommandCategories, ICommandContext } from "../types";
-import { CommandPermissions } from "../types/CommandTypes/CommandPermissions";
+import type { KafuuClient } from ".";
+import type {
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuButtonContext,
+  KafuuRoleSelectMenuContext,
+  KafuuMessageComponentCustomIdOptions,
+  KafuuChannelSelectMenuContext,
+} from "@/types/command";
+import { KafuuCommandPermission } from "@/types/command";
+import { getCustomId } from "@/utils/formatter";
 
+// Define an abstract class named BaseCommand
 export abstract class BaseCommand {
+  // Define properties of the class
   public slashCommand:
     | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
     | SlashCommandSubcommandsOnlyBuilder;
-  public category: CommandCategories;
-  public permissions: CommandPermissions[];
+  public category: KafuuCommandCategory;
+  public permissions: KafuuCommandPermission[];
   public requirements: number;
   public botPermissions: Discord.PermissionsString[];
-  protected client: Client;
+  protected client: KafuuClient;
 
+  // Define the constructor method
   public constructor(
     slashCommand:
       | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
       | SlashCommandSubcommandsOnlyBuilder,
-    client: Client,
-    category: CommandCategories,
-    permissions: CommandPermissions[],
+    client: KafuuClient,
+    category: KafuuCommandCategory,
+    permissions: KafuuCommandPermission[],
     requirements: number,
     botPermissions: Discord.PermissionsString[]
   ) {
+    // Assign values to the properties
     this.slashCommand = slashCommand;
     this.client = client;
     this.category = category;
@@ -35,58 +48,48 @@ export abstract class BaseCommand {
     this.requirements = requirements;
   }
 
-  public async onCommandInteraction(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: ICommandContext<boolean>
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#onCommandInteraction");
-  }
+  public abstract onCommandInteraction(
+    context: KafuuCommandContext<boolean>
+  ): Promise<void>;
 
-  public async onAutocompleteInteraction(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onChannelSelectMenuInteraction?(
+    context: KafuuChannelSelectMenuContext
+  ): Promise<void>;
+
+  public onRoleSelectMenuInteraction?(
+    context: KafuuRoleSelectMenuContext
+  ): Promise<void>;
+
+  public onAutocompleteInteraction?(
     interaction: Discord.AutocompleteInteraction
-  ): Promise<void> {
-    throw new Error(
-      "Method not implemented. BaseCommand#onAutocompleteInteraction"
-    );
-  }
+  ): Promise<void>;
 
-  public async onButtonInteraction(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interaction: Discord.ButtonInteraction
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runButton");
-  }
+  public onButtonInteraction?(context: KafuuButtonContext): Promise<void>;
 
-  public async onMessageComponentInteraction(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onMessageComponentInteraction?(
     interaction: Discord.MessageComponentInteraction
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runMessageComponent");
-  }
+  ): Promise<void>;
 
-  public async onSelectMenuInteraction(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onSelectMenuInteraction?(
     interaction: Discord.SelectMenuInteraction
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runSelectMenu");
-  }
+  ): Promise<void>;
 
-  public async onContextMenuCommand(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onContextMenuCommand?(
     interaction: Discord.ContextMenuCommandInteraction
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runContextMenu");
-  }
-  public async onUserContextCommand(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interaction: Discord.UserContextMenuCommandInteraction
-  ): Promise<void> {
-    throw new Error("Method not implemented. BaseCommand#runUserContextMenu");
-  }
+  ): Promise<void>;
 
-  // Custom id for handling
-  public getCustomId(customId: string): string {
-    return `[${this.slashCommand.name};${customId};`;
+  public onUserContextCommand?(
+    interaction: Discord.UserContextMenuCommandInteraction
+  ): Promise<void>;
+
+  // Message Component custom id template: [commandName]:[customId]:[executorId];[args];[args];[args]
+  protected getCustomId(
+    option: Omit<KafuuMessageComponentCustomIdOptions, "commandName">
+  ): string {
+    // Return a string with the name of the slash command and the custom ID
+    return getCustomId({
+      commandName: this.slashCommand.name,
+      ...option,
+    });
   }
 }
