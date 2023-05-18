@@ -1,0 +1,36 @@
+version: "3"
+# Services
+services:
+  # MongoDB
+  mongodb:
+    labels:
+      - "traefik.enable=false"
+    ports:
+      - "27017:27017"
+    image: mongo:latest
+    restart: always
+    environment:
+      # Change this to your credentials
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_datadir:/data/db
+  # MariaDB
+  mariadb:
+    labels:
+      - "traefik.enable=false"
+    ports:
+      - "3306:3306"
+    image: mariadb:latest
+    restart: always
+    environment:
+      # Change this to your credentials
+      MARIADB_ROOT_PASSWORD: super-secret-passwd
+      MARIADB_DATABASE: siru
+    volumes:
+      - mariadb_datadir:/var/lib/mysql
+      
+# Volumes
+volumes:
+  mongodb_datadir:
+  mariadb_datadir:
