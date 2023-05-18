@@ -34,6 +34,10 @@ export class AudioHandler extends Shoukaku {
       resumeTimeout: 60000,
       moveOnDisconnect: true,
       reconnectTries: 10,
+      resume: true,
+      resumeByLibrary: true,
+      resumeKey: `// TODO: ResumeKey`,
+      alwaysSendResumeKey: true,
     });
     this.client = client;
     this.log = this.client.log.getChildLogger({
@@ -92,7 +96,7 @@ export class AudioHandler extends Shoukaku {
         joinOptions
       );
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
-    await dispatcher.playOrResumeOrNothing();
+    // await dispatcher.playOrResumeOrNothing();;
     return dispatcher;
   }
 
@@ -158,12 +162,16 @@ export class AudioHandler extends Shoukaku {
   }
 
   private setupHandler() {
-    this.on("ready", (name, resumed) =>
+    this.on("ready", (name, resumed) => {
       this.log.info(
         `Lavalink Node: ${name} is now connected`,
         `This connection is ${resumed ? "resumed" : "a new connection"}`
-      )
-    );
+      );
+      if (resumed) {
+        this.log.info("Resuming players...");
+        this.resumePlayers();
+      }
+    });
     this.on("error", (name, error) => {
       this.log.error(error);
       Sentry.captureException(error, { tags: { node: name } });
@@ -183,5 +191,18 @@ export class AudioHandler extends Shoukaku {
     this.on("debug", (name, reason) =>
       this.log.debug(`Lavalink Node: ${name}`, reason || "No reason")
     );
+  }
+
+  private resumePlayers(): void {
+    // Query updatedAt < 1min ago
+    // Testing Stuff
+    if (process.env.NODE_ENV == "development") {
+      this.joinChannel({
+        channelId: "1096224923120324741",
+        shardId: 0,
+        guildId: "1096224922226933862",
+        textChannelId: "1100985233068806174",
+      });
+    }
   }
 }
