@@ -270,7 +270,8 @@ export default class SkipCommand extends BaseCommand {
           localeName,
           "SKIP_VOTE_EMBED_DESC",
           member.displayName,
-          formatTrack(track, format(localeName, "LIVESTREAM"), {
+          formatTrack(track, {
+            streamString: format(localeName, "LIVESTREAM"),
             withMarkdownURL: true,
           })
         )
@@ -392,7 +393,8 @@ export default class SkipCommand extends BaseCommand {
         .map(
           (e, index) =>
             `#${start + index} ` + // Start + Index
-            formatTrack(e, format(interaction.locale, "LIVESTREAM"), {
+            formatTrack(e, {
+              streamString: format(interaction.locale, "LIVESTREAM"),
               showLength: false,
             })
         )
