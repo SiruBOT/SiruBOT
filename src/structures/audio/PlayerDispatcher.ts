@@ -349,15 +349,18 @@ export class PlayerDispatcher {
     const playingMessage: string = position
       ? format(
           "RESUMED_PLAYING",
-          formatTrack(trackToPlay, format("LIVESTREAM")),
+          formatTrack(trackToPlay, { streamString: format("LIVESTREAM") }),
           humanizeSeconds(position, true)
         )
       : trackToPlay.relatedTrack
       ? format(
           "PLAYING_NOW_RELATED",
-          formatTrack(trackToPlay, format("LIVESTREAM"))
+          formatTrack(trackToPlay, { streamString: format("LIVESTREAM") })
         )
-      : format("PLAYING_NOW", formatTrack(trackToPlay, format("LIVESTREAM")));
+      : format(
+          "PLAYING_NOW",
+          formatTrack(trackToPlay, { streamString: format("LIVESTREAM") })
+        );
     await this.audioMessage.sendMessage(playingMessage);
     await this.queue.setNowPlaying(trackToPlay);
     this.setVolumePercent(volume);
