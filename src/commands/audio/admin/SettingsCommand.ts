@@ -35,7 +35,7 @@ import {
 import { EMOJI_REPEAT } from "@/constants/message";
 import { STRING_KEYS } from "@/types/locales";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
-import { MessageComponentRenderContext } from "@/types/utils";
+import { MessageComponentRenderContext, ReplyOrUpdate } from "@/types/utils";
 import { KafuuRepeatMode } from "@/types/audio";
 
 const PAGES = {
@@ -67,10 +67,6 @@ type RenderOptions = {
   page: SettingsPageNames;
   context: MessageComponentRenderContext;
 };
-
-type ReplyOrUpdate<IsReply extends boolean> = Promise<
-  IsReply extends true ? InteractionReplyOptions : InteractionUpdateOptions
->;
 
 class SettingsCommand extends BaseCommand {
   constructor(client: KafuuClient) {
