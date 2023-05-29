@@ -32,17 +32,38 @@ export class ExtendedEmbed extends EmbedBuilder {
     return this;
   }
 
-  public setTrackThumbnail({ info, track }: Track): this {
-    if (info.sourceName === "youtube" && info.identifier) {
-      super.setThumbnail(
-        `https://img.youtube.com/vi/${info.identifier}/maxresdefault.jpg`
-      );
-    }
-    if (info.sourceName === "spotify") {
-      const { spotifyInfo } = decode(track);
-      spotifyInfo?.thumbnail && super.setThumbnail(spotifyInfo.thumbnail);
-    }
+  public async setImageAndColor(url: string): Promise<this> {
+    const palette = await Vibrant.from(url).getPalette();
+    this.setThumbnail(url);
+    this.setColor((palette.Vibrant?.hex ?? DEFAULT_COLOR) as ColorResolvable);
+    return this;
+  }
 
+  public setTrackThumbnail(track: Track): this {
+    return this._setTrackImage(track, this.setThumbnail);
+  }
+
+  public setTrackImage(track: Track): this {
+    return this._setTrackImage(track, this.setImage);
+  }
+
+  public getTrackImage({ info, track }: Track): string | null {
+    switch (true) {
+      case info.sourceName == "youtube" && !!info.identifier:
+        return `https://i3.ytimg.com/vi/${info.identifier}/maxresdefault.jpg`;
+      case info.sourceName == "spotify":
+        const { spotifyInfo } = decode(track);
+        return !spotifyInfo?.thumbnail ? null : spotifyInfo.thumbnail;
+      default:
+        return null;
+    }
+  }
+
+  private _setTrackImage(
+    track: Track,
+    setMethod: (url: string | null) => this
+  ): this {
+    setMethod.call(this, this.getTrackImage(track));
     return this;
   }
 
@@ -89,7 +110,9 @@ export class EmbedFactory {
     }
     embed
       .setDescription(
-        `[${formatTrack(track, format("LIVESTREAM"))}](${track.info.uri})`
+        `[${formatTrack(track, { streamString: format("LIVESTREAM") })}](${
+          track.info.uri
+        })`
       )
       .setTrackThumbnail(track);
     return embed;
@@ -117,13 +140,10 @@ export class EmbedFactory {
         format,
         nowplaying
       );
-      const formattedTrack = `**${formatTrack(
-        nowplaying,
-        format("LIVESTREAM"),
-        {
-          showLength: false,
-        }
-      )}**`;
+      const formattedTrack = `**${formatTrack(nowplaying, {
+        streamString: format("LIVESTREAM"),
+        showLength: false,
+      })}**`;
       const progressBar: string = emojiProgressBar(
         currentPosition / trackLength
       );
