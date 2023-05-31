@@ -90,6 +90,7 @@
 	"INTERACTION_ONLY_SAME_EXECUTOR": "> ❔  이 상호작용은 명령어를 실행한 사용자만 사용 가능해요.",
 	"INTERACTION_ONLY_ADMIN": "> ❔  이 상호작용은 관리자 권한을 가지고 있는 사용자만 사용이 가능해요.",
 	"INVALID_CUSTOM_ID": "> ❔  유효하지 않은 상호작용이에요.",
+	"EXPIRED_INTERACTION": "> ❔  상호작용이 만료되었어요.",
 
 	"SETTINGS_MAIN_TITLE": "🔧 {0} 설정",
 	"SETTINGS_MAIN_FOOTER": "{0} 서버의 치노봇 설정",
@@ -144,6 +145,8 @@
 	"VOLUME_CANNOT_UNDER_LOW": "> ❎  볼륨은 **1%** 이상이어야 해요!",
 	"WILL_PLAYING": "> 🎶  **{0}** 을 곧 재생할게요!",
 	"WILL_PLAYING_TITLE": "> 🎶  노래를 곧 재생할게요!",
+	"NOW_PLAYING_QUEUE_TITLE": "🎶 재생 중",
+	"QUEUE_TITLE": "**📄 대기열 목록**",
 
 	"MISSING_BOT_PERMISSIONS": "> ❎  이 명령어를 실행하기 위한 봇의 권한이 부족해요! 서버 관리자에게 문의해주세요! (필요한 권한들 {0})",
 	"COMMAND_MISSING_USER_PERMISSIONS": "> ❎  이 명령어는 {0} 권한이 있는 사용자만 사용이 가능해요.",

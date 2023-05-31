@@ -15,7 +15,10 @@ import {
   PROGRESS_BAR_END_MIDDLE_WHITE,
 } from "@/constants/message";
 import { FormatTrackOptions } from "@/types/utils/formatter";
-import { PROGRESS_BAR_EMOJI_COUNT } from "@/constants/utils/formatter";
+import {
+  MAX_TRACK_URL_LENGTH,
+  PROGRESS_BAR_EMOJI_COUNT,
+} from "@/constants/utils/formatter";
 import { KafuuMessageComponentCustomIdOptions } from "@/types/command";
 import { Locale } from "discord.js";
 
@@ -56,7 +59,6 @@ export function generateGlobPattern(basePath: string, dirName: string): string {
  */
 export function formatTrack(
   track: Track,
-  streamString = "Live Stream",
   options?: FormatTrackOptions
 ): string {
   const {
@@ -68,16 +70,22 @@ export function formatTrack(
     length?: number;
     isStream?: boolean;
   } = track.info;
-  const { showLength, withMarkdownURL } = options ?? {
+  const { showLength, withMarkdownURL, streamString } = options ?? {
     showLength: true,
+    streamString: "Live Stream",
     withMarkdownUri: false,
-  }; // Default value;
+  };
   return (
-    (withMarkdownURL ? "[" : "") + // If withMarkdownURL is true, add opening square bracket
-    `${title ?? "No title"} ${
-      // If title is not null or undefined, add title, otherwise add "No title"
+    (!withMarkdownURL
+      ? `${title.trim() ?? "No title"}` // If withMarkdownURL is false, format track string without markdown URL
+      : // If track uri length is greater than MAX_TRACK_URL_LENGTH, return not formatted track title
+      track.info.uri.length > MAX_TRACK_URL_LENGTH
+      ? `${title.trim() ?? "No title"}`
+      : `[${title.trim() ?? "No title"}](${track.info.uri})`) +
+    // If showLength is true, add length in parentheses
+    `${
       showLength
-        ? `[${
+        ? ` [${
             length
               ? isStream
                 ? streamString
@@ -85,9 +93,7 @@ export function formatTrack(
               : "N/A" // Otherwise, add "N/A"
           }]`
         : ""
-    }` +
-    (withMarkdownURL ? "]" : "") + // If withMarkdownURL is true, add closing square bracket
-    (withMarkdownURL ? `(${track.info.uri})` : "") // If withMarkdownURL is true, add track URI in parentheses
+    }`
   );
 }
 

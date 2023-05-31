@@ -1,8 +1,8 @@
 // Import Sentry, discord.js, undici, shoukaku, @discordjs/builders
-import * as Sentry from "@sentry/node";
 import * as Discord from "discord.js";
+import * as Sentry from "@sentry/node";
 import { fetch } from "undici";
-import { Track } from "shoukaku";
+import { LavalinkResponse, Track } from "shoukaku";
 import { SlashCommandBuilder } from "@discordjs/builders";
 // Import structures
 import { BaseCommand, KafuuClient } from "@/structures";
@@ -10,12 +10,12 @@ import { PlayerDispatcher } from "@/structures/audio";
 import { format, getReusableFormatFunction } from "@/locales";
 // Import types
 import {
+  KafuuButtonContext,
   KafuuCommandCategory,
   KafuuCommandContext,
   KafuuCommandFlags,
   KafuuCommandPermission,
 } from "@/types/command";
-import { VoiceConnectedGuildMemberVoiceState } from "@/types/member";
 import { KafuuAudioTrack } from "@/types/audio";
 import { GuildAudioData } from "@/types/models/audio";
 import { STRING_KEYS } from "@/types/locales";
@@ -30,10 +30,21 @@ import {
   EMOJI_INBOX_TRAY,
   EMOJI_X,
 } from "@/constants/message";
-import { BUTTON_AWAIT_TIMEOUT } from "@/constants/time";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
+import { BUTTON_AWAIT_TIMEOUT } from "@/constants/time";
+import { VoiceConnectedGuildMemberVoiceState } from "@/types/member";
+
+// Set Custom Id
+const okButtonCustomId = "p_ok";
+const noButtonCustomId = "p_cancel";
+
+type CacheItem = {
+  searchResult: LavalinkResponse;
+  timeoutId: NodeJS.Timeout;
+};
 
 export default class PlayCommand extends BaseCommand {
+  private playlistCache: Map<string, CacheItem>;
   constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("play")
@@ -80,6 +91,8 @@ export default class PlayCommand extends BaseCommand {
         KafuuCommandFlags.VOICE_CONNECTED,
       ["SendMessages", "Connect", "Speak", "EmbedLinks"]
     );
+    // Youtube playlist result cache.
+    this.playlistCache = new Map<string, CacheItem>();
   }
 
   public override async onCommandInteraction({
@@ -170,12 +183,9 @@ export default class PlayCommand extends BaseCommand {
           const selectedTrack: number =
             searchResult.playlistInfo.selectedTrack ?? 0;
           const track: Track = searchResult.tracks[selectedTrack as number];
-          // Slice tracks after selected track position
-          const slicedPlaylist: Track[] = searchResult.tracks.slice(
-            selectedTrack + 1, // Array starts 0
-            searchResult.tracks.length
-          );
+          const trackCacheKey: string = interaction.id;
           // Will playing or Enqueued message
+          const leftTracks = searchResult.tracks.length - selectedTrack;
           const enQueueState: string =
             this.willPlayingOrEnqueued(
               guildAudioData.nowPlaying,
@@ -184,31 +194,43 @@ export default class PlayCommand extends BaseCommand {
               ? format(
                   interaction.locale,
                   "WILL_PLAYING",
-                  formatTrack(track, format(interaction.locale, "LIVESTREAM"))
+                  formatTrack(track, {
+                    streamString: format(interaction.locale, "LIVESTREAM"),
+                  })
                 )
               : format(
                   interaction.locale,
                   "ENQUEUED_TRACK",
-                  formatTrack(track, format(interaction.locale, "LIVESTREAM")),
+                  formatTrack(track, {
+                    streamString: format(interaction.locale, "LIVESTREAM"),
+                  }),
                   (guildAudioData.queue.length + 1).toString()
                 );
-          // Set Custom Id
-          const okButtonCustomId = "play_command_playlist_ok";
-          const noButtonCustomId = "play_command_playlist_cancel";
           // Create ActionRow
           const actionRow: Discord.ActionRowBuilder<Discord.ButtonBuilder> =
             new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
               new Discord.ButtonBuilder()
-                .setCustomId(okButtonCustomId)
+                .setCustomId(
+                  this.getCustomId({
+                    customId: okButtonCustomId,
+                    executorId: interaction.user.id,
+                    args: [trackCacheKey],
+                  })
+                )
                 .setEmoji(EMOJI_INBOX_TRAY)
                 .setStyle(Discord.ButtonStyle.Secondary),
               new Discord.ButtonBuilder()
-                .setCustomId(noButtonCustomId)
+                .setCustomId(
+                  this.getCustomId({
+                    customId: noButtonCustomId,
+                    executorId: interaction.user.id,
+                  })
+                )
                 .setEmoji(EMOJI_X)
                 .setStyle(Discord.ButtonStyle.Secondary)
             );
           // Question message
-          const promptMessage: Discord.Message = await interaction.editReply({
+          const promptMsg = await interaction.editReply({
             content: enQueueState,
             components: [actionRow],
             embeds: [
@@ -218,12 +240,23 @@ export default class PlayCommand extends BaseCommand {
                   format(
                     interaction.locale,
                     "INCLUDES_PLAYLIST",
-                    slicedPlaylist.length.toString()
+                    leftTracks.toString()
                   )
                 )
                 .setTrackThumbnail(track),
             ],
           });
+          // Prompt timeout
+          const timeoutId = setTimeout(() => {
+            this.client.log.debug(
+              "Prompt interaction menu deleted, interaction timeout @ " +
+                interaction.id
+            );
+            this.playlistCache.delete(trackCacheKey);
+            if (promptMsg.editable)
+              promptMsg.edit({ components: [], embeds: [] });
+          }, BUTTON_AWAIT_TIMEOUT);
+          this.playlistCache.set(trackCacheKey, { searchResult, timeoutId });
           // Add selected track without playlist
           await dispatcher.addTrack({
             ...track,
@@ -231,90 +264,6 @@ export default class PlayCommand extends BaseCommand {
             relatedTrack: false,
             repeated: false,
           });
-          // Check interaction does not have channel
-          if (!interaction.channel)
-            throw new Error("Interaction channel not found.");
-          // Create filter for awaitMessageComponents
-          // button interaction user id = command user id && button interaction message id = promptMessage.id
-          const buttonCollectorFilter: Discord.CollectorFilter<
-            [Discord.ButtonInteraction<"cached">]
-          > = (i: Discord.ButtonInteraction<"cached">): boolean =>
-            i.user.id == interaction.user.id &&
-            i.message.id == promptMessage.id;
-          // Try collect interactions
-          try {
-            const collectorInteraction: Discord.ButtonInteraction<Discord.CacheType> =
-              await interaction.channel.awaitMessageComponent({
-                componentType: Discord.ComponentType.Button,
-                filter: buttonCollectorFilter,
-                time: BUTTON_AWAIT_TIMEOUT,
-              });
-            // Ok button
-            if (collectorInteraction.customId === okButtonCustomId) {
-              // Prevent error when user click ok button after dispatcher is destroyed
-              if (!this.client.audio.hasPlayerDispatcher(interaction.guildId)) {
-                await collectorInteraction.update({
-                  content: enQueueState,
-                  components: [],
-                  embeds: [],
-                });
-              } else {
-                // Update successfully added message
-                await collectorInteraction.update({
-                  content: enQueueState,
-                  components: [],
-                  embeds: [
-                    EmbedFactory.createEmbed()
-                      .setTitle(format(interaction.locale, "PLAYLIST"))
-                      .setDescription(
-                        format(
-                          interaction.locale,
-                          "PLAYLIST_ADDED_NOEMOJI",
-                          searchResult.playlistInfo?.name ??
-                            format(interaction.locale, "UNKNOWN"),
-                          slicedPlaylist.length.toString()
-                        )
-                      )
-                      .setTrackThumbnail(track),
-                  ],
-                });
-                // Add sliced playlist
-                await dispatcher.addTracks(
-                  slicedPlaylist.map((e: Track) => {
-                    return {
-                      ...e,
-                      requestUserId: interaction.user.id,
-                      relatedTrack: false,
-                      repeated: false,
-                    };
-                  })
-                );
-              }
-            } else {
-              // When user press cancel button, remove buttons, embeds
-              await collectorInteraction.update({
-                content: enQueueState,
-                components: [],
-                embeds: [],
-              });
-            }
-          } catch (error) {
-            const err: Error = error as Error;
-            if (
-              err.name.includes("INTERACTION_COLLECTOR_ERROR") &&
-              err.message.includes("time")
-            ) {
-              // Timeout handle, remove buttons & embeds
-              await interaction.editReply({
-                content: enQueueState,
-                components: [],
-                embeds: [],
-              });
-            } else {
-              // When something errored, throw error
-              throw error;
-            }
-          }
         }
         break;
       // Enqueue first of search result or track
@@ -356,6 +305,82 @@ export default class PlayCommand extends BaseCommand {
     const localeKey: string =
       !nowplaying && queueLength === 0 ? "WILL_PLAYING" : "ENQUEUED_TRACK";
     return localeKey;
+  }
+
+  public override async onButtonInteraction(
+    context: KafuuButtonContext
+  ): Promise<void> {
+    const { interaction, customInfo } = context;
+    if (!interaction.guildId) return;
+    switch (customInfo.customId) {
+      case okButtonCustomId:
+        const trackCacheKey = customInfo.args?.[0] ?? null;
+        const cachedResult = trackCacheKey
+          ? this.playlistCache.get(trackCacheKey)
+          : null;
+        if (!cachedResult) {
+          await interaction.update({
+            content: format(interaction.locale, "EXPIRED_INTERACTION"),
+            components: [],
+            embeds: [],
+          });
+          return;
+        } else if (trackCacheKey) {
+          // Clear cache, clear timeout
+          this.playlistCache.delete(trackCacheKey);
+          clearTimeout(cachedResult.timeoutId);
+        }
+        // Slice tracks after selected track position
+        const slicedPlaylist: Track[] = cachedResult.searchResult.tracks.slice(
+          cachedResult.searchResult.playlistInfo.selectedTrack ?? 0, // Array starts 0
+          cachedResult.searchResult.tracks.length
+        );
+        const dispatcher = this.client.audio.dispatchers.get(
+          interaction.guildId
+        );
+        if (!dispatcher) {
+          await interaction.update({
+            components: [],
+            embeds: [],
+          });
+          return;
+        }
+        // Update successfully added message
+        await interaction.update({
+          components: [],
+          embeds: [
+            EmbedFactory.createEmbed()
+              .setTitle(format(interaction.locale, "PLAYLIST"))
+              .setDescription(
+                format(
+                  interaction.locale,
+                  "PLAYLIST_ADDED_NOEMOJI",
+                  cachedResult.searchResult.playlistInfo?.name ??
+                    format(interaction.locale, "UNKNOWN"),
+                  slicedPlaylist.length.toString()
+                )
+              )
+              .setTrackThumbnail(cachedResult.searchResult.tracks[0]),
+          ],
+        });
+        // Add sliced playlist
+        await dispatcher.addTracks(
+          slicedPlaylist.map((e: Track) => {
+            return {
+              ...e,
+              requestUserId: interaction.user.id,
+              relatedTrack: false,
+              repeated: false,
+            };
+          })
+        );
+        break;
+      case noButtonCustomId:
+        await interaction.update({
+          components: [],
+          embeds: [],
+        });
+    }
   }
 
   public override async onAutocompleteInteraction(

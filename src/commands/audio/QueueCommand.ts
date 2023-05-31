@@ -2,7 +2,6 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  Locale,
   MessageActionRowComponentBuilder,
   SlashCommandBuilder,
 } from "discord.js";
@@ -13,9 +12,9 @@ import {
   EMOJI_NEXT,
   EMOJI_PLAY_STATE,
   EMOJI_PREV,
+  EMOJI_REFRESH,
   EMOJI_REPEAT,
   EMOJI_STOP,
-  PAGE_CHUNK_SIZE,
 } from "@/constants/message";
 import {
   KafuuButtonContext,
@@ -29,20 +28,21 @@ import { TypeORMGuild } from "@/models/typeorm";
 import { ExtendedEmbed, EmbedFactory } from "@/utils/embed";
 import { chunkArray } from "@/utils/array";
 import { formatTrack, humanizeSeconds, volumeEmoji } from "@/utils/formatter";
-import { KafuuAudioTrack } from "@/types/audio";
+import { KafuuAudioTrack, KafuuPlayingState } from "@/types/audio";
 import { STRING_KEYS } from "@/types/locales";
 import { format } from "@/locales";
-import { MessageComponentRenderContext } from "@/types/utils";
+import { MessageComponentRenderContext, ReplyOrUpdate } from "@/types/utils";
 
-//TODO: 만약 큐가 초기화된 상태에서 NEXT를 누르면 아마 튕길것.
 type QueueRenderContext = Omit<
   MessageComponentRenderContext,
   "member" | "guild"
 > & {
-  dispatcher: PlayerDispatcher;
   page: number;
   guildId: string;
 };
+
+const QUEUE_PAGE_CHUNK_SIZE = 10 as const;
+const QUEUE_NOWPLAYING_LINEBREAK_LENGTH = 26 as const;
 
 export default class QueueCommand extends BaseCommand {
   constructor(client: KafuuClient) {
@@ -83,11 +83,10 @@ export default class QueueCommand extends BaseCommand {
         ?.onCommandInteraction(context);
       return;
     } else {
-      const payload = await this.render({
+      const payload = await this.render<true>({
         page: 1,
         guildId: interaction.guildId,
         locale: interaction.locale,
-        dispatcher,
       });
       await interaction.reply({ ...payload });
     }
@@ -96,14 +95,11 @@ export default class QueueCommand extends BaseCommand {
   public override async onButtonInteraction(context: KafuuButtonContext) {
     const { interaction } = context;
     if (!interaction.guildId) return;
-    const dispatcher: PlayerDispatcher =
-      this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     const page = context.customInfo.args?.[0] ?? 1;
-    const payload = await this.render({
+    const payload = await this.render<false>({
       page: Number(page),
       guildId: interaction.guildId,
       locale: interaction.locale,
-      dispatcher,
     });
     await interaction.update({
       ...payload,
@@ -114,31 +110,59 @@ export default class QueueCommand extends BaseCommand {
     });
   }
 
-  private async render({
+  private async render<IsReply extends boolean>({
     page = 1,
     guildId,
     locale,
-    dispatcher,
-  }: QueueRenderContext) {
+  }: QueueRenderContext): ReplyOrUpdate<IsReply> {
+    const dispatcher = this.client.audio.dispatchers.get(guildId);
+    if (!dispatcher) {
+      return {
+        embeds: [
+          EmbedFactory.createEmbed().setTitle(
+            format(locale, "NOWPLAYING_NONE")
+          ),
+        ],
+        components: [
+          new ActionRowBuilder<ButtonBuilder>().addComponents([
+            new ButtonBuilder()
+              .setCustomId(
+                this.getCustomId({
+                  customId: "page_goto",
+                  args: ["1"],
+                })
+              )
+              .setEmoji(EMOJI_REFRESH)
+              .setStyle(ButtonStyle.Secondary),
+          ]),
+        ],
+      };
+    }
     const { queue, nowPlaying, position }: GuildAudioData =
       await dispatcher.queue.getGuildAudioData();
-    const totalPages = Math.ceil(queue.length / PAGE_CHUNK_SIZE);
+
+    const totalPages = Math.ceil(queue.length / QUEUE_PAGE_CHUNK_SIZE);
     const guildConfig: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(guildId);
-    const chunked: KafuuAudioTrack[][] = chunkArray(queue, PAGE_CHUNK_SIZE);
-    const pageContent: string = chunked[page - 1]
+    const chunked: KafuuAudioTrack[][] = chunkArray(
+      queue,
+      QUEUE_PAGE_CHUNK_SIZE
+    );
+    let pageContent: string = chunked[page - 1]
       .map((track, index) => {
         // index = 1 ~ 10
         // page = 1 ~ end
-        return `\`\`#${index + 1 + (page - 1) * 10} [${
-          track.info.length ? humanizeSeconds(track.info.length, true) : "N/A"
-        }]\`\` | **${track.info.title ?? "N/A"}** <@${track.requestUserId}>`;
+        return `\`\`#${
+          index + 1 + (page - 1) * QUEUE_PAGE_CHUNK_SIZE
+        }\`\` - ${formatTrack(track, {
+          showLength: true,
+          withMarkdownURL: true,
+        })}`;
       })
       .join("\n");
     // Embed
     const embed: ExtendedEmbed = EmbedFactory.createEmbed()
-      .setTrackThumbnail(queue[0])
-      .setDescription(pageContent)
+      .setTrackImage(queue[0])
       .setFooter({
         text: format(
           locale,
@@ -158,6 +182,7 @@ export default class QueueCommand extends BaseCommand {
           totalPages.toString()
         ),
       });
+    const buttons = this.getActionRow({ total: totalPages, current: page });
     if (nowPlaying) {
       const status: string[] = [
         `${
@@ -172,27 +197,50 @@ export default class QueueCommand extends BaseCommand {
           ("REPEAT_" + guildConfig.repeat) as STRING_KEYS
         )}**`,
         `${volumeEmoji(guildConfig.volume)} **${guildConfig.volume}%**`,
-        `**[${position ? `${humanizeSeconds(position, true)}` : "N/A"} / ${
-          nowPlaying.info.length
-            ? humanizeSeconds(nowPlaying.info.length, true)
-            : "N/A"
-        }]**`,
       ];
 
-      const trackDisplay: string = formatTrack(
-        nowPlaying,
-        format(locale, "LIVESTREAM"),
-        {
-          showLength: false,
-        }
-      );
-      const buttons = this.getActionRow({ total: totalPages, current: page });
-      return {
-        embeds: [embed],
-        content: `> **${trackDisplay}**\n${status.join(" | ")}`,
-        ...(buttons ? { components: [buttons] } : {}),
-      };
+      if (
+        this.client.audio.playingState(guildId) != KafuuPlayingState.NOTPLAYING
+      )
+        status.push(
+          `**[${position ? `${humanizeSeconds(position, true)}` : "00:00"} / ${
+            nowPlaying.info.length
+              ? humanizeSeconds(nowPlaying.info.length, true)
+              : "N/A"
+          }]**`
+        );
+
+      const trackDisplay: string = formatTrack(nowPlaying, {
+        streamString: format(locale, "LIVESTREAM"),
+        showLength: false,
+        withMarkdownURL: true,
+      });
+      embed.setTitle(status.join(" | "));
+      pageContent =
+        ` ${
+          nowPlaying.info.title.length > QUEUE_NOWPLAYING_LINEBREAK_LENGTH
+            ? "├"
+            : "└"
+        } ${trackDisplay} ${
+          nowPlaying.requestUserId
+            ? // 한줄 넘어가면 Username line break
+              `${
+                nowPlaying.info.title.length > QUEUE_NOWPLAYING_LINEBREAK_LENGTH
+                  ? "\n└ "
+                  : "-"
+              } <@${nowPlaying.requestUserId}`
+            : ""
+        }>\n\n${format(locale, "QUEUE_TITLE")}\n` + pageContent;
+    } else {
+      pageContent = format(locale, "QUEUE_TITLE") + "\n" + pageContent;
     }
+
+    embed.setDescription(pageContent);
+
+    return {
+      embeds: [embed],
+      ...(buttons ? { components: [buttons] } : {}),
+    };
   }
 
   private getActionRow({
