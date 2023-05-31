@@ -4441,10 +4441,10 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-slyrics@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/slyrics/-/slyrics-1.0.2.tgz#7fe2fb1b857d89dc6db7803734ae7ebd00eb5b48"
-  integrity sha512-+NeE/GSfsWl2MGqv5VLyMrf/FmHjhZK8EuMliyeJhSvhzQeBv/0vr2fJ5fh/fc21rzAFFQbnEVXbwdrySyNc8Q==
+slyrics@^1.0.22:
+  version "1.0.22"
+  resolved "https://registry.yarnpkg.com/slyrics/-/slyrics-1.0.22.tgz#b0a243ab8a0b7df68f643a1748d995feb080f7e9"
+  integrity sha512-drU2769cAJk+9J+9zZW8k1XbXsUTvsIk+nLvi6i54oPU/WBwHcyYMvhRftl6CzeHe/MmpkXJcRvuj8555HqpXg==
   dependencies:
     jsdom "^19.0.0"
     undici "^4.12.2"
