@@ -201,6 +201,7 @@ export class AudioHandler extends Shoukaku {
       penalties.set(videoId, videoPenalty);
     }
     // Sort by Levenshtein distance (Similar )
+    // 일정 정도로 비슷한 threshold를 설정해야 할듯
     const sorted = scrapeResults
       .sort((a, b) => {
         if (
