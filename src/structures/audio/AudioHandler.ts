@@ -12,6 +12,7 @@ import {
   KafuuAudioTrack,
   KafuuJoinOptions,
   KafuuPlayingState,
+  TinyInfo,
 } from "@/types/audio";
 import { KafuuClient } from "@/structures";
 import { PlayerDispatcher, PlayerDispatcherFactory } from "@/structures/audio";
@@ -19,7 +20,9 @@ import { EmbedFactory } from "@/utils/embed";
 import { GuildAudioData } from "@/types/models/audio";
 
 import { getReusableFormatFunction } from "@/locales";
-import { Locale } from "discord.js";
+import { Locale, TextBasedChannel, codeBlock } from "discord.js";
+import { RELATED_TRACKS_DURATION_OFFSET } from "@/constants/time";
+import { calculateLevenshteinDistance } from "@/types/utils/algorithm";
 
 export class AudioHandler extends Shoukaku {
   public client: KafuuClient;
@@ -139,13 +142,103 @@ export class AudioHandler extends Shoukaku {
 
   public async getRelatedVideo(
     videoId: string
-  ): Promise<KafuuAudioTrack | null> {
+  ): Promise<IRelatedVideo[] | null> {
     const scrapeResult: IRelatedVideo[] | null =
       await this.relatedScraper.scrape(videoId, this?.routePlanner);
     if (!scrapeResult || scrapeResult.length <= 0) return null;
+    return scrapeResult;
+  }
+
+  // Time unit: seconds
+  public async rankRelatedVideos(
+    scrapeResults: IRelatedVideo[],
+    playedYoutubeTracks: TinyInfo[]
+  ): Promise<IRelatedVideo[]> {
+    const penalties = new Map<string, number>();
+    this.log.debug(
+      "Rank related videos, playedYoutubeTracks: ",
+      playedYoutubeTracks.length,
+      " scrapeResult: ",
+      scrapeResults.length
+    );
+    const {
+      duration: lastTrackDuration,
+      title: lastTrackTitle,
+      videoId: lastTrackVideoId,
+    } = playedYoutubeTracks[
+      playedYoutubeTracks?.length ? playedYoutubeTracks.length - 1 : 0
+    ];
+
+    for (const scrapedTrack of scrapeResults) {
+      const { videoId, duration } = scrapedTrack;
+      const playedTrack = playedYoutubeTracks.find(
+        (e) => e.videoId === videoId
+      );
+      let videoPenalty = penalties.get(videoId) ?? 0;
+      // Duplicated track
+      if (playedTrack) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const playedTrackDuration = playedTrack.duration;
+        videoPenalty += 1;
+
+        if (
+          duration &&
+          playedTrackDuration &&
+          Math.abs(duration - playedTrackDuration) >
+            RELATED_TRACKS_DURATION_OFFSET
+        )
+          videoPenalty += 2;
+      }
+      // Scraped track is too long
+      if (
+        duration &&
+        lastTrackDuration &&
+        Math.abs(duration - lastTrackDuration) >
+          RELATED_TRACKS_DURATION_OFFSET / 1000 + lastTrackDuration
+      ) {
+        videoPenalty += 3;
+      }
+      penalties.set(videoId, videoPenalty);
+    }
+    // Sort by Levenshtein distance (Similar )
+    const sorted = scrapeResults
+      .sort((a, b) => {
+        if (
+          calculateLevenshteinDistance(a.title, lastTrackTitle) >
+          calculateLevenshteinDistance(b.title, lastTrackTitle)
+        )
+          return 1;
+        else return -1;
+      })
+      .sort((a, b) => {
+        const aPenalty = penalties.get(a.videoId) ?? 0;
+        const bPenalty = penalties.get(b.videoId) ?? 0;
+        return aPenalty - bPenalty;
+      })
+      .slice(0, 5);
+    const logStr = sorted.map(
+      (e, index) =>
+        index +
+        "|" +
+        e.title +
+        " / " +
+        e.videoId +
+        " / " +
+        penalties.get(e.videoId)
+    );
+
+    this.log.debug(
+      `\n----- Related video ranking for ${lastTrackVideoId} -----\n${logStr.join(
+        "\n"
+      )}\n----- End of related video ranking -----`
+    );
+    return sorted;
+  }
+
+  public async fetchRelated(videoId: string): Promise<KafuuAudioTrack | null> {
     const idealNode = this.getNode();
     if (!idealNode) throw new Error("Ideal node not found");
-    const searchResult = await idealNode.rest.resolve(scrapeResult[0].videoId);
+    const searchResult = await idealNode.rest.resolve(videoId);
     if (
       !searchResult ||
       ["LOAD_FAILED", "NO_MATCHES"].includes(searchResult?.loadType)
@@ -196,13 +289,13 @@ export class AudioHandler extends Shoukaku {
   private resumePlayers(): void {
     // Query updatedAt < 1min ago
     // Testing Stuff
-    if (process.env.NODE_ENV == "development") {
-      this.joinChannel({
-        channelId: "1096224923120324741",
-        shardId: 0,
-        guildId: "1096224922226933862",
-        textChannelId: "1100985233068806174",
-      });
-    }
+    // if (process.env.NODE_ENV == "development") {
+    //   this.joinChannel({
+    //     channelId: "1096224923120324741",
+    //     shardId: 0,
+    //     guildId: "1096224922226933862",
+    //     textChannelId: "1100985233068806174",
+    //   });
+    // }
   }
 }

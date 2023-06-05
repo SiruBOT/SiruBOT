@@ -14,12 +14,14 @@ import {
   KafuuAudioTrack,
   KafuuJoinOptions,
   KafuuRepeatMode,
+  TinyInfo,
 } from "@/types/audio";
 import { AudioMessage, BreakOnDestroyed, Queue } from "@/structures/audio";
 import { ReusableFormatFunc } from "@/types/locales";
 
 import { formatTrack, humanizeSeconds } from "@/utils/formatter";
 import { TypeORMGuild } from "@/models/typeorm";
+import { MAX_PLAYED_TRACK_HISTORY } from "@/constants/structures/audio/PlayerDispatcher";
 
 export class PlayerDispatcher {
   public client: KafuuClient;
@@ -27,7 +29,8 @@ export class PlayerDispatcher {
   public queue: Queue;
   public audioMessage: AudioMessage;
   public log: Logger;
-  public playedYoutubeTracks: string[];
+  // Youtube identifier, track length
+  public playedYoutubeTracks: TinyInfo[];
 
   private guildId: string;
   private _destroyed = false;
@@ -255,18 +258,32 @@ export class PlayerDispatcher {
       return;
     }
     try {
-      // Try scrape related video
+      // Scrape related videos
       const relatedSearchResult = await this.client.audio.getRelatedVideo(
         beforeTrack.info.identifier
       );
-      // When related video is not exists, stop player
       if (!relatedSearchResult) {
         await this.audioMessage.sendMessage(format("RELATED_FAILED"));
         await this.cleanStop();
         return;
       }
+      // Rank related videos
+      const rankedRelatedSearchResult =
+        await this.client.audio.rankRelatedVideos(
+          relatedSearchResult,
+          this.playedYoutubeTracks
+        );
+      // Get track from lavalink
+      const lavalinkTrack = await this.client.audio.fetchRelated(
+        rankedRelatedSearchResult[0].videoId
+      );
+      if (!lavalinkTrack) {
+        await this.audioMessage.sendMessage(format("RELATED_FAILED"));
+        await this.cleanStop();
+        return;
+      }
       // Push related video to queue
-      await this.queue.pushTrack(relatedSearchResult);
+      await this.queue.pushTrack(lavalinkTrack);
       // Play next track
       await this.playNextTrack();
       return;
@@ -344,6 +361,19 @@ export class PlayerDispatcher {
         position ? "with position " + position : ""
       }`
     );
+    // If played track is youtube, push to playedYoutubeTracks
+    if (trackToPlay.info.sourceName == "youtube") {
+      if (this.playedYoutubeTracks.length >= MAX_PLAYED_TRACK_HISTORY) {
+        this.playedYoutubeTracks.shift();
+        this.log.debug("Played track history is full, shift first element.");
+      }
+      this.log.debug("Pushing track to playedYoutubeTracks...");
+      this.playedYoutubeTracks.push({
+        videoId: trackToPlay.info.identifier,
+        title: trackToPlay.info.title,
+        duration: trackToPlay.info.length / 1000,
+      });
+    }
     const format: ReusableFormatFunc =
       await this.audioMessage.getReusableFormatFunction();
     const playingMessage: string = position
@@ -423,6 +453,7 @@ export class PlayerDispatcher {
 
   public destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
+    this.playedYoutubeTracks = [];
     this._destroyed = true;
     this.client.audio.deletePlayerDispatcher(this.guildId);
     this.client.audio.players.delete(this.guildId);
