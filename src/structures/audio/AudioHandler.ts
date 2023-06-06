@@ -20,7 +20,7 @@ import { EmbedFactory } from "@/utils/embed";
 import { GuildAudioData } from "@/types/models/audio";
 
 import { getReusableFormatFunction } from "@/locales";
-import { Locale, TextBasedChannel, codeBlock } from "discord.js";
+import { Locale } from "discord.js";
 import { RELATED_TRACKS_DURATION_OFFSET } from "@/constants/time";
 import { calculateLevenshteinDistance } from "@/types/utils/algorithm";
 
@@ -34,13 +34,8 @@ export class AudioHandler extends Shoukaku {
 
   constructor(client: KafuuClient) {
     super(new Connectors.DiscordJS(client), client.settings.audio.nodes, {
-      resumeTimeout: 60000,
       moveOnDisconnect: true,
       reconnectTries: 10,
-      resume: true,
-      resumeByLibrary: true,
-      resumeKey: `// TODO: ResumeKey`,
-      alwaysSendResumeKey: true,
     });
     this.client = client;
     this.log = this.client.log.getChildLogger({
