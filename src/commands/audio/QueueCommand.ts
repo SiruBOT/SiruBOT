@@ -162,7 +162,7 @@ export default class QueueCommand extends BaseCommand {
       .join("\n");
     // Embed
     const embed: ExtendedEmbed = EmbedFactory.createEmbed()
-      .setTrackImage(queue[0])
+      .setTrackThumbnail(queue[0])
       .setFooter({
         text: format(
           locale,
