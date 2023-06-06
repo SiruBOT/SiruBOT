@@ -1,8 +1,8 @@
 import { Guild } from "discord.js";
-import { BaseEvent, Client } from "../structures";
+import { BaseEvent, KafuuClient } from "../structures";
 const eventName = "guildDelete" as const;
 export default class GuildDeleteEvent extends BaseEvent<typeof eventName> {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     super(client, eventName);
   }
 

@@ -1,11 +1,12 @@
 import { DataSource, Repository } from "typeorm";
 import { UpdateQuery, connect } from "mongoose";
 import { Logger } from "tslog";
-import { Client } from ".";
-import entities, { Guild, Metrics } from "../database/mysql/entities";
-import { GuildAudioDataModel } from "../database/mongodb/models";
-import { IGuildAudioData } from "../types";
+
+import { KafuuClient } from "@/structures/KafuuClient";
+import { GuildAudioDataModel } from "@/models/mongoose";
+import { GuildAudioData } from "@/types/models/audio";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import entities, { TypeORMGuild, TypeORMMetrics } from "@/models/typeorm";
 
 interface StatsMetricsArgs {
   playingPlayers: number;
@@ -17,11 +18,11 @@ interface StatsMetricsArgs {
 
 export class DatabaseHelper {
   private log: Logger;
-  protected client: Client;
+  protected client: KafuuClient;
   public mySqlDataSource: DataSource;
   public mongoose: typeof import("mongoose") | undefined;
 
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     this.client = client;
     this.log = this.client.log.getChildLogger({
       name: this.client.log.settings.name,
@@ -35,7 +36,7 @@ export class DatabaseHelper {
       entities,
       ...this.client.settings.database.mysql,
       logging: this.client.bootStrapperArgs.debug,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV === "production" ? false : true,
     });
     await this.mySqlDataSource.initialize();
 
@@ -64,14 +65,14 @@ export class DatabaseHelper {
 
   public async upsertGuildAudioData(
     discordGuildId: string,
-    query: UpdateQuery<IGuildAudioData> = {}
-  ): Promise<IGuildAudioData> {
+    query: UpdateQuery<GuildAudioData> = {}
+  ): Promise<GuildAudioData> {
     if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert GuildAudioData @ ${discordGuildId}`,
       Object.keys(query) ? query : "Empty query"
     );
-    const guildAudioData: IGuildAudioData =
+    const guildAudioData: GuildAudioData =
       await GuildAudioDataModel.findOneAndUpdate(
         {
           discordGuildId,
@@ -87,15 +88,15 @@ export class DatabaseHelper {
 
   public async upsertAndFindGuild(
     discordGuildId: string,
-    data: QueryDeepPartialEntity<Guild> = {}
-  ): Promise<Guild> {
+    data: QueryDeepPartialEntity<TypeORMGuild> = {}
+  ): Promise<TypeORMGuild> {
     if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert Guild @ ${discordGuildId}`,
       Object.keys(data) ? data : "Empty data"
     );
-    const guildRepository: Repository<Guild> =
-      this.mySqlDataSource.getRepository(Guild);
+    const guildRepository: Repository<TypeORMGuild> =
+      this.mySqlDataSource.getRepository(TypeORMGuild);
     await guildRepository.upsert(
       {
         discordGuildId,
@@ -123,8 +124,8 @@ export class DatabaseHelper {
       shardIds,
     } = options;
     this.log.debug(`Insert metrics data @ ${clusterId}/${playingPlayers}`);
-    const metricsRepository: Repository<Metrics> =
-      this.mySqlDataSource.getRepository(Metrics);
+    const metricsRepository: Repository<TypeORMMetrics> =
+      this.mySqlDataSource.getRepository(TypeORMMetrics);
     await metricsRepository.insert({
       clusterId,
       playingPlayers,

@@ -1,4 +1,5 @@
 import { Collection, GuildMember, VoiceBasedChannel } from "discord.js";
+import { getListeningMembers } from "@/utils/voice";
 
 export class VoteSkip {
   skipUserIds: string[];
@@ -25,26 +26,18 @@ export class VoteSkip {
 
   public getNumberOfVotesRequired(voiceChannel: VoiceBasedChannel): number {
     // 1.5 -> 2 절반의 올림값
-    return Math.ceil(this.getListeningMembers(voiceChannel).size / 2);
+    return Math.ceil(getListeningMembers(voiceChannel).size / 2);
   }
 
   public getVotedMembers(
     voiceChannel: VoiceBasedChannel
   ): Collection<string, GuildMember> {
-    return this.getListeningMembers(voiceChannel).filter((user) =>
+    return getListeningMembers(voiceChannel).filter((user) =>
       this.skipUserIds.includes(user.id)
     );
   }
 
   public isSkipVoted(userId: string): boolean {
     return this.skipUserIds.includes(userId);
-  }
-
-  public getListeningMembers(
-    voiceChannel: VoiceBasedChannel
-  ): Collection<string, GuildMember> {
-    return voiceChannel.members.filter(
-      (member) => !member.user.bot && !member.voice.deaf
-    );
   }
 }

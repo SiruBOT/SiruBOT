@@ -1,16 +1,18 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Guild } from "../../database/mysql/entities";
-import { BaseCommand, Client } from "../../structures";
+
+import { BaseCommand, KafuuClient } from "@/structures";
+import { TypeORMGuild } from "@/models/typeorm";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import { Formatter } from "../../utils";
-import locale from "../../locales";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { volumeEmoji } from "@/utils/formatter";
+import { format } from "@/locales";
+
 export default class VolumeCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("volume")
       .setNameLocalizations({
@@ -35,9 +37,9 @@ export default class VolumeCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
@@ -45,27 +47,27 @@ export default class VolumeCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
     userPermissions,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const volume: number | null = interaction.options.getInteger("volume");
     if (!volume) {
-      const guildConfig: Guild =
+      const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId
         );
       await interaction.reply({
-        content: locale.format(
+        content: format(
           interaction.locale,
           "CURRENT_VOLUME",
-          Formatter.volumeEmoji(guildConfig.volume),
+          volumeEmoji(guildConfig.volume),
           guildConfig.volume.toString()
         ),
       });
       return;
     }
 
-    if (volume && !userPermissions.includes(CommandPermissions.DJ)) {
+    if (volume && !userPermissions.includes(KafuuCommandPermission.DJ)) {
       await interaction.reply({
-        content: locale.format(interaction.locale, "MUSIC_DJ_FEATURE"),
+        content: format(interaction.locale, "MUSIC_DJ_FEATURE"),
       });
       return;
     }
@@ -73,16 +75,16 @@ export default class VolumeCommand extends BaseCommand {
     // Max Volume = 150
     if (volume > 150) {
       await interaction.reply(
-        locale.format(interaction.locale, "VOLUME_CANNOT_OVER_MAX")
+        format(interaction.locale, "VOLUME_CANNOT_OVER_MAX")
       );
       return;
     } else if (volume < 0) {
       await interaction.reply(
-        locale.format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW")
+        format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW")
       );
       return;
     }
-    const guildConfig: Guild =
+    const guildConfig: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(interaction.guildId, {
         volume,
       });
@@ -92,10 +94,10 @@ export default class VolumeCommand extends BaseCommand {
         .setVolumePercent(guildConfig.volume);
     } catch {}
     await interaction.reply({
-      content: locale.format(
+      content: format(
         interaction.locale,
         "CHANGED_VOLUME",
-        Formatter.volumeEmoji(guildConfig.volume),
+        volumeEmoji(guildConfig.volume),
         guildConfig.volume.toString()
       ),
     });

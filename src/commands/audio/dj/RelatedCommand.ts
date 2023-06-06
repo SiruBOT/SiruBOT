@@ -1,16 +1,17 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../../structures";
+
+import { BaseCommand, KafuuClient } from "@/structures";
+import { TypeORMGuild } from "@/models/typeorm";
+import { format } from "@/locales";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../../types";
-import locale from "../../../locales";
-import { Guild } from "../../../database/mysql/entities";
-import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
 
 export default class RepeatCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("related")
       .setNameLocalizations({
@@ -51,46 +52,40 @@ export default class RepeatCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.DJ],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.DJ],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const relatedMode: string | null = interaction.options.getString("status");
     if (!relatedMode) {
-      const guildConfig: Guild =
+      const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId
         );
       await interaction.reply({
-        content: locale.format(
+        content: format(
           interaction.locale,
           "RELATED_MODE",
-          locale.format(
-            interaction.locale,
-            guildConfig.playRelated ? "ON" : "OFF"
-          )
+          format(interaction.locale, guildConfig.playRelated ? "ON" : "OFF")
         ),
       });
     } else {
-      const guildConfig: Guild =
+      const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId,
           { playRelated: relatedMode === "ON" } // OFF = false
         );
       await interaction.reply({
-        content: locale.format(
+        content: format(
           interaction.locale,
           "RELATED_MODE_SET",
-          locale.format(
-            interaction.locale,
-            guildConfig.playRelated ? "ON" : "OFF"
-          )
+          format(interaction.locale, guildConfig.playRelated ? "ON" : "OFF")
         ),
       });
     }

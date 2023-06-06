@@ -28,6 +28,8 @@ services:
   # SiruBOT Client
   sirubot:
     build: .
+    environment:
+      - NODE_ENV=production
     command: node ./build -d -s -c settings.yaml
     volumes:
       - ${PWD}/build:/opt/sirubot/build

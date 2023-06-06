@@ -1,7 +1,9 @@
-import { IGuildAudioData, IAudioTrack } from "../../types";
 import { Logger } from "tslog";
-import { DatabaseHelper } from "..";
-import { VoteSkip } from "./VoteSkip";
+
+import { KafuuAudioTrack } from "@/types/audio";
+import { GuildAudioData } from "@/types/models/audio";
+import { DatabaseHelper } from "@/structures";
+import { VoteSkip } from "@/structures/audio";
 
 export class Queue {
   private log: Logger;
@@ -16,7 +18,7 @@ export class Queue {
     this.voteSkip = new VoteSkip();
   }
 
-  public async cleanQueue(): Promise<IGuildAudioData> {
+  public async cleanQueue(): Promise<GuildAudioData> {
     this.log.debug(`Clean the queue @ ${this.guildId}`);
     const cleanedData = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
@@ -25,24 +27,22 @@ export class Queue {
     return cleanedData;
   }
 
-  public async getQueue(): Promise<IAudioTrack[]> {
+  public async getTracks(): Promise<KafuuAudioTrack[]> {
     this.log.debug(`Get queue from ${this.guildId}`);
-    const { queue }: { queue: IAudioTrack[] } =
+    const { queue }: { queue: KafuuAudioTrack[] } =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
     return queue;
   }
 
-  public async pushTrack(track: IAudioTrack): Promise<IAudioTrack> {
-    this.log.debug(
-      `Push track ${track.track.info.identifier} @ ${this.guildId}`
-    );
+  public async pushTrack(track: KafuuAudioTrack): Promise<KafuuAudioTrack> {
+    this.log.debug(`Push track ${track.info.identifier} @ ${this.guildId}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: track },
     });
     return track;
   }
 
-  public async pushTracks(tracks: IAudioTrack[]): Promise<number> {
+  public async pushTracks(tracks: KafuuAudioTrack[]): Promise<number> {
     this.log.debug(`Push ${tracks.length} tracks to ${this.guildId}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: tracks } },
@@ -50,9 +50,9 @@ export class Queue {
     return tracks.length;
   }
 
-  public async unshiftTrack(track: IAudioTrack): Promise<IAudioTrack> {
+  public async unshiftTrack(track: KafuuAudioTrack): Promise<KafuuAudioTrack> {
     this.log.debug(
-      `Push track ${track.track.info.identifier} with position 0 @ ${this.guildId}`
+      `Push track ${track.info.identifier} with position 0 @ ${this.guildId}`
     );
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: [track], $position: 0 } },
@@ -60,7 +60,7 @@ export class Queue {
     return track;
   }
 
-  public async shiftTrack(): Promise<IAudioTrack | null> {
+  public async shiftTrack(): Promise<KafuuAudioTrack | null> {
     const beforeShift = await this.databaseHelper.upsertGuildAudioData(
       this.guildId
     );
@@ -81,7 +81,9 @@ export class Queue {
     return beforeShift.queue[0];
   }
 
-  public async setNowPlaying(track: IAudioTrack): Promise<IAudioTrack | null> {
+  public async setNowPlaying(
+    track: KafuuAudioTrack
+  ): Promise<KafuuAudioTrack | null> {
     this.log.debug(`Set nowplaying @ ${this.guildId}`);
     const updated = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
@@ -90,9 +92,9 @@ export class Queue {
     return updated.nowPlaying;
   }
 
-  public async getNowPlaying(): Promise<IAudioTrack | null> {
+  public async getNowPlaying(): Promise<KafuuAudioTrack | null> {
     this.log.debug(`Get nowplaying from ${this.guildId}`);
-    const { nowPlaying }: { nowPlaying: IAudioTrack | null } =
+    const { nowPlaying }: { nowPlaying: KafuuAudioTrack | null } =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
     return nowPlaying;
   }
@@ -122,7 +124,20 @@ export class Queue {
     ]);
   }
 
-  public async setPosition(position: number | null): Promise<IGuildAudioData> {
+  public async shuffleTrack(): Promise<number> {
+    this.log.debug(`Shuffle queue tracks @ ${this.guildId}`);
+    const { queue }: { queue: KafuuAudioTrack[] } =
+      await this.databaseHelper.upsertGuildAudioData(this.guildId);
+    const shuffled = queue.sort(() => Math.random() - 0.5);
+    await this.databaseHelper.upsertGuildAudioData(this.guildId, {
+      $set: {
+        queue: shuffled,
+      },
+    });
+    return shuffled.length;
+  }
+
+  public async setPosition(position: number | null): Promise<GuildAudioData> {
     this.log.debug(`Update position to ${position} @ ${this.guildId}`);
     return await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $set: {
@@ -132,9 +147,9 @@ export class Queue {
     });
   }
 
-  public async getGuildAudioData(): Promise<IGuildAudioData> {
+  public async getGuildAudioData(): Promise<GuildAudioData> {
     this.log.debug(`Get guildAudioData from ${this.guildId}`);
-    const guildAudioData: IGuildAudioData =
+    const guildAudioData: GuildAudioData =
       await this.databaseHelper.upsertGuildAudioData(this.guildId);
     return guildAudioData;
   }

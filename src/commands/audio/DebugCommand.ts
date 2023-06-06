@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { Constants, Node } from "shoukaku";
-import { BaseCommand, Client } from "../../structures";
+import { SlashCommandBuilder } from "@discordjs/builders";
+
+import { BaseCommand, KafuuClient } from "@/structures";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../types";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
-import { EmbedFactory, Formatter } from "../../utils";
-import { ExtendedEmbed } from "../../utils/ExtendedEmbed";
+  KafuuCommandContext,
+  KafuuCommandCategory,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { EmbedFactory, ExtendedEmbed } from "@/utils/embed";
+import { humanizeSeconds } from "@/utils/formatter";
 
 // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript/23625419
 const units = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
@@ -33,7 +34,7 @@ const STATE_STRING = [
   "DISCONNECTED",
 ];
 export default class NodeInfoCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("debuginfo")
       .setNameLocalizations({
@@ -43,21 +44,21 @@ export default class NodeInfoCommand extends BaseCommand {
         "Shows bot's debug info (Usally uses support identify errors)"
       )
       .setDescriptionLocalizations({
-        ko: "봇의 디버그 정보를 보여드려요. (대부분 봇의 오류를 파악하는데 사용되어요)",
+        ko: "봇의 디버그 정보를 보여드려요.",
       });
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.NOTHING,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.NOTHING,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const nodes: Node[] = [...this.client.audio.nodes.values()];
     const onlineNodes: Node[] = nodes.filter(
       (v) => v.state === Constants.State.CONNECTED
@@ -85,7 +86,7 @@ export default class NodeInfoCommand extends BaseCommand {
             (node.state === Constants.State.CONNECTED)
               ? `Players: **${node?.stats?.players ?? 0}**\n` +
                 `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
-                `Uptime: **${Formatter.humanizeSeconds(
+                `Uptime: **${humanizeSeconds(
                   node?.stats?.uptime ?? 0,
                   true
                 )}**\n` +

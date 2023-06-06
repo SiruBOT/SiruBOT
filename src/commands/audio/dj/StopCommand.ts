@@ -1,16 +1,16 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { BaseCommand, Client } from "../../../structures";
-import { PlayerDispatcher } from "../../../structures/audio/PlayerDispatcher";
+import { BaseCommand, KafuuClient } from "@/structures";
+import { PlayerDispatcher } from "@/structures/audio";
 import {
-  CommandCategories,
-  CommandPermissions,
-  ICommandContext,
-} from "../../../types";
-import { CommandRequirements } from "../../../types/CommandTypes/CommandRequirements";
-import locale from "../../../locales";
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { format } from "@/locales";
 
 export default class StopCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
       .setName("stop")
       .setNameLocalizations({
@@ -23,20 +23,20 @@ export default class StopCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.DJ],
-      CommandRequirements.TRACK_PLAYING | CommandRequirements.AUDIO_NODE,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.DJ],
+      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
       ["SendMessages"]
     );
   }
 
   public override async onCommandInteraction({
     interaction,
-  }: ICommandContext): Promise<void> {
+  }: KafuuCommandContext): Promise<void> {
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
     await interaction.reply({
-      content: locale.format(interaction.locale, "CLEANED_AND_STOPPED"),
+      content: format(interaction.locale, "CLEANED_AND_STOPPED"),
     });
     await dispatcher.cleanStop();
   }

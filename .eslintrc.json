@@ -6,7 +6,11 @@
   "env": {
     "node": true
   },
-  "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "plugin:security/recommended"],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:security/recommended"
+  ],
   "rules": {
     "prettier/prettier": [
       "error",

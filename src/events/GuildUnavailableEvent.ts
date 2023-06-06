@@ -1,9 +1,9 @@
 import { Guild } from "discord.js";
-import { BaseEvent, Client } from "../structures";
-const eventName = "guildUnavailable" as const;
-export default class GuildUnavailableEvent extends BaseEvent<typeof eventName> {
-  constructor(client: Client) {
-    super(client, eventName);
+import { BaseEvent, KafuuClient } from "@/structures";
+
+export default class GuildUnavailableEvent extends BaseEvent<"guildUnavailable"> {
+  constructor(client: KafuuClient) {
+    super(client, "guildUnavailable");
   }
 
   public override async run(guild: Guild): Promise<void> {

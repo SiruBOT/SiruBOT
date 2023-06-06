@@ -1,9 +1,9 @@
 import * as Sentry from "@sentry/node";
-import { BaseEvent, Client } from "../structures";
+import { BaseEvent, KafuuClient } from "../structures";
 
 const eventName = "error" as const;
 export default class ErrorEvent extends BaseEvent<typeof eventName> {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     super(client, eventName);
   }
 

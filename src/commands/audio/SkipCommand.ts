@@ -1,4 +1,3 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import {
   ActionRowBuilder,
   ApplicationCommandOptionChoiceData,
@@ -9,28 +8,29 @@ import {
   GuildMember,
   InteractionReplyOptions,
   InteractionUpdateOptions,
+  Locale,
   VoiceBasedChannel,
 } from "discord.js";
-import { BaseCommand, Client } from "../../structures";
-import { PlayerDispatcher } from "../../structures/audio/PlayerDispatcher";
-import {
-  CommandCategories,
-  CommandPermissions,
-  HandledCommandInteraction,
-  IAudioTrack,
-  ICommandContext,
-  IGuildAudioData,
-} from "../../types";
-import locale from "../../locales";
-import { EmbedFactory } from "../../utils/EmbedFactory";
-import { Formatter } from "../../utils";
-import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "../../events/InteractionCreateEvent";
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { Track } from "shoukaku";
+
 import {
-  AUTOCOMPLETE_MAX_RESULT,
-  SKIP_EMOJI,
-} from "../../constant/MessageConstant";
-import { CommandRequirements } from "../../types/CommandTypes/CommandRequirements";
+  KafuuButtonContext,
+  KafuuCommandCategory,
+  KafuuCommandContext,
+  KafuuCommandFlags,
+  KafuuCommandPermission,
+} from "@/types/command";
+import { BaseCommand, KafuuClient } from "@/structures";
+import { PlayerDispatcher } from "@/structures/audio";
+import { GuildAudioData } from "@/types/models/audio";
+import { KafuuAudioTrack } from "@/types/audio";
+import { HandledCommandInteraction } from "@/types/interaction";
+import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
+import { AUTOCOMPLETE_MAX_RESULT, SKIP_EMOJI } from "@/constants/message";
+import { EmbedFactory } from "@/utils/embed";
+import { format, getReusableFormatFunction } from "@/locales";
+import { formatTrack } from "@/utils/formatter";
 
 /**
  * SkipCommand 조건
@@ -49,11 +49,11 @@ import { CommandRequirements } from "../../types/CommandTypes/CommandRequirement
 type SkipContext = {
   interaction: HandledCommandInteraction<true>;
   dispatcher: PlayerDispatcher;
-  queue: IAudioTrack[];
-  nextTrack: IAudioTrack;
+  queue: KafuuAudioTrack[];
+  nextTrack: KafuuAudioTrack;
 };
 export default class SkipCommand extends BaseCommand {
-  constructor(client: Client) {
+  constructor(client: KafuuClient) {
     // Build slash command info
     const slashCommand = new SlashCommandBuilder()
       .setName("skip")
@@ -97,12 +97,12 @@ export default class SkipCommand extends BaseCommand {
     super(
       slashCommand,
       client,
-      CommandCategories.MUSIC,
-      [CommandPermissions.EVERYONE],
-      CommandRequirements.TRACK_PLAYING |
-        CommandRequirements.AUDIO_NODE |
-        CommandRequirements.VOICE_SAME_CHANNEL |
-        CommandRequirements.VOICE_CONNECTED,
+      KafuuCommandCategory.MUSIC,
+      [KafuuCommandPermission.EVERYONE],
+      KafuuCommandFlags.TRACK_PLAYING |
+        KafuuCommandFlags.AUDIO_NODE |
+        KafuuCommandFlags.VOICE_SAME_CHANNEL |
+        KafuuCommandFlags.VOICE_CONNECTED,
       ["SendMessages"]
     );
   }
@@ -110,19 +110,19 @@ export default class SkipCommand extends BaseCommand {
   public override async onCommandInteraction({
     interaction,
     userPermissions,
-  }: ICommandContext<true>): Promise<void> {
+  }: KafuuCommandContext<true>): Promise<void> {
     const dispatcher: PlayerDispatcher =
       this.client.audio.getPlayerDispatcherOrfail(interaction.guildId);
-    const { queue }: IGuildAudioData =
+    const { queue }: GuildAudioData =
       await dispatcher.queue.getGuildAudioData();
     const nowplaying = await dispatcher.queue.getNowPlaying();
-    const nextTrack: IAudioTrack | undefined = queue.at(0);
+    const nextTrack: KafuuAudioTrack | undefined = queue.at(0);
     // 건너뛸 곡이 없는 경우
     if (!nextTrack) {
       // TODO: 추천 영상일경우 건너뛸지 물어보기
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "SKIP_NO_NEXT"),
+        content: format(interaction.locale, "SKIP_NO_NEXT"),
       });
       return;
     }
@@ -138,7 +138,7 @@ export default class SkipCommand extends BaseCommand {
     // Force, Jump 명령어를 안쓰거나, 명령어를 썼지만 권한이 없는 경우 일반 voteSkip 으로 간주
     if (
       !subCommand ||
-      (subCommand && !userPermissions.includes(CommandPermissions.DJ))
+      (subCommand && !userPermissions.includes(KafuuCommandPermission.DJ))
     ) {
       // skip 명령어를 치면 투표한걸로 간주함
       dispatcher.queue.voteSkip.addSkipper(interaction.member.id);
@@ -154,7 +154,7 @@ export default class SkipCommand extends BaseCommand {
             interaction.locale,
             interaction.guildId,
             interaction.member,
-            (nowplaying as IAudioTrack).track
+            nowplaying as KafuuAudioTrack
           )
         );
       }
@@ -174,7 +174,7 @@ export default class SkipCommand extends BaseCommand {
   }: SkipContext): Promise<void> {
     await dispatcher.skipTrack();
     await interaction.reply({
-      content: locale.format(
+      content: format(
         interaction.locale,
         "SKIPPED_TRACK_FORCE",
         interaction.member.displayName
@@ -182,7 +182,7 @@ export default class SkipCommand extends BaseCommand {
       embeds: [
         await EmbedFactory.getTrackEmbed(
           this.client,
-          locale.getReusableFormatFunction(interaction.locale),
+          getReusableFormatFunction(interaction.locale),
           nextTrack
         ),
       ],
@@ -195,12 +195,12 @@ export default class SkipCommand extends BaseCommand {
     queue,
   }: SkipContext): Promise<void> {
     const skipTo = interaction.options.getInteger("to", true);
-    const skipToTrack: IAudioTrack | undefined = queue.at(skipTo - 1);
+    const skipToTrack: KafuuAudioTrack | undefined = queue.at(skipTo - 1);
     // 점프할 곡이 없다면
     if (!skipToTrack) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "SKIP_NO_SELECTED"),
+        content: format(interaction.locale, "SKIP_NO_SELECTED"),
       });
       return;
     }
@@ -208,7 +208,7 @@ export default class SkipCommand extends BaseCommand {
     // skipTo 처리
     await dispatcher.skipTrack(skipTo - 1);
     await interaction.reply({
-      content: locale.format(
+      content: format(
         interaction.locale,
         "SKIP_TO_JUMP",
         interaction.member.displayName,
@@ -217,7 +217,7 @@ export default class SkipCommand extends BaseCommand {
       embeds: [
         await EmbedFactory.getTrackEmbed(
           this.client,
-          locale.getReusableFormatFunction(interaction.locale),
+          getReusableFormatFunction(interaction.locale),
           skipToTrack
         ),
       ],
@@ -226,10 +226,10 @@ export default class SkipCommand extends BaseCommand {
   }
 
   private buildSkippedPayload(
-    localeName: string
+    localeName: Locale
   ): InteractionReplyOptions & InteractionUpdateOptions {
     return {
-      content: locale.format(localeName, "SKIPPED_TRACK_VOTED"),
+      content: format(localeName, "SKIPPED_TRACK_VOTED"),
       components: [],
       embeds: [],
     };
@@ -237,17 +237,17 @@ export default class SkipCommand extends BaseCommand {
 
   // Skip 버튼 페이로드 만들기
   private buildVoteSkipPayload(
-    localeName: string,
+    localeName: Locale,
     guildId: string,
     member: GuildMember,
     track: Track
   ) {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(guildId);
     const voteButton = new ButtonBuilder()
-      .setCustomId(this.getCustomId("voteskip_vote"))
+      .setCustomId(this.getCustomId({ customId: "voteskip_vote" }))
       .setEmoji(SKIP_EMOJI)
       .setLabel(
-        locale.format(
+        format(
           localeName,
           "SKIP_BUTTON_LABEL",
           `${
@@ -264,22 +264,19 @@ export default class SkipCommand extends BaseCommand {
       voteButton
     );
     const trackEmbed = EmbedFactory.createEmbed()
-      .setTitle(locale.format(localeName, "SKIP_VOTE_EMBED_TITLE"))
+      .setTitle(format(localeName, "SKIP_VOTE_EMBED_TITLE"))
       .setDescription(
-        locale.format(
+        format(
           localeName,
           "SKIP_VOTE_EMBED_DESC",
           member.displayName,
-          Formatter.formatTrack(
-            track,
-            locale.format(localeName, "LIVESTREAM"),
-            {
-              withMarkdownUri: true,
-            }
-          )
+          formatTrack(track, {
+            streamString: format(localeName, "LIVESTREAM"),
+            withMarkdownURL: true,
+          })
         )
       )
-      .setTrackThumbnail(track.info);
+      .setTrackThumbnail(track);
     return {
       components: [actionRow],
       embeds: [trackEmbed],
@@ -300,8 +297,11 @@ export default class SkipCommand extends BaseCommand {
     }
   }
 
-  public override async onButtonInteraction(interaction: ButtonInteraction) {
-    switch (interaction.customId) {
+  public override async onButtonInteraction({
+    interaction,
+    customInfo: { customId },
+  }: KafuuButtonContext) {
+    switch (customId) {
       case "voteskip_vote":
         await this.handleVoteSkipButton(interaction);
         break;
@@ -316,18 +316,18 @@ export default class SkipCommand extends BaseCommand {
       // dispatcher가 없다면 재생 중이 아님
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "AVAILABLE_ONLY_PLAYING"),
+        content: format(interaction.locale, "AVAILABLE_ONLY_PLAYING"),
       });
       return;
     }
-    const queue = await dispatcher.queue.getQueue();
+    const queue = await dispatcher.queue.getTracks();
     const nowplaying = await dispatcher.queue.getNowPlaying();
     const nextTrack = queue.at(0);
     if (!nextTrack) {
       // 다음곡이 없다면
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "SKIP_NO_NEXT"),
+        content: format(interaction.locale, "SKIP_NO_NEXT"),
       });
       return;
     }
@@ -335,7 +335,7 @@ export default class SkipCommand extends BaseCommand {
       // 이미 투표하였다면
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "SKIP_ALREADY_VOTED"),
+        content: format(interaction.locale, "SKIP_ALREADY_VOTED"),
       });
       return;
     }
@@ -344,7 +344,7 @@ export default class SkipCommand extends BaseCommand {
       // 음성채널에 접속 안했다면
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
-        content: locale.format(interaction.locale, "JOIN_VOICE_FIRST"),
+        content: format(interaction.locale, "JOIN_VOICE_FIRST"),
       });
       return;
     }
@@ -362,7 +362,7 @@ export default class SkipCommand extends BaseCommand {
           interaction.locale,
           interaction.guildId,
           member,
-          (nowplaying as IAudioTrack).track
+          nowplaying as KafuuAudioTrack
         )
       );
     }
@@ -393,13 +393,10 @@ export default class SkipCommand extends BaseCommand {
         .map(
           (e, index) =>
             `#${start + index} ` + // Start + Index
-            Formatter.formatTrack(
-              e.track,
-              locale.format(interaction.locale, "LIVESTREAM"),
-              {
-                showLength: false,
-              }
-            )
+            formatTrack(e, {
+              streamString: format(interaction.locale, "LIVESTREAM"),
+              showLength: false,
+            })
         )
         .map((e, index): ApplicationCommandOptionChoiceData => {
           return {
