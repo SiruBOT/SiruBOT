@@ -48,26 +48,22 @@ export class AudioMessage {
     const { textChannelId, sendAudioMessages }: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
     if (!sendAudioMessages) {
-      this.log.warn(
-        `Guild ${this.guildId} disabled audio messages, ignoreing...`
-      );
+      this.log.warn(`Guild ${this.guildId} disabled audio messages, ignore...`);
       return;
     }
-    let targetChannel: Channel | null = null;
-    if (textChannelId) {
-      targetChannel = await this.fetchChannel(textChannelId);
-    } else {
-      targetChannel = await this.fetchChannel(this.channelId);
-    }
+    const targetChannel: Channel | null = await this.fetchChannel(
+      textChannelId ?? this.channelId
+    );
     if (!targetChannel || !targetChannel.isTextBased()) {
       this.log.warn(`Target channel not found ${this.channelId}`);
       return;
     }
-    const lastMessage: Message | undefined = (
+    const lastMessage = (
       await targetChannel.messages.fetch({
         limit: 1,
       })
     ).first();
+    // If last message is not null and audio message == last message and editable
     if (
       lastMessage &&
       lastMessage.id == this.lastMessageId &&
@@ -81,13 +77,6 @@ export class AudioMessage {
         );
         await lastMessage.edit(options);
       } catch (e) {
-        this.log.error(
-          `Failed to edit message ${targetChannel.id}#${
-            lastMessage?.id ?? "Unknown"
-          } is message is deleted?`,
-          e
-        );
-        Sentry.captureException(e);
         this.log.debug(
           `Failed to edit message ${targetChannel.id}#${
             lastMessage?.id ?? "Unknown"
@@ -97,8 +86,18 @@ export class AudioMessage {
         this.lastMessageId = lastMsg.id;
       }
     } else {
-      if (this.lastMessageId)
-        await targetChannel.messages.delete(this.lastMessageId).catch(); // Ignore errors
+      try {
+        if (this.lastMessageId)
+          await targetChannel.messages.delete(this.lastMessageId);
+      } catch (e) {
+        this.log.debug(
+          `Failed to delete message ${targetChannel.id}#${
+            this.lastMessageId ?? "Unknown"
+          } is message is deleted?`,
+          e
+        );
+        Sentry.captureException(e);
+      }
       this.log.debug(`Send message to ${targetChannel.id}`);
       const lastMsg: Message = await targetChannel.send(options);
       this.lastMessageId = lastMsg.id;
