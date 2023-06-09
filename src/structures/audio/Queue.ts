@@ -100,7 +100,7 @@ export class Queue {
   }
 
   // https://stackoverflow.com/questions/69070811/pop-many-first-n-items-in-mongo-db
-  public async skipTo(to: number) {
+  public async skipTo(to: number): Promise<void> {
     this.log.debug(`Slice queue tracks @ ${this.guildId} ${to}`);
     await this.databaseHelper.upsertGuildAudioData(this.guildId, [
       {
@@ -122,6 +122,18 @@ export class Queue {
         },
       },
     ]);
+  }
+
+  public async removeTrack(index: number): Promise<KafuuAudioTrack> {
+    this.log.debug(`Remove track @ ${this.guildId} #${index}`);
+    const { queue } = await this.getGuildAudioData();
+    const [removedTrack] = queue.splice(index, 1);
+    await this.databaseHelper.upsertGuildAudioData(this.guildId, {
+      $set: {
+        queue,
+      },
+    });
+    return removedTrack;
   }
 
   public async shuffleTrack(): Promise<number> {
