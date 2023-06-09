@@ -84,7 +84,7 @@ export class AudioHandler extends Shoukaku {
   ): Promise<PlayerDispatcher> {
     const idealNode = this.getNode();
     if (!idealNode) throw new Error("Ideal node not found");
-    this.log.debug(
+    this.log.info(
       `Join channel #${joinOptions.channelId} with Node ${idealNode.name}`
     );
     const shoukakuPlayer = await idealNode.joinChannel(joinOptions);
@@ -94,7 +94,7 @@ export class AudioHandler extends Shoukaku {
         joinOptions
       );
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
-    // await dispatcher.playOrResumeOrNothing();;
+    await dispatcher.playOrResumeOrNothing();
     return dispatcher;
   }
 
