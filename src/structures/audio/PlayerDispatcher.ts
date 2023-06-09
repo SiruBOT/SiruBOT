@@ -17,7 +17,6 @@ import {
   TinyInfo,
 } from "@/types/audio";
 import { AudioMessage, BreakOnDestroyed, Queue } from "@/structures/audio";
-import { ReusableFormatFunc } from "@/types/locales";
 
 import { formatTrack, humanizeSeconds } from "@/utils/formatter";
 import { TypeORMGuild } from "@/models/typeorm";
@@ -79,7 +78,7 @@ export class PlayerDispatcher {
             reasonString
         );
         this.destroy();
-        await this.sendDisconnected();
+        await this.audioMessage.sendDisconnectedMessage();
         break;
       case resumeErrorCode:
         this.log.warn(
@@ -120,10 +119,9 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async onException(exception: TrackExceptionEvent) {
-    // TODO: 플레이어 핸들이 안되어 있음
     this.log.error(`Error while playback`, exception);
     Sentry.captureException(exception);
-    this.destroy();
+    await this.handleError();
   }
 
   @BreakOnDestroyed()
@@ -145,9 +143,9 @@ export class PlayerDispatcher {
             await this.playNextTrack();
           }
         } catch (error) {
-          const exceptionId = Sentry.captureException(error);
+          Sentry.captureException(error);
           this.log.error(`Failed to playing next track`, error);
-          this.handleError(exceptionId);
+          this.handleError();
         }
         break;
       case "REPLACED":
@@ -183,12 +181,6 @@ export class PlayerDispatcher {
     await this.queue.pushTrack(track);
     await this.playOrResumeOrNothing();
     return track;
-  }
-
-  public async sendDisconnected(): Promise<void> {
-    await this.audioMessage.sendMessage(
-      await this.audioMessage.format("DISCONNECT_ERROR")
-    );
   }
 
   public async seekTo(seekTo: number): Promise<this> {
@@ -245,15 +237,13 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async playRelated(): Promise<void> {
-    const format: ReusableFormatFunc =
-      await this.audioMessage.getReusableFormatFunction();
     const beforeTrack = await this.queue.getNowPlaying();
     // 이전 트랙이 없거나, 이전 트랙이 유튜브가 아니면 종료
     if (!beforeTrack || beforeTrack.info.sourceName != "youtube") {
       this.log.debug(
         `Before track is not exists or identifier is not exists. Stop & clean PlayerDispatcher`
       );
-      await this.audioMessage.sendMessage(format("RELATED_ONLY_YOUTUBE"));
+      await this.audioMessage.sendRelatedYoutubeOnly();
       await this.cleanStop();
       return;
     }
@@ -263,7 +253,7 @@ export class PlayerDispatcher {
         beforeTrack.info.identifier
       );
       if (!relatedSearchResult) {
-        await this.audioMessage.sendMessage(format("RELATED_FAILED"));
+        await this.audioMessage.sendRelatedFailed();
         await this.cleanStop();
         return;
       }
@@ -278,7 +268,7 @@ export class PlayerDispatcher {
         rankedRelatedSearchResult[0].videoId
       );
       if (!lavalinkTrack) {
-        await this.audioMessage.sendMessage(format("RELATED_FAILED"));
+        await this.audioMessage.sendRelatedFailed();
         await this.cleanStop();
         return;
       }
@@ -289,12 +279,10 @@ export class PlayerDispatcher {
       return;
     } catch (error) {
       // When scrape related video is failed, stop player and capture Exception
-      const exceptionId: string = Sentry.captureException(error);
+      Sentry.captureException(error);
       this.log.error("Failed to scrape related video.", error);
       // Send error message
-      await this.audioMessage.sendMessage(
-        format("RELATED_SCRAPE_ERROR", exceptionId)
-      );
+      await this.audioMessage.sendRelatedScrapeFailed();
       await this.cleanStop();
       return;
     }
@@ -374,24 +362,30 @@ export class PlayerDispatcher {
         duration: trackToPlay.info.length / 1000,
       });
     }
-    const format: ReusableFormatFunc =
-      await this.audioMessage.getReusableFormatFunction();
-    const playingMessage: string = position
-      ? format(
+
+    const streamString = await this.audioMessage.format("LIVESTREAM");
+    const playingMessage: string = await (position
+      ? this.audioMessage.format(
           "RESUMED_PLAYING",
-          formatTrack(trackToPlay, { streamString: format("LIVESTREAM") }),
+          formatTrack(trackToPlay, {
+            streamString,
+          }),
           humanizeSeconds(position, true)
         )
       : trackToPlay.relatedTrack
-      ? format(
+      ? this.audioMessage.format(
           "PLAYING_NOW_RELATED",
-          formatTrack(trackToPlay, { streamString: format("LIVESTREAM") })
+          formatTrack(trackToPlay, {
+            streamString,
+          })
         )
-      : format(
+      : this.audioMessage.format(
           "PLAYING_NOW",
-          formatTrack(trackToPlay, { streamString: format("LIVESTREAM") })
-        );
-    await this.audioMessage.sendMessage(playingMessage);
+          formatTrack(trackToPlay, {
+            streamString,
+          })
+        ));
+    await this.audioMessage.sendRaw(playingMessage);
     await this.queue.setNowPlaying(trackToPlay);
     this.setVolumePercent(volume);
     return this.player.playTrack({
@@ -427,9 +421,7 @@ export class PlayerDispatcher {
   public async stopPlayer(): Promise<void> {
     await this.cleanStop();
     // Send Audio Message
-    await this.audioMessage.sendMessage(
-      await this.audioMessage.format("ENDED_PLAYBACK")
-    );
+    await this.audioMessage.sendPlayEnded();
   }
 
   @BreakOnDestroyed()
@@ -440,11 +432,9 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  private async handleError(exceptionId: string): Promise<void> {
-    this.destroy();
-    await this.audioMessage.sendMessage(
-      await this.audioMessage.format("PLAYBACK_ERROR", exceptionId)
-    );
+  private async handleError(): Promise<void> {
+    await this.playNextTrack();
+    await this.audioMessage.sendErrorMessage();
   }
 
   public get destroyed(): boolean {
@@ -453,10 +443,9 @@ export class PlayerDispatcher {
 
   public destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
-    this.playedYoutubeTracks = [];
     this._destroyed = true;
+    this.playedYoutubeTracks = [];
     this.client.audio.deletePlayerDispatcher(this.guildId);
-    this.client.audio.players.delete(this.guildId);
     this.player.connection.disconnect();
   }
 }

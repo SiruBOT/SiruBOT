@@ -2,7 +2,7 @@ import { MessagePayload, Message, Channel } from "discord.js";
 import { Logger } from "tslog";
 import { KafuuClient } from "@/structures";
 import { TypeORMGuild } from "@/models/typeorm";
-import { format, getReusableFormatFunction } from "@/locales";
+import { getReusableFormatFunction } from "@/locales";
 import * as Sentry from "@sentry/node";
 import { ReusableFormatFunc, STRING_KEYS } from "@/types/locales";
 
@@ -11,8 +11,9 @@ export class AudioMessage {
   private guildId: string;
   private channelId: string;
   private lastMessageId: string;
-  public nowplayingMessage?: Message<true>;
   private log: Logger;
+  private cachedFormatFunction?: ReusableFormatFunc;
+  public nowplayingMessage?: Message<true>;
   constructor(
     client: KafuuClient,
     guildId: string,
@@ -28,22 +29,20 @@ export class AudioMessage {
   }
 
   public async format(key: STRING_KEYS, ...args: string[]): Promise<string> {
-    this.log.debug(`Format key ${key} with guild config ${this.guildId}`);
-    const guildConfig: TypeORMGuild =
-      await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
-    return format(guildConfig.guildLocale, key, ...args);
+    if (!this.cachedFormatFunction) {
+      this.log.debug(
+        `Get reusable format function (for reduce db query) ${this.guildId}`
+      );
+      const guildConfig: TypeORMGuild =
+        await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
+      this.cachedFormatFunction = getReusableFormatFunction(
+        guildConfig.guildLocale
+      );
+    }
+    return this.cachedFormatFunction(key, ...args);
   }
 
-  public async getReusableFormatFunction(): Promise<ReusableFormatFunc> {
-    this.log.debug(
-      `Get reusable format function (for reduce db query) ${this.guildId}`
-    );
-    const guildConfig: TypeORMGuild =
-      await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
-    return getReusableFormatFunction(guildConfig.guildLocale);
-  }
-
-  public async sendMessage(options: string | MessagePayload): Promise<void> {
+  private async sendMessage(options: string | MessagePayload): Promise<void> {
     this.log.debug(`Send audio message to guild ${this.guildId}...`);
     const { textChannelId, sendAudioMessages }: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
@@ -102,6 +101,38 @@ export class AudioMessage {
       const lastMsg: Message = await targetChannel.send(options);
       this.lastMessageId = lastMsg.id;
     }
+  }
+
+  public async sendErrorMessage(): Promise<void> {
+    await this._formatSend("PLAYBACK_ERROR");
+  }
+
+  public async sendDisconnectedMessage(): Promise<void> {
+    await this._formatSend("DISCONNECT_ERROR");
+  }
+
+  public async sendRelatedYoutubeOnly() {
+    await this._formatSend("RELATED_ONLY_YOUTUBE");
+  }
+
+  public async sendRelatedFailed() {
+    await this._formatSend("RELATED_FAILED");
+  }
+
+  public async sendRelatedScrapeFailed() {
+    await this._formatSend("RELATED_SCRAPE_ERROR");
+  }
+
+  public async sendPlayEnded() {
+    await this._formatSend("ENDED_PLAYBACK");
+  }
+
+  public async sendRaw(content: string) {
+    await this.sendMessage(content);
+  }
+
+  private async _formatSend(key: STRING_KEYS, ...args: string[]) {
+    await this.sendMessage(await this.format(key, ...args));
   }
 
   private async fetchChannel(channelId: string): Promise<Channel | null> {
