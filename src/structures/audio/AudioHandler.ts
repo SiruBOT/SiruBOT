@@ -54,7 +54,7 @@ export class AudioHandler extends Shoukaku {
     );
     this.client = client;
     this.log = this.client.log.getChildLogger({
-      name: this.client.log.settings.name,
+      name: this.client.log.settings.name + "-" + AudioHandler.name,
     });
     const { relatedRoutePlanner } = client.settings.audio;
     if (relatedRoutePlanner) {

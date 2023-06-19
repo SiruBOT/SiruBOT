@@ -24,7 +24,7 @@ export class AudioMessage {
     this.guildId = guildId;
     this.channelId = channelId;
     this.log = log.getChildLogger({
-      name: log.settings.name + "/AudioMessage",
+      name: log.settings.name + "-" + AudioMessage.name,
     });
   }
 
