@@ -43,13 +43,15 @@ export default class RemoveCommand extends BaseCommand {
       slashCommand,
       client,
       KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.DJ],
+      // Remove command for everyone, but only dj remove other's track
+      [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
       ["SendMessages"]
     );
   }
   public override async onCommandInteraction({
     interaction,
+    userPermissions,
   }: KafuuCommandContext<false>): Promise<void> {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(
       interaction.guildId
@@ -64,6 +66,17 @@ export default class RemoveCommand extends BaseCommand {
           "REMOVE_INVALID",
           position.toString()
         ),
+      });
+      return;
+    }
+
+    // User is not a DJ and not the same user who requested the track
+    if (
+      !userPermissions.includes(KafuuCommandPermission.DJ) &&
+      queue[position - 1].requestUserId !== interaction.user.id
+    ) {
+      await interaction.reply({
+        content: format(interaction.locale, "REMOVE_NOT_ALLOWED"),
       });
       return;
     }
