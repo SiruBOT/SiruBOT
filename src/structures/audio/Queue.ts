@@ -12,7 +12,9 @@ export class Queue {
   public voteSkip: VoteSkip;
 
   constructor(guildId: string, databaseHelper: DatabaseHelper, log: Logger) {
-    this.log = log.getChildLogger({ name: log.settings.name });
+    this.log = log.getChildLogger({
+      name: log.settings.name + "-" + Queue.name,
+    });
     this.guildId = guildId;
     this.databaseHelper = databaseHelper;
     this.voteSkip = new VoteSkip();

@@ -25,7 +25,7 @@ export class DatabaseHelper {
   constructor(client: KafuuClient) {
     this.client = client;
     this.log = this.client.log.getChildLogger({
-      name: this.client.log.settings.name,
+      name: client.log.settings.name + "-" + DatabaseHelper.name,
     });
   }
 

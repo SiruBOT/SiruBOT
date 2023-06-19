@@ -33,7 +33,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   constructor(client: KafuuClient) {
     super(client, "interactionCreate");
     this.log = client.log.getChildLogger({
-      name: client.log.settings.name + "/InteractionHandler",
+      name: client.log.settings.name + "-" + InteractionCreateEvent.name,
     });
   }
 

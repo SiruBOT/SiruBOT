@@ -42,7 +42,12 @@ export class PlayerDispatcher {
     this.player = player;
     this.guildId = this.player.connection.guildId;
     this.log = this.client.log.getChildLogger({
-      name: this.client.log.settings.name + "/PlayerDispatcher/" + this.guildId,
+      name:
+        this.client.log.settings.name +
+        "-" +
+        PlayerDispatcher.name +
+        "-" +
+        this.guildId,
     });
     this.queue = new Queue(this.guildId, this.client.databaseHelper, this.log);
     this.audioMessage = new AudioMessage(
