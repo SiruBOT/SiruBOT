@@ -99,7 +99,9 @@ export class EmbedFactory {
         embed.setAuthor({
           iconURL:
             userInfo.avatarURL({ size: 256 }) ?? userInfo.defaultAvatarURL,
-          name: `${userInfo.username}#${userInfo.discriminator}`,
+          name: `${userInfo.username}${
+            +userInfo.discriminator ? "#" + userInfo.discriminator : ""
+          }`,
         });
       }
     }
