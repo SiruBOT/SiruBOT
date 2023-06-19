@@ -15,6 +15,7 @@ import { KafuuClient } from "@/structures";
 import { isURL } from "@/utils/url";
 import type { KafuuBootStrapperArgs } from "@/types/bootstrapper";
 import type { KafuuSettings } from "@/types/settings";
+import { createLogger } from "./utils/logger";
 
 let argvSettings: KafuuSettings;
 let bootStrapperArgs: KafuuBootStrapperArgs;
@@ -30,9 +31,18 @@ try {
 }
 
 // Setup logger
-const log: Logger = new Logger({
-  name: bootStrapperArgs.shard ? `Cluster#${Cluster.data.CLUSTER}` : "Client",
-  minLevel: bootStrapperArgs.debug ? "debug" : "info",
+const log: Logger = createLogger({
+  name: bootStrapperArgs.shard
+    ? `cluster-${Cluster.data.CLUSTER}`
+    : "standalone",
+  shardInfo: bootStrapperArgs.shard
+    ? {
+        clusterId: Cluster.data.CLUSTER,
+        shardIds: Cluster.data.SHARD_LIST,
+        totalShards: Cluster.data.TOTAL_SHARDS,
+      }
+    : undefined,
+  consoleLevel: bootStrapperArgs.debug ? "debug" : "info",
 });
 
 // Setup Client
