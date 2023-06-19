@@ -94,7 +94,6 @@ export default class RemoveCommand extends BaseCommand {
     // position 을 가져옴
     const position = interaction.options.getInteger("position", false);
     // position, dispatcher 가 없으면 return
-    if (!position) return;
     if (!dispatcher) return;
     // queue 를 가져옴
     const { queue } = await dispatcher.queue.getGuildAudioData();
@@ -104,9 +103,7 @@ export default class RemoveCommand extends BaseCommand {
       return;
     }
     // position 이 있고 queue.length 보다 크면 1, 아니면 position, position 이 없으면 1
-    const start = Number(
-      position ? (position > queue.length ? 1 : position) : 1
-    );
+    const start = position ? (position > queue.length ? 1 : position) : 1;
     await interaction.respond(
       queue
         // start - 1 부터 start + MAX_RESULT 까지
