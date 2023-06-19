@@ -30,15 +30,25 @@ export class AudioHandler extends Shoukaku {
   public routePlanner?: RoutePlanner;
 
   constructor(client: KafuuClient) {
-    super(new Connectors.DiscordJS(client), client.settings.audio.nodes, {
+    const devOptions = {
       resumeTimeout: 60000,
       moveOnDisconnect: true,
       reconnectTries: 10,
       resume: true,
       resumeByLibrary: true,
-      resumeKey: `// TODO: ResumeKey`,
+      resumeKey: `resumeKey-${client.user?.id}`,
       alwaysSendResumeKey: true,
-    });
+    };
+    super(
+      new Connectors.DiscordJS(client),
+      client.settings.audio.nodes,
+      process.env.NODE_ENV === "development"
+        ? devOptions
+        : {
+            moveOnDisconnect: true,
+            reconnectTries: 10,
+          }
+    );
     this.client = client;
     this.log = this.client.log.getChildLogger({
       name: this.client.log.settings.name,
@@ -67,6 +77,10 @@ export class AudioHandler extends Shoukaku {
         : KafuuPlayingState.PLAYING;
     }
     return KafuuPlayingState.NOTPLAYING;
+  }
+
+  public getPlayerDispatcher(guildId: string): PlayerDispatcher | null {
+    return this.dispatchers.get(guildId) ?? null;
   }
 
   public getPlayerDispatcherOrfail(guildId: string): PlayerDispatcher {
@@ -169,7 +183,6 @@ export class AudioHandler extends Shoukaku {
       );
       if (resumed) {
         this.log.info("Resuming players...");
-        this.resumePlayers();
       }
     });
     this.on("error", (name, error) => {
