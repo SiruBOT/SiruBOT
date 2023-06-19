@@ -383,13 +383,10 @@ export default class SkipCommand extends BaseCommand {
       return;
     }
     const skipTo = interaction.options.getInteger("to", false);
-    const start =
-      (skipTo ?? queue.length + 1) > queue.length
-        ? 1
-        : Math.max(skipTo ?? 1, 1);
+    const start = Number(skipTo ? (skipTo > queue.length ? 1 : skipTo) : 1);
     await interaction.respond(
       queue
-        .slice(start - 1, start + AUTOCOMPLETE_MAX_RESULT - 1) // Array starts 0..
+        .slice(start - 1, start + AUTOCOMPLETE_MAX_RESULT - 1) // slice array to discord's max result
         .map(
           (e, index) =>
             `#${start + index} ` + // Start + Index
