@@ -70,10 +70,11 @@ export function formatTrack(
     length?: number;
     isStream?: boolean;
   } = track.info;
-  const { showLength, withMarkdownURL, streamString } = options ?? {
+  const { showLength, withMarkdownURL, streamString } = {
     showLength: true,
     streamString: "Live Stream",
-    withMarkdownUri: false,
+    withMarkdownURL: false,
+    ...options,
   };
   return (
     (!withMarkdownURL

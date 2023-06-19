@@ -27,6 +27,12 @@ export enum KafuuPlayingState {
   PAUSED, // Currently paused
 }
 
+export type TinyInfo = {
+  videoId: string;
+  title: string;
+  duration: number;
+};
+
 /**
  *  Type definitions for shoukaku LavalinkResponse.info
  */

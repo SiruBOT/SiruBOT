@@ -1,7 +1,7 @@
 # Set base image to node:lts-alpine
 FROM node:lts-alpine
 # Install node.js dependencies, yarn (libc6-compat  https://github.com/nodejs/docker-node#nodealpine)
-RUN apk add --no-cache libc6-compat  yarn 
+RUN apk add --no-cache libc6-compat yarn git
 # Set workdir to /app
 WORKDIR /opt/sirubot
 # Copy files to /app
