@@ -16,11 +16,14 @@ import { stat, readFile } from "fs/promises";
 import { Logger } from "tslog";
 import FastGlob from "fast-glob";
 import { fetch, Response } from "undici";
+import Fastify from "fastify";
 
 import { BaseCommand } from "@/structures";
 import { WebhookNotifier } from "@/utils/webhooknotifier";
-import Fastify from "fastify";
 import { generateGlobPattern } from "@/utils/formatter";
+import { getGitBranch, getGitHash } from "@/utils/version";
+import { createLogger } from "@/utils/logger";
+
 import type {
   KafuuBootStrapperArgs,
   DiscordGatewayResponse,
@@ -28,7 +31,6 @@ import type {
 import type { KafuuSettings } from "@/types/settings";
 
 import { version, name, dependencies } from "../package.json";
-import { getGitBranch, getGitHash } from "./utils/version";
 
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
@@ -87,9 +89,9 @@ parser.add_argument("-p", "--port", {
 const args: KafuuBootStrapperArgs = parser.parse_args();
 // Logger setup
 const LOGGER_NAME = "BootStrapper";
-const log: Logger = new Logger({
+const log: Logger = createLogger({
   name: LOGGER_NAME,
-  minLevel: args.debug ? "debug" : "info",
+  consoleLevel: args.debug ? "debug" : "info",
 });
 
 /* ---------------- BOOT CALL ---------------- */
