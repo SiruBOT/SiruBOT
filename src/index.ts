@@ -337,7 +337,7 @@ async function boot() {
         `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`
       );
       // Start sharding
-      const clusterManager: Cluster.Manager = new Cluster.Manager(
+      const clusterManager: Cluster.ClusterManager = new Cluster.ClusterManager(
         __dirname + "/bot.js",
         {
           totalShards: gatewayJson.shards,
@@ -399,7 +399,6 @@ async function boot() {
           for (const cluster of clusters) {
             clustersInfo.push({
               clusterId: cluster.id,
-              heartbeat: cluster.heartbeat,
               ready: cluster.ready,
               ...statusInfo[cluster.id],
             });
