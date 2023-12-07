@@ -1,6 +1,5 @@
 // Import discord.js and SlashCommandBuilder
 import * as Discord from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
 
 // Import necessary modules and types
 import { BaseCommand, KafuuClient } from "@/structures";
@@ -15,7 +14,7 @@ import { format } from "@/locales";
 
 export default class PingCommand extends BaseCommand {
   constructor(client: KafuuClient) {
-    const slashCommand = new SlashCommandBuilder()
+    const slashCommand = new Discord.SlashCommandBuilder()
       .setName("ping")
       .setNameLocalizations({
         ko: "핑",

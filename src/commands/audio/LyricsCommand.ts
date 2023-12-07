@@ -1,5 +1,8 @@
-import { AutocompleteInteraction, CacheType } from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import {
+  AutocompleteInteraction,
+  CacheType,
+  SlashCommandBuilder,
+} from "discord.js";
 
 import { ILyricsSearchResult, MelonProvider } from "slyrics";
 

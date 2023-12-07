@@ -10,8 +10,8 @@ import {
   InteractionUpdateOptions,
   Locale,
   VoiceBasedChannel,
+  SlashCommandBuilder,
 } from "discord.js";
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { Track } from "shoukaku";
 
 import {

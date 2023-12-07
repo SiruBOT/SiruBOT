@@ -1,4 +1,3 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommand, KafuuClient } from "@/structures";
 
 import {
@@ -8,6 +7,7 @@ import {
   InteractionUpdateOptions,
   InteractionReplyOptions,
   Locale,
+  SlashCommandBuilder,
 } from "discord.js";
 import { EMOJI_REFRESH, EMOJI_STAR } from "@/constants/message";
 import {

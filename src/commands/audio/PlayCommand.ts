@@ -1,9 +1,8 @@
-// Import Sentry, discord.js, undici, shoukaku, @discordjs/builders
+// Import Sentry, discord.js, undici, shoukaku
 import * as Discord from "discord.js";
 import * as Sentry from "@sentry/node";
 import { fetch } from "undici";
 import { LavalinkResponse, Track } from "shoukaku";
-import { SlashCommandBuilder } from "@discordjs/builders";
 // Import structures
 import { BaseCommand, KafuuClient } from "@/structures";
 import { PlayerDispatcher } from "@/structures/audio";
@@ -46,7 +45,7 @@ type CacheItem = {
 export default class PlayCommand extends BaseCommand {
   private playlistCache: Map<string, CacheItem>;
   constructor(client: KafuuClient) {
-    const slashCommand = new SlashCommandBuilder()
+    const slashCommand = new Discord.SlashCommandBuilder()
       .setName("play")
       .setNameLocalizations({
         ko: "재생",

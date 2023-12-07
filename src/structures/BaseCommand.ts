@@ -1,9 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
-} from "@discordjs/builders";
-import type * as Discord from "discord.js";
+  PermissionsString,
+  AutocompleteInteraction,
+  MessageComponentInteraction,
+  SelectMenuInteraction,
+  ContextMenuCommandInteraction,
+  UserContextMenuCommandInteraction,
+} from "discord.js";
 import type { KafuuClient } from ".";
 import type {
   KafuuCommandCategory,
@@ -17,27 +21,26 @@ import { KafuuCommandPermission } from "@/types/command";
 import { getCustomId } from "@/utils/formatter";
 
 // Define an abstract class named BaseCommand
+type AnySlashCommandBuilder =
+  | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+  | SlashCommandSubcommandsOnlyBuilder;
 export abstract class BaseCommand {
   // Define properties of the class
-  public slashCommand:
-    | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
-    | SlashCommandSubcommandsOnlyBuilder;
+  public slashCommand: AnySlashCommandBuilder;
   public category: KafuuCommandCategory;
   public permissions: KafuuCommandPermission[];
   public requirements: number;
-  public botPermissions: Discord.PermissionsString[];
+  public botPermissions: PermissionsString[];
   protected client: KafuuClient;
 
   // Define the constructor method
   public constructor(
-    slashCommand:
-      | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
-      | SlashCommandSubcommandsOnlyBuilder,
+    slashCommand: AnySlashCommandBuilder,
     client: KafuuClient,
     category: KafuuCommandCategory,
     permissions: KafuuCommandPermission[],
     requirements: number,
-    botPermissions: Discord.PermissionsString[]
+    botPermissions: PermissionsString[]
   ) {
     // Assign values to the properties
     this.slashCommand = slashCommand;
@@ -61,25 +64,25 @@ export abstract class BaseCommand {
   ): Promise<void>;
 
   public onAutocompleteInteraction?(
-    interaction: Discord.AutocompleteInteraction
+    interaction: AutocompleteInteraction
   ): Promise<void>;
 
   public onButtonInteraction?(context: KafuuButtonContext): Promise<void>;
 
   public onMessageComponentInteraction?(
-    interaction: Discord.MessageComponentInteraction
+    interaction: MessageComponentInteraction
   ): Promise<void>;
 
   public onSelectMenuInteraction?(
-    interaction: Discord.SelectMenuInteraction
+    interaction: SelectMenuInteraction
   ): Promise<void>;
 
   public onContextMenuCommand?(
-    interaction: Discord.ContextMenuCommandInteraction
+    interaction: ContextMenuCommandInteraction
   ): Promise<void>;
 
   public onUserContextCommand?(
-    interaction: Discord.UserContextMenuCommandInteraction
+    interaction: UserContextMenuCommandInteraction
   ): Promise<void>;
 
   // Message Component custom id template: [commandName]:[customId]:[executorId];[args];[args];[args]
