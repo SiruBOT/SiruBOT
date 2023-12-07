@@ -19,7 +19,7 @@ class KafuuClient extends Discord.Client {
   public settings: KafuuSettings;
   public bootStrapperArgs: KafuuBootStrapperArgs;
 
-  public cluster?: Cluster.Client;
+  public cluster?: Cluster.ClusterClient<this>;
   public log: Logger;
 
   public commands: Discord.Collection<string, BaseCommand>;

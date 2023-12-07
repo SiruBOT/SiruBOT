@@ -2,7 +2,7 @@
 import "module-alias/register";
 // Import discord.js stuff
 import Discord, { GatewayIntentBits } from "discord.js";
-import Cluster from "discord-hybrid-sharding";
+import Cluster, { getInfo } from "discord-hybrid-sharding";
 
 // Import Sentry stuff
 import * as Sentry from "@sentry/node";
@@ -32,14 +32,12 @@ try {
 
 // Setup logger
 const log: Logger = createLogger({
-  name: bootStrapperArgs.shard
-    ? `cluster-${Cluster.data.CLUSTER}`
-    : "standalone",
+  name: bootStrapperArgs.shard ? `cluster-${getInfo().CLUSTER}` : "standalone",
   shardInfo: bootStrapperArgs.shard
     ? {
-        clusterId: Cluster.data.CLUSTER,
-        shardIds: Cluster.data.SHARD_LIST,
-        totalShards: Cluster.data.TOTAL_SHARDS,
+        clusterId: getInfo().CLUSTER,
+        shardIds: getInfo().SHARD_LIST,
+        totalShards: getInfo().TOTAL_SHARDS,
       }
     : undefined,
   consoleLevel: bootStrapperArgs.debug ? "debug" : "info",
@@ -62,8 +60,8 @@ if (bootStrapperArgs.shard) {
   log.debug(
     "Sharding enabled. setup clientOptions.shards, clientOptions.shardCount"
   );
-  clientOptions.shards = Cluster.data.SHARD_LIST;
-  clientOptions.shardCount = Cluster.data.TOTAL_SHARDS;
+  clientOptions.shards = getInfo().SHARD_LIST;
+  clientOptions.shardCount = getInfo().TOTAL_SHARDS;
   log.info(
     `Sharding Info | shards: [ ${clientOptions.shards.join(
       ", "
@@ -81,7 +79,7 @@ const client = new KafuuClient(
 
 if (bootStrapperArgs.shard) {
   log.debug("Sharding enabled. Set Client.cluster to Cluster.Client");
-  client.cluster = new Cluster.Client(client);
+  client.cluster = new Cluster.ClusterClient(client);
 }
 
 if (argvSettings?.sentryDsn && isURL(argvSettings.sentryDsn as string)) {
