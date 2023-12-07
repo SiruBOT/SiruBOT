@@ -32,7 +32,7 @@ services:
     container_name: sirubot_discord
     build: .
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     command: node ./build -d -s -c settings.yaml
     volumes:
       - ./build:/opt/sirubot/build
