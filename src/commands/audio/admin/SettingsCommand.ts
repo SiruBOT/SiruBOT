@@ -1,5 +1,4 @@
 import {
-  InteractionReplyOptions,
   SlashCommandBuilder,
   ActionRowBuilder,
   Guild,
@@ -8,7 +7,6 @@ import {
   ButtonStyle,
   Locale,
   RoleSelectMenuBuilder,
-  InteractionUpdateOptions,
   ChannelSelectMenuBuilder,
   ChannelType,
 } from "discord.js";

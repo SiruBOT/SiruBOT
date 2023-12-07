@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommand, KafuuClient } from "@/structures";
 import {
@@ -137,21 +138,28 @@ export default class LyricsCommand extends BaseCommand {
   }
 
   validateInput(date: string) {
+    // eslint-disable-next-line security/detect-unsafe-regex
     const dateRegex = /^(\d{4})\/?(\d{2})\/?(\d{2})?$/;
+    // eslint-disable-next-line security/detect-unsafe-regex
     const yearMonthRegex = /^(\d{4})\/?(\d{2})?$/;
+    // eslint-disable-next-line security/detect-unsafe-regex
     const monthDayRegex = /^(\d{2})\/?(\d{2})?$/;
     const dayRegex = /^(\d{2})$/;
 
     if (dateRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, year, month, day] = date.match(dateRegex)!;
       return { year, month, day };
     } else if (yearMonthRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, year, month] = date.match(yearMonthRegex)!;
       return { year, month };
     } else if (monthDayRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, month, day] = date.match(monthDayRegex)!;
       return { month, day };
     } else if (dayRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, day] = date.match(dayRegex)!;
       return { day };
     } else {

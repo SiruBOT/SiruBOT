@@ -105,7 +105,7 @@ export default class NodeInfoCommand extends BaseCommand {
                 `Frames Nulled: **${node?.stats?.frameStats?.nulled ?? 0}**\n` +
                 `Frames Deficit: **${node?.stats?.frameStats?.deficit ?? 0}**\n`
               : "",
-            inline: true
+          inline: true,
         };
       })
     );
