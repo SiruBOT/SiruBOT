@@ -3,8 +3,9 @@ version: "3.9"  # optional since v1.27.0
 services:
   # MongoDB
   mongodb:
+    container_name: sirubot_mongodb
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     image: mongo:latest
     restart: always
     environment:
@@ -15,8 +16,9 @@ services:
       - mongodb_datadir:/data/db
   # MariaDB
   mariadb:
+    container_name: sirubot_mariadb
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     image: mariadb:latest
     restart: always
     environment:
@@ -27,15 +29,17 @@ services:
       - mariadb_datadir:/var/lib/mysql
   # SiruBOT Client
   sirubot:
+    container_name: sirubot_discord
     build: .
     environment:
       - NODE_ENV=production
     command: node ./build -d -s -c settings.yaml
     volumes:
-      - ${PWD}/build:/opt/sirubot/build
+      - ./build:/opt/sirubot/build
       - type: bind
-        source: ${PWD}/settings.yaml
+        source: settings.yaml
         target: /opt/sirubot/settings.yaml
+    network_mode: host
     depends_on:
       - mariadb
       - mongodb

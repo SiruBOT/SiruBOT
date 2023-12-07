@@ -41,10 +41,5 @@ export interface KafuuSettings {
       username: string; // MongoDB username string
       password: string; // MongoDB password string
     };
-    redis: {
-      host: string; // Redis host string
-      port: number; // Redis port number
-      password: string; // Redis password string
-    };
   };
 }

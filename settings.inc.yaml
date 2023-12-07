@@ -15,22 +15,19 @@ database:
   mysql:
     host: "localhost" # Your mysql host
     port: 3306 # Your mysql port
-    username: "user" # Your mysql user
-    password: "password" # Your mysql password
-    database: "database" # Your mysql database
+    username: "root" # Your mysql user
+    password: "super-secret-passwd" # Your mysql password
+    database: "siru" # Your mysql databases
   mongodb:
-    url: "mongodb://host:port/dbname?authSource=admin" # Your mongoDB URL
+    url: "mongodb://localhost:27017/sirubot?authSource=admin" # Your mongoDB URL
     username: "root" # Your mongoDB username
     password: "password" # Your mongoDB password
-  redis:
-    url: "redis://host:port" # Your redis URL
-    password: "password" # Your redis password
 audio:
   searchResults: 5 # Number of search results to show (Max result: 10, Min result: 1)
   timeout: 60000 # Timeout for audio search
   nodes: # Lavalink nodes
     - name: "Default Node"
-      url: "localhost:5000"
+      url: "localhost:2333"
       auth: "youshallnotpass"
   # relatedRoutePlanner: # Related video search route planner (Avoid 429 from youtube) If you use this uncomment this line and fill your ip range (CIDR notation)
   #   ipBlocks:
