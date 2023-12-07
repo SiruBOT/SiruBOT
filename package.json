@@ -4,6 +4,7 @@
   "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
+    "@discordjs/builders": "^1.7.0",
     "@discordjs/rest": "^0.3.0",
     "@sentry/integrations": "^7.45.0",
     "@sentry/node": "^7.45.0",
