@@ -26,7 +26,7 @@ export default class StopCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.DJ],
       KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 

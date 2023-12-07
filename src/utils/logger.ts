@@ -20,13 +20,13 @@ export function createLogger({
     join(
       "logs",
       `${name.toLowerCase()}`,
-      `kafuu-${name.toLowerCase()}-${new Date().getTime()}.log`
+      `kafuu-${name.toLowerCase()}-${new Date().getTime()}.log`,
     ),
     {
       size: "10M",
       interval: "1d",
       compress: "gzip",
-    }
+    },
   );
 
   const writeTransport = (logObj: ILogObject) => {
@@ -51,7 +51,7 @@ export function createLogger({
       trace: writeTransport,
       warn: writeTransport,
     },
-    "debug"
+    "debug",
   );
 
   return logger;

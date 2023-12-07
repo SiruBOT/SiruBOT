@@ -36,7 +36,7 @@ export class PlayerDispatcher {
   constructor(
     client: KafuuClient,
     player: Player,
-    joinOptions: KafuuJoinOptions
+    joinOptions: KafuuJoinOptions,
   ) {
     this.client = client;
     this.player = player;
@@ -54,7 +54,7 @@ export class PlayerDispatcher {
       this.client,
       this.guildId,
       joinOptions.textChannelId,
-      this.log
+      this.log,
     );
     this.playedYoutubeTracks = [];
     this.setupDispatcher();
@@ -80,14 +80,14 @@ export class PlayerDispatcher {
       case friendlyErrorCode:
         this.log.warn(
           "Websocket closed, disconncted from user, (friendlyErrorCode) " +
-            reasonString
+            reasonString,
         );
         this.destroy();
         await this.audioMessage.sendDisconnectedMessage();
         break;
       case resumeErrorCode:
         this.log.warn(
-          "Websocket closed,  may be lavalink resume" + reasonString
+          "Websocket closed,  may be lavalink resume" + reasonString,
         );
         break;
       default:
@@ -110,13 +110,13 @@ export class PlayerDispatcher {
     if (!position) {
       this.log.debug(
         `PlayerUpdate data is not containing position data.`,
-        data
+        data,
       );
     } else {
       this.log.debug(
         `Update position data to ${
           data.state.connected ? data.state.position : null
-        }`
+        }`,
       );
       await this.queue.setPosition(connected ? position : null);
     }
@@ -133,7 +133,7 @@ export class PlayerDispatcher {
   private async onEnd(trackEndEvent: TrackEndEvent) {
     this.log.debug(
       `Track ended, playing next item or handle repeat/related`,
-      trackEndEvent.reason || "No reason"
+      trackEndEvent.reason || "No reason",
     );
     switch (trackEndEvent.reason) {
       case "FINISHED":
@@ -201,13 +201,13 @@ export class PlayerDispatcher {
       await this.queue.getGuildAudioData();
     if (nowPlaying && position && !this.player.track) {
       this.log.debug(
-        `Database nowplaying is exists, but player is not. resuming`
+        `Database nowplaying is exists, but player is not. resuming`,
       );
       return await this.resumeNowPlaying(nowPlaying, position);
     }
     if (!this.player.track && queue.length > 0) {
       this.log.debug(
-        `Player is nothing to playing but next track exists playing next track`
+        `Player is nothing to playing but next track exists playing next track`,
       );
       return await this.playNextTrack();
     }
@@ -229,7 +229,7 @@ export class PlayerDispatcher {
       guildConfig.playRelated
     ) {
       this.log.debug(
-        `Nothing to playing next, but related playing is enabled. trying handle related videos...`
+        `Nothing to playing next, but related playing is enabled. trying handle related videos...`,
       );
       await this.playRelated();
       return;
@@ -246,7 +246,7 @@ export class PlayerDispatcher {
     // 이전 트랙이 없거나, 이전 트랙이 유튜브가 아니면 종료
     if (!beforeTrack || beforeTrack.info.sourceName != "youtube") {
       this.log.debug(
-        `Before track is not exists or identifier is not exists. Stop & clean PlayerDispatcher`
+        `Before track is not exists or identifier is not exists. Stop & clean PlayerDispatcher`,
       );
       await this.audioMessage.sendRelatedYoutubeOnly();
       await this.cleanStop();
@@ -255,7 +255,7 @@ export class PlayerDispatcher {
     try {
       // Scrape related videos
       const relatedSearchResult = await this.client.audio.getRelatedVideo(
-        beforeTrack.info.identifier
+        beforeTrack.info.identifier,
       );
       if (!relatedSearchResult) {
         await this.audioMessage.sendRelatedFailed();
@@ -266,11 +266,11 @@ export class PlayerDispatcher {
       const rankedRelatedSearchResult =
         await this.client.audio.rankRelatedVideos(
           relatedSearchResult,
-          this.playedYoutubeTracks
+          this.playedYoutubeTracks,
         );
       // Get track from lavalink
       const lavalinkTrack = await this.client.audio.fetchRelated(
-        rankedRelatedSearchResult[0].videoId
+        rankedRelatedSearchResult[0].videoId,
       );
       if (!lavalinkTrack) {
         await this.audioMessage.sendRelatedFailed();
@@ -300,7 +300,7 @@ export class PlayerDispatcher {
     // When before track is not exists, just play next track
     if (!beforeTrack) {
       this.log.debug(
-        "Tried handle repeat but, beforeTrack is not exists. Trying play next track."
+        "Tried handle repeat but, beforeTrack is not exists. Trying play next track.",
       );
       await this.playNextTrack();
       return;
@@ -312,7 +312,7 @@ export class PlayerDispatcher {
         await this.queue.pushTrack(beforeTrack); // Add track to queue
         await this.playNextTrack(); // Play next track
         this.log.debug(
-          `Successfully re-enqueued nowplaying to queue & invoke playNextTrack @ ${this.guildId}`
+          `Successfully re-enqueued nowplaying to queue & invoke playNextTrack @ ${this.guildId}`,
         );
         break;
       case KafuuRepeatMode.SINGLE:
@@ -320,7 +320,7 @@ export class PlayerDispatcher {
         await this.queue.unshiftTrack(beforeTrack);
         await this.playNextTrack();
         this.log.debug(
-          `(Repeat.SINGLE) Successfully re-enqueued track to position 0 & invoke playNextTrack.`
+          `(Repeat.SINGLE) Successfully re-enqueued track to position 0 & invoke playNextTrack.`,
         );
         break;
     }
@@ -329,11 +329,11 @@ export class PlayerDispatcher {
   @BreakOnDestroyed()
   private async resumeNowPlaying(
     nowPlaying: KafuuAudioTrack,
-    position: number
+    position: number,
   ) {
     // Player track = null, DB nowplaying = exists
     const guildConfig = await this.client.databaseHelper.upsertAndFindGuild(
-      this.guildId
+      this.guildId,
     );
     if (nowPlaying.info.isStream) {
       this.log.debug(`Nowplaying is stream, skipping...`);
@@ -347,12 +347,12 @@ export class PlayerDispatcher {
   private async playTrack(
     trackToPlay: KafuuAudioTrack,
     volume: number,
-    position?: number
+    position?: number,
   ): Promise<Player> {
     this.log.debug(
       `Playing track with volume ${volume} ${
         position ? "with position " + position : ""
-      }`
+      }`,
     );
     // If played track is youtube, push to playedYoutubeTracks
     if (trackToPlay.info.sourceName == "youtube") {
@@ -375,21 +375,21 @@ export class PlayerDispatcher {
           formatTrack(trackToPlay, {
             streamString,
           }),
-          humanizeSeconds(position, true)
+          humanizeSeconds(position, true),
         )
       : trackToPlay.relatedTrack
-      ? this.audioMessage.format(
-          "PLAYING_NOW_RELATED",
-          formatTrack(trackToPlay, {
-            streamString,
-          })
-        )
-      : this.audioMessage.format(
-          "PLAYING_NOW",
-          formatTrack(trackToPlay, {
-            streamString,
-          })
-        ));
+        ? this.audioMessage.format(
+            "PLAYING_NOW_RELATED",
+            formatTrack(trackToPlay, {
+              streamString,
+            }),
+          )
+        : this.audioMessage.format(
+            "PLAYING_NOW",
+            formatTrack(trackToPlay, {
+              streamString,
+            }),
+          ));
     await this.audioMessage.sendRaw(playingMessage);
     await this.queue.setNowPlaying(trackToPlay);
     this.setVolumePercent(volume);

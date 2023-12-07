@@ -7,7 +7,7 @@ import {
 } from "@/types/command";
 
 export async function KafuuCommandPermissionCondition(
-  ctx: KafuuCommandPermissionCheckContext
+  ctx: KafuuCommandPermissionCheckContext,
 ): Promise<boolean> {
   const { ADMIN, BOTOWNER, DJ, EVERYONE } = KafuuCommandPermission;
 
@@ -21,7 +21,7 @@ export async function KafuuCommandPermissionCondition(
     case DJ: {
       const voiceMembers: Collection<string, GuildMember> | undefined =
         ctx.guildMember.voice.channel?.members.filter(
-          (member) => !member.user.bot
+          (member) => !member.user.bot,
         ); // 봇 제외 듣고있는 사람들 collection
       // 듣고있는 사람이 있고, 혼자고 그사람이 ctx.guildMember라면, DJ true
       if (
@@ -51,12 +51,12 @@ export async function KafuuCommandPermissionCondition(
  *  Check if the user has the required permissions
  */
 export async function getUserPermissions(
-  options: KafuuCommandPermissionCheckOptions
+  options: KafuuCommandPermissionCheckOptions,
 ): Promise<KafuuPermissionCheckResult> {
   const notFulfilledPermissions: KafuuCommandPermission[] = [];
   const fulfilledPermissions: KafuuCommandPermission[] = [];
   for (const perm of Object.keys(
-    KafuuCommandPermission
+    KafuuCommandPermission,
   ) as KafuuCommandPermission[]) {
     const checkRes: boolean = await KafuuCommandPermissionCondition({
       ...options,

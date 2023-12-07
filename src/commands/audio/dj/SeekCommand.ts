@@ -33,7 +33,7 @@ export default class SeekCommand extends BaseCommand {
           .setDescriptionLocalizations({
             ko: "이동할 위치 (+1:10, -1:10, 3:20, 1:12:3)",
           })
-          .setRequired(true)
+          .setRequired(true),
       );
     super(
       slashCommand,
@@ -45,7 +45,7 @@ export default class SeekCommand extends BaseCommand {
         KafuuCommandFlags.LISTEN_STATUS |
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
         KafuuCommandFlags.VOICE_CONNECTED,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -53,7 +53,7 @@ export default class SeekCommand extends BaseCommand {
     interaction,
   }: KafuuCommandContext<true>): Promise<void> {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(
-      interaction.guildId
+      interaction.guildId,
     );
     const decodedTrack: TrackInfo = decode(dispatcher.player.track as string);
     if (decodedTrack.isStream) {
@@ -87,8 +87,8 @@ export default class SeekCommand extends BaseCommand {
     seekTo = !seekOperation
       ? seekTo
       : seekOperation == "+"
-      ? dispatcher.player.position + seekTo
-      : dispatcher.player.position - seekTo;
+        ? dispatcher.player.position + seekTo
+        : dispatcher.player.position - seekTo;
 
     if (seekTo >= decodedTrack.length) {
       await interaction.reply({
@@ -96,7 +96,7 @@ export default class SeekCommand extends BaseCommand {
         content: format(
           interaction.locale,
           "SEEK_MAX_LENGTH",
-          humanizeSeconds(seekTo, true)
+          humanizeSeconds(seekTo, true),
         ),
       });
       return;
@@ -114,12 +114,12 @@ export default class SeekCommand extends BaseCommand {
         interaction.locale,
         "SEEK_SUCCESS",
         seekOperation == "-" ? "⏪" : "⏩",
-        humanizeSeconds(seekTo, true)
+        humanizeSeconds(seekTo, true),
       ),
       embeds: [
         await this.client.audio.getNowPlayingEmbed(
           interaction.guildId,
-          interaction.locale
+          interaction.locale,
         ),
       ],
     });

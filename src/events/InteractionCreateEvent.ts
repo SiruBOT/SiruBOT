@@ -39,7 +39,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
 
   public override async run(interaction: Discord.Interaction): Promise<void> {
     this.log.debug(
-      `Interaction received. ${interaction.id}/${interaction.type}`
+      `Interaction received. ${interaction.id}/${interaction.type}`,
     );
 
     // Sentry
@@ -60,7 +60,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   // Routes interaction to the correct handler
   async routeInteraciton(
     interaction: Discord.Interaction,
-    transaction: Transaction
+    transaction: Transaction,
   ) {
     // Sentry
     const span: Span = transaction.startChild({
@@ -71,7 +71,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     if (interaction.applicationId !== this.client.user?.id) {
       // 클라이언트 아이디와 인터렉션의 클라이언트 아이디가 다르면
       this.client.log.warn(
-        `Interaction application id mismatch. ${interaction.applicationId} ${this.client.user?.id}`
+        `Interaction application id mismatch. ${interaction.applicationId} ${this.client.user?.id}`,
       );
       span.setHttpStatus(500);
       span.setData("endReason", "interactionApplicationIdMismatch");
@@ -96,7 +96,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   // Handle command interaction type
   private async handleChatInputCommandInteraction(
     interaction: Discord.ChatInputCommandInteraction,
-    transaction: Transaction
+    transaction: Transaction,
   ): Promise<void> {
     this.log.info(`Handle command (${this.cmdInfoStr(interaction)})`);
 
@@ -106,7 +106,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     });
 
     const command: BaseCommand | undefined = this.client.commands.get(
-      interaction.commandName
+      interaction.commandName,
     );
 
     span.setData("commandName", interaction.commandName);
@@ -148,13 +148,13 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       // 길드가 캐시된 길드가 아닐 경우, 캐싱 시도
       if (!interaction.inCachedGuild()) {
         this.log.debug(
-          `Guild ${interaction.guildId} not cached. fetch Guild..`
+          `Guild ${interaction.guildId} not cached. fetch Guild..`,
         );
         try {
           // 길드 가져오기 시도
           this.client.guilds.cache.set(
             interaction.guildId,
-            await this.client.guilds.fetch(interaction.guildId)
+            await this.client.guilds.fetch(interaction.guildId),
           );
         } catch (error) {
           // 길드 가져오기에 실패했다면
@@ -188,14 +188,14 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       //#region Check bot permissons in guild
       // 봇에 없는 권한 찾기
       const missingPermissions = command.botPermissions.filter(
-        (perm) => !interaction.guild.members.me?.permissions.has(perm)
+        (perm) => !interaction.guild.members.me?.permissions.has(perm),
       );
       // 봇에 권한이 없다면
       if (missingPermissions.length > 0) {
         this.log.warn(
           `Missing permissions ${
             command.slashCommand.name
-          } (${missingPermissions.join(",")}) @ ${interaction.guildId}`
+          } (${missingPermissions.join(",")}) @ ${interaction.guildId}`,
         );
         const permStr = missingPermissions
           .map(
@@ -203,7 +203,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
             (e) =>
               "``" +
               format(interaction.locale, ("PERM_" + e) as STRING_KEYS) +
-              "``"
+              "``",
           )
           .join(", ");
         await interaction.reply({
@@ -211,7 +211,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           content: format(
             interaction.locale,
             "MISSING_BOT_PERMISSIONS",
-            permStr
+            permStr,
           ), // end of format
         });
         span.setData("endReason", "missingBotPermissions");
@@ -227,7 +227,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       //#region  Check member, guild config
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
-          interaction.guildId
+          interaction.guildId,
         );
 
       const member: Discord.GuildMember | undefined =
@@ -236,7 +236,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
 
       if (!member)
         throw new Error(
-          "Fetch member, but member not found. " + interaction.user.id
+          "Fetch member, but member not found. " + interaction.user.id,
         );
       //#endregion
 
@@ -248,13 +248,13 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       });
       if (
         command.permissions.some((e) =>
-          userPermissions.notFulfilledPermissions.includes(e)
+          userPermissions.notFulfilledPermissions.includes(e),
         ) // 충족되지 않은 권한중에 커맨드에서 필요한 권한이 있다면 명령어 사용 불가
       ) {
         span.setData("endReason", "commandPermissionsNotFulfilled");
         span.setData(
           "missingPermissions",
-          userPermissions.notFulfilledPermissions
+          userPermissions.notFulfilledPermissions,
         );
         span.setHttpStatus(403);
         transaction.finish();
@@ -265,7 +265,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
               ? format(
                   interaction.locale, // 단일 구문으로 출력 (ex: COMMAND_MISSING_USER_DJ
                   ("COMMAND_MISSING_USER_PERMISSION_" +
-                    userPermissions.notFulfilledPermissions[0]) as STRING_KEYS
+                    userPermissions.notFulfilledPermissions[0]) as STRING_KEYS,
                 )
               : format(
                   interaction.locale, // 여러개라면 (ex: COMMAND_MISSING_USER_PERMISSIONS
@@ -276,11 +276,11 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
                         "``" +
                         format(
                           interaction.locale,
-                          ("PERMISSIONS_" + e) as STRING_KEYS
+                          ("PERMISSIONS_" + e) as STRING_KEYS,
                         ) +
-                        "``" // 권한 이름을 현지화
+                        "``", // 권한 이름을 현지화
                     )
-                    .join(", ")
+                    .join(", "),
                 ),
         });
         return;
@@ -293,14 +293,14 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         const defaultTextChannel: Discord.TextBasedChannel | null =
           guildConfig.textChannelId
             ? ((await interaction.guild.channels.fetch(
-                guildConfig.textChannelId
+                guildConfig.textChannelId,
               )) as Discord.TextBasedChannel)
             : null;
         // DB에 들어가는건 Voice Based, 캐스팅해줌
         const defaultVoiceChannel: Discord.VoiceBasedChannel | null =
           guildConfig.voiceChannelId
             ? ((await interaction.guild.channels.fetch(
-                guildConfig.voiceChannelId
+                guildConfig.voiceChannelId,
               )) as Discord.VoiceBasedChannel)
             : null;
         // 기본 텍스트 채널이 존재하고, 명령어 사용한 채널과 기본 채널이 다르다면, 명령어 사용 금지
@@ -316,7 +316,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
             content: format(
               interaction.locale,
               "DEFAULT_TEXT_CHANNEL",
-              defaultTextChannel.id
+              defaultTextChannel.id,
             ),
           });
           return;
@@ -336,7 +336,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
             content: format(
               interaction.locale,
               "DEFAULT_VOICE_CHANNEL",
-              defaultVoiceChannel.id
+              defaultVoiceChannel.id,
             ),
           });
           return;
@@ -350,7 +350,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       if (
         commandRequirements & KafuuCommandFlags.AUDIO_NODE &&
         [...this.client.audio.nodes.values()].filter(
-          (e) => e.state == Constants.State.CONNECTED
+          (e) => e.state == Constants.State.CONNECTED,
         ).length == 0
       ) {
         span.setData("endReason", "noNodesAvailable");
@@ -411,7 +411,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           content: format(
             interaction.locale,
             "SAME_VOICE_CHANNEL",
-            interaction.guild.members.me.voice.channelId
+            interaction.guild.members.me.voice.channelId,
           ),
         });
         return;
@@ -443,7 +443,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       this.log.info(
         `Command successfully executed (${this.cmdInfoStr(interaction)}) ${
           interaction.user.id
-        }@${interaction.guildId}[${interaction.channelId}]`
+        }@${interaction.guildId}[${interaction.channelId}]`,
       );
       span.setData("endReason", "ok");
       span.setHttpStatus(200);
@@ -455,7 +455,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         `Command failed to execute (${this.cmdInfoStr(interaction)}) ${
           interaction.user.id
         }@${interaction.guildId}[${interaction.channelId}]`,
-        error
+        error,
       );
 
       const exceptionId: string = Sentry.captureException(error);
@@ -482,7 +482,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   // Handle command interaction type
   private async handleAutoComplete(
     interaction: Discord.AutocompleteInteraction,
-    transaction: Transaction
+    transaction: Transaction,
   ): Promise<void> {
     const span: Span = transaction.startChild({
       op: "InteractionCreateEvent#handleAutoComplete",
@@ -491,7 +491,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     span.setData("commandName", interaction.commandName);
 
     const command: BaseCommand | undefined = this.client.commands.get(
-      interaction.commandName
+      interaction.commandName,
     );
     if (!command) {
       span.setData("endReason", "commandNotFound");
@@ -513,7 +513,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     } catch (error) {
       this.log.error(
         `Failed to handle autocomplete command ${interaction.commandName}`,
-        error
+        error,
       );
       if (!interaction.responded) await interaction.respond([]);
       const exceptionId = Sentry.captureException(error);
@@ -526,7 +526,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   }
 
   private parseCustomId(
-    interaction: Discord.MessageComponentInteraction
+    interaction: Discord.MessageComponentInteraction,
   ): KafuuMessageComponentCustomIdOptions | null {
     // [commandName]:[customId]:[executorId?];[ARG1];[ARG2];[ARG3];[ARG...]
     // [commandName]:[customId]:;[ARG1];[ARG2];[ARG3];[ARG...]
@@ -548,10 +548,10 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
 
   private async handleMessageComponent(
     interaction: Discord.MessageComponentInteraction,
-    transaction: Transaction
+    transaction: Transaction,
   ) {
     this.log.debug(
-      `MessageComponent received, Interaction id: ${interaction.id} custom id: ${interaction.customId}`
+      `MessageComponent received, Interaction id: ${interaction.id} custom id: ${interaction.customId}`,
     );
     const span: Span = transaction.startChild({
       op: "InteractionCreateEvent#handleMessageComponent",
@@ -595,7 +595,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       span.finish();
       transaction.finish();
       this.client.log.warn(
-        "Failed to handle message component interaction, command name not found."
+        "Failed to handle message component interaction, command name not found.",
       );
       await interaction.update({
         content: format(interaction.locale, "INVALID_CUSTOM_ID"),
@@ -613,7 +613,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       span.finish();
       transaction.finish();
       this.client.log.warn(
-        "Failed to handle message component interaction, user not in guild."
+        "Failed to handle message component interaction, user not in guild.",
       );
       await interaction.update({
         content: format(interaction.locale, "NOT_IN_GUILD"),
@@ -625,7 +625,7 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     const userPermissions = await getUserPermissions({
       client: this.client,
       guildConfig: await this.client.databaseHelper.upsertAndFindGuild(
-        interaction.guildId
+        interaction.guildId,
       ),
       guildMember: member,
     });
@@ -660,14 +660,14 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           transaction.finish();
           Sentry.captureEvent({ message: "Invalid component type" });
           this.client.log.warn(
-            "Failed to handle message component interaction, invalid component type."
+            "Failed to handle message component interaction, invalid component type.",
           );
       }
       this.log.info(`Handled message component: ${interaction.customId}`);
     } catch (error) {
       this.log.error(
         `Failed to handle message component ${interaction.componentType} ${parsedCustomId.commandName}`,
-        error
+        error,
       );
       const exceptionId = Sentry.captureException(error);
       span.setData("endReason", "error");

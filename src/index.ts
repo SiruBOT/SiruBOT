@@ -100,6 +100,7 @@ boot();
 // fs.exists is deprecated
 async function exists(path: string): Promise<boolean> {
   try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await stat(path);
     return true;
   } catch (err) {
@@ -113,6 +114,7 @@ async function safeReadFile(path: string): Promise<string> {
   if (!fileExists) throw new Error(`File ${path} does not exist`);
   if (typeof path == "string" && !path.endsWith(".yaml"))
     throw new Error(`File ${path} is not a YAML file`);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   return readFile(path, "utf-8");
 }
 
@@ -141,21 +143,21 @@ async function boot() {
       .replace("%GIT_HASH%", getGitHash())
       .replace("%GIT_BRANCH%", getGitBranch())
       .replace("%NODE_ENV%", process.env.NODE_ENV || "development")
-      .replace("%LOG_LEVEL%", log.settings.minLevel)
+      .replace("%LOG_LEVEL%", log.settings.minLevel),
   );
 
   // Read config file
   log.info(
     `${name} version: ${version} (${getGitHash()}), log level: ${
       log.settings.minLevel
-    } NODE_ENV=${process.env.NODE_ENV}`
+    } NODE_ENV=${process.env.NODE_ENV}`,
   );
   log.info(
     `config file: ${args.config}, shard: ${
       args.shard ? "Auto sharding enabled" : "Auto sharding disabled"
     }, debug: ${
       args.debug ? "Debug logging enabled" : "Debug logging disabled"
-    }`
+    }`,
   );
   log.info(`Loading config from ${args.config}`);
 
@@ -168,14 +170,14 @@ async function boot() {
 
   if (parsedConfig.webhook) {
     log.info(
-      `Webhook notifier enabled. (id: ${parsedConfig.webhook.id}) (token: ${parsedConfig.webhook.token})`
+      `Webhook notifier enabled. (id: ${parsedConfig.webhook.id}) (token: ${parsedConfig.webhook.token})`,
     );
     webhookNotifier = new WebhookNotifier(
       LOGGER_NAME,
       parsedConfig.webhook.id,
       parsedConfig.webhook.token,
       parsedConfig.bot.owners,
-      log
+      log,
     );
   }
 
@@ -189,7 +191,7 @@ async function boot() {
             .setTitle("Fatal Error")
             .setColor(Colors.Red)
             .setDescription("FATAL " + err.stack?.slice(0, 1000)),
-          true // It's important
+          true, // It's important
         )
         .finally(() => {
           process.exit(2);
@@ -224,7 +226,7 @@ async function boot() {
     log.debug("Fetch application info from applicationInfo endpoint..");
     // Get applicationCommands from discord api (Old thing)
     const applicationInfo: APIApplication = (await restClient.get(
-      Routes.oauth2CurrentApplication()
+      Routes.oauth2CurrentApplication(),
     )) as APIApplication;
     if (!applicationInfo) throw new Error("Application info not found");
     // Replace All Slash commands
@@ -232,12 +234,12 @@ async function boot() {
       process.env.DEVGUILD
         ? Routes.applicationGuildCommands(
             applicationInfo.id,
-            process.env.DEVGUILD
+            process.env.DEVGUILD,
           )
         : Routes.applicationCommands(applicationInfo.id),
       {
         body: [],
-      }
+      },
     );
     const publishAt: string = process.env.DEVGUILD
       ? "applicationGuildCommands (/) at " + process.env.DEVGUILD
@@ -248,7 +250,7 @@ async function boot() {
       webhookNotifier
         .warnEmbed()
         .setTitle(`🗒️ Commands cleared`)
-        .setDescription(logStr)
+        .setDescription(logStr),
     );
   }
 
@@ -257,12 +259,12 @@ async function boot() {
     log.debug("Fetch global commands info from applicationCommands endpoint..");
     // Get applicationCommands from discord api (Old thing)
     const applicationInfo: APIApplication = (await restClient.get(
-      Routes.oauth2CurrentApplication()
+      Routes.oauth2CurrentApplication(),
     )) as APIApplication;
     if (!applicationInfo) throw new Error("Application info not found");
 
     const commandFiles: string[] = await FastGlob(
-      generateGlobPattern(__dirname, "commands")
+      generateGlobPattern(__dirname, "commands"),
     );
     const slashCommands: RESTPostAPIApplicationCommandsJSONBody[] = [];
     log.info(`Found ${commandFiles.length} commands`);
@@ -274,12 +276,12 @@ async function boot() {
       // Command file validation
       if (!CommandClass.default)
         throw new Error(
-          "Command file is missing default export\n" + commandPath
+          "Command file is missing default export\n" + commandPath,
         );
       const commandInstance: BaseCommand = new CommandClass.default();
       if (!(commandInstance instanceof BaseCommand))
         throw new Error(
-          "Command file is not extends BaseCommand\n" + commandPath
+          "Command file is not extends BaseCommand\n" + commandPath,
         );
       log.debug(`Validating command file ${commandPath}`);
       slashCommands.push(commandInstance.slashCommand.toJSON());
@@ -290,12 +292,12 @@ async function boot() {
       process.env.DEVGUILD
         ? Routes.applicationGuildCommands(
             applicationInfo.id,
-            process.env.DEVGUILD
+            process.env.DEVGUILD,
           )
         : Routes.applicationCommands(applicationInfo.id),
       {
         body: slashCommands,
-      }
+      },
     );
     const publishAt: string = process.env.DEVGUILD
       ? "applicationGuildCommands (/) at " + process.env.DEVGUILD
@@ -306,7 +308,7 @@ async function boot() {
       webhookNotifier
         .infoEmbed()
         .setTitle(`🗒️  ${slashCommands.length} Commands published`)
-        .setDescription(logStr)
+        .setDescription(logStr),
     );
   }
 
@@ -322,19 +324,19 @@ async function boot() {
         `https://discord.com/api/gateway/bot`,
         {
           headers: { Authorization: `Bot ${token}` },
-        }
+        },
       );
       if (!gatewayFetch.ok)
         throw new Error(
           "Failed to fetch shard count. response code: " +
             gatewayFetch.status +
             " " +
-            gatewayFetch.statusText
+            gatewayFetch.statusText,
         );
       // Cast gateway response to IGatewayResponse
       const gatewayJson = (await gatewayFetch.json()) as DiscordGatewayResponse;
       log.debug(
-        `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`
+        `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`,
       );
       // Start sharding
       const clusterManager: Cluster.ClusterManager = new Cluster.ClusterManager(
@@ -346,16 +348,16 @@ async function boot() {
           respawn: true,
           execArgv: ["--trace-warnings"],
           shardArgs: [JSON.stringify(parsedConfig), JSON.stringify(args)],
-        }
+        },
       );
       log.info(
-        `total Shards: ${clusterManager.totalShards}, total Clusters: ${clusterManager.totalClusters}`
+        `total Shards: ${clusterManager.totalShards}, total Clusters: ${clusterManager.totalClusters}`,
       );
       clusterManager.on("clusterCreate", (cluster: Cluster.Cluster) => {
         log.info(
           `Launched Cluster ${cluster.id} (${cluster.id + 1} of ${
             clusterManager.totalClusters
-          })`
+          })`,
         );
         // Event Listen
         cluster.on("death", () => {
@@ -371,7 +373,7 @@ async function boot() {
           log.info(
             `Cluster spawned (${cluster.id + 1}/${
               cluster.manager.totalClusters
-            })`
+            })`,
           );
           webhookNotifier?.clusterSpawned(cluster);
           cluster.removeAllListeners("ready");
@@ -379,7 +381,7 @@ async function boot() {
             log.info(`Cluster #${cluster.id} ready`);
             webhookNotifier?.clusterReady(
               cluster,
-              new Date().getTime() - spawnedTime
+              new Date().getTime() - spawnedTime,
             );
           });
         }); // Spawn
@@ -393,9 +395,8 @@ async function boot() {
         fastify.get("/stats", async () => {
           const clusters = [...clusterManager.clusters.values()];
           const clustersInfo = [];
-          const statusInfo = await clusterManager.broadcastEval(
-            "this.statsInfo()"
-          );
+          const statusInfo =
+            await clusterManager.broadcastEval("this.statsInfo()");
           for (const cluster of clusters) {
             clustersInfo.push({
               clusterId: cluster.id,
@@ -413,7 +414,7 @@ async function boot() {
 
         await fastify.listen({ port: args.port ?? 3000 });
         log.info(
-          "Experimental API server started on port " + args.port ?? 3000
+          "Experimental API server started on port " + args.port ?? 3000,
         );
       }
     } catch (err) {

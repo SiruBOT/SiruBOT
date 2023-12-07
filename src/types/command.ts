@@ -39,7 +39,7 @@ export enum KafuuCommandFlags {
 
 // Interface for command context
 export interface KafuuBaseInteractionContext<
-  InteractionType extends BaseInteraction<CacheType>
+  InteractionType extends BaseInteraction<CacheType>,
 > {
   interaction: InteractionType;
   userPermissions: KafuuCommandPermission[];
@@ -61,7 +61,7 @@ export type KafuuChannelSelectMenuContext = KafuuMessageComponentContext<
 >;
 
 interface KafuuMessageComponentContext<
-  InteractionType extends MessageComponentInteraction<CacheType>
+  InteractionType extends MessageComponentInteraction<CacheType>,
 > extends KafuuBaseInteractionContext<InteractionType> {
   customInfo: KafuuMessageComponentCustomIdOptions;
 }

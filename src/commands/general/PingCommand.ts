@@ -29,7 +29,7 @@ export default class PingCommand extends BaseCommand {
       KafuuCommandCategory.GENERAL,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -40,7 +40,7 @@ export default class PingCommand extends BaseCommand {
 
     const deferReply = await interaction.deferReply({ fetchReply: true });
     const deferReplyTime = Math.round(
-      deferReply.createdTimestamp - interaction.createdTimestamp
+      deferReply.createdTimestamp - interaction.createdTimestamp,
     );
 
     pingEmbed.setDescription(
@@ -51,8 +51,8 @@ export default class PingCommand extends BaseCommand {
         (deferReplyTime / 1000).toFixed(2),
         deferReplyTime.toString(),
         (this.client.ws.ping / 1000).toFixed(2),
-        this.client.ws.ping.toString()
-      )
+        this.client.ws.ping.toString(),
+      ),
     );
 
     await interaction.editReply({ embeds: [pingEmbed] });

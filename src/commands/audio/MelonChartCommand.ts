@@ -36,7 +36,7 @@ export default class LyricsCommand extends BaseCommand {
           })
           .setDescriptionLocalizations({
             ko: "실시간 멜론차트 순위를 보여드려요!",
-          })
+          }),
       )
       .addSubcommand((subcommand) =>
         subcommand
@@ -55,8 +55,8 @@ export default class LyricsCommand extends BaseCommand {
               .setDescription("Date of daliy chart")
               .setDescriptionLocalizations({
                 ko: "일간 차트의 기준 날짜에요. (년도/월/일) 형식이나, (년도/월), (월/일), (일) 형식으로 입력해주세요.",
-              })
-          )
+              }),
+          ),
       );
     super(
       slashCommand,
@@ -64,7 +64,7 @@ export default class LyricsCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -108,7 +108,7 @@ export default class LyricsCommand extends BaseCommand {
 
   private async getChartEmbed(
     { data, dates }: MelonChart,
-    locale: Locale
+    locale: Locale,
   ): Promise<ExtendedEmbed> {
     const embed = new ExtendedEmbed();
 
@@ -117,10 +117,10 @@ export default class LyricsCommand extends BaseCommand {
       return embed;
     }
     await embed.setThumbnailAndColor(
-      (data.at(0) as MelonChartTrackInfo).albumCover
+      (data.at(0) as MelonChartTrackInfo).albumCover,
     );
     embed.setTitle(
-      format(locale, "MELON_CHART_TITLE", melonDateToString(dates, locale))
+      format(locale, "MELON_CHART_TITLE", melonDateToString(dates, locale)),
     );
     const pages = chunkArray(data, PAGE_CHUNK_SIZE);
     pages.map((page, index) => {
@@ -129,9 +129,9 @@ export default class LyricsCommand extends BaseCommand {
         page
           .map(
             (track) =>
-              `#${track.rank} [${track.title}](https://www.melon.com/song/detail.htm?songId=${track.songId}) - ${track.artist}`
+              `#${track.rank} [${track.title}](https://www.melon.com/song/detail.htm?songId=${track.songId}) - ${track.artist}`,
           )
-          .join("\n")
+          .join("\n"),
       );
     });
     return embed;

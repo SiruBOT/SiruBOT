@@ -40,7 +40,7 @@ export default class VolumeCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -52,14 +52,14 @@ export default class VolumeCommand extends BaseCommand {
     if (!volume) {
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
-          interaction.guildId
+          interaction.guildId,
         );
       await interaction.reply({
         content: format(
           interaction.locale,
           "CURRENT_VOLUME",
           volumeEmoji(guildConfig.volume),
-          guildConfig.volume.toString()
+          guildConfig.volume.toString(),
         ),
       });
       return;
@@ -75,12 +75,12 @@ export default class VolumeCommand extends BaseCommand {
     // Max Volume = 150
     if (volume > 150) {
       await interaction.reply(
-        format(interaction.locale, "VOLUME_CANNOT_OVER_MAX")
+        format(interaction.locale, "VOLUME_CANNOT_OVER_MAX"),
       );
       return;
     } else if (volume < 0) {
       await interaction.reply(
-        format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW")
+        format(interaction.locale, "VOLUME_CANNOT_UNDER_LOW"),
       );
       return;
     }
@@ -98,7 +98,7 @@ export default class VolumeCommand extends BaseCommand {
         interaction.locale,
         "CHANGED_VOLUME",
         volumeEmoji(guildConfig.volume),
-        guildConfig.volume.toString()
+        guildConfig.volume.toString(),
       ),
     });
   }

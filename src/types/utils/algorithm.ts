@@ -25,7 +25,7 @@ export function calculateLevenshteinDistance(a: string, b: string) {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1, // deletion
         matrix[i][j - 1] + 1, // insertion
-        matrix[i - 1][j - 1] + cost // substitution
+        matrix[i - 1][j - 1] + cost, // substitution
       );
     }
   }

@@ -35,7 +35,7 @@ export default class NowplayingCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages", "EmbedLinks"]
+      ["SendMessages", "EmbedLinks"],
     );
   }
 
@@ -43,7 +43,7 @@ export default class NowplayingCommand extends BaseCommand {
     interaction,
   }: KafuuCommandContext): Promise<void> {
     await interaction.reply(
-      await this.getNowplayingPayload(interaction.guildId, interaction.locale)
+      await this.getNowplayingPayload(interaction.guildId, interaction.locale),
     );
   }
 
@@ -57,8 +57,8 @@ export default class NowplayingCommand extends BaseCommand {
         await interaction.update(
           await this.getNowplayingPayload(
             interaction.guildId,
-            interaction.locale
-          )
+            interaction.locale,
+          ),
         );
         break;
       case "np_favorite":
@@ -78,21 +78,21 @@ export default class NowplayingCommand extends BaseCommand {
         new ButtonBuilder()
           .setEmoji(EMOJI_STAR)
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId(this.getCustomId({ customId: "np_favorite" }))
+          .setCustomId(this.getCustomId({ customId: "np_favorite" })),
       );
     return actionRow;
   }
 
   private async getNowplayingPayload(
     guildId: string,
-    localeName: string
+    localeName: string,
   ): Promise<InteractionUpdateOptions & InteractionReplyOptions> {
     return {
       components: [this.buildActionRow()],
       embeds: [
         await this.client.audio.getNowPlayingEmbed(
           guildId,
-          localeName as Locale
+          localeName as Locale,
         ),
       ],
       fetchReply: true,

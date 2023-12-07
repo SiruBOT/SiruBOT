@@ -30,10 +30,10 @@ export class VoteSkip {
   }
 
   public getVotedMembers(
-    voiceChannel: VoiceBasedChannel
+    voiceChannel: VoiceBasedChannel,
   ): Collection<string, GuildMember> {
     return getListeningMembers(voiceChannel).filter((user) =>
-      this.skipUserIds.includes(user.id)
+      this.skipUserIds.includes(user.id),
     );
   }
 

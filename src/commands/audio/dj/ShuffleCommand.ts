@@ -28,7 +28,7 @@ export default class SeekCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.DJ],
       KafuuCommandFlags.AUDIO_NODE | KafuuCommandFlags.TRACK_PLAYING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -36,7 +36,7 @@ export default class SeekCommand extends BaseCommand {
     interaction,
   }: KafuuCommandContext<true>): Promise<void> {
     const { queue } = await this.client.audio.getPlayerDispatcherOrfail(
-      interaction.guildId
+      interaction.guildId,
     );
     if ((await queue.getTracks()).length <= 0) {
       await interaction.reply({
@@ -52,7 +52,7 @@ export default class SeekCommand extends BaseCommand {
       content: format(
         interaction.locale,
         "SHUFFLE_SHUFFLED_TRACKS",
-        shuffledTracksCount.toString()
+        shuffledTracksCount.toString(),
       ),
     });
   }

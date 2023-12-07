@@ -11,15 +11,15 @@ export class PlayerDispatcherFactory {
 
   async createPlayerDispatcher(
     player: Player,
-    joinOptions: KafuuJoinOptions
+    joinOptions: KafuuJoinOptions,
   ): Promise<PlayerDispatcher> {
     const playerDispatcher = new PlayerDispatcher(
       this.client,
       player,
-      joinOptions
+      joinOptions,
     );
     this.client.log.info(
-      `PlayerDispatcher successfully created @ ${player.connection.guildId}/${player.connection.channelId}`
+      `PlayerDispatcher successfully created @ ${player.connection.guildId}/${player.connection.channelId}`,
     );
     return playerDispatcher;
   }

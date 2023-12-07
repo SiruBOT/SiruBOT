@@ -45,7 +45,7 @@ export default class RepeatCommand extends BaseCommand {
               name_localizations: {
                 ko: "끄기",
               },
-            }
+            },
           );
         return option;
       });
@@ -55,7 +55,7 @@ export default class RepeatCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.DJ],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -66,26 +66,26 @@ export default class RepeatCommand extends BaseCommand {
     if (!relatedMode) {
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
-          interaction.guildId
+          interaction.guildId,
         );
       await interaction.reply({
         content: format(
           interaction.locale,
           "RELATED_MODE",
-          format(interaction.locale, guildConfig.playRelated ? "ON" : "OFF")
+          format(interaction.locale, guildConfig.playRelated ? "ON" : "OFF"),
         ),
       });
     } else {
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId,
-          { playRelated: relatedMode === "ON" } // OFF = false
+          { playRelated: relatedMode === "ON" }, // OFF = false
         );
       await interaction.reply({
         content: format(
           interaction.locale,
           "RELATED_MODE_SET",
-          format(interaction.locale, guildConfig.playRelated ? "ON" : "OFF")
+          format(interaction.locale, guildConfig.playRelated ? "ON" : "OFF"),
         ),
       });
     }

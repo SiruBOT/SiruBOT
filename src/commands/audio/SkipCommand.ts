@@ -84,7 +84,7 @@ export default class SkipCommand extends BaseCommand {
             ko: "점프",
           })
           .setDescription(
-            "Skips to the specified track (Queue position) (Only admin/dj)"
+            "Skips to the specified track (Queue position) (Only admin/dj)",
           )
           .setDescriptionLocalizations({
             ko: "지정된 위치로 건너뛰어요 (대기열 번호) (관리자/DJ만 사용 가능)",
@@ -103,7 +103,7 @@ export default class SkipCommand extends BaseCommand {
         KafuuCommandFlags.AUDIO_NODE |
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
         KafuuCommandFlags.VOICE_CONNECTED,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -129,12 +129,12 @@ export default class SkipCommand extends BaseCommand {
     // Forceskip 있다면 "forceskip", to 있다면 "to", 둘다 없다면 null
     const subCommand: string | null = interaction.options.getBoolean(
       "forceskip",
-      false
+      false,
     )
       ? "forceskip"
       : interaction.options.getInteger("to", false)
-      ? "to"
-      : null;
+        ? "to"
+        : null;
     // Force, Jump 명령어를 안쓰거나, 명령어를 썼지만 권한이 없는 경우 일반 voteSkip 으로 간주
     if (
       !subCommand ||
@@ -144,7 +144,7 @@ export default class SkipCommand extends BaseCommand {
       dispatcher.queue.voteSkip.addSkipper(interaction.member.id);
       const voteSkippable = await this.checkSkip(
         dispatcher,
-        interaction.member.voice.channel
+        interaction.member.voice.channel,
       );
       if (voteSkippable) {
         await interaction.reply(this.buildSkippedPayload(interaction.locale));
@@ -154,8 +154,8 @@ export default class SkipCommand extends BaseCommand {
             interaction.locale,
             interaction.guildId,
             interaction.member,
-            nowplaying as KafuuAudioTrack
-          )
+            nowplaying as KafuuAudioTrack,
+          ),
         );
       }
     } else if (subCommand === "forceskip") {
@@ -177,13 +177,13 @@ export default class SkipCommand extends BaseCommand {
       content: format(
         interaction.locale,
         "SKIPPED_TRACK_FORCE",
-        interaction.member.displayName
+        interaction.member.displayName,
       ),
       embeds: [
         await EmbedFactory.getTrackEmbed(
           this.client,
           getReusableFormatFunction(interaction.locale),
-          nextTrack
+          nextTrack,
         ),
       ],
     });
@@ -212,13 +212,13 @@ export default class SkipCommand extends BaseCommand {
         interaction.locale,
         "SKIP_TO_JUMP",
         interaction.member.displayName,
-        skipTo.toString()
+        skipTo.toString(),
       ),
       embeds: [
         await EmbedFactory.getTrackEmbed(
           this.client,
           getReusableFormatFunction(interaction.locale),
-          skipToTrack
+          skipToTrack,
         ),
       ],
     });
@@ -226,7 +226,7 @@ export default class SkipCommand extends BaseCommand {
   }
 
   private buildSkippedPayload(
-    localeName: Locale
+    localeName: Locale,
   ): InteractionReplyOptions & InteractionUpdateOptions {
     return {
       content: format(localeName, "SKIPPED_TRACK_VOTED"),
@@ -240,7 +240,7 @@ export default class SkipCommand extends BaseCommand {
     localeName: Locale,
     guildId: string,
     member: GuildMember,
-    track: Track
+    track: Track,
   ) {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(guildId);
     const voteButton = new ButtonBuilder()
@@ -252,16 +252,16 @@ export default class SkipCommand extends BaseCommand {
           "SKIP_BUTTON_LABEL",
           `${
             dispatcher.queue.voteSkip.getVotedMembers(
-              member.voice.channel as VoiceBasedChannel
+              member.voice.channel as VoiceBasedChannel,
             ).size
           }/${dispatcher.queue.voteSkip.getNumberOfVotesRequired(
-            member.voice.channel as VoiceBasedChannel
-          )}` // 투표하기 (votedMembers / requiredMembers)
-        )
+            member.voice.channel as VoiceBasedChannel,
+          )}`, // 투표하기 (votedMembers / requiredMembers)
+        ),
       )
       .setStyle(ButtonStyle.Secondary);
     const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      voteButton
+      voteButton,
     );
     const trackEmbed = EmbedFactory.createEmbed()
       .setTitle(format(localeName, "SKIP_VOTE_EMBED_TITLE"))
@@ -273,8 +273,8 @@ export default class SkipCommand extends BaseCommand {
           formatTrack(track, {
             streamString: format(localeName, "LIVESTREAM"),
             withMarkdownURL: true,
-          })
-        )
+          }),
+        ),
       )
       .setTrackThumbnail(track);
     return {
@@ -287,7 +287,7 @@ export default class SkipCommand extends BaseCommand {
   // 절반이 넘어가면 스킵하는 코드
   private async checkSkip(
     dispatcher: PlayerDispatcher,
-    voiceChannel: VoiceBasedChannel
+    voiceChannel: VoiceBasedChannel,
   ) {
     if (dispatcher.queue.voteSkip.isAgreedHalf(voiceChannel)) {
       await dispatcher.skipTrack();
@@ -352,7 +352,7 @@ export default class SkipCommand extends BaseCommand {
     // skip 명령어를 치면 투표한걸로 간주함
     const voteSkippable = await this.checkSkip(
       dispatcher,
-      member.voice.channel
+      member.voice.channel,
     );
     if (voteSkippable) {
       await interaction.update(this.buildSkippedPayload(interaction.locale));
@@ -362,21 +362,21 @@ export default class SkipCommand extends BaseCommand {
           interaction.locale,
           interaction.guildId,
           member,
-          nowplaying as KafuuAudioTrack
-        )
+          nowplaying as KafuuAudioTrack,
+        ),
       );
     }
   }
 
   public override async onAutocompleteInteraction(
-    interaction: AutocompleteInteraction
+    interaction: AutocompleteInteraction,
   ): Promise<void> {
     if (!interaction.guildId) {
       await interaction.respond([]);
       return;
     }
     const { queue } = await this.client.databaseHelper.upsertGuildAudioData(
-      interaction.guildId
+      interaction.guildId,
     );
     if (queue.length <= 0) {
       await interaction.respond([]);
@@ -393,14 +393,14 @@ export default class SkipCommand extends BaseCommand {
             formatTrack(e, {
               streamString: format(interaction.locale, "LIVESTREAM"),
               showLength: false,
-            })
+            }),
         )
         .map((e, index): ApplicationCommandOptionChoiceData => {
           return {
             name: e.slice(0, 99),
             value: start + index,
           };
-        })
+        }),
     );
     return;
   }

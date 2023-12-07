@@ -14,7 +14,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
     id: string,
     token: string,
     owners: string[],
-    log: Logger
+    log: Logger,
   ) {
     super({ id, token });
     this.name = name;
@@ -43,7 +43,9 @@ export class WebhookNotifier extends Discord.WebhookClient {
   clusterSpawned(cluster: Cluster): void {
     const embed: Discord.EmbedBuilder = this.infoEmbed();
     embed.setTitle(
-      `💡  Cluster spawned (${cluster.id + 1}/${cluster.manager.totalClusters})`
+      `💡  Cluster spawned (${cluster.id + 1}/${
+        cluster.manager.totalClusters
+      })`,
     ).setDescription(`
       Cluster Id: ${cluster.id}
       Shards Per Clusters: ${
@@ -51,7 +53,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
         typeof cluster.manager.totalClusters === "string"
           ? "auto"
           : Math.ceil(
-              cluster.manager.totalShards / cluster.manager.totalClusters
+              cluster.manager.totalShards / cluster.manager.totalClusters,
             )
       }
     `);
@@ -62,7 +64,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
     const embed: Discord.EmbedBuilder = this.warnEmbed();
     embed.setTitle(`⚠️  Cluster Error #${cluster.id}`);
     embed.setDescription(
-      codeBlock("ts", error.stack ?? "N/A, Check the console.")
+      codeBlock("ts", error.stack ?? "N/A, Check the console."),
     );
     this.safeSendEmbed(embed, true);
   }
@@ -82,7 +84,7 @@ export class WebhookNotifier extends Discord.WebhookClient {
 
   async safeSendEmbed(
     embed: Discord.EmbedBuilder,
-    important = false
+    important = false,
   ): Promise<void> {
     try {
       await this.send({

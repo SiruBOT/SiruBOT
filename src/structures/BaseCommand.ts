@@ -40,7 +40,7 @@ export abstract class BaseCommand {
     category: KafuuCommandCategory,
     permissions: KafuuCommandPermission[],
     requirements: number,
-    botPermissions: PermissionsString[]
+    botPermissions: PermissionsString[],
   ) {
     // Assign values to the properties
     this.slashCommand = slashCommand;
@@ -52,42 +52,42 @@ export abstract class BaseCommand {
   }
 
   public abstract onCommandInteraction(
-    context: KafuuCommandContext<boolean>
+    context: KafuuCommandContext<boolean>,
   ): Promise<void>;
 
   public onChannelSelectMenuInteraction?(
-    context: KafuuChannelSelectMenuContext
+    context: KafuuChannelSelectMenuContext,
   ): Promise<void>;
 
   public onRoleSelectMenuInteraction?(
-    context: KafuuRoleSelectMenuContext
+    context: KafuuRoleSelectMenuContext,
   ): Promise<void>;
 
   public onAutocompleteInteraction?(
-    interaction: AutocompleteInteraction
+    interaction: AutocompleteInteraction,
   ): Promise<void>;
 
   public onButtonInteraction?(context: KafuuButtonContext): Promise<void>;
 
   public onMessageComponentInteraction?(
-    interaction: MessageComponentInteraction
+    interaction: MessageComponentInteraction,
   ): Promise<void>;
 
   public onSelectMenuInteraction?(
-    interaction: SelectMenuInteraction
+    interaction: SelectMenuInteraction,
   ): Promise<void>;
 
   public onContextMenuCommand?(
-    interaction: ContextMenuCommandInteraction
+    interaction: ContextMenuCommandInteraction,
   ): Promise<void>;
 
   public onUserContextCommand?(
-    interaction: UserContextMenuCommandInteraction
+    interaction: UserContextMenuCommandInteraction,
   ): Promise<void>;
 
   // Message Component custom id template: [commandName]:[customId]:[executorId];[args];[args];[args]
   protected getCustomId(
-    option: Omit<KafuuMessageComponentCustomIdOptions, "commandName">
+    option: Omit<KafuuMessageComponentCustomIdOptions, "commandName">,
   ): string {
     // Return a string with the name of the slash command and the custom ID
     return getCustomId({

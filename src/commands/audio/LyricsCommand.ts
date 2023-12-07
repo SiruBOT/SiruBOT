@@ -47,7 +47,7 @@ export default class LyricsCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -61,7 +61,7 @@ export default class LyricsCommand extends BaseCommand {
     const searchResult: ILyricsSearchResult = await provider.search(query);
     if (searchResult.entries.length <= 0) {
       await interaction.editReply(
-        format(interaction.locale, "LYRICS_NOT_FOUND")
+        format(interaction.locale, "LYRICS_NOT_FOUND"),
       );
       return;
     }
@@ -77,7 +77,7 @@ export default class LyricsCommand extends BaseCommand {
       format(
         interaction.locale,
         "LYRICS_NAN",
-        lyrics.artist + "-" + lyrics.title
+        lyrics.artist + "-" + lyrics.title,
       );
 
     // 가사가 길다면 링크로 대체
@@ -86,7 +86,7 @@ export default class LyricsCommand extends BaseCommand {
         interaction.locale,
         "LYRICS_TOO_LONG",
         lyrics.artist + "-" + lyrics.title,
-        lyrics.url
+        lyrics.url,
       );
     resultEmbed.setDescription(resultText);
     await interaction.editReply({ embeds: [resultEmbed] });
@@ -94,7 +94,7 @@ export default class LyricsCommand extends BaseCommand {
 
   // Autocomplete Handler
   public override async onAutocompleteInteraction(
-    interaction: AutocompleteInteraction<CacheType>
+    interaction: AutocompleteInteraction<CacheType>,
   ): Promise<void> {
     const query: string | null = interaction.options.getString("query");
     if (!query)
@@ -116,7 +116,7 @@ export default class LyricsCommand extends BaseCommand {
               value: name.length > 100 ? name.slice(0, 99) : name,
             };
           })
-          .slice(0, AUTOCOMPLETE_MAX_RESULT)
+          .slice(0, AUTOCOMPLETE_MAX_RESULT),
       );
     }
   }

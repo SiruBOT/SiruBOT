@@ -24,7 +24,7 @@ export class Queue {
     this.log.debug(`Clean the queue @ ${this.guildId}`);
     const cleanedData = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
-      { $set: { queue: [], nowPlaying: null, position: null } }
+      { $set: { queue: [], nowPlaying: null, position: null } },
     );
     return cleanedData;
   }
@@ -54,7 +54,7 @@ export class Queue {
 
   public async unshiftTrack(track: KafuuAudioTrack): Promise<KafuuAudioTrack> {
     this.log.debug(
-      `Push track ${track.info.identifier} with position 0 @ ${this.guildId}`
+      `Push track ${track.info.identifier} with position 0 @ ${this.guildId}`,
     );
     await this.databaseHelper.upsertGuildAudioData(this.guildId, {
       $push: { queue: { $each: [track], $position: 0 } },
@@ -64,13 +64,13 @@ export class Queue {
 
   public async shiftTrack(): Promise<KafuuAudioTrack | null> {
     const beforeShift = await this.databaseHelper.upsertGuildAudioData(
-      this.guildId
+      this.guildId,
     );
     this.voteSkip.clearSkippers(); // 한곡이 끝날때마다 shiftTrack이 되기 때문에 스킵 유저 초기화를 여기에서 처리해주면 됨
     // BeforeShift = shifted track
     if (!beforeShift.queue[0]) {
       this.log.debug(
-        `Shift track from ${this.guildId} (Queue is empty. returning null)`
+        `Shift track from ${this.guildId} (Queue is empty. returning null)`,
       );
       return null;
     }
@@ -84,12 +84,12 @@ export class Queue {
   }
 
   public async setNowPlaying(
-    track: KafuuAudioTrack
+    track: KafuuAudioTrack,
   ): Promise<KafuuAudioTrack | null> {
     this.log.debug(`Set nowplaying @ ${this.guildId}`);
     const updated = await this.databaseHelper.upsertGuildAudioData(
       this.guildId,
-      { $set: { nowPlaying: track } }
+      { $set: { nowPlaying: track } },
     );
     return updated.nowPlaying;
   }

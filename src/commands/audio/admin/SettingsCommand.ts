@@ -59,7 +59,7 @@ const CUSTOM_IDS = {
   MUSIC_REPEAT_SET: "repeat_set",
 };
 
-type SettingsPageNames = typeof PAGES[keyof typeof PAGES];
+type SettingsPageNames = (typeof PAGES)[keyof typeof PAGES];
 
 type RenderOptions = {
   page: SettingsPageNames;
@@ -83,7 +83,7 @@ class SettingsCommand extends BaseCommand {
       KafuuCommandCategory.ADMIN,
       [KafuuCommandPermission.ADMIN],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -132,7 +132,7 @@ class SettingsCommand extends BaseCommand {
             interaction.guildId,
             {
               djRoleId: null,
-            }
+            },
           );
           pageName = PAGES.DJ;
           break;
@@ -142,7 +142,7 @@ class SettingsCommand extends BaseCommand {
             interaction.guildId,
             {
               textChannelId: null,
-            }
+            },
           );
           pageName = PAGES.CHANNELS;
           break;
@@ -152,7 +152,7 @@ class SettingsCommand extends BaseCommand {
             interaction.guildId,
             {
               voiceChannelId: null,
-            }
+            },
           );
           pageName = PAGES.CHANNELS;
           break;
@@ -164,7 +164,7 @@ class SettingsCommand extends BaseCommand {
               interaction.guildId,
               {
                 sendAudioMessages: JSON.parse(sendAudioMessagesArg),
-              }
+              },
             );
           }
           pageName = PAGES.MUSIC;
@@ -177,7 +177,7 @@ class SettingsCommand extends BaseCommand {
               interaction.guildId,
               {
                 playRelated: JSON.parse(sendRelatedVideosArg),
-              }
+              },
             );
           }
           pageName = PAGES.MUSIC;
@@ -189,7 +189,7 @@ class SettingsCommand extends BaseCommand {
               interaction.guildId,
               {
                 repeat: Number(repeatArg),
-              }
+              },
             );
           }
           pageName = PAGES.MUSIC;
@@ -274,7 +274,7 @@ class SettingsCommand extends BaseCommand {
           interaction.guild.id,
           {
             textChannelId: toSet?.id ? toSet.id : null,
-          }
+          },
         );
         break;
       case CUSTOM_IDS.DEFAULT_VOICE_SET:
@@ -282,7 +282,7 @@ class SettingsCommand extends BaseCommand {
           interaction.guild.id,
           {
             voiceChannelId: toSet?.id ? toSet.id : null,
-          }
+          },
         );
         break;
     }
@@ -302,7 +302,7 @@ class SettingsCommand extends BaseCommand {
 
   // Menu
   private async render<IsReply extends boolean>(
-    opts: RenderOptions
+    opts: RenderOptions,
   ): ReplyOrUpdate<IsReply> {
     switch (opts.page) {
       case PAGES.MAIN:
@@ -370,7 +370,7 @@ class SettingsCommand extends BaseCommand {
           this.getCustomId({
             customId: CUSTOM_IDS.GOTO_DJ,
             executorId: member.id,
-          })
+          }),
         )
         .setEmoji("💿")
         .setStyle(ButtonStyle.Secondary),
@@ -380,7 +380,7 @@ class SettingsCommand extends BaseCommand {
           this.getCustomId({
             customId: CUSTOM_IDS.GOTO_MUSIC,
             executorId: member.id,
-          })
+          }),
         )
         .setEmoji("🎵")
         .setStyle(ButtonStyle.Secondary),
@@ -390,7 +390,7 @@ class SettingsCommand extends BaseCommand {
           this.getCustomId({
             customId: CUSTOM_IDS.GOTO_CHANNELS,
             executorId: member.id,
-          })
+          }),
         )
         .setEmoji("📑")
         .setStyle(ButtonStyle.Secondary),
@@ -402,7 +402,7 @@ class SettingsCommand extends BaseCommand {
           .setEmoji(SPARKLES_EMOJI)
           .setLabel(format(locale, "SETTINGS_DASHBOARD_BUTTON"))
           .setURL(DASHBOARD_URL + guild.id)
-          .setStyle(ButtonStyle.Link)
+          .setStyle(ButtonStyle.Link),
       );
     }
     // -------------------------------------------- Development -------------------------------------------- //
@@ -410,7 +410,7 @@ class SettingsCommand extends BaseCommand {
     const mainActionRow = new ActionRowBuilder<ButtonBuilder>();
     mainActionRow.addComponents(buttons);
     mainEmbed.addFields(
-      fields.map((e) => ({ name: e[0], value: e[1], inline: true }))
+      fields.map((e) => ({ name: e[0], value: e[1], inline: true })),
     );
 
     return {
@@ -423,7 +423,7 @@ class SettingsCommand extends BaseCommand {
     context: { locale, guild, member },
   }: RenderOptions): ReplyOrUpdate<IsReply> {
     const { djRoleId } = await this.client.databaseHelper.upsertAndFindGuild(
-      guild.id
+      guild.id,
     );
     // const mainActionRow = new ActionRowBuilder<ButtonBuilder>();
     const djRoleObj = djRoleId && (await guild.roles.fetch(djRoleId));
@@ -446,7 +446,7 @@ class SettingsCommand extends BaseCommand {
         this.getCustomId({
           customId: CUSTOM_IDS.DJ_ROLE_SET,
           executorId: member.id,
-        })
+        }),
       )
       .setMaxValues(1)
       .setMinValues(1)
@@ -457,7 +457,7 @@ class SettingsCommand extends BaseCommand {
           this.getCustomId({
             customId: CUSTOM_IDS.GOTO_MAIN,
             executorId: member.id,
-          })
+          }),
         )
         .setLabel(format(locale, "SETTINGS_BACK_BUTTON"))
         .setEmoji(EMOJI_BACK)
@@ -467,7 +467,7 @@ class SettingsCommand extends BaseCommand {
           this.getCustomId({
             customId: CUSTOM_IDS.DJ_ROLE_RESET,
             executorId: member.id,
-          })
+          }),
         )
         .setStyle(ButtonStyle.Danger)
         .setEmoji(EMOJI_TRASH)
@@ -479,7 +479,7 @@ class SettingsCommand extends BaseCommand {
         roleSelectMenu,
       ]);
     const buttonActionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      buttons
+      buttons,
     );
 
     return {
@@ -497,8 +497,8 @@ class SettingsCommand extends BaseCommand {
       repeat === KafuuRepeatMode.OFF
         ? KafuuRepeatMode.ALL
         : repeat === KafuuRepeatMode.ALL
-        ? KafuuRepeatMode.SINGLE
-        : KafuuRepeatMode.OFF;
+          ? KafuuRepeatMode.SINGLE
+          : KafuuRepeatMode.OFF;
     return {
       embeds: [
         this.createSettingsEmbed({
@@ -522,7 +522,7 @@ class SettingsCommand extends BaseCommand {
                 locale,
                 "SETTINGS_MAIN_FIELDS_REPEAT",
                 // eslint-disable-next-line security/detect-object-injection
-                EMOJI_REPEAT[repeat]
+                EMOJI_REPEAT[repeat],
               ),
               value: format(locale, ("REPEAT_" + repeat) as STRING_KEYS),
             },
@@ -535,38 +535,38 @@ class SettingsCommand extends BaseCommand {
               this.getCustomId({
                 customId: CUSTOM_IDS.MUSIC_PLAYMESSAGE_TOGGLE,
                 args: [`${!sendAudioMessages}`],
-              })
+              }),
             )
             .setLabel(
               format(
                 locale,
                 sendAudioMessages
                   ? "SETTINGS_MUSIC_PLAYMESSAGE_BTN_OFF"
-                  : "SETTINGS_MUSIC_PLAYMESSAGE_BTN_ON"
-              )
+                  : "SETTINGS_MUSIC_PLAYMESSAGE_BTN_ON",
+              ),
             )
             .setEmoji("📨")
             .setStyle(
-              sendAudioMessages ? ButtonStyle.Secondary : ButtonStyle.Primary
+              sendAudioMessages ? ButtonStyle.Secondary : ButtonStyle.Primary,
             ),
           new ButtonBuilder()
             .setCustomId(
               this.getCustomId({
                 customId: CUSTOM_IDS.MUSIC_RELATED_TOGGLE,
                 args: [`${!playRelated}`],
-              })
+              }),
             )
             .setLabel(
               format(
                 locale,
                 playRelated
                   ? "SETTINGS_MUSIC_RELATED_BTN_OFF"
-                  : "SETTINGS_MUSIC_RELATED_BTN_ON"
-              )
+                  : "SETTINGS_MUSIC_RELATED_BTN_ON",
+              ),
             )
             .setEmoji(EMOJI_STAR)
             .setStyle(
-              playRelated ? ButtonStyle.Secondary : ButtonStyle.Primary
+              playRelated ? ButtonStyle.Secondary : ButtonStyle.Primary,
             ),
         ]),
         new ActionRowBuilder<ButtonBuilder>().addComponents([
@@ -575,7 +575,7 @@ class SettingsCommand extends BaseCommand {
               this.getCustomId({
                 customId: CUSTOM_IDS.GOTO_MAIN,
                 executorId: member.id,
-              })
+              }),
             )
             .setLabel(format(locale, "SETTINGS_BACK_BUTTON"))
             .setEmoji(EMOJI_BACK)
@@ -585,13 +585,13 @@ class SettingsCommand extends BaseCommand {
               this.getCustomId({
                 customId: CUSTOM_IDS.MUSIC_REPEAT_SET,
                 args: [`${nextRepeat}`],
-              })
+              }),
             )
             .setLabel(
               format(
                 locale,
-                ("SETTINGS_MUSIC_REPEAT_BTN_" + nextRepeat) as STRING_KEYS
-              )
+                ("SETTINGS_MUSIC_REPEAT_BTN_" + nextRepeat) as STRING_KEYS,
+              ),
             )
             // eslint-disable-next-line security/detect-object-injection
             .setEmoji(EMOJI_REPEAT[nextRepeat])
@@ -634,20 +634,20 @@ class SettingsCommand extends BaseCommand {
               },
             ].map((e) => {
               return { ...e, inline: true };
-            })
+            }),
           ),
       ],
       components: [
         new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents([
           new ChannelSelectMenuBuilder()
             .setPlaceholder(
-              format(locale, "SETTINGS_CHANNELS_TEXT_PLACEHOLDER")
+              format(locale, "SETTINGS_CHANNELS_TEXT_PLACEHOLDER"),
             )
             .setCustomId(
               this.getCustomId({
                 customId: CUSTOM_IDS.DEFAULT_TEXT_SET,
                 executorId: member.id,
-              })
+              }),
             )
             .setChannelTypes(ChannelType.GuildText)
             .setMaxValues(1)
@@ -656,13 +656,13 @@ class SettingsCommand extends BaseCommand {
         new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents([
           new ChannelSelectMenuBuilder()
             .setPlaceholder(
-              format(locale, "SETTINGS_CHANNELS_VOICE_PLACEHOLDER")
+              format(locale, "SETTINGS_CHANNELS_VOICE_PLACEHOLDER"),
             )
             .setCustomId(
               this.getCustomId({
                 customId: CUSTOM_IDS.DEFAULT_VOICE_SET,
                 executorId: member.id,
-              })
+              }),
             )
             .setChannelTypes(ChannelType.GuildVoice)
             .setMaxValues(1)
@@ -674,7 +674,7 @@ class SettingsCommand extends BaseCommand {
               this.getCustomId({
                 customId: CUSTOM_IDS.GOTO_MAIN,
                 executorId: member.id,
-              })
+              }),
             )
             .setLabel(format(locale, "SETTINGS_BACK_BUTTON"))
             .setEmoji(EMOJI_BACK)
@@ -687,7 +687,7 @@ class SettingsCommand extends BaseCommand {
               this.getCustomId({
                 customId: CUSTOM_IDS.TEXT_RESET,
                 executorId: member.id,
-              })
+              }),
             )
             .setDisabled(!textChannel),
           new ButtonBuilder()
@@ -698,7 +698,7 @@ class SettingsCommand extends BaseCommand {
               this.getCustomId({
                 customId: CUSTOM_IDS.VOICE_RESET,
                 executorId: member.id,
-              })
+              }),
             )
             .setDisabled(!voiceChannel),
         ]),

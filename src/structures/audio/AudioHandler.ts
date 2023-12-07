@@ -50,7 +50,7 @@ export class AudioHandler extends Shoukaku {
         : {
             moveOnDisconnect: true,
             reconnectTries: 10,
-          }
+          },
     );
     this.client = client;
     this.log = this.client.log.getChildLogger({
@@ -99,18 +99,18 @@ export class AudioHandler extends Shoukaku {
   }
 
   public async joinChannel(
-    joinOptions: KafuuJoinOptions
+    joinOptions: KafuuJoinOptions,
   ): Promise<PlayerDispatcher> {
     const idealNode = this.getNode();
     if (!idealNode) throw new Error("Ideal node not found");
     this.log.info(
-      `Join channel #${joinOptions.channelId} with Node ${idealNode.name}`
+      `Join channel #${joinOptions.channelId} with Node ${idealNode.name}`,
     );
     const shoukakuPlayer = await idealNode.joinChannel(joinOptions);
     const dispatcher =
       await this.playerDispatcherFactory.createPlayerDispatcher(
         shoukakuPlayer,
-        joinOptions
+        joinOptions,
       );
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
     await dispatcher.playOrResumeOrNothing();
@@ -119,11 +119,11 @@ export class AudioHandler extends Shoukaku {
 
   public addPlayerDispatcher(
     guildId: string,
-    dispatcher: PlayerDispatcher
+    dispatcher: PlayerDispatcher,
   ): PlayerDispatcher {
     if (this.dispatchers.get(guildId)) {
       Sentry.captureMessage(
-        "PlayerDispatcher is already exists in AudioHandler"
+        "PlayerDispatcher is already exists in AudioHandler",
       );
       this.log.warn("PlayerDispatcher is already exists in AudioHandler");
     }
@@ -150,12 +150,12 @@ export class AudioHandler extends Shoukaku {
       queue
         .filter((e) => !e.info.isStream)
         .map((e) => e.info.length)
-        .reduce((a, b) => a + b, 0)
+        .reduce((a, b) => a + b, 0),
     );
   }
 
   public async getRelatedVideo(
-    videoId: string
+    videoId: string,
   ): Promise<IRelatedVideo[] | null> {
     const scrapeResult: IRelatedVideo[] | null =
       await this.relatedScraper.scrape(videoId, this?.routePlanner);
@@ -166,14 +166,14 @@ export class AudioHandler extends Shoukaku {
   // Time unit: seconds
   public async rankRelatedVideos(
     scrapeResults: IRelatedVideo[],
-    playedYoutubeTracks: TinyInfo[]
+    playedYoutubeTracks: TinyInfo[],
   ): Promise<IRelatedVideo[]> {
     const penalties = new Map<string, number>();
     this.log.debug(
       "Rank related videos, playedYoutubeTracks: ",
       playedYoutubeTracks.length,
       " scrapeResult: ",
-      scrapeResults.length
+      scrapeResults.length,
     );
     const {
       duration: lastTrackDuration,
@@ -186,7 +186,7 @@ export class AudioHandler extends Shoukaku {
     for (const scrapedTrack of scrapeResults) {
       const { videoId, duration } = scrapedTrack;
       const playedTrack = playedYoutubeTracks.find(
-        (e) => e.videoId === videoId
+        (e) => e.videoId === videoId,
       );
       let videoPenalty = penalties.get(videoId) ?? 0;
       // Duplicated track
@@ -239,13 +239,13 @@ export class AudioHandler extends Shoukaku {
         " / " +
         e.videoId +
         " / " +
-        penalties.get(e.videoId)
+        penalties.get(e.videoId),
     );
 
     this.log.debug(
       `\n----- Related video ranking for ${lastTrackVideoId} -----\n${logStr.join(
-        "\n"
-      )}\n----- End of related video ranking -----`
+        "\n",
+      )}\n----- End of related video ranking -----`,
     );
     return sorted;
   }
@@ -273,7 +273,7 @@ export class AudioHandler extends Shoukaku {
     this.on("ready", (name, resumed) => {
       this.log.info(
         `Lavalink Node: ${name} is now connected`,
-        `This connection is ${resumed ? "resumed" : "a new connection"}`
+        `This connection is ${resumed ? "resumed" : "a new connection"}`,
       );
       if (resumed) {
         this.log.info("Resuming players...");
@@ -286,17 +286,17 @@ export class AudioHandler extends Shoukaku {
     this.on("close", (name, code, reason) =>
       this.log.info(
         `Lavalink Node: ${name} closed with code ${code}`,
-        reason || "No reason"
-      )
+        reason || "No reason",
+      ),
     );
     this.on("disconnect", (name, _players, moved) =>
       this.log.info(
         `Lavalink Node: ${name} disconnected`,
-        moved ? "players have been moved" : "players have been disconnected"
-      )
+        moved ? "players have been moved" : "players have been disconnected",
+      ),
     );
     this.on("debug", (name, reason) =>
-      this.log.debug(`Lavalink Node: ${name}`, reason || "No reason")
+      this.log.debug(`Lavalink Node: ${name}`, reason || "No reason"),
     );
   }
 

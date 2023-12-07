@@ -45,13 +45,13 @@ export class DatabaseHelper {
       {
         user: this.client.settings.database.mongodb.username,
         pass: this.client.settings.database.mongodb.password,
-      }
+      },
     );
     this.mongoose = mongoose;
 
     if (!this.isReady)
       throw new Error(
-        "Database initialize failed. please check your settings."
+        "Database initialize failed. please check your settings.",
       );
   }
 
@@ -65,12 +65,12 @@ export class DatabaseHelper {
 
   public async upsertGuildAudioData(
     discordGuildId: string,
-    query: UpdateQuery<GuildAudioData> = {}
+    query: UpdateQuery<GuildAudioData> = {},
   ): Promise<GuildAudioData> {
     if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert GuildAudioData @ ${discordGuildId}`,
-      Object.keys(query) ? query : "Empty query"
+      Object.keys(query) ? query : "Empty query",
     );
     const guildAudioData: GuildAudioData =
       await GuildAudioDataModel.findOneAndUpdate(
@@ -81,19 +81,19 @@ export class DatabaseHelper {
         {
           new: true,
           upsert: true,
-        }
+        },
       ); // combine filter & update, new = data of after update
     return guildAudioData;
   }
 
   public async upsertAndFindGuild(
     discordGuildId: string,
-    data: QueryDeepPartialEntity<TypeORMGuild> = {}
+    data: QueryDeepPartialEntity<TypeORMGuild> = {},
   ): Promise<TypeORMGuild> {
     if (!this.isReady) throw new Error("DatabaseHelper is not ready.");
     this.log.debug(
       `Upsert Guild @ ${discordGuildId}`,
-      Object.keys(data) ? data : "Empty data"
+      Object.keys(data) ? data : "Empty data",
     );
     const guildRepository: Repository<TypeORMGuild> =
       this.mySqlDataSource.getRepository(TypeORMGuild);
@@ -104,7 +104,7 @@ export class DatabaseHelper {
       },
       {
         conflictPaths: ["discordGuildId"],
-      }
+      },
     );
     const returnResult = await guildRepository.findOneOrFail({
       where: {

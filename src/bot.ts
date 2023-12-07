@@ -26,7 +26,7 @@ try {
 } catch {
   console.error(process.argv);
   throw new Error(
-    "Failed to parse process.argv[2] and process.argv[3] (Bot config and Bootstrapper args)"
+    "Failed to parse process.argv[2] and process.argv[3] (Bot config and Bootstrapper args)",
   );
 }
 
@@ -58,14 +58,14 @@ const clientOptions: Discord.ClientOptions = {
 
 if (bootStrapperArgs.shard) {
   log.debug(
-    "Sharding enabled. setup clientOptions.shards, clientOptions.shardCount"
+    "Sharding enabled. setup clientOptions.shards, clientOptions.shardCount",
   );
   clientOptions.shards = getInfo().SHARD_LIST;
   clientOptions.shardCount = getInfo().TOTAL_SHARDS;
   log.info(
     `Sharding Info | shards: [ ${clientOptions.shards.join(
-      ", "
-    )} ], shardCount: ${clientOptions.shardCount}`
+      ", ",
+    )} ], shardCount: ${clientOptions.shardCount}`,
   );
 }
 
@@ -74,7 +74,7 @@ const client = new KafuuClient(
   clientOptions,
   log,
   argvSettings,
-  bootStrapperArgs
+  bootStrapperArgs,
 );
 
 if (bootStrapperArgs.shard) {
@@ -112,7 +112,7 @@ const uncaughtException = (err: Error): void => {
 
 const unhandledRejection = (
   _reason: string,
-  promise: Promise<unknown>
+  promise: Promise<unknown>,
 ): void => {
   promise.catch((reason) => {
     Sentry.captureException(reason);
@@ -130,7 +130,7 @@ client
   .catch((err) => {
     log.error(
       "Failed to start the bot. for more information, start with -d(ebug) option",
-      err
+      err,
     );
     process.exit(2);
   });

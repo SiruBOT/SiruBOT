@@ -59,7 +59,7 @@ export function generateGlobPattern(basePath: string, dirName: string): string {
  */
 export function formatTrack(
   track: Track,
-  options?: FormatTrackOptions
+  options?: FormatTrackOptions,
 ): string {
   const {
     title,
@@ -80,9 +80,9 @@ export function formatTrack(
     (!withMarkdownURL
       ? `${title.trim() ?? "No title"}` // If withMarkdownURL is false, format track string without markdown URL
       : // If track uri length is greater than MAX_TRACK_URL_LENGTH, return not formatted track title
-      track.info.uri.length > MAX_TRACK_URL_LENGTH
-      ? `${title.trim() ?? "No title"}`
-      : `[${title.trim() ?? "No title"}](${track.info.uri})`) +
+        track.info.uri.length > MAX_TRACK_URL_LENGTH
+        ? `${title.trim() ?? "No title"}`
+        : `[${title.trim() ?? "No title"}](${track.info.uri})`) +
     // If showLength is true, add length in parentheses
     `${
       showLength
@@ -145,7 +145,7 @@ export function getCustomId({
 
 export function melonDateToString(
   date: MelonChartDates,
-  locale: Locale
+  locale: Locale,
 ): string {
   let result = "";
   switch (true) {
@@ -153,14 +153,14 @@ export function melonDateToString(
     case date.start == date.end && date.start.length == 10:
       result = `${date.start.slice(0, 4)}년 ${date.start.slice(
         4,
-        6
+        6,
       )}월 ${date.start.slice(6, 8)}일 ${date.start.slice(8, 10)}시`;
       break;
     // Daily
     case date.start == date.end && date.start.length == 8:
       result = `${date.start.slice(0, 4)}년 ${date.start.slice(
         4,
-        6
+        6,
       )}월 ${date.start.slice(6, 8)}일`;
       break;
     // Weekly
