@@ -2,7 +2,7 @@
 import "module-alias/register";
 // Import discord.js stuff
 import Discord, { GatewayIntentBits } from "discord.js";
-import Cluster, { getInfo } from "discord-hybrid-sharding";
+import { ClusterClient, getInfo } from "discord-hybrid-sharding";
 
 // Import Sentry stuff
 import * as Sentry from "@sentry/node";
@@ -79,7 +79,7 @@ const client = new KafuuClient(
 
 if (bootStrapperArgs.shard) {
   log.debug("Sharding enabled. Set Client.cluster to Cluster.Client");
-  client.cluster = new Cluster.ClusterClient(client);
+  client.cluster = new ClusterClient(client);
 }
 
 if (argvSettings?.sentryDsn && isURL(argvSettings.sentryDsn as string)) {

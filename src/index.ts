@@ -1,6 +1,5 @@
 import "module-alias/register";
 import yaml from "yaml";
-import Cluster from "discord-hybrid-sharding";
 
 import {
   Colors,
@@ -31,6 +30,7 @@ import type {
 import type { KafuuSettings } from "@/types/settings";
 
 import { version, name, dependencies } from "../package.json";
+import { Cluster, ClusterManager } from "discord-hybrid-sharding";
 
 // Args Parser
 const parser: ArgumentParser = new ArgumentParser({
@@ -339,7 +339,7 @@ async function boot() {
         `Shard count: ${gatewayJson.shards}, Gateway url: ${gatewayJson.url}`,
       );
       // Start sharding
-      const clusterManager: Cluster.ClusterManager = new Cluster.ClusterManager(
+      const clusterManager: ClusterManager = new ClusterManager(
         __dirname + "/bot.js",
         {
           totalShards: gatewayJson.shards,
@@ -353,7 +353,7 @@ async function boot() {
       log.info(
         `total Shards: ${clusterManager.totalShards}, total Clusters: ${clusterManager.totalClusters}`,
       );
-      clusterManager.on("clusterCreate", (cluster: Cluster.Cluster) => {
+      clusterManager.on("clusterCreate", (cluster: Cluster) => {
         log.info(
           `Launched Cluster ${cluster.id} (${cluster.id + 1} of ${
             clusterManager.totalClusters

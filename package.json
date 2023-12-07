@@ -13,7 +13,7 @@
     "@sirubot/yt-related-scraper": "^0.3.21",
     "argparse": "^2.0.1",
     "discord-api-types": "^0.37.65",
-    "discord-hybrid-sharding": "meister03/discord-hybrid-sharding",
+    "discord-hybrid-sharding": "^2.1.4",
     "discord.js": "^14.14.1",
     "fast-glob": "^3.2.11",
     "fastify": "^4.24.3",
