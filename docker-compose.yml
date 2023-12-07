@@ -40,12 +40,6 @@ services:
         source: settings.yaml
         target: /opt/sirubot/settings.yaml
     network_mode: host
-    depends_on:
-      - mariadb
-      - mongodb
-    links:
-      - mongodb
-      - mariadb
 
 # Volumes
 volumes:
