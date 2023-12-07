@@ -18,5 +18,10 @@
         "endOfLine": "auto"
       }
     ]
-  }
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "**/*.js"
+  ]
 }
