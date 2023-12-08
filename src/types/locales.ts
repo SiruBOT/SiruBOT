@@ -2,8 +2,8 @@ import { locales } from "@/locales";
 import { Locale } from "discord.js";
 
 export type STRING_KEYS =
-  | keyof typeof locales[Locale.Korean]
-  | keyof typeof locales["en"];
+  | keyof (typeof locales)[Locale.Korean]
+  | keyof (typeof locales)["en"];
 
 export type LocaleData = { [key in STRING_KEYS]: string };
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Constants, Node } from "shoukaku";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from "discord.js";
 
 import { BaseCommand, KafuuClient } from "@/structures";
 import {
@@ -41,7 +41,7 @@ export default class NodeInfoCommand extends BaseCommand {
         ko: "디버그",
       })
       .setDescription(
-        "Shows bot's debug info (Usally uses support identify errors)"
+        "Shows bot's debug info (Usally uses support identify errors)",
       )
       .setDescriptionLocalizations({
         ko: "봇의 디버그 정보를 보여드려요.",
@@ -52,7 +52,7 @@ export default class NodeInfoCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -61,7 +61,7 @@ export default class NodeInfoCommand extends BaseCommand {
   }: KafuuCommandContext): Promise<void> {
     const nodes: Node[] = [...this.client.audio.nodes.values()];
     const onlineNodes: Node[] = nodes.filter(
-      (v) => v.state === Constants.State.CONNECTED
+      (v) => v.state === Constants.State.CONNECTED,
     );
     const totalPlayers: number = onlineNodes
       .map((e) => e.stats!.players)
@@ -74,7 +74,7 @@ export default class NodeInfoCommand extends BaseCommand {
     nodeInfoEmbed.setTimestamp(new Date());
     nodeInfoEmbed.setDescription(
       `All nodes: **${nodes.length}** | Online nodes: **${onlineNodes.length}**\n` +
-        `Total players: **${totalPlayers}** | Total playing players: **${totalPlayingPlayers}**`
+        `Total players: **${totalPlayers}** | Total playing players: **${totalPlayingPlayers}**`,
     );
     nodeInfoEmbed.addFields(
       nodes.map((node) => {
@@ -88,26 +88,26 @@ export default class NodeInfoCommand extends BaseCommand {
                 `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
                 `Uptime: **${humanizeSeconds(
                   node?.stats?.uptime ?? 0,
-                  true
+                  true,
                 )}**\n` +
                 `Cores: **${cpuStats?.cores ?? "Not detected"}**\n` +
                 `Lavalink Load: **${this.formatLoad(
-                  cpuStats?.lavalinkLoad
+                  cpuStats?.lavalinkLoad,
                 )}%**\n` +
                 `System Load: **${this.formatLoad(cpuStats?.systemLoad)}%**\n` +
                 `Used Memory: **${niceBytes(
-                  node?.stats?.memory?.used ?? 0
+                  node?.stats?.memory?.used ?? 0,
                 )}**\n` +
                 `Free Memory: **${niceBytes(
-                  node?.stats?.memory?.free ?? 0
+                  node?.stats?.memory?.free ?? 0,
                 )}**\n` +
                 `Frames Sent: **${node?.stats?.frameStats?.sent ?? 0}**\n` +
                 `Frames Nulled: **${node?.stats?.frameStats?.nulled ?? 0}**\n` +
                 `Frames Deficit: **${node?.stats?.frameStats?.deficit ?? 0}**\n`
               : "",
-            inline: true
+          inline: true,
         };
-      })
+      }),
     );
     await interaction.reply({ embeds: [nodeInfoEmbed] });
   }

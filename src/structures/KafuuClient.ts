@@ -19,7 +19,7 @@ class KafuuClient extends Discord.Client {
   public settings: KafuuSettings;
   public bootStrapperArgs: KafuuBootStrapperArgs;
 
-  public cluster?: Cluster.Client;
+  public cluster?: Cluster.ClusterClient<this>;
   public log: Logger;
 
   public commands: Discord.Collection<string, BaseCommand>;
@@ -34,7 +34,7 @@ class KafuuClient extends Discord.Client {
     clientOptions: Discord.ClientOptions,
     log: Logger,
     botSettings: KafuuSettings,
-    bootStrapperArgs: KafuuBootStrapperArgs
+    bootStrapperArgs: KafuuBootStrapperArgs,
   ) {
     // Discord#ClientOptions
     super({
@@ -47,7 +47,7 @@ class KafuuClient extends Discord.Client {
               value: Discord.Message<boolean>,
               key: string,
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              _collection: Discord.Collection<string, Discord.Message<boolean>>
+              _collection: Discord.Collection<string, Discord.Message<boolean>>,
             ) => {
               return value.guildId
                 ? this.audio.dispatchers.get(value.guildId)?.audioMessage
@@ -88,7 +88,7 @@ class KafuuClient extends Discord.Client {
 
   // When unhandled event error, log it and send it to Sentry
   private warpEventFunc(
-    eventInstance: BaseEvent<keyof Discord.ClientEvents>
+    eventInstance: BaseEvent<keyof Discord.ClientEvents>,
   ): (
     ...args: Discord.ClientEvents[keyof Discord.ClientEvents]
   ) => Promise<void> {
@@ -102,7 +102,7 @@ class KafuuClient extends Discord.Client {
         this.log.error(err);
         Sentry.captureException(err);
         Sentry.captureException(
-          new Error("Unhandled event error from " + eventInstance.name)
+          new Error("Unhandled event error from " + eventInstance.name),
         );
       }
     };
@@ -111,7 +111,7 @@ class KafuuClient extends Discord.Client {
   private async loadEvents() {
     const eventsPattern: string = generateGlobPattern(
       joinPath(__dirname, "../"),
-      "events"
+      "events",
     );
     this.log.debug("Loading events with pattern: " + eventsPattern);
     const events: string[] = await FastGlob(eventsPattern);
@@ -136,7 +136,7 @@ class KafuuClient extends Discord.Client {
   private async loadCommands() {
     const commandsPattern: string = generateGlobPattern(
       joinPath(__dirname, "../"),
-      "commands"
+      "commands",
     );
 
     this.log.debug("Loading commands with pattern: " + commandsPattern);
@@ -150,12 +150,12 @@ class KafuuClient extends Discord.Client {
       // Command file validation
       if (!CommandClass.default)
         throw new Error(
-          "Command file is missing default export\n" + commandPath
+          "Command file is missing default export\n" + commandPath,
         );
       const commandInstance: BaseCommand = new CommandClass.default(this);
       if (!(commandInstance instanceof BaseCommand))
         throw new Error(
-          "Command file is not extends BaseCommand\n" + commandPath
+          "Command file is not extends BaseCommand\n" + commandPath,
         );
       this.commands.set(commandInstance.slashCommand.name, commandInstance);
     }

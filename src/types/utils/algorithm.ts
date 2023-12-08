@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 export function calculateLevenshteinDistance(a: string, b: string) {
   // Ensure a and b are valid strings
   if (typeof a !== "string" || typeof b !== "string") {
@@ -24,7 +25,7 @@ export function calculateLevenshteinDistance(a: string, b: string) {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1, // deletion
         matrix[i][j - 1] + 1, // insertion
-        matrix[i - 1][j - 1] + cost // substitution
+        matrix[i - 1][j - 1] + cost, // substitution
       );
     }
   }

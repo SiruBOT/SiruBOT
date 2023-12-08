@@ -5,7 +5,7 @@ import type { VoiceConnectedGuildMember } from "@/types/member";
 // Defining a class that extends ChatInputCommandInteraction
 // and takes a generic type parameter 'VoiceConnected'
 export class HandledCommandInteraction<
-  VoiceConnected extends boolean
+  VoiceConnected extends boolean,
 > extends ChatInputCommandInteraction<"cached"> {
   // Overriding the 'member' property of the base class
   // based on the generic type parameter 'VoiceConnected'

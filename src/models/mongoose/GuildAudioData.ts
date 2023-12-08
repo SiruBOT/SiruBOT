@@ -28,6 +28,6 @@ export default model<GuildAudioData>(
         default: [],
       },
     },
-    { timestamps: true }
-  )
+    { timestamps: true },
+  ),
 );

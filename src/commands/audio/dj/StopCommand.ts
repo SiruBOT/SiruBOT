@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from "discord.js";
 import { BaseCommand, KafuuClient } from "@/structures";
 import { PlayerDispatcher } from "@/structures/audio";
 import {
@@ -26,7 +26,7 @@ export default class StopCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.DJ],
       KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 

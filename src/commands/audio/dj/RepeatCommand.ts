@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from "discord.js";
 
 import { BaseCommand, KafuuClient } from "@/structures";
 import { TypeORMGuild } from "@/models/typeorm";
@@ -55,7 +55,7 @@ export default class RepeatCommand extends BaseCommand {
               name_localizations: {
                 ko: "한곡",
               },
-            }
+            },
           );
         return option;
       });
@@ -65,7 +65,7 @@ export default class RepeatCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.DJ],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -78,7 +78,7 @@ export default class RepeatCommand extends BaseCommand {
     if (!repeatMode || !userPermissions.includes(KafuuCommandPermission.DJ)) {
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
-          interaction.guildId
+          interaction.guildId,
         );
       await interaction.reply({
         content: format(
@@ -87,8 +87,8 @@ export default class RepeatCommand extends BaseCommand {
           EMOJI_REPEAT[guildConfig.repeat], // EMOJI_REPEAT => OFF: "EMOJI", RepeatModeString => (number like string): "OFF"
           format(
             interaction.locale,
-            ("REPEAT_" + guildConfig.repeat.toString()) as STRING_KEYS
-          )
+            ("REPEAT_" + guildConfig.repeat.toString()) as STRING_KEYS,
+          ),
         ),
       });
       return;
@@ -96,7 +96,7 @@ export default class RepeatCommand extends BaseCommand {
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(
           interaction.guildId,
-          { repeat: parseInt(repeatMode) }
+          { repeat: parseInt(repeatMode) },
         );
       await interaction.reply({
         content: format(
@@ -105,8 +105,8 @@ export default class RepeatCommand extends BaseCommand {
           EMOJI_REPEAT[guildConfig.repeat],
           format(
             interaction.locale,
-            ("REPEAT_" + guildConfig.repeat.toString()) as STRING_KEYS
-          )
+            ("REPEAT_" + guildConfig.repeat.toString()) as STRING_KEYS,
+          ),
         ),
       });
     }

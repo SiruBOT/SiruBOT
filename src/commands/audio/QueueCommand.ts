@@ -61,12 +61,12 @@ export default class QueueCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
   public override async onCommandInteraction(
-    context: KafuuCommandContext
+    context: KafuuCommandContext,
   ): Promise<void> {
     const { interaction } = context;
     const dispatcher: PlayerDispatcher =
@@ -120,7 +120,7 @@ export default class QueueCommand extends BaseCommand {
       return {
         embeds: [
           EmbedFactory.createEmbed().setTitle(
-            format(locale, "NOWPLAYING_NONE")
+            format(locale, "NOWPLAYING_NONE"),
           ),
         ],
         components: [
@@ -130,7 +130,7 @@ export default class QueueCommand extends BaseCommand {
                 this.getCustomId({
                   customId: "page_goto",
                   args: ["1"],
-                })
+                }),
               )
               .setEmoji(EMOJI_REFRESH)
               .setStyle(ButtonStyle.Secondary),
@@ -146,7 +146,7 @@ export default class QueueCommand extends BaseCommand {
       await this.client.databaseHelper.upsertAndFindGuild(guildId);
     const chunked: KafuuAudioTrack[][] = chunkArray(
       queue,
-      QUEUE_PAGE_CHUNK_SIZE
+      QUEUE_PAGE_CHUNK_SIZE,
     );
     let pageContent: string = chunked[page - 1]
       .map((track, index) => {
@@ -176,10 +176,10 @@ export default class QueueCommand extends BaseCommand {
               .reduce((prev, bTrack) => {
                 return prev + (bTrack.info.length ?? 0);
               }, 0),
-            true
+            true,
           ),
           page.toString(),
-          totalPages.toString()
+          totalPages.toString(),
         ),
       });
     const buttons = this.getActionRow({ total: totalPages, current: page });
@@ -190,11 +190,11 @@ export default class QueueCommand extends BaseCommand {
         } **${format(
           locale,
           ("PLAYING_STATE_" +
-            this.client.audio.playingState(guildId)) as STRING_KEYS
+            this.client.audio.playingState(guildId)) as STRING_KEYS,
         )}**`,
         `${EMOJI_REPEAT[guildConfig.repeat]} **${format(
           locale,
-          ("REPEAT_" + guildConfig.repeat) as STRING_KEYS
+          ("REPEAT_" + guildConfig.repeat) as STRING_KEYS,
         )}**`,
         `${volumeEmoji(guildConfig.volume)} **${guildConfig.volume}%**`,
       ];
@@ -207,7 +207,7 @@ export default class QueueCommand extends BaseCommand {
             nowPlaying.info.length
               ? humanizeSeconds(nowPlaying.info.length, true)
               : "N/A"
-          }]**`
+          }]**`,
         );
 
       const trackDisplay: string = formatTrack(nowPlaying, {
@@ -259,7 +259,7 @@ export default class QueueCommand extends BaseCommand {
             this.getCustomId({
               customId: "page_goto",
               args: [(current - 1).toString()],
-            })
+            }),
           )
           .setEmoji(EMOJI_PREV)
           .setStyle(ButtonStyle.Secondary)
@@ -268,7 +268,7 @@ export default class QueueCommand extends BaseCommand {
           .setCustomId(
             this.getCustomId({
               customId: "paginator_stop",
-            })
+            }),
           )
           .setEmoji(EMOJI_STOP)
           .setStyle(ButtonStyle.Secondary),
@@ -277,11 +277,11 @@ export default class QueueCommand extends BaseCommand {
             this.getCustomId({
               customId: "page_goto",
               args: [(current + 1).toString()],
-            })
+            }),
           )
           .setEmoji(EMOJI_NEXT)
           .setStyle(ButtonStyle.Secondary)
-          .setDisabled(current == total)
+          .setDisabled(current == total),
       );
       return actionRow;
     }

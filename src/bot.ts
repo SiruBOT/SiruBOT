@@ -2,7 +2,7 @@
 import "module-alias/register";
 // Import discord.js stuff
 import Discord, { GatewayIntentBits } from "discord.js";
-import Cluster from "discord-hybrid-sharding";
+import { ClusterClient, getInfo } from "discord-hybrid-sharding";
 
 // Import Sentry stuff
 import * as Sentry from "@sentry/node";
@@ -26,20 +26,18 @@ try {
 } catch {
   console.error(process.argv);
   throw new Error(
-    "Failed to parse process.argv[2] and process.argv[3] (Bot config and Bootstrapper args)"
+    "Failed to parse process.argv[2] and process.argv[3] (Bot config and Bootstrapper args)",
   );
 }
 
 // Setup logger
 const log: Logger = createLogger({
-  name: bootStrapperArgs.shard
-    ? `cluster-${Cluster.data.CLUSTER}`
-    : "standalone",
+  name: bootStrapperArgs.shard ? `cluster-${getInfo().CLUSTER}` : "standalone",
   shardInfo: bootStrapperArgs.shard
     ? {
-        clusterId: Cluster.data.CLUSTER,
-        shardIds: Cluster.data.SHARD_LIST,
-        totalShards: Cluster.data.TOTAL_SHARDS,
+        clusterId: getInfo().CLUSTER,
+        shardIds: getInfo().SHARD_LIST,
+        totalShards: getInfo().TOTAL_SHARDS,
       }
     : undefined,
   consoleLevel: bootStrapperArgs.debug ? "debug" : "info",
@@ -60,14 +58,14 @@ const clientOptions: Discord.ClientOptions = {
 
 if (bootStrapperArgs.shard) {
   log.debug(
-    "Sharding enabled. setup clientOptions.shards, clientOptions.shardCount"
+    "Sharding enabled. setup clientOptions.shards, clientOptions.shardCount",
   );
-  clientOptions.shards = Cluster.data.SHARD_LIST;
-  clientOptions.shardCount = Cluster.data.TOTAL_SHARDS;
+  clientOptions.shards = getInfo().SHARD_LIST;
+  clientOptions.shardCount = getInfo().TOTAL_SHARDS;
   log.info(
     `Sharding Info | shards: [ ${clientOptions.shards.join(
-      ", "
-    )} ], shardCount: ${clientOptions.shardCount}`
+      ", ",
+    )} ], shardCount: ${clientOptions.shardCount}`,
   );
 }
 
@@ -76,12 +74,12 @@ const client = new KafuuClient(
   clientOptions,
   log,
   argvSettings,
-  bootStrapperArgs
+  bootStrapperArgs,
 );
 
 if (bootStrapperArgs.shard) {
   log.debug("Sharding enabled. Set Client.cluster to Cluster.Client");
-  client.cluster = new Cluster.Client(client);
+  client.cluster = new ClusterClient(client);
 }
 
 if (argvSettings?.sentryDsn && isURL(argvSettings.sentryDsn as string)) {
@@ -114,7 +112,7 @@ const uncaughtException = (err: Error): void => {
 
 const unhandledRejection = (
   _reason: string,
-  promise: Promise<unknown>
+  promise: Promise<unknown>,
 ): void => {
   promise.catch((reason) => {
     Sentry.captureException(reason);
@@ -132,7 +130,7 @@ client
   .catch((err) => {
     log.error(
       "Failed to start the bot. for more information, start with -d(ebug) option",
-      err
+      err,
     );
     process.exit(2);
   });

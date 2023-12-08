@@ -37,7 +37,7 @@ export default class RemoveCommand extends BaseCommand {
           })
           .setMinValue(1)
           .setAutocomplete(true)
-          .setRequired(true)
+          .setRequired(true),
       );
     super(
       slashCommand,
@@ -46,7 +46,7 @@ export default class RemoveCommand extends BaseCommand {
       // Remove command for everyone, but only dj remove other's track
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
   public override async onCommandInteraction({
@@ -54,7 +54,7 @@ export default class RemoveCommand extends BaseCommand {
     userPermissions,
   }: KafuuCommandContext<false>): Promise<void> {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(
-      interaction.guildId
+      interaction.guildId,
     );
 
     const position = interaction.options.getInteger("position", true);
@@ -64,7 +64,7 @@ export default class RemoveCommand extends BaseCommand {
         content: format(
           interaction.locale,
           "REMOVE_INVALID",
-          position.toString()
+          position.toString(),
         ),
       });
       return;
@@ -90,19 +90,19 @@ export default class RemoveCommand extends BaseCommand {
         formatTrack(removedTrack, {
           showLength: true,
           withMarkdownURL: false,
-        })
+        }),
       ),
     });
   }
 
   public override async onAutocompleteInteraction(
-    interaction: AutocompleteInteraction
+    interaction: AutocompleteInteraction,
   ): Promise<void> {
     // 길드에서만 사용 가능
     if (!interaction.inGuild()) return;
     // dispatcher 를 가져옴
     const dispatcher = await this.client.audio.getPlayerDispatcher(
-      interaction.guildId
+      interaction.guildId,
     );
     // position 을 가져옴
     const position = interaction.options.getInteger("position", false);
@@ -127,14 +127,14 @@ export default class RemoveCommand extends BaseCommand {
             formatTrack(e, {
               streamString: format(interaction.locale, "LIVESTREAM"),
               showLength: true,
-            })
+            }),
         )
         .map((e, index): ApplicationCommandOptionChoiceData => {
           return {
             name: e.slice(0, 99), // 100자 초과 방지
             value: start + index,
           };
-        })
+        }),
     );
     return;
   }

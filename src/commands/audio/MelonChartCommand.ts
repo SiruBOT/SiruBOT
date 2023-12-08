@@ -1,4 +1,5 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { SlashCommandBuilder } from "discord.js";
 import { BaseCommand, KafuuClient } from "@/structures";
 import {
   KafuuCommandCategory,
@@ -35,7 +36,7 @@ export default class LyricsCommand extends BaseCommand {
           })
           .setDescriptionLocalizations({
             ko: "실시간 멜론차트 순위를 보여드려요!",
-          })
+          }),
       )
       .addSubcommand((subcommand) =>
         subcommand
@@ -54,8 +55,8 @@ export default class LyricsCommand extends BaseCommand {
               .setDescription("Date of daliy chart")
               .setDescriptionLocalizations({
                 ko: "일간 차트의 기준 날짜에요. (년도/월/일) 형식이나, (년도/월), (월/일), (일) 형식으로 입력해주세요.",
-              })
-          )
+              }),
+          ),
       );
     super(
       slashCommand,
@@ -63,7 +64,7 @@ export default class LyricsCommand extends BaseCommand {
       KafuuCommandCategory.MUSIC,
       [KafuuCommandPermission.EVERYONE],
       KafuuCommandFlags.NOTHING,
-      ["SendMessages"]
+      ["SendMessages"],
     );
   }
 
@@ -107,7 +108,7 @@ export default class LyricsCommand extends BaseCommand {
 
   private async getChartEmbed(
     { data, dates }: MelonChart,
-    locale: Locale
+    locale: Locale,
   ): Promise<ExtendedEmbed> {
     const embed = new ExtendedEmbed();
 
@@ -116,10 +117,10 @@ export default class LyricsCommand extends BaseCommand {
       return embed;
     }
     await embed.setThumbnailAndColor(
-      (data.at(0) as MelonChartTrackInfo).albumCover
+      (data.at(0) as MelonChartTrackInfo).albumCover,
     );
     embed.setTitle(
-      format(locale, "MELON_CHART_TITLE", melonDateToString(dates, locale))
+      format(locale, "MELON_CHART_TITLE", melonDateToString(dates, locale)),
     );
     const pages = chunkArray(data, PAGE_CHUNK_SIZE);
     pages.map((page, index) => {
@@ -128,30 +129,37 @@ export default class LyricsCommand extends BaseCommand {
         page
           .map(
             (track) =>
-              `#${track.rank} [${track.title}](https://www.melon.com/song/detail.htm?songId=${track.songId}) - ${track.artist}`
+              `#${track.rank} [${track.title}](https://www.melon.com/song/detail.htm?songId=${track.songId}) - ${track.artist}`,
           )
-          .join("\n")
+          .join("\n"),
       );
     });
     return embed;
   }
 
   validateInput(date: string) {
+    // eslint-disable-next-line security/detect-unsafe-regex
     const dateRegex = /^(\d{4})\/?(\d{2})\/?(\d{2})?$/;
+    // eslint-disable-next-line security/detect-unsafe-regex
     const yearMonthRegex = /^(\d{4})\/?(\d{2})?$/;
+    // eslint-disable-next-line security/detect-unsafe-regex
     const monthDayRegex = /^(\d{2})\/?(\d{2})?$/;
     const dayRegex = /^(\d{2})$/;
 
     if (dateRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, year, month, day] = date.match(dateRegex)!;
       return { year, month, day };
     } else if (yearMonthRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, year, month] = date.match(yearMonthRegex)!;
       return { year, month };
     } else if (monthDayRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, month, day] = date.match(monthDayRegex)!;
       return { month, day };
     } else if (dayRegex.test(date)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [_, day] = date.match(dayRegex)!;
       return { day };
     } else {

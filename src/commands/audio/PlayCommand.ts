@@ -1,9 +1,8 @@
-// Import Sentry, discord.js, undici, shoukaku, @discordjs/builders
+// Import Sentry, discord.js, undici, shoukaku
 import * as Discord from "discord.js";
 import * as Sentry from "@sentry/node";
 import { fetch } from "undici";
 import { LavalinkResponse, Track } from "shoukaku";
-import { SlashCommandBuilder } from "@discordjs/builders";
 // Import structures
 import { BaseCommand, KafuuClient } from "@/structures";
 import { PlayerDispatcher } from "@/structures/audio";
@@ -46,7 +45,7 @@ type CacheItem = {
 export default class PlayCommand extends BaseCommand {
   private playlistCache: Map<string, CacheItem>;
   constructor(client: KafuuClient) {
-    const slashCommand = new SlashCommandBuilder()
+    const slashCommand = new Discord.SlashCommandBuilder()
       .setName("play")
       .setNameLocalizations({
         ko: "재생",
@@ -66,7 +65,7 @@ export default class PlayCommand extends BaseCommand {
             ko: "재생할 노래의 제목이나 URL을 입력해주세요.",
           })
           .setAutocomplete(true)
-          .setRequired(true)
+          .setRequired(true),
       )
       .addBooleanOption((option) =>
         option
@@ -78,7 +77,7 @@ export default class PlayCommand extends BaseCommand {
           .setDescriptionLocalizations({
             ko: "검색을 유튜브가 아닌 사운드클라우드에서 해요.",
           })
-          .setRequired(false)
+          .setRequired(false),
       );
     super(
       slashCommand,
@@ -89,7 +88,7 @@ export default class PlayCommand extends BaseCommand {
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
         KafuuCommandFlags.LISTEN_STATUS |
         KafuuCommandFlags.VOICE_CONNECTED,
-      ["SendMessages", "Connect", "Speak", "EmbedLinks"]
+      ["SendMessages", "Connect", "Speak", "EmbedLinks"],
     );
     // Youtube playlist result cache.
     this.playlistCache = new Map<string, CacheItem>();
@@ -124,7 +123,7 @@ export default class PlayCommand extends BaseCommand {
         // Handle joinChannel exception
         const exceptionId: string = Sentry.captureException(error);
         await interaction.editReply(
-          format(interaction.locale, "FAILED_JOIN", exceptionId)
+          format(interaction.locale, "FAILED_JOIN", exceptionId),
         );
       }
     }
@@ -137,7 +136,7 @@ export default class PlayCommand extends BaseCommand {
     if (!node) throw new Error("Ideal node not found");
     const soundCloud = interaction.options.getBoolean("soundcloud", false);
     const searchResult = await node.rest.resolve(
-      isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query
+      isURL(query) ? query : (soundCloud ? "scsearch:" : "ytsearch:") + query,
     );
     if (!searchResult) throw new Error("Search result not found");
     // Search result
@@ -162,7 +161,7 @@ export default class PlayCommand extends BaseCommand {
               "PLAYLIST_ADD",
               searchResult.playlistInfo?.name ??
                 format(interaction.locale, "UNKNOWN"),
-              searchResult.tracks.length.toString()
+              searchResult.tracks.length.toString(),
             ),
           });
           await dispatcher.addTracks(
@@ -173,7 +172,7 @@ export default class PlayCommand extends BaseCommand {
                 relatedTrack: false,
                 repeated: false,
               };
-            })
+            }),
           );
         } else {
           // Handles videoId with playlistId
@@ -189,14 +188,14 @@ export default class PlayCommand extends BaseCommand {
           const enQueueState: string =
             this.willPlayingOrEnqueued(
               guildAudioData.nowPlaying,
-              guildAudioData.queue.length
+              guildAudioData.queue.length,
             ) === "WILL_PLAYING"
               ? format(
                   interaction.locale,
                   "WILL_PLAYING",
                   formatTrack(track, {
                     streamString: format(interaction.locale, "LIVESTREAM"),
-                  })
+                  }),
                 )
               : format(
                   interaction.locale,
@@ -204,7 +203,7 @@ export default class PlayCommand extends BaseCommand {
                   formatTrack(track, {
                     streamString: format(interaction.locale, "LIVESTREAM"),
                   }),
-                  (guildAudioData.queue.length + 1).toString()
+                  (guildAudioData.queue.length + 1).toString(),
                 );
           // Create ActionRow
           const actionRow: Discord.ActionRowBuilder<Discord.ButtonBuilder> =
@@ -215,7 +214,7 @@ export default class PlayCommand extends BaseCommand {
                     customId: okButtonCustomId,
                     executorId: interaction.user.id,
                     args: [trackCacheKey],
-                  })
+                  }),
                 )
                 .setEmoji(EMOJI_INBOX_TRAY)
                 .setStyle(Discord.ButtonStyle.Secondary),
@@ -224,10 +223,10 @@ export default class PlayCommand extends BaseCommand {
                   this.getCustomId({
                     customId: noButtonCustomId,
                     executorId: interaction.user.id,
-                  })
+                  }),
                 )
                 .setEmoji(EMOJI_X)
-                .setStyle(Discord.ButtonStyle.Secondary)
+                .setStyle(Discord.ButtonStyle.Secondary),
             );
           // Question message
           const promptMsg = await interaction.editReply({
@@ -240,8 +239,8 @@ export default class PlayCommand extends BaseCommand {
                   format(
                     interaction.locale,
                     "INCLUDES_PLAYLIST",
-                    leftTracks.toString()
-                  )
+                    leftTracks.toString(),
+                  ),
                 )
                 .setTrackThumbnail(track),
             ],
@@ -250,7 +249,7 @@ export default class PlayCommand extends BaseCommand {
           const timeoutId = setTimeout(() => {
             this.client.log.debug(
               "Prompt interaction menu deleted, interaction timeout @ " +
-                interaction.id
+                interaction.id,
             );
             this.playlistCache.delete(trackCacheKey);
             if (promptMsg.editable)
@@ -280,16 +279,16 @@ export default class PlayCommand extends BaseCommand {
         const trackEmbed: ExtendedEmbed = await EmbedFactory.getTrackEmbed(
           this.client,
           getReusableFormatFunction(interaction.locale),
-          addTo
+          addTo,
         );
         await interaction.editReply({
           content: format(
             interaction.locale,
             (this.willPlayingOrEnqueued(
               guildAudioData.nowPlaying,
-              guildAudioData.queue.length
+              guildAudioData.queue.length,
             ) + "_TITLE") as STRING_KEYS,
-            (guildAudioData.queue.length + 1).toString()
+            (guildAudioData.queue.length + 1).toString(),
           ),
           embeds: [trackEmbed],
         });
@@ -300,7 +299,7 @@ export default class PlayCommand extends BaseCommand {
 
   private willPlayingOrEnqueued(
     nowplaying: KafuuAudioTrack | null,
-    queueLength: number
+    queueLength: number,
   ): string {
     const localeKey: string =
       !nowplaying && queueLength === 0 ? "WILL_PLAYING" : "ENQUEUED_TRACK";
@@ -308,7 +307,7 @@ export default class PlayCommand extends BaseCommand {
   }
 
   public override async onButtonInteraction(
-    context: KafuuButtonContext
+    context: KafuuButtonContext,
   ): Promise<void> {
     const { interaction, customInfo } = context;
     if (!interaction.guildId) return;
@@ -333,10 +332,10 @@ export default class PlayCommand extends BaseCommand {
         // Slice tracks after selected track position
         const slicedPlaylist: Track[] = cachedResult.searchResult.tracks.slice(
           cachedResult.searchResult.playlistInfo.selectedTrack ?? 0, // Array starts 0
-          cachedResult.searchResult.tracks.length
+          cachedResult.searchResult.tracks.length,
         );
         const dispatcher = this.client.audio.dispatchers.get(
-          interaction.guildId
+          interaction.guildId,
         );
         if (!dispatcher) {
           await interaction.update({
@@ -357,8 +356,8 @@ export default class PlayCommand extends BaseCommand {
                   "PLAYLIST_ADDED_NOEMOJI",
                   cachedResult.searchResult.playlistInfo?.name ??
                     format(interaction.locale, "UNKNOWN"),
-                  slicedPlaylist.length.toString()
-                )
+                  slicedPlaylist.length.toString(),
+                ),
               )
               .setTrackThumbnail(cachedResult.searchResult.tracks[0]),
           ],
@@ -372,7 +371,7 @@ export default class PlayCommand extends BaseCommand {
               relatedTrack: false,
               repeated: false,
             };
-          })
+          }),
         );
         break;
       case noButtonCustomId:
@@ -384,7 +383,7 @@ export default class PlayCommand extends BaseCommand {
   }
 
   public override async onAutocompleteInteraction(
-    interaction: Discord.AutocompleteInteraction<Discord.CacheType>
+    interaction: Discord.AutocompleteInteraction<Discord.CacheType>,
   ): Promise<void> {
     const soundCloud = interaction.options.getBoolean("soundcloud", false);
     const query: string | null = interaction.options.getString("query");
@@ -415,7 +414,7 @@ export default class PlayCommand extends BaseCommand {
           headers: {
             "Content-Type": "text/plain; charset=UTF-8",
           },
-        }
+        },
       ).then((res) => res.json())) as YTSuggestResponse;
 
       if (!ytAutocomplete?.[1]) {
@@ -431,7 +430,7 @@ export default class PlayCommand extends BaseCommand {
               value: name.length > 100 ? name.slice(0, 90) + "..." : name,
             };
           })
-          .slice(0, AUTOCOMPLETE_MAX_RESULT)
+          .slice(0, AUTOCOMPLETE_MAX_RESULT),
       );
       return;
     } else {
@@ -458,7 +457,7 @@ export default class PlayCommand extends BaseCommand {
               value: v.info.uri ?? query.slice(0, 100),
             };
           })
-          .slice(0, AUTOCOMPLETE_MAX_RESULT)
+          .slice(0, AUTOCOMPLETE_MAX_RESULT),
       );
       return;
     }

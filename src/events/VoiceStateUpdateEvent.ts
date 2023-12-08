@@ -9,10 +9,7 @@ export default class VoiceStateUpdateEvent extends BaseEvent<typeof eventName> {
     super(client, eventName);
   }
 
-  public override async run(
-    oldState: VoiceState,
-    newState: VoiceState
-  ): Promise<void> {
+  public override async run(oldState: VoiceState): Promise<void> {
     if (oldState.member?.id !== this.client.user?.id) return;
     if (!oldState.channelId) return;
     // if (oldState.channelId !== newState.channelId) {

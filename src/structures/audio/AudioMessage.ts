@@ -18,7 +18,7 @@ export class AudioMessage {
     client: KafuuClient,
     guildId: string,
     channelId: string,
-    log: Logger
+    log: Logger,
   ) {
     this.client = client;
     this.guildId = guildId;
@@ -31,12 +31,12 @@ export class AudioMessage {
   public async format(key: STRING_KEYS, ...args: string[]): Promise<string> {
     if (!this.cachedFormatFunction) {
       this.log.debug(
-        `Get reusable format function (for reduce db query) ${this.guildId}`
+        `Get reusable format function (for reduce db query) ${this.guildId}`,
       );
       const guildConfig: TypeORMGuild =
         await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
       this.cachedFormatFunction = getReusableFormatFunction(
-        guildConfig.guildLocale
+        guildConfig.guildLocale,
       );
     }
     return this.cachedFormatFunction(key, ...args);
@@ -51,7 +51,7 @@ export class AudioMessage {
       return;
     }
     const targetChannel: Channel | null = await this.fetchChannel(
-      textChannelId ?? this.channelId
+      textChannelId ?? this.channelId,
     );
     if (!targetChannel || !targetChannel.isTextBased()) {
       this.log.warn(`Target channel not found ${this.channelId}`);
@@ -72,14 +72,14 @@ export class AudioMessage {
         this.log.debug(
           `Trying to edit message ${targetChannel.id}#${
             lastMessage?.id ?? "Unknown"
-          }...`
+          }...`,
         );
         await lastMessage.edit(options);
       } catch (e) {
         this.log.debug(
           `Failed to edit message ${targetChannel.id}#${
             lastMessage?.id ?? "Unknown"
-          } trying to send message`
+          } trying to send message`,
         );
         const lastMsg: Message = await targetChannel.send(options);
         this.lastMessageId = lastMsg.id;
@@ -93,7 +93,7 @@ export class AudioMessage {
           `Failed to delete message ${targetChannel.id}#${
             this.lastMessageId ?? "Unknown"
           } is message is deleted?`,
-          e
+          e,
         );
         Sentry.captureException(e);
       }
@@ -141,7 +141,7 @@ export class AudioMessage {
     } catch (e) {
       this.log.error(
         `Failed to fetch channel (${channelId}), is channel is deleted?`,
-        e
+        e,
       );
       Sentry.captureException(e);
       return null;

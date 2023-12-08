@@ -61,7 +61,7 @@ export class ExtendedEmbed extends EmbedBuilder {
 
   private _setTrackImage(
     track: Track,
-    setMethod: (url: string | null) => this
+    setMethod: (url: string | null) => this,
   ): this {
     setMethod.call(this, this.getTrackImage(track));
     return this;
@@ -88,7 +88,7 @@ export class EmbedFactory {
   public static async getTrackEmbed(
     client: KafuuClient,
     format: ReusableFormatFunc,
-    track: KafuuAudioTrack
+    track: KafuuAudioTrack,
   ): Promise<ExtendedEmbed> {
     const embed: ExtendedEmbed = EmbedFactory.createEmbed();
     if (!track.relatedTrack) {
@@ -114,7 +114,7 @@ export class EmbedFactory {
       .setDescription(
         `[${formatTrack(track, { streamString: format("LIVESTREAM") })}](${
           track.info.uri
-        })`
+        })`,
       )
       .setTrackThumbnail(track);
     return embed;
@@ -126,7 +126,7 @@ export class EmbedFactory {
     nowplaying: GuildAudioData["nowPlaying"],
     position: number | null,
     remainTracks?: number,
-    remainTimes?: number
+    remainTimes?: number,
   ): Promise<ExtendedEmbed> {
     if (!nowplaying) {
       return this.createEmbed().setTitle(format("NOWPLAYING_NONE"));
@@ -140,20 +140,20 @@ export class EmbedFactory {
       const trackEmbed: ExtendedEmbed = await this.getTrackEmbed(
         client,
         format,
-        nowplaying
+        nowplaying,
       );
       const formattedTrack = `**${formatTrack(nowplaying, {
         streamString: format("LIVESTREAM"),
         showLength: false,
       })}**`;
       const progressBar: string = emojiProgressBar(
-        currentPosition / trackLength
+        currentPosition / trackLength,
       );
       const urlLinkTitle: string = nowplaying.info.uri
         ? `[${formattedTrack}](${nowplaying.info.uri})`
         : formattedTrack;
       trackEmbed.setDescription(
-        `${urlLinkTitle}\n${readablePosition}  ${progressBar}  ${readableTrackLength}`
+        `${urlLinkTitle}\n${readablePosition}  ${progressBar}  ${readableTrackLength}`,
       );
       const footerItems: string[] = [];
       if (nowplaying.info.author) {
@@ -167,8 +167,8 @@ export class EmbedFactory {
           format(
             "REMAIN_TRACKS",
             remainTracks.toString(),
-            humanizeSeconds(remainTimes, true)
-          )
+            humanizeSeconds(remainTimes, true),
+          ),
         );
       }
       trackEmbed.setFooter({ text: footerItems.join(" | ") });
