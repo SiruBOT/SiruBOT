@@ -1,13 +1,9 @@
-import type { NodeStats } from "shoukaku";
+import type { NodeInfo, NodeStats } from "shoukaku";
 
-export interface AudioNodeStats {
-  name: string;
-  players: number;
-  usageByDispatchers: number;
-  state: string;
-  reconnects: number;
+export type AudioNodeStats = {
   stats: NodeStats | null;
-}
+  info: NodeInfo | null;
+};
 
 export interface ClientStats {
   shardIds: number[];

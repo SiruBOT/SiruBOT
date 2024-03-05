@@ -15,7 +15,6 @@ import {
 
 import { getGitHash } from "@/utils/version";
 import { version } from "../../package.json";
-import { decode } from "@sirubot/lavalink-encoding";
 
 const versionInfo = `${version} (${getGitHash()})`;
 
@@ -47,16 +46,24 @@ export class ExtendedEmbed extends EmbedBuilder {
     return this._setTrackImage(track, this.setImage);
   }
 
-  public getTrackImage({ info, track }: Track): string | null {
-    switch (true) {
-      case info.sourceName == "youtube" && !!info.identifier:
-        return `https://i3.ytimg.com/vi/${info.identifier}/maxresdefault.jpg`;
-      case info.sourceName == "spotify":
-        const { spotifyInfo } = decode(track);
-        return !spotifyInfo?.thumbnail ? null : spotifyInfo.thumbnail;
-      default:
-        return null;
-    }
+  public getTrackImage({ info }: Track): string | null {
+    return info.artworkUrl ?? null;
+    // switch (true) {
+    //   case info.sourceName == "youtube" && !!info.identifier:
+    //     return info.artworkUrl ?? null;
+    //   case info.sourceName == "spotify":
+    //     const spotifyInfo = pluginInfo as {
+    //       albumName: string;
+    //       artistArtworkUrl: string;
+    //       albumUrl: string;
+    //       artistUrl: string;
+    //       previewUrl: string;
+    //       isPreview: boolean;
+    //     };
+    //     return spotifyInfo?.albumUrl || spotifyInfo?.artistArtworkUrl || null;
+    //   default:
+    //     return null;
+    // }
   }
 
   private _setTrackImage(

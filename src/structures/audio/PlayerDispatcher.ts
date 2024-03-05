@@ -40,7 +40,7 @@ export class PlayerDispatcher {
   ) {
     this.client = client;
     this.player = player;
-    this.guildId = this.player.connection.guildId;
+    this.guildId = this.player.guildId;
     this.log = this.client.log.getChildLogger({
       name:
         this.client.log.settings.name +
@@ -82,8 +82,8 @@ export class PlayerDispatcher {
           "Websocket closed, disconncted from user, (friendlyErrorCode) " +
             reasonString,
         );
-        this.destroy();
-        await this.audioMessage.sendDisconnectedMessage();
+        // await this.destroy();
+        // await this.audioMessage.sendDisconnectedMessage();
         break;
       case resumeErrorCode:
         this.log.warn(
@@ -92,7 +92,7 @@ export class PlayerDispatcher {
         break;
       default:
         this.log.warn("Websocket closed, unknown reason, " + reasonString);
-        this.destroy();
+        await this.destroy();
         Sentry.captureEvent({
           message:
             "Unknown websocket closed event. " +
@@ -136,7 +136,7 @@ export class PlayerDispatcher {
       trackEndEvent.reason || "No reason",
     );
     switch (trackEndEvent.reason) {
-      case "FINISHED":
+      case "finished":
         try {
           const guildConfig: TypeORMGuild =
             await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
@@ -153,14 +153,14 @@ export class PlayerDispatcher {
           this.handleError();
         }
         break;
-      case "REPLACED":
+      case "replaced":
         this.log.debug("Track replaced, ignore end event.");
         break;
-      case "CLEANUP":
+      case "cleanup":
         this.log.debug(`Cleanup received, clean dispatcher.`);
-        this.destroy();
+        await this.destroy();
         break;
-      case "LOAD_FAILED":
+      case "loadFailed":
         this.log.warn("Track load failed, skip track.");
         // Something message send
         await this.skipTrack();
@@ -393,13 +393,15 @@ export class PlayerDispatcher {
     await this.audioMessage.sendRaw(playingMessage);
     await this.queue.setNowPlaying(trackToPlay);
     this.setVolumePercent(volume);
-    return this.player.playTrack({
-      track: trackToPlay.track,
+    await this.player.playTrack({
+      track: trackToPlay.encoded,
       options: {
         startTime: position,
         noReplace: false,
       },
     });
+
+    return this.player;
   }
 
   @BreakOnDestroyed()
@@ -416,9 +418,8 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   public setVolumePercent(val: number): number {
-    const calc = val / 100;
-    this.log.debug(`Set player's volume to ${val}% (${calc})`);
-    this.player.setVolume(calc);
+    this.log.debug(`Set player ${this.guildId}'s volume to ${val}%`);
+    this.player.setFilterVolume(val / 1000);
     return val;
   }
 
@@ -432,7 +433,7 @@ export class PlayerDispatcher {
   @BreakOnDestroyed()
   public async cleanStop() {
     this.log.debug(`Clean queue & destroy dispatcher`);
-    this.destroy();
+    await this.destroy();
     await this.queue.cleanQueue();
   }
 
@@ -446,11 +447,12 @@ export class PlayerDispatcher {
     return this._destroyed;
   }
 
-  public destroy() {
+  public async destroy() {
     this.log.debug(`Destroy PlayerDispatcher.`);
     this._destroyed = true;
     this.playedYoutubeTracks = [];
+    await this.player.stopTrack();
+    await this.client.audio.leaveVoiceChannel(this.guildId);
     this.client.audio.deletePlayerDispatcher(this.guildId);
-    this.player.connection.disconnect();
   }
 }

@@ -21,6 +21,10 @@ import {
 } from "@/constants/utils/formatter";
 import { KafuuMessageComponentCustomIdOptions } from "@/types/command";
 import { Locale } from "discord.js";
+import dayjs_ from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import duration from "dayjs/plugin/duration";
 
 /**
  * Convert seconds to readble format (like 00:00:00)
@@ -36,6 +40,11 @@ export function humanizeSeconds(sec: number, ms?: boolean): string {
     .filter((v, i) => v !== "00" || i > 0) // Remove leading zeros from the first value
     .join(":"); // Join the values with colon
 }
+
+dayjs_.extend(utc);
+dayjs_.extend(timezone);
+dayjs_.extend(duration);
+export const dayjs = dayjs_;
 
 /**
  * Return emoji for volume (mute, small, loud)
@@ -76,13 +85,15 @@ export function formatTrack(
     withMarkdownURL: false,
     ...options,
   };
-  return (
-    (!withMarkdownURL
-      ? `${title.trim() ?? "No title"}` // If withMarkdownURL is false, format track string without markdown URL
-      : // If track uri length is greater than MAX_TRACK_URL_LENGTH, return not formatted track title
-        track.info.uri.length > MAX_TRACK_URL_LENGTH
+  let str = "";
+  if (!withMarkdownURL) str = `${title.trim() ?? "No title"}`;
+  else if (track.info.uri?.length)
+    str =
+      track.info.uri.length > MAX_TRACK_URL_LENGTH
         ? `${title.trim() ?? "No title"}`
-        : `[${title.trim() ?? "No title"}](${track.info.uri})`) +
+        : `[${title.trim() ?? "No title"}](${track.info.uri})`;
+  return (
+    str +
     // If showLength is true, add length in parentheses
     `${
       showLength

@@ -8,6 +8,6 @@ export default class GuildDeleteEvent extends BaseEvent<typeof eventName> {
 
   public override async run(guild: Guild): Promise<void> {
     this.client.log.debug(`Guild deleted. Clear audio @ ${guild.id}`);
-    this.client.audio.dispatchers.get(guild.id)?.destroy();
+    await this.client.audio.dispatchers.get(guild.id)?.destroy();
   }
 }

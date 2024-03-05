@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { Shoukaku, Connectors } from "shoukaku";
+import { Shoukaku, Connectors, Constants, LoadType } from "shoukaku";
 import { Logger } from "tslog";
 
 import {
@@ -35,12 +35,10 @@ export class AudioHandler extends Shoukaku {
   constructor(client: KafuuClient) {
     const devOptions = {
       resumeTimeout: 60000,
-      moveOnDisconnect: true,
+      // moveOnDisconnect: true,
       reconnectTries: 10,
-      resume: true,
-      resumeByLibrary: true,
-      resumeKey: `resumeKey-${client.user?.id}`,
-      alwaysSendResumeKey: true,
+      // resume: true,
+      // resumeByLibrary: true,
     };
     super(
       new Connectors.DiscordJS(client),
@@ -101,17 +99,14 @@ export class AudioHandler extends Shoukaku {
   public async joinChannel(
     joinOptions: KafuuJoinOptions,
   ): Promise<PlayerDispatcher> {
-    const idealNode = this.getNode();
-    if (!idealNode) throw new Error("Ideal node not found");
-    this.log.info(
-      `Join channel #${joinOptions.channelId} with Node ${idealNode.name}`,
-    );
-    const shoukakuPlayer = await idealNode.joinChannel(joinOptions);
+    this.log.info(`Join channel #${joinOptions.channelId}`);
+    const shoukakuPlayer = await this.joinVoiceChannel(joinOptions);
     const dispatcher =
       await this.playerDispatcherFactory.createPlayerDispatcher(
         shoukakuPlayer,
         joinOptions,
       );
+
     this.addPlayerDispatcher(joinOptions.guildId, dispatcher);
     await dispatcher.playOrResumeOrNothing();
     return dispatcher;
@@ -250,16 +245,28 @@ export class AudioHandler extends Shoukaku {
     return sorted;
   }
 
+  public getNode() {
+    return [...this.nodes.values()]
+      .filter((node) => node.state === Constants.State.CONNECTED)
+      .sort((a, b) => a.penalties - b.penalties)
+      .shift();
+  }
+
   public async fetchRelated(videoId: string): Promise<KafuuAudioTrack | null> {
-    const idealNode = this.getNode();
-    if (!idealNode) throw new Error("Ideal node not found");
-    const searchResult = await idealNode.rest.resolve(videoId);
+    const searchResult = await this.getNode()?.rest.resolve(videoId);
+
     if (
       !searchResult ||
-      ["LOAD_FAILED", "NO_MATCHES"].includes(searchResult?.loadType)
+      searchResult.loadType == LoadType.ERROR ||
+      searchResult.loadType == LoadType.EMPTY
     )
       return null;
-    const track = searchResult.tracks.at(0);
+    const track =
+      searchResult.loadType == LoadType.TRACK
+        ? searchResult.data
+        : searchResult.loadType == LoadType.PLAYLIST
+          ? searchResult.data.tracks[0]
+          : searchResult.data[0];
     if (!track) return null;
     return {
       requestUserId: this.client.isReady() ? this.client.user.id : "",
@@ -279,22 +286,23 @@ export class AudioHandler extends Shoukaku {
         this.log.info("Resuming players...");
       }
     });
+
     this.on("error", (name, error) => {
       this.log.error(error);
       Sentry.captureException(error, { tags: { node: name } });
     });
+
     this.on("close", (name, code, reason) =>
       this.log.info(
         `Lavalink Node: ${name} closed with code ${code}`,
         reason || "No reason",
       ),
     );
-    this.on("disconnect", (name, _players, moved) =>
-      this.log.info(
-        `Lavalink Node: ${name} disconnected`,
-        moved ? "players have been moved" : "players have been disconnected",
-      ),
+
+    this.on("disconnect", (name) =>
+      this.log.info(`Lavalink Node: ${name} disconnected`),
     );
+
     this.on("debug", (name, reason) =>
       this.log.debug(`Lavalink Node: ${name}`, reason || "No reason"),
     );

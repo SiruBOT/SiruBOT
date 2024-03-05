@@ -173,17 +173,8 @@ class KafuuClient extends Discord.Client {
         audioDispatchers: this.audio.dispatchers.size,
         audioNodes: [...this.audio.nodes.values()].map((e) => {
           return {
-            name: e.name,
-            players: e.players.size,
-            usageByDispatchers:
-              this.audio.dispatchers.size > 0
-                ? (e.players.size / this.audio.dispatchers.size) * 100
-                : 0,
-            state: ["CONNECTING", "CONNECTED", "DISCONNECTING", "DISCONNECTED"][
-              e.state
-            ],
-            reconnects: e.reconnects,
             stats: e.stats,
+            info: e.info,
           };
         }),
       },

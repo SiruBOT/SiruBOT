@@ -9,7 +9,6 @@ import {
 } from "@/types/command";
 import { format } from "@/locales";
 import { humanizeSeconds } from "@/utils/formatter";
-import { decode, TrackInfo } from "@sirubot/lavalink-encoding";
 import { COMMAND_WARN_MESSAGE_EPHEMERAL } from "@/constants/events/InteractionCreateEvent";
 
 export default class SeekCommand extends BaseCommand {
@@ -55,8 +54,12 @@ export default class SeekCommand extends BaseCommand {
     const dispatcher = this.client.audio.getPlayerDispatcherOrfail(
       interaction.guildId,
     );
-    const decodedTrack: TrackInfo = decode(dispatcher.player.track as string);
-    if (decodedTrack.isStream) {
+    const nowplaying = await dispatcher.queue.getNowPlaying();
+    if (!nowplaying) {
+      return;
+    }
+
+    if (nowplaying?.info.isStream || !nowplaying?.info.isSeekable) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
         content: format(interaction.locale, "SEEK_LIVESTREAM"),
@@ -90,7 +93,7 @@ export default class SeekCommand extends BaseCommand {
         ? dispatcher.player.position + seekTo
         : dispatcher.player.position - seekTo;
 
-    if (seekTo >= decodedTrack.length) {
+    if (seekTo >= nowplaying?.info.length) {
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
         content: format(

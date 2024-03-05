@@ -2,7 +2,7 @@
 import * as Discord from "discord.js";
 import * as Sentry from "@sentry/node";
 import { fetch } from "undici";
-import { LavalinkResponse, Track } from "shoukaku";
+import { LoadType, PlaylistResult, Track } from "shoukaku";
 // Import structures
 import { BaseCommand, KafuuClient } from "@/structures";
 import { PlayerDispatcher } from "@/structures/audio";
@@ -38,7 +38,7 @@ const okButtonCustomId = "p_ok";
 const noButtonCustomId = "p_cancel";
 
 type CacheItem = {
-  searchResult: LavalinkResponse;
+  searchResult: PlaylistResult;
   timeoutId: NodeJS.Timeout;
 };
 
@@ -141,31 +141,31 @@ export default class PlayCommand extends BaseCommand {
     if (!searchResult) throw new Error("Search result not found");
     // Search result
     switch (searchResult.loadType) {
-      case "LOAD_FAILED":
+      case LoadType.ERROR:
         await interaction.editReply({
           content: format(interaction.locale, "LOAD_FAILED"),
         });
         break;
-      case "NO_MATCHES":
+      case LoadType.EMPTY:
         await interaction.editReply({
           content: format(interaction.locale, "NO_MATCHES"),
         });
         break;
       // Playlist Handle
-      case "PLAYLIST_LOADED":
+      case LoadType.PLAYLIST:
         // Only playlist url
-        if (searchResult.playlistInfo?.selectedTrack === -1) {
+        if (searchResult.data.info?.selectedTrack === -1) {
           await interaction.editReply({
             content: format(
               interaction.locale,
               "PLAYLIST_ADD",
-              searchResult.playlistInfo?.name ??
+              searchResult.data.info?.name ??
                 format(interaction.locale, "UNKNOWN"),
-              searchResult.tracks.length.toString(),
+              searchResult.data.tracks.length.toString(),
             ),
           });
           await dispatcher.addTracks(
-            searchResult.tracks.map((e: Track) => {
+            searchResult.data.tracks.map((e: Track) => {
               return {
                 ...e,
                 requestUserId: interaction.user.id,
@@ -180,11 +180,12 @@ export default class PlayCommand extends BaseCommand {
             await dispatcher.queue.getGuildAudioData();
           // Selected track
           const selectedTrack: number =
-            searchResult.playlistInfo.selectedTrack ?? 0;
-          const track: Track = searchResult.tracks[selectedTrack as number];
+            searchResult.data.info.selectedTrack ?? 0;
+          const track: Track =
+            searchResult.data.tracks[selectedTrack as number];
           const trackCacheKey: string = interaction.id;
           // Will playing or Enqueued message
-          const leftTracks = searchResult.tracks.length - selectedTrack;
+          const leftTracks = searchResult.data.tracks.length - selectedTrack;
           const enQueueState: string =
             this.willPlayingOrEnqueued(
               guildAudioData.nowPlaying,
@@ -266,13 +267,15 @@ export default class PlayCommand extends BaseCommand {
         }
         break;
       // Enqueue first of search result or track
-      case "SEARCH_RESULT":
-      case "TRACK_LOADED":
+      case LoadType.SEARCH:
+      case LoadType.TRACK:
         const guildAudioData: GuildAudioData =
           await dispatcher.queue.getGuildAudioData();
         const addTo: KafuuAudioTrack = {
           requestUserId: interaction.user.id,
-          ...searchResult.tracks[0],
+          ...(searchResult.loadType == LoadType.TRACK
+            ? searchResult.data
+            : searchResult.data[0]),
           relatedTrack: false,
           repeated: false,
         };
@@ -330,10 +333,11 @@ export default class PlayCommand extends BaseCommand {
           clearTimeout(cachedResult.timeoutId);
         }
         // Slice tracks after selected track position
-        const slicedPlaylist: Track[] = cachedResult.searchResult.tracks.slice(
-          cachedResult.searchResult.playlistInfo.selectedTrack ?? 0, // Array starts 0
-          cachedResult.searchResult.tracks.length,
-        );
+        const slicedPlaylist: Track[] =
+          cachedResult.searchResult.data.tracks.slice(
+            cachedResult.searchResult.data.info.selectedTrack ?? 0, // Array starts 0
+            cachedResult.searchResult.data.tracks.length,
+          );
         const dispatcher = this.client.audio.dispatchers.get(
           interaction.guildId,
         );
@@ -354,12 +358,12 @@ export default class PlayCommand extends BaseCommand {
                 format(
                   interaction.locale,
                   "PLAYLIST_ADDED_NOEMOJI",
-                  cachedResult.searchResult.playlistInfo?.name ??
+                  cachedResult.searchResult.data.info?.name ??
                     format(interaction.locale, "UNKNOWN"),
                   slicedPlaylist.length.toString(),
                 ),
               )
-              .setTrackThumbnail(cachedResult.searchResult.tracks[0]),
+              .setTrackThumbnail(cachedResult.searchResult.data.tracks[0]),
           ],
         });
         // Add sliced playlist
@@ -440,13 +444,18 @@ export default class PlayCommand extends BaseCommand {
       if (!idealNode) return await interaction.respond([]);
       const searchResult = await idealNode.rest.resolve("scsearch:" + query);
       // Search가 아니거나 검색 결과가 null 일 경우 결과 없음.
-      // TODO 플레이리스트일경우 플레이리스트 추가, 한곡 추가, 등등, URL일경우 URL 정보 표시해주기
-      if (!searchResult || searchResult.loadType !== "SEARCH_RESULT") {
-        await interaction.respond([]);
+      if (!searchResult || searchResult.loadType !== LoadType.SEARCH) {
+        await interaction.respond([
+          {
+            name: format(interaction.locale, "PLAY_AUTOCOMPLETE_NO_RESULT"),
+            value: "",
+          },
+        ]);
         return;
       }
+
       await interaction.respond(
-        searchResult.tracks
+        searchResult.data
           .map((v: Track) => {
             return {
               name: v.info.title

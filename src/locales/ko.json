@@ -46,6 +46,7 @@
 	"OFF": "꺼짐",
 	"ON": "켜짐",
 	"PLAY_AUTOCOMPLETE_NO_QUERY": "🔍  검색어 또는 URL을 입력해주세요.",
+	"PLAY_AUTOCOMPLETE_NO_RESULT": "❌ 검색 결과가 없어요. 다른 검색어로 다시 시도해 주세요!",
 	"PLAY_SEARCHING": "> 🔍  검색 중이에요...",
 	
 	"PLAYING_NOW": "> 🎶  재생 중 **{0}**",
@@ -98,9 +99,9 @@
 	"SETTINGS_MAIN_TITLE": "🔧 {0} 설정",
 	"SETTINGS_MAIN_FOOTER": "{0} 서버의 치노봇 설정",
 	"SETTINGS_MAIN_FIELDS_DJ": "💿 DJ 역할",
-	"SETTINGS_DJ_NONE": "DJ 역할이 설정되어 있지 않아요!",
-	"SETTINGS_TEXTCH_NONE": "기본 텍스트 채널이 설정되어 있지 않아요!",
-	"SETTINGS_VOICECH_NONE": "기본 음성 채널이 설정되어 있지 않아요!",
+	"SETTINGS_DJ_NONE": "설정되어 있지 않아요!",
+	"SETTINGS_TEXTCH_NONE": "설정되어 있지 않아요!",
+	"SETTINGS_VOICECH_NONE": "설정되어 있지 않아요!",
 	"SETTINGS_MAIN_FIELDS_TEXTCH": " 📑 기본 텍스트 채널",
 	"SETTINGS_MAIN_FIELDS_VOICECH": "🎧 기본 음성 채널",
 	"SETTINGS_MAIN_FIELDS_REPEAT": "{0} 반복 모드",
@@ -159,6 +160,7 @@
 	"PERMISSIONS_ADMIN": "🛠️ 관리자",
 	"PERMISSIONS_DJ": "💿 DJ",
 	"PERMISSIONS_BOTOWNER": "❤️ 봇 소유자",
+	"DURATION_FORMAT": "",
 
 	"PERM_CreateInstantInvite": "초대 링크 생성",
 	"PERM_KickMembers": "멤버 추방",

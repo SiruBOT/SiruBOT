@@ -19,7 +19,7 @@ export class PlayerDispatcherFactory {
       joinOptions,
     );
     this.client.log.info(
-      `PlayerDispatcher successfully created @ ${player.connection.guildId}/${player.connection.channelId}`,
+      `PlayerDispatcher successfully created @ ${player.guildId}/${joinOptions.channelId}`,
     );
     return playerDispatcher;
   }
