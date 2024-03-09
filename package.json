@@ -1,80 +1,13 @@
 {
-  "name": "sirubot",
-  "version": "4.3.0",
-  "description": "Lavalink MusicBOT",
-  "main": "./src/index.js",
-  "dependencies": {
-    "@discordjs/rest": "^2.2.0",
-    "@sentry/integrations": "^7.45.0",
-    "@sentry/node": "^7.45.0",
-    "@sentry/tracing": "^7.45.0",
-    "@sirubot/melon-chart-api": "^1.1.6-fork",
-    "@sirubot/yt-related-scraper": "^0.3.21",
-    "argparse": "^2.0.1",
-    "dayjs": "^1.11.10",
-    "discord-api-types": "^0.37.65",
-    "discord-hybrid-sharding": "^2.1.4",
-    "discord.js": "^14.14.1",
-    "fast-glob": "^3.2.11",
-    "fastify": "^4.24.3",
-    "module-alias": "^2.2.2",
-    "mongoose": "^7.1.1",
-    "mysql2": "^3.2.0",
-    "node-vibrant": "^3.2.1-alpha.1",
-    "reflect-metadata": "^0.1.13",
-    "rotating-file-stream": "^3.1.0",
-    "shoukaku": "^4.0.1",
-    "slyrics": "^1.0.22",
-    "tslog": "^3.3.2",
-    "typeorm": "^0.3.17",
-    "undici": "^4.15.1",
-    "yaml": "^2.2.2"
-  },
+  "name": "SiruBOT",
+  "version": "5.0.0",
+  "description": "Discord musicbot with lavalink v4",
+  "main": "./dist/index.js",
+  "repository": "https://github.com/SiruBOT/SiruBOT",
+  "author": "Sannoob3144 <cotwo0139@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
-    "@types/argparse": "^2.0.10",
-    "@types/ip": "^1.1.0",
-    "@types/node": "^18.15.5",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
-    "@typescript-eslint/parser": "^5.59.1",
-    "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-security": "^1.7.1",
-    "prettier": "^3.1.0",
-    "rimraf": "^5.0.5",
-    "tsc-watch": "^6.0.4",
-    "typescript": "^5.0.4"
-  },
-  "scripts": {
-    "lint": "eslint --ext .ts ./src",
-    "lint:fix": "eslint --ext .ts ./src --fix",
-    "build:ts": "yarn run build:clean && tsc --project ./tsconfig.json",
-    "build:clean": "yarn run rimraf build",
-    "build:watch": "yarn run rimraf build && yarn run tsc --watch",
-    "build:deploy": "yarn run build:ts && yarn run deploy:commands",
-    "deploy:clean": "node ./build -d -r -c settings.yaml -clean",
-    "deploy:commands": "node ./build -d -r -c settings.yaml"
-  },
-  "_moduleAliases": {
-    "@/": "build/src",
-    "@/utils": "build/src/utils",
-    "@/constants": "build/src/constants",
-    "@/structures": "build/src/structures",
-    "@/types": "build/src/types",
-    "@/locales": "build/src/locales",
-    "@/models": "build/src/models"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SiruBOT/SiruBOT"
-  },
-  "engines": {
-    "node": ">=16.6.0"
-  },
-  "author": "Sannoob#3144",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/SiruBOT/SiruBOT/issues"
-  },
-  "homepage": "https://github.com/SiruBOT/SiruBOT/issues"
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.2"
+  }
 }
