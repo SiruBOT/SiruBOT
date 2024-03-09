@@ -35,10 +35,7 @@ export class AudioHandler extends Shoukaku {
   constructor(client: KafuuClient) {
     const devOptions = {
       resumeTimeout: 60000,
-      // moveOnDisconnect: true,
       reconnectTries: 10,
-      // resume: true,
-      // resumeByLibrary: true,
     };
     super(
       new Connectors.DiscordJS(client),

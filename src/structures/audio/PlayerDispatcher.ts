@@ -11,7 +11,7 @@ import {
 
 import { KafuuClient } from "@/structures/KafuuClient";
 import {
-  KafuuAudioTrack,
+  type KafuuAudioTrack,
   KafuuJoinOptions,
   KafuuRepeatMode,
   TinyInfo,

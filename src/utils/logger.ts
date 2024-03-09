@@ -26,6 +26,7 @@ export function createLogger({
       size: "10M",
       interval: "1d",
       compress: "gzip",
+      path: join("logs", "archive", `${name.toLowerCase()}`),
     },
   );
 

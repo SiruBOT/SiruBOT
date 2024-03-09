@@ -49,7 +49,7 @@ export class TypeORMGuild extends BaseEntity {
   @Column({ type: "text", name: "dj_role_id", nullable: true, default: null }) // DJ Role id
   djRoleId: string | null;
 
-  @Column({ default: 0 }) // 0 = disabled, 1 = repeat all, 2 = repeat single
+  @Column({ type: "numeric", default: 0 }) // 0 = disabled, 1 = repeat all, 2 = repeat single
   repeat: KafuuRepeatMode;
 
   @Column({ name: "play_related", default: false }) // Play related songs
