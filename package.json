@@ -1,5 +1,5 @@
 {
-  "name": "SiruBOT",
+  "name": "sirubot",
   "version": "5.0.0",
   "description": "Discord musicbot with lavalink v4",
   "main": "./dist/index.js",
