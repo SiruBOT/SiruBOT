@@ -1,16 +1,23 @@
 # Set base image to node:lts-alpine
 FROM node:lts-alpine
+
 # Install node.js dependencies, yarn (libc6-compat  https://github.com/nodejs/docker-node#nodealpine)
 RUN apk add --no-cache libc6-compat yarn git
+
 # Set workdir to /app
-WORKDIR /opt/sirubot
-# Copy files to /app
-COPY . .
+WORKDIR /app
+
+# Copy deps files to /app
+COPY package.json yarn.lock /app/
+
 # Install dependencies
-RUN  yarn --frozen-lockfile
+RUN yarn --frozen-lockfile
+
+# Copy source files to /app
+COPY . .
+
 # Build files
-RUN yarn run build:ts
-# Set NODE_ENV to production
-ENV PORT 3000 NODE_ENV production
-# Run next.js application
-CMD ["node", "./build"]
+RUN yarn run tsc --project ./tsconfig.json
+
+# Run nodejs application
+CMD ["node", "/app/build/index.js"]
