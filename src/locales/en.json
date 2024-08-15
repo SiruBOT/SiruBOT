@@ -6,7 +6,7 @@
 	"DISCONNECT_ERROR": "❌  Disconnection has disconnected you from the voice channel. I'll pause the song.\n💡  Please use the ``/stop`` command instead of ``Disconnect``!",
 	"ENDED_PLAYBACK": "🎶  I played all the songs in the queue.",
 	"ENQUEUED_TRACK": "🗒️  Added **{0}** to queue **#{1}**.",
-	"FAILED_JOIN": "❌  An attempt was made to connect to the voice channel, but the connection failed. ``{0}``",
+	"FAILED_JOIN": "❌  An attempt was made to connect to the voice channel, but the connection failed.",
 	"GUILD_CACHE_FAILED": "❌  An error occurred while caching guild. ``{0}``\n```js\n{1}\n```",
 	"INCLUDES_PLAYLIST": "This song contains a playlist.\nAdd **{0}** songs from the playlist to the queue?",
 	"JOINED_VOICE": "✅  Connected to voice channel <#{0}>.",
