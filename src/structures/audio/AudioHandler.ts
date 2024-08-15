@@ -1,5 +1,4 @@
-import * as Sentry from "@sentry/node";
-import { Shoukaku, Connectors } from "shoukaku";
+import { Shoukaku, Connectors, Constants, Node } from "shoukaku";
 import { Logger } from "tslog";
 
 import {
@@ -36,7 +35,6 @@ export class AudioHandler extends Shoukaku {
     const devOptions = {
       resumeTimeout: 60000,
       moveOnDisconnect: true,
-      reconnectTries: 10,
       resume: true,
       resumeByLibrary: true,
       resumeKey: `resumeKey-${client.user?.id}`,
@@ -122,9 +120,6 @@ export class AudioHandler extends Shoukaku {
     dispatcher: PlayerDispatcher,
   ): PlayerDispatcher {
     if (this.dispatchers.get(guildId)) {
-      Sentry.captureMessage(
-        "PlayerDispatcher is already exists in AudioHandler",
-      );
       this.log.warn("PlayerDispatcher is already exists in AudioHandler");
     }
     this.dispatchers.set(guildId, dispatcher);
@@ -269,6 +264,41 @@ export class AudioHandler extends Shoukaku {
     };
   }
 
+  private nodeInfo() {
+    const nodeStatus = (name: string) => {
+      const node = this.nodes.get(name);
+      if (!node) return "연결 끊김 (10회 실패)";
+      return ["연결 중", "연결됨", "연결 해제중", "연결 끊김"][node.state];
+    };
+
+    return this.client.settings.audio.nodes.reduce<{ [x: string]: string }>(
+      (acc, nodeInfo) => {
+        acc[nodeInfo.name] = nodeStatus(nodeInfo.name);
+        return acc;
+      },
+      {},
+    );
+  }
+
+  private reconnectNodes() {
+    for (const nodeInfo of this.client.settings.audio.nodes) {
+      const node = this.nodes.get(nodeInfo.name);
+      if (!node) {
+        this.log.info("Connect node -> " + nodeInfo.name);
+        this.addNode({
+          auth: nodeInfo.auth,
+          name: nodeInfo.name,
+          url: nodeInfo.url,
+        });
+      } else {
+        if (node.state === Constants.State.DISCONNECTED) {
+          this.log.info("Reconnect node -> " + nodeInfo.name);
+          node.connect();
+        }
+      }
+    }
+  }
+
   private setupHandler() {
     this.on("ready", (name, resumed) => {
       this.log.info(
@@ -281,7 +311,6 @@ export class AudioHandler extends Shoukaku {
     });
     this.on("error", (name, error) => {
       this.log.error(error);
-      Sentry.captureException(error, { tags: { node: name } });
     });
     this.on("close", (name, code, reason) =>
       this.log.info(
@@ -298,18 +327,5 @@ export class AudioHandler extends Shoukaku {
     this.on("debug", (name, reason) =>
       this.log.debug(`Lavalink Node: ${name}`, reason || "No reason"),
     );
-  }
-
-  private resumePlayers(): void {
-    // Query updatedAt < 1min ago
-    // Testing Stuff
-    // if (process.env.NODE_ENV == "development") {
-    //   this.joinChannel({
-    //     channelId: "1096224923120324741",
-    //     shardId: 0,
-    //     guildId: "1096224922226933862",
-    //     textChannelId: "1100985233068806174",
-    //   });
-    // }
   }
 }
