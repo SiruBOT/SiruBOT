@@ -24,6 +24,17 @@ import { getCustomId } from "@/utils/formatter";
 type AnySlashCommandBuilder =
   | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
   | SlashCommandSubcommandsOnlyBuilder;
+
+interface KafuuCommandOptions {
+  slashCommand: AnySlashCommandBuilder;
+  client: KafuuClient;
+  category: KafuuCommandCategory;
+  permissions: KafuuCommandPermission[];
+  requirements: number;
+  botPermissions: PermissionsString[];
+  allowedGuildIds?: string[];
+}
+
 export abstract class BaseCommand {
   // Define properties of the class
   public slashCommand: AnySlashCommandBuilder;
@@ -31,17 +42,19 @@ export abstract class BaseCommand {
   public permissions: KafuuCommandPermission[];
   public requirements: number;
   public botPermissions: PermissionsString[];
+  public allowedGuildIds?: string[];
   protected client: KafuuClient;
 
   // Define the constructor method
-  public constructor(
-    slashCommand: AnySlashCommandBuilder,
-    client: KafuuClient,
-    category: KafuuCommandCategory,
-    permissions: KafuuCommandPermission[],
-    requirements: number,
-    botPermissions: PermissionsString[],
-  ) {
+  public constructor({
+    slashCommand,
+    client,
+    category,
+    permissions,
+    botPermissions,
+    requirements,
+    allowedGuildIds,
+  }: KafuuCommandOptions) {
     // Assign values to the properties
     this.slashCommand = slashCommand;
     this.client = client;
@@ -49,6 +62,7 @@ export abstract class BaseCommand {
     this.permissions = permissions;
     this.botPermissions = botPermissions;
     this.requirements = requirements;
+    this.allowedGuildIds = allowedGuildIds;
   }
 
   public abstract onCommandInteraction(

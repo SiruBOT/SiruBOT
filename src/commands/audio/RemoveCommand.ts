@@ -39,15 +39,16 @@ export default class RemoveCommand extends BaseCommand {
           .setAutocomplete(true)
           .setRequired(true),
       );
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
+      category: KafuuCommandCategory.MUSIC,
       // Remove command for everyone, but only dj remove other's track
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"],
-    );
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements:
+        KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
+      botPermissions: ["SendMessages"],
+    });
   }
   public override async onCommandInteraction({
     interaction,

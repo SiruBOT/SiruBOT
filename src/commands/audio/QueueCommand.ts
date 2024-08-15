@@ -55,14 +55,15 @@ export default class QueueCommand extends BaseCommand {
       .setDescriptionLocalizations({
         ko: "이 서버의 노래 대기열을 보여드려요",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements:
+        KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction(

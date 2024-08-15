@@ -58,14 +58,14 @@ export default class LyricsCommand extends BaseCommand {
               }),
           ),
       );
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.NOTHING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements: KafuuCommandFlags.NOTHING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({
@@ -120,7 +120,7 @@ export default class LyricsCommand extends BaseCommand {
       (data.at(0) as MelonChartTrackInfo).albumCover,
     );
     embed.setTitle(
-      format(locale, "MELON_CHART_TITLE", melonDateToString(dates, locale)),
+      format(locale, "MELON_CHART_TITLE", melonDateToString(dates)),
     );
     const pages = chunkArray(data, PAGE_CHUNK_SIZE);
     pages.map((page, index) => {

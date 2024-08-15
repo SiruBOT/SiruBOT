@@ -22,14 +22,15 @@ export default class SeekCommand extends BaseCommand {
       .setDescriptionLocalizations({
         ko: "재생 목록을 무작위로 섞어요.",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.DJ],
-      KafuuCommandFlags.AUDIO_NODE | KafuuCommandFlags.TRACK_PLAYING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.DJ],
+      requirements:
+        KafuuCommandFlags.AUDIO_NODE | KafuuCommandFlags.TRACK_PLAYING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({

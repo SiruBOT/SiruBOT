@@ -77,14 +77,14 @@ class SettingsCommand extends BaseCommand {
       .setDescriptionLocalizations({
         ko: "봇의 설정을 변경하거나 보여드려요!",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.ADMIN,
-      [KafuuCommandPermission.ADMIN],
-      KafuuCommandFlags.NOTHING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.ADMIN,
+      permissions: [KafuuCommandPermission.ADMIN],
+      requirements: KafuuCommandFlags.NOTHING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   //#region Handlers

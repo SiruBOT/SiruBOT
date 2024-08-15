@@ -35,18 +35,19 @@ export default class SeekCommand extends BaseCommand {
           })
           .setRequired(true),
       );
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.DJ],
-      KafuuCommandFlags.AUDIO_NODE |
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.DJ],
+      requirements:
+        KafuuCommandFlags.AUDIO_NODE |
         KafuuCommandFlags.TRACK_PLAYING |
         KafuuCommandFlags.LISTEN_STATUS |
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
         KafuuCommandFlags.VOICE_CONNECTED,
-      ["SendMessages"],
-    );
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({

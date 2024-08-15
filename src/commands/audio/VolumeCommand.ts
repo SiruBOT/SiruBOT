@@ -34,14 +34,14 @@ export default class VolumeCommand extends BaseCommand {
           })
           .setRequired(false);
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.NOTHING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements: KafuuCommandFlags.NOTHING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({

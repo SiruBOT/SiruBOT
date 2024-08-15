@@ -20,14 +20,15 @@ export default class StopCommand extends BaseCommand {
       .setDescriptionLocalizations({
         ko: "재생 중인 노래를 정지하고 대기열을 초기화해요.",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.DJ],
-      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.DJ],
+      requirements:
+        KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({

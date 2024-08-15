@@ -1,6 +1,5 @@
 // Import Sentry, discord.js, undici, shoukaku
 import * as Discord from "discord.js";
-import * as Sentry from "@sentry/node";
 import { fetch } from "undici";
 import { LavalinkResponse, Track } from "shoukaku";
 // Import structures
@@ -79,17 +78,18 @@ export default class PlayCommand extends BaseCommand {
           })
           .setRequired(false),
       );
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.AUDIO_NODE |
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements:
+        KafuuCommandFlags.AUDIO_NODE |
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
         KafuuCommandFlags.LISTEN_STATUS |
         KafuuCommandFlags.VOICE_CONNECTED,
-      ["SendMessages", "Connect", "Speak", "EmbedLinks"],
-    );
+      botPermissions: ["SendMessages", "Connect", "Speak", "EmbedLinks"],
+    });
     // Youtube playlist result cache.
     this.playlistCache = new Map<string, CacheItem>();
   }
@@ -120,11 +120,7 @@ export default class PlayCommand extends BaseCommand {
           textChannelId: interaction.channelId,
         });
       } catch (error) {
-        // Handle joinChannel exception
-        const exceptionId: string = Sentry.captureException(error);
-        await interaction.editReply(
-          format(interaction.locale, "FAILED_JOIN", exceptionId),
-        );
+        await interaction.editReply(format(interaction.locale, "FAILED_JOIN"));
       }
     }
     await interaction.reply(format(interaction.locale, "PLAY_SEARCHING"));

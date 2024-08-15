@@ -94,17 +94,18 @@ export default class SkipCommand extends BaseCommand {
       });
 
     // Command Info
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.TRACK_PLAYING |
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements:
+        KafuuCommandFlags.TRACK_PLAYING |
         KafuuCommandFlags.AUDIO_NODE |
         KafuuCommandFlags.VOICE_SAME_CHANNEL |
         KafuuCommandFlags.VOICE_CONNECTED,
-      ["SendMessages"],
-    );
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({

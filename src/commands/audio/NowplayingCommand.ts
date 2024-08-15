@@ -29,14 +29,15 @@ export default class NowplayingCommand extends BaseCommand {
       .setDescriptionLocalizations({
         ko: "현재 재생 중인 곡의 정보를 보여드려요.",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
-      ["SendMessages", "EmbedLinks"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements:
+        KafuuCommandFlags.TRACK_PLAYING | KafuuCommandFlags.AUDIO_NODE,
+      botPermissions: ["SendMessages", "EmbedLinks"],
+    });
   }
 
   public override async onCommandInteraction({

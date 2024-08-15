@@ -23,14 +23,14 @@ export default class PingCommand extends BaseCommand {
       .setDescriptionLocalizations({
         ko: "봇의 반응 속도를 보여드려요!",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.GENERAL,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.NOTHING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.GENERAL,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements: KafuuCommandFlags.NOTHING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({

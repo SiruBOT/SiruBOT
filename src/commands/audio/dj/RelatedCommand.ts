@@ -49,14 +49,14 @@ export default class RepeatCommand extends BaseCommand {
           );
         return option;
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.DJ],
-      KafuuCommandFlags.NOTHING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.DJ],
+      requirements: KafuuCommandFlags.NOTHING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({
