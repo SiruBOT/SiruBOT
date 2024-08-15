@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package.json yarn.lock /app/
 
 # Install dependencies
-RUN yarn --frozen-lockfile
+RUN yarn install
 
 # Copy source files to /app
 COPY . .
