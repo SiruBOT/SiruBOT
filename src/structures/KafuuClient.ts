@@ -1,6 +1,5 @@
 import Discord from "discord.js";
 import FastGlob from "fast-glob";
-import * as Sentry from "@sentry/node";
 import type Cluster from "discord-hybrid-sharding";
 import type { Logger } from "tslog";
 
@@ -81,7 +80,6 @@ class KafuuClient extends Discord.Client {
       this.log.info("Client setup complete, logging in...");
       await this.login(this.settings.bot.token);
     } catch (err) {
-      Sentry.captureException(err);
       throw err;
     }
   }
@@ -100,10 +98,6 @@ class KafuuClient extends Discord.Client {
       } catch (err) {
         this.log.error("Unhandled event error from " + eventInstance.name);
         this.log.error(err);
-        Sentry.captureException(err);
-        Sentry.captureException(
-          new Error("Unhandled event error from " + eventInstance.name),
-        );
       }
     };
   }

@@ -4,11 +4,6 @@ import { Constants } from "shoukaku";
 
 // import discord.js
 import * as Discord from "discord.js";
-// Import Sentry.io stuff
-import * as Sentry from "@sentry/node";
-import type { Transaction } from "@sentry/types";
-import { Span } from "@sentry/tracing";
-
 // Import structures
 import { type BaseCommand, BaseEvent, type KafuuClient } from "@/structures";
 // Import database models
@@ -42,51 +37,26 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       `Interaction received. ${interaction.id}/${interaction.type}`,
     );
 
-    // Sentry
-    const transaction: Transaction = Sentry.startTransaction({
-      op: "InteractionCreateEvent#run",
-      name: "InteractionCreateEvent",
-    });
-    transaction.setData("guildId", interaction.guildId);
-    transaction.setData("userId", interaction.user.id);
-    transaction.setData("shardId", interaction.guild?.shardId);
-    transaction.setData("clusterId", this.client.cluster?.id ?? 0);
-    transaction.setData("interactionType", interaction.type);
-    transaction.setData("interactionLocale", interaction.locale);
-
-    await this.routeInteraciton(interaction, transaction);
+    await this.routeInteraciton(interaction);
   }
 
   // Routes interaction to the correct handler
-  async routeInteraciton(
-    interaction: Discord.Interaction,
-    transaction: Transaction,
-  ) {
-    // Sentry
-    const span: Span = transaction.startChild({
-      op: "InteractionCreateEvent#routeInteraction",
-      description: "Route interaction to the correct handler",
-    });
-
+  async routeInteraciton(interaction: Discord.Interaction) {
     if (interaction.applicationId !== this.client.user?.id) {
       // 클라이언트 아이디와 인터렉션의 클라이언트 아이디가 다르면
       this.client.log.warn(
         `Interaction application id mismatch. ${interaction.applicationId} ${this.client.user?.id}`,
       );
-      span.setHttpStatus(500);
-      span.setData("endReason", "interactionApplicationIdMismatch");
-      span.finish();
-      transaction.finish();
       return;
     }
 
     // 인터렉션 타입에 따라서 핸들러를 다르게 호출
     if (interaction.isChatInputCommand())
-      await this.handleChatInputCommandInteraction(interaction, transaction);
+      await this.handleChatInputCommandInteraction(interaction);
     if (interaction.isAutocomplete())
-      await this.handleAutoComplete(interaction, transaction);
+      await this.handleAutoComplete(interaction);
     if (interaction.isMessageComponent())
-      await this.handleMessageComponent(interaction, transaction);
+      await this.handleMessageComponent(interaction);
   }
 
   private cmdInfoStr(interaction: Discord.CommandInteraction): string {
@@ -96,35 +66,18 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   // Handle command interaction type
   private async handleChatInputCommandInteraction(
     interaction: Discord.ChatInputCommandInteraction,
-    transaction: Transaction,
   ): Promise<void> {
     this.log.info(`Handle command (${this.cmdInfoStr(interaction)})`);
-
-    const span: Span = transaction.startChild({
-      op: "InteractionCreateEvent#handleChatInputCommandInteraction",
-      description: "Handle ChatInputCommand type",
-    });
 
     const command: BaseCommand | undefined = this.client.commands.get(
       interaction.commandName,
     );
-
-    span.setData("commandName", interaction.commandName);
 
     try {
       //#region Basic checks
       // 명령어가 없다면
       if (!command) {
         this.log.warn(`Command not found (${this.cmdInfoStr(interaction)})`);
-        // Sentry capture
-        Sentry.captureEvent({
-          message: `Command not found (${this.cmdInfoStr(interaction)})`,
-        });
-        span.setHttpStatus(404);
-        span.setData("endReason", "commandNotFound");
-        span.finish();
-        transaction.finish();
-
         // 알수 없는 명령어에요.
         await interaction.reply({
           ephemeral: true,
@@ -135,10 +88,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
 
       // 명령어가 길드에서 실행된게 아니라면
       if (!interaction.inGuild()) {
-        span.setHttpStatus(500);
-        span.setData("endReason", "notInGuild");
-        span.finish();
-        transaction.finish();
         await interaction.reply({
           content: format(interaction.locale, "NOT_IN_GUILD"),
         });
@@ -158,28 +107,17 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           );
         } catch (error) {
           // 길드 가져오기에 실패했다면
-          const excepId = Sentry.captureException(error);
           await interaction.reply({
             content: format(interaction.locale, "GUILD_CACHE_FAILED"),
           });
-          span.setHttpStatus(500);
-          span.setData("endReason", "guildCacheFailed");
-          span.setData("isCached", "guildCacheFailed");
-          span.setData("exceptionId", excepId);
-          transaction.finish();
           return;
         }
       }
 
       if (!interaction.inCachedGuild()) return; // 위에서 캐시 시도했는데도 캐시 안되면 무시
-      // 캐시되있다면 alreadyCached 로 표시
-      span.setData("isCached", "alreadyCached");
 
       // 명령어는 작동하는데, 길드에 봇이 없다면, ApplicationCommand scope만 사용해서 초대한것이기 떄문에 초대 메세지 발송
       if (!interaction.guild.members.me) {
-        span.setHttpStatus(500);
-        span.setData("endReason", "applicatonCommandOnly");
-        transaction.finish();
         await interaction.reply(format(interaction.locale, "BOT_INVITE_FIRST"));
         return;
       }
@@ -214,11 +152,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
             permStr,
           ), // end of format
         });
-        span.setData("endReason", "missingBotPermissions");
-        span.setData("missingPermissions", missingPermissions);
-        span.setHttpStatus(401);
-        span.finish();
-        transaction.finish();
         // Ends method
         return;
       }
@@ -251,13 +184,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           userPermissions.notFulfilledPermissions.includes(e),
         ) // 충족되지 않은 권한중에 커맨드에서 필요한 권한이 있다면 명령어 사용 불가
       ) {
-        span.setData("endReason", "commandPermissionsNotFulfilled");
-        span.setData(
-          "missingPermissions",
-          userPermissions.notFulfilledPermissions,
-        );
-        span.setHttpStatus(403);
-        transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content:
@@ -308,9 +234,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           defaultTextChannel &&
           defaultTextChannel.id !== interaction.channelId
         ) {
-          span.setData("endReason", "defaultTextChannel");
-          span.setHttpStatus(403);
-          transaction.finish();
           await interaction.reply({
             ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
             content: format(
@@ -328,9 +251,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           member.voice.channel &&
           defaultVoiceChannel.id !== member.voice.channel.id
         ) {
-          span.setData("endReason", "defaultVoiceChannel");
-          span.setHttpStatus(403);
-          transaction.finish();
           await interaction.reply({
             ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
             content: format(
@@ -353,9 +273,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           (e) => e.state == Constants.State.CONNECTED,
         ).length == 0
       ) {
-        span.setData("endReason", "noNodesAvailable");
-        span.setHttpStatus(500);
-        transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content: format(interaction.locale, "NO_NODES_AVAILABLE"),
@@ -369,9 +286,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         commandRequirements & KafuuCommandFlags.TRACK_PLAYING &&
         !this.client.audio.hasPlayerDispatcher(interaction.guildId)
       ) {
-        span.setData("endReason", "availableOnlyPlaying");
-        span.setHttpStatus(403);
-        transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content: format(interaction.locale, "AVAILABLE_ONLY_PLAYING"),
@@ -385,9 +299,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         commandRequirements & KafuuCommandFlags.VOICE_CONNECTED &&
         !member.voice.channelId
       ) {
-        span.setData("endReason", "availableOnlyVoice");
-        span.setHttpStatus(403);
-        transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content: format(interaction.locale, "JOIN_VOICE_FIRST"),
@@ -403,9 +314,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         interaction.guild.members.me.voice.channelId &&
         member.voice.channelId !== interaction.guild.members.me.voice.channelId
       ) {
-        span.setData("endReason", "voiceSameChannel");
-        span.setHttpStatus(403);
-        transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content: format(
@@ -424,9 +332,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         member.voice.channelId &&
         member.voice.deaf
       ) {
-        span.setData("endReason", "listenStatus");
-        span.setHttpStatus(403);
-        transaction.finish();
         await interaction.reply({
           ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
           content: format(interaction.locale, "LISTEN_FIRST"),
@@ -445,10 +350,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           interaction.user.id
         }@${interaction.guildId}[${interaction.channelId}]`,
       );
-      span.setData("endReason", "ok");
-      span.setHttpStatus(200);
-      span.finish();
-      transaction.finish();
       //#endregion
     } catch (error) {
       this.log.error(
@@ -458,22 +359,16 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         error,
       );
 
-      const exceptionId: string = Sentry.captureException(error);
       const payload: Discord.InteractionReplyOptions = {
         ephemeral: SYSTEM_MESSAGE_EPHEMERAL,
         content: format(interaction.locale, "COMMAND_HANDLE_ERROR"),
       };
-      span.setData("endReason", "error");
-      span.setData("exceptionId", exceptionId);
-      span.setHttpStatus(500);
-      span.finish();
-      transaction.finish();
       try {
         if (interaction.deferred) await interaction.editReply(payload);
         else if (interaction.replied) await interaction.followUp(payload);
         else await interaction.reply(payload);
       } catch (error) {
-        this.log.warn(`Failed to reply error message ${exceptionId}`, error);
+        this.log.warn(`Failed to reply error message`, error);
         return;
       }
     }
@@ -482,23 +377,11 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
   // Handle command interaction type
   private async handleAutoComplete(
     interaction: Discord.AutocompleteInteraction,
-    transaction: Transaction,
   ): Promise<void> {
-    const span: Span = transaction.startChild({
-      op: "InteractionCreateEvent#handleAutoComplete",
-      description: "Handle autocomplete interaction",
-    });
-    span.setData("commandName", interaction.commandName);
-
     const command: BaseCommand | undefined = this.client.commands.get(
       interaction.commandName,
     );
     if (!command) {
-      span.setData("endReason", "commandNotFound");
-      span.setHttpStatus(404);
-      span.finish();
-      transaction.finish();
-
       await interaction.respond([
         { name: "AutoComplete command not found.", value: "Error" },
       ]);
@@ -506,22 +389,12 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
     }
     try {
       await command.onAutocompleteInteraction?.(interaction);
-      span.setData("endReson", "ok");
-      span.setHttpStatus(200);
-      span.finish();
-      transaction.finish();
     } catch (error) {
       this.log.error(
         `Failed to handle autocomplete command ${interaction.commandName}`,
         error,
       );
       if (!interaction.responded) await interaction.respond([]);
-      const exceptionId = Sentry.captureException(error);
-      span.setData("endReason", "error");
-      span.setData("exceptionId", exceptionId);
-      span.setHttpStatus(500);
-      span.finish();
-      transaction.finish();
     }
   }
 
@@ -548,23 +421,13 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
 
   private async handleMessageComponent(
     interaction: Discord.MessageComponentInteraction,
-    transaction: Transaction,
   ) {
     this.log.debug(
       `MessageComponent received, Interaction id: ${interaction.id} custom id: ${interaction.customId}`,
     );
-    const span: Span = transaction.startChild({
-      op: "InteractionCreateEvent#handleMessageComponent",
-      description: "Handle message component interaction",
-    });
-    span.setData("customId", interaction.customId);
 
     const parsedCustomId = this.parseCustomId(interaction);
     if (!parsedCustomId) {
-      span.setHttpStatus(400);
-      span.setData("endReason", "invalidCustomId");
-      span.finish();
-      transaction.finish();
       this.client.log.warn("Failed to handle interaction, invalid custom id.");
       await interaction.update({
         content: format(interaction.locale, "INVALID_CUSTOM_ID"),
@@ -576,10 +439,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       parsedCustomId.executorId &&
       parsedCustomId.executorId != interaction.user.id
     ) {
-      span.setHttpStatus(403);
-      span.setData("endReason", "invalidExecutor");
-      span.finish();
-      transaction.finish();
       this.client.log.warn("Failed to handle interaction, invalid executor.");
       await interaction.reply({
         ephemeral: COMMAND_WARN_MESSAGE_EPHEMERAL,
@@ -590,10 +449,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
 
     const command = this.client.commands.get(parsedCustomId.commandName);
     if (!command) {
-      span.setHttpStatus(404);
-      span.setData("endReason", "commandNotFound");
-      span.finish();
-      transaction.finish();
       this.client.log.warn(
         "Failed to handle message component interaction, command name not found.",
       );
@@ -608,10 +463,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
       (await interaction.guild?.members.fetch(interaction.user.id));
 
     if (!member || !interaction.inGuild()) {
-      span.setHttpStatus(403);
-      span.setData("endReason", "notInGuild");
-      span.finish();
-      transaction.finish();
       this.client.log.warn(
         "Failed to handle message component interaction, user not in guild.",
       );
@@ -654,11 +505,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
           });
           break;
         default:
-          span.setHttpStatus(400);
-          span.setData("endReason", "invalidComponentType");
-          span.finish();
-          transaction.finish();
-          Sentry.captureEvent({ message: "Invalid component type" });
           this.client.log.warn(
             "Failed to handle message component interaction, invalid component type.",
           );
@@ -669,12 +515,6 @@ export default class InteractionCreateEvent extends BaseEvent<"interactionCreate
         `Failed to handle message component ${interaction.componentType} ${parsedCustomId.commandName}`,
         error,
       );
-      const exceptionId = Sentry.captureException(error);
-      span.setData("endReason", "error");
-      span.setData("exceptionId", exceptionId);
-      span.setHttpStatus(500);
-      span.finish();
-      transaction.finish();
     }
   }
 }

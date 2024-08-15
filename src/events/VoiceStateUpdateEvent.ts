@@ -12,28 +12,5 @@ export default class VoiceStateUpdateEvent extends BaseEvent<typeof eventName> {
   public override async run(oldState: VoiceState): Promise<void> {
     if (oldState.member?.id !== this.client.user?.id) return;
     if (!oldState.channelId) return;
-    // if (oldState.channelId !== newState.channelId) {
-    //   const dispatcher: PlayerDispatcher | undefined =
-    //     this.client.audio.dispatchers.get(newState.guild.id);
-    //   this.client.log.debug(
-    //     `Channel update, ${oldState.channelId} -> ${
-    //       newState.channelId ? newState.channelId : "Disconnected."
-    //     }`
-    //   );
-    //   if (!dispatcher) return;
-    //   try {
-    //     // Handle Disconnect.
-    //     if (!newState.channelId) {
-    //       dispatcher.destroy();
-    //       await dispatcher.sendDisconnected();
-    //       return;
-    //     }
-    //     await dispatcher.player.connection.connect(newState.channelId);
-    //   } catch (error) {
-    //     Sentry.captureException(error);
-    //     dispatcher.destroy();
-    //     this.client.log.error(`Failed to reconnect on moved channel`, error);
-    //   }
-    // }
   }
 }

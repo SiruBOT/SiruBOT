@@ -1,5 +1,4 @@
 import { Logger } from "tslog";
-import * as Sentry from "@sentry/node";
 
 import {
   PlayerUpdate,
@@ -93,13 +92,6 @@ export class PlayerDispatcher {
       default:
         this.log.warn("Websocket closed, unknown reason, " + reasonString);
         this.destroy();
-        Sentry.captureEvent({
-          message:
-            "Unknown websocket closed event. " +
-            reason.code +
-            " " +
-            reasonString,
-        });
         break;
     }
   }
@@ -125,7 +117,6 @@ export class PlayerDispatcher {
   @BreakOnDestroyed()
   private async onException(exception: TrackExceptionEvent) {
     this.log.error(`Error while playback`, exception);
-    Sentry.captureException(exception);
     await this.handleError();
   }
 
@@ -148,7 +139,6 @@ export class PlayerDispatcher {
             await this.playNextTrack();
           }
         } catch (error) {
-          Sentry.captureException(error);
           this.log.error(`Failed to playing next track`, error);
           this.handleError();
         }
@@ -284,7 +274,6 @@ export class PlayerDispatcher {
       return;
     } catch (error) {
       // When scrape related video is failed, stop player and capture Exception
-      Sentry.captureException(error);
       this.log.error("Failed to scrape related video.", error);
       // Send error message
       await this.audioMessage.sendRelatedScrapeFailed();

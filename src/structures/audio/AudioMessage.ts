@@ -3,7 +3,6 @@ import { Logger } from "tslog";
 import { KafuuClient } from "@/structures";
 import { TypeORMGuild } from "@/models/typeorm";
 import { getReusableFormatFunction } from "@/locales";
-import * as Sentry from "@sentry/node";
 import { ReusableFormatFunc, STRING_KEYS } from "@/types/locales";
 
 export class AudioMessage {
@@ -95,7 +94,6 @@ export class AudioMessage {
           } is message is deleted?`,
           e,
         );
-        Sentry.captureException(e);
       }
       this.log.debug(`Send message to ${targetChannel.id}`);
       const lastMsg: Message = await targetChannel.send(options);
@@ -143,7 +141,6 @@ export class AudioMessage {
         `Failed to fetch channel (${channelId}), is channel is deleted?`,
         e,
       );
-      Sentry.captureException(e);
       return null;
     }
   }
