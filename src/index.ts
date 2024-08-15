@@ -267,6 +267,11 @@ async function boot() {
       generateGlobPattern(__dirname, "commands"),
     );
     const slashCommands: RESTPostAPIApplicationCommandsJSONBody[] = [];
+
+    const guildSpecificSlashCommands: {
+      [k: string]: RESTPostAPIApplicationCommandsJSONBody[];
+    } = {};
+
     log.info(`Found ${commandFiles.length} commands`);
 
     // Register commands to slashCommands array
@@ -283,10 +288,32 @@ async function boot() {
         throw new Error(
           "Command file is not extends BaseCommand\n" + commandPath,
         );
-      log.debug(`Validating command file ${commandPath}`);
-      slashCommands.push(commandInstance.slashCommand.toJSON());
+
+      if (commandInstance.allowedGuildIds) {
+        log.debug(
+          `This command ${
+            commandInstance.slashCommand.name
+          } is guild specific slash commands ${commandInstance.allowedGuildIds.join(
+            ", ",
+          )}`,
+        );
+        for (const guildId of commandInstance.allowedGuildIds) {
+          if (!guildSpecificSlashCommands[guildId]) {
+            guildSpecificSlashCommands[guildId] = [];
+          }
+          guildSpecificSlashCommands[guildId].push(
+            commandInstance.slashCommand.toJSON(),
+          );
+        }
+      } else {
+        log.debug(
+          `This command ${commandInstance.slashCommand.name} is global slash commands`,
+        );
+        slashCommands.push(commandInstance.slashCommand.toJSON());
+      }
     }
 
+    log.info("Apply Updates to Global Slash Commands...");
     // Replace All Slash commands
     await restClient.put(
       process.env.DEVGUILD
@@ -310,6 +337,25 @@ async function boot() {
         .setTitle(`🗒️  ${slashCommands.length} Commands published`)
         .setDescription(logStr),
     );
+
+    log.info("Apply Updates to Guild Specific Slash Commands...");
+    for (const guildId in guildSpecificSlashCommands) {
+      const guildCommands = guildSpecificSlashCommands[guildId];
+      await restClient.put(
+        Routes.applicationGuildCommands(applicationInfo.id, guildId),
+        {
+          body: guildCommands,
+        },
+      );
+      const logStr = `${guildCommands.length} Commands successfully published on applicationGuildCommands (/) at ${guildId}`;
+      log.info(logStr);
+      webhookNotifier?.safeSendEmbed(
+        webhookNotifier
+          .infoEmbed()
+          .setTitle(`🗒️  ${guildCommands.length} Commands published`)
+          .setDescription(logStr),
+      );
+    }
   }
 
   //#region AutoSharding
