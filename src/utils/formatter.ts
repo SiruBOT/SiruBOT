@@ -20,7 +20,6 @@ import {
   PROGRESS_BAR_EMOJI_COUNT,
 } from "@/constants/utils/formatter";
 import { KafuuMessageComponentCustomIdOptions } from "@/types/command";
-import { Locale } from "discord.js";
 
 /**
  * Convert seconds to readble format (like 00:00:00)
@@ -143,10 +142,7 @@ export function getCustomId({
   }`;
 }
 
-export function melonDateToString(
-  date: MelonChartDates,
-  locale: Locale,
-): string {
+export function melonDateToString(date: MelonChartDates): string {
   let result = "";
   switch (true) {
     // Realtime
@@ -172,4 +168,16 @@ export function melonDateToString(
       result = date.start + " ~ " + date.end;
   }
   return result;
+}
+
+export function niceBytes(x = 0): string {
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let l = 0;
+  let n = x || 0;
+  while (n >= 1024 && ++l) n /= 1024;
+  return n.toFixed(n >= 10 || l < 1 ? 0 : 1) + " " + units[l];
+}
+
+export function formatLoad(load = 0): string {
+  return Number(load * 100).toFixed(2);
 }
