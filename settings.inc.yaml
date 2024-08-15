@@ -1,4 +1,3 @@
-#sentryDsn: "URL" # Your sentry DSN URL (https://sentry.io/...)
 bot:
   shardsPerClusters: 2 # Number of shards per clusters
   activity:

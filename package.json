@@ -1,13 +1,10 @@
 {
   "name": "sirubot",
-  "version": "4.2.2",
+  "version": "4.3.1",
   "description": "Lavalink MusicBOT",
   "main": "./src/index.js",
   "dependencies": {
     "@discordjs/rest": "^2.2.0",
-    "@sentry/integrations": "^7.45.0",
-    "@sentry/node": "^7.45.0",
-    "@sentry/tracing": "^7.45.0",
     "@sirubot/lavalink-encoding": "^0.1.2-spotify",
     "@sirubot/melon-chart-api": "^1.1.6-fork",
     "@sirubot/yt-related-scraper": "^0.3.21",
@@ -15,7 +12,7 @@
     "discord-api-types": "^0.37.65",
     "discord-hybrid-sharding": "^2.1.4",
     "discord.js": "^14.14.1",
-    "fast-glob": "^3.2.11",
+    "fast-glob": "^3.3.2",
     "fastify": "^4.24.3",
     "module-alias": "^2.2.2",
     "mongoose": "^7.1.1",

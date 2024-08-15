@@ -4,15 +4,10 @@ import "module-alias/register";
 import Discord, { GatewayIntentBits } from "discord.js";
 import { ClusterClient, getInfo } from "discord-hybrid-sharding";
 
-// Import Sentry stuff
-import * as Sentry from "@sentry/node";
-import * as Tracing from "@sentry/tracing";
-import { RewriteFrames } from "@sentry/integrations";
 import { Logger } from "tslog";
 
 // Import Kafuu
 import { KafuuClient } from "@/structures";
-import { isURL } from "@/utils/url";
 import type { KafuuBootStrapperArgs } from "@/types/bootstrapper";
 import type { KafuuSettings } from "@/types/settings";
 import { createLogger } from "./utils/logger";
@@ -82,32 +77,9 @@ if (bootStrapperArgs.shard) {
   client.cluster = new ClusterClient(client);
 }
 
-if (argvSettings?.sentryDsn && isURL(argvSettings.sentryDsn as string)) {
-  log.info(`Sentry enabled, DSN: ${argvSettings.sentryDsn}`);
-  Sentry.init({
-    dsn: argvSettings.sentryDsn,
-    debug: bootStrapperArgs.debug,
-    tracesSampleRate: 1.0,
-    integrations: [
-      new RewriteFrames({
-        root: global.__dirname,
-      }),
-      new Sentry.Integrations.Http({ tracing: true }),
-      new Tracing.Integrations.BrowserTracing(),
-    ],
-  });
-  if (bootStrapperArgs.shard && client.cluster) {
-    log.debug(`Sentry sets up. set clusterId tag to ${client.cluster.id}`);
-    Sentry.setTag("clusterId", client.cluster.id);
-  }
-} else {
-  log.warn(`Sentry disabled. Sentry URL: ${argvSettings.sentryDsn}`);
-}
-
 // ignore uncaughtException, unhandledRejection
 const uncaughtException = (err: Error): void => {
   log.error("Uncaught exception: ", err);
-  Sentry.captureException(err);
 };
 
 const unhandledRejection = (
@@ -115,7 +87,6 @@ const unhandledRejection = (
   promise: Promise<unknown>,
 ): void => {
   promise.catch((reason) => {
-    Sentry.captureException(reason);
     log.fatal("Uncaught rejection, reason: ", reason);
   });
 };
