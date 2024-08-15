@@ -10,50 +10,29 @@ import {
   KafuuCommandPermission,
 } from "@/types/command";
 import { EmbedFactory, ExtendedEmbed } from "@/utils/embed";
-import { humanizeSeconds } from "@/utils/formatter";
+import { formatLoad, humanizeSeconds, niceBytes } from "@/utils/formatter";
 
-// https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript/23625419
-const units = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-function niceBytes(x: number): string {
-  let l = 0;
-  let n = parseInt(x.toString(), 10) || 0;
-
-  while (n >= 1024 && ++l) {
-    n = n / 1024;
-  }
-  // include a decimal point and a tenths-place digit if presenting
-  // less than ten of KB or greater units
-  // eslint-disable-next-line security/detect-object-injection
-  return n.toFixed(n < 10 && l > 0 ? 1 : 0) + " " + units[l];
-}
-
-const STATE_STRING = [
-  "CONNECTING",
-  "CONNECTED",
-  "DISCONNECTING",
-  "DISCONNECTED",
-];
 export default class NodeInfoCommand extends BaseCommand {
   constructor(client: KafuuClient) {
     const slashCommand = new SlashCommandBuilder()
-      .setName("debuginfo")
+      .setName("audionode")
       .setNameLocalizations({
-        ko: "디버그",
+        ko: "음성서버",
       })
       .setDescription(
         "Shows bot's debug info (Usally uses support identify errors)",
       )
       .setDescriptionLocalizations({
-        ko: "봇의 디버그 정보를 보여드려요.",
+        ko: "봇의 음성 서버 정보를 보여드려요.",
       });
-    super(
+    super({
       slashCommand,
       client,
-      KafuuCommandCategory.MUSIC,
-      [KafuuCommandPermission.EVERYONE],
-      KafuuCommandFlags.NOTHING,
-      ["SendMessages"],
-    );
+      category: KafuuCommandCategory.MUSIC,
+      permissions: [KafuuCommandPermission.EVERYONE],
+      requirements: KafuuCommandFlags.NOTHING,
+      botPermissions: ["SendMessages"],
+    });
   }
 
   public override async onCommandInteraction({
@@ -69,50 +48,48 @@ export default class NodeInfoCommand extends BaseCommand {
     const totalPlayingPlayers: number = onlineNodes
       .map((e) => e.stats!.playingPlayers)
       .reduce((a, b) => a + b, 0);
+
     const nodeInfoEmbed: ExtendedEmbed = EmbedFactory.createEmbed();
-    nodeInfoEmbed.setTitle("📡  Node status");
+    nodeInfoEmbed.setTitle("📡  음성 서버 정보");
     nodeInfoEmbed.setTimestamp(new Date());
+
+    const indicator = (a: number, b: number) => {
+      if (a === 0 || b === 0) return "❔";
+      return a / b >= 1 ? "🟢" : a / b >= 0.7 ? "🟡" : "🔴";
+    };
+
     nodeInfoEmbed.setDescription(
-      `All nodes: **${nodes.length}** | Online nodes: **${onlineNodes.length}**\n` +
-        `Total players: **${totalPlayers}** | Total playing players: **${totalPlayingPlayers}**`,
+      `음성 서버: **${nodes.length}** 개 | 온라인 서버: **${onlineNodes.length}** 개\n` +
+        `전체 플레이어: **${totalPlayers}** 개 | 재생 중인 플레이어: **${totalPlayingPlayers}** 개`,
     );
-    nodeInfoEmbed.addFields(
-      nodes.map((node) => {
-        const cpuStats = node?.stats?.cpu;
-        return {
-          name: `**${node.name}**`,
-          value:
-            `State: **${STATE_STRING[node.state]}**\n` +
-            (node.state === Constants.State.CONNECTED)
-              ? `Players: **${node?.stats?.players ?? 0}**\n` +
-                `Playing Players: **${node?.stats?.playingPlayers ?? 0}**\n` +
-                `Uptime: **${humanizeSeconds(
-                  node?.stats?.uptime ?? 0,
-                  true,
-                )}**\n` +
-                `Cores: **${cpuStats?.cores ?? "Not detected"}**\n` +
-                `Lavalink Load: **${this.formatLoad(
-                  cpuStats?.lavalinkLoad,
-                )}%**\n` +
-                `System Load: **${this.formatLoad(cpuStats?.systemLoad)}%**\n` +
-                `Used Memory: **${niceBytes(
-                  node?.stats?.memory?.used ?? 0,
-                )}**\n` +
-                `Free Memory: **${niceBytes(
-                  node?.stats?.memory?.free ?? 0,
-                )}**\n` +
-                `Frames Sent: **${node?.stats?.frameStats?.sent ?? 0}**\n` +
-                `Frames Nulled: **${node?.stats?.frameStats?.nulled ?? 0}**\n` +
-                `Frames Deficit: **${node?.stats?.frameStats?.deficit ?? 0}**\n`
-              : "",
-          inline: true,
-        };
-      }),
-    );
+
+    nodes.map((node) => {
+      const nodeQuality =
+        node.state === Constants.State.CONNECTED
+          ? indicator(node.stats?.playingPlayers ?? 0, node.stats?.players ?? 0)
+          : "🔴";
+      nodeInfoEmbed.addFields({
+        name: `${nodeQuality} | **${node.name}**`,
+        value: `**${node.stats?.players ?? 0}** 개 플레이어 중 **${
+          node.stats?.playingPlayers ?? 0
+        }** 개 재생 중\n메모리 **${niceBytes(
+          node.stats?.memory.used,
+        )}** 사용 중 | CPU **${formatLoad(
+          node.stats?.cpu.systemLoad,
+        )}%** 사용 중\n업타임 **${msToHuman(node.stats?.uptime ?? 0)}**`,
+      });
+    });
+
     await interaction.reply({ embeds: [nodeInfoEmbed] });
   }
+}
 
-  private formatLoad(load = 0): string {
-    return Number(load * 100).toFixed(2);
-  }
+function msToHuman(ms: number): string {
+  const sec = ms / 1000;
+  const hours = Math.floor(sec / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+  const seconds = Math.floor(sec % 60);
+  return `${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분 ` : ""}${
+    seconds ? `${seconds}초` : `${seconds}초`
+  }`;
 }
