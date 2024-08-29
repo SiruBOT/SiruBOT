@@ -140,7 +140,7 @@ export class PlayerDispatcher {
           }
         } catch (error) {
           this.log.error(`Failed to playing next track`, error);
-          this.handleError();
+          await this.handleError();
         }
         break;
       case "REPLACED":
@@ -152,7 +152,6 @@ export class PlayerDispatcher {
         break;
       case "LOAD_FAILED":
         this.log.warn("Track load failed, skip track.");
-        // Something message send
         await this.skipTrack();
         break;
       default:
@@ -412,10 +411,10 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  public async stopPlayer(): Promise<void> {
+  public async stopPlayer(muted = false): Promise<void> {
     await this.cleanStop();
     // Send Audio Message
-    await this.audioMessage.sendPlayEnded();
+    if (!muted) await this.audioMessage.sendPlayEnded();
   }
 
   @BreakOnDestroyed()

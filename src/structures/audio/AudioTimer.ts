@@ -1,5 +1,6 @@
 import Discord from "discord.js";
 import { KafuuClient } from "../KafuuClient";
+import { format } from "@/locales";
 
 class AudioTimer {
   private timers: Discord.Collection<string, NodeJS.Timeout>;
@@ -12,65 +13,62 @@ class AudioTimer {
     this.timeout = timeout;
   }
 
-  //   createTimer(guildId) {
-  //     const timer = setTimeout(async () => {
-  //       const guild = this.client.guilds.cache.get(guildId);
-  //       if (!guild) return this.clearTimer(guildId);
-  //       if (this.isInActive(guild)) {
-  //         try {
-  //           const guildData = await this.client.database.getGuild(guild.id);
-  //           await this.client.audio.utils.sendMessage(
-  //             guildId,
-  //             this.client.utils.localePicker.get(
-  //               guildData.locale,
-  //               "AUDIO_PAUSED_INACTIVE"
-  //             ),
-  //             true
-  //           );
-  //           this.client.audio.stop(guildId, false);
-  //           this.client.logger.debug(
-  //             `[AudioTimer] Timer Ended ${this.timeout}ms ${guildId}`
-  //           );
-  //         } catch {
-  //           this.client.logger.warn(
-  //             `[AudioTimer] Failed to send TimerEndedMessage ${guildId} is channel is invalid?`
-  //           );
-  //         }
-  //       } else {
-  //         this.clearTimer(guildId);
-  //       }
-  //     }, this.timeout);
-  //     this.timers.set(guildId, timer);
-  //   }
+  public createTimer(guildId: string) {
+    this.client.log.debug('[AudioTimer] Creating timer for guild ', guildId);
+    const timer = setTimeout(async () => {
+      const player = this.client.audio.players.get(guildId);
+      if (!player || !player.connection.channelId) {
+        this.client.log.debug(
+          `[AudioTimer] Player not found or connection not found in guild ${guildId}`,
+        );
+        this.deleteTimer(guildId);
+        return;
+      }
+      const guild = await this.client.guilds.fetch(guildId);
+      if (!guild) {
+        this.deleteTimer(guildId);
+        await this.client.audio.dispatchers.get(guildId)?.stopPlayer(true);
+        this.client.log.debug(
+          `[AudioTimer] Guild not found in guild ${guildId}`,
+        );
+        return;
+      }
+      const channel = await guild.channels.fetch(player.connection.channelId);
+      if (!channel || !channel.isVoiceBased()) {
+        this.deleteTimer(guildId);
+        await this.client.audio.dispatchers.get(guildId)?.stopPlayer(true);
+        this.client.log.debug(
+          `[AudioTimer] Channel not found in guild ${guildId}`,
+        );
+        return;
+      }
+      if (
+        channel.members.filter((e) => !e.user.bot).filter((e) => !e.voice.selfDeaf).size <= 0
+      ) {
+        this.deleteTimer(guildId);
+        this.client.audio.dispatchers
+          .get(guildId)
+          ?.audioMessage.sendRaw(
+            format(Discord.Locale.Korean, "VOICE_TIMEOUT"),
+          );
+        await this.client.audio.dispatchers.get(guildId)?.stopPlayer(true);
+        return;
+      } else {
+        this.deleteTimer(guildId);
+      }
+    }, this.timeout);
 
-  //   clearTimer(guildId) {
-  //     clearTimeout(this.timers.get(guildId));
-  //     this.timers.delete(guildId);
-  //   }
+    this.timers.set(guildId, timer);
+  }
 
-  //   chkTimer(guildId) {
-  //     const guild = this.client.guilds.cache.get(guildId);
-  //     if (this.isInActive(guild)) {
-  //       if (this.timers.get(guildId)) return;
-  //       this.client.logger.debug(
-  //         `[AudioTimer] Timer Started ${this.timeout}ms ${guildId}`
-  //       );
-  //       this.createTimer(guildId);
-  //     }
-  //   }
-
-  //   isInActive(guild) {
-  //     return (
-  //       guild.me.voice.channel &&
-  //       ((guild.me.voice.channel.members &&
-  //         guild.me.voice.channel.members
-  //           .filter((el) => !el.user.bot)
-  //           .filter((el) => !el.voice.serverDeaf && !el.voice.selfDeaf).size <=
-  //           0) ||
-  //         (this.client.audio.players.get(guild.id) &&
-  //           !this.client.audio.players.get(guild.id).track))
-  //     );
-  //   }
+  public deleteTimer(guildId: string) {
+    this.client.log.debug('[AudioTimer] Deleting timer for guild ', guildId);
+    const timer = this.timers.get(guildId);
+    if (timer) {
+      clearTimeout(timer);
+      this.timers.delete(guildId);
+    }
+  }
 }
 
 export { AudioTimer };

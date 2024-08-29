@@ -22,6 +22,7 @@ import { getReusableFormatFunction } from "@/locales";
 import { Locale } from "discord.js";
 import { RELATED_TRACKS_DURATION_OFFSET } from "@/constants/time";
 import { calculateLevenshteinDistance } from "@/types/utils/algorithm";
+import { AudioTimer } from "./AudioTimer";
 
 export class AudioHandler extends Shoukaku {
   public client: KafuuClient;
@@ -30,6 +31,7 @@ export class AudioHandler extends Shoukaku {
   public dispatchers: Map<string, PlayerDispatcher>;
   public relatedScraper: Scraper;
   public routePlanner?: RoutePlanner;
+  public audioTimer: AudioTimer;
 
   constructor(client: KafuuClient) {
     const devOptions = {
@@ -66,6 +68,7 @@ export class AudioHandler extends Shoukaku {
     this.relatedScraper = new Scraper({ log: this.log });
     this.dispatchers = new Map<string, PlayerDispatcher>();
     this.playerDispatcherFactory = new PlayerDispatcherFactory(this.client);
+    this.audioTimer = new AudioTimer(this.client, 60000);
     this.setupHandler();
   }
 
