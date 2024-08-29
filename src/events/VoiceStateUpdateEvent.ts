@@ -11,7 +11,7 @@ export default class VoiceStateUpdateEvent extends BaseEvent<typeof eventName> {
 
   public override async run(
     oldState: VoiceState,
-    newState: VoiceState
+    newState: VoiceState,
   ): Promise<void> {
     if (oldState.member?.user.bot) return;
     // User Leaves Voice Channel
@@ -20,7 +20,9 @@ export default class VoiceStateUpdateEvent extends BaseEvent<typeof eventName> {
       player &&
       oldState.channelId === player.player.connection.channelId &&
       oldState.channelId != newState.channelId &&
-      oldState.channel?.members.filter((e) => !e.user.bot).filter((e) => !e.voice.selfDeaf).size == 0
+      oldState.channel?.members
+        .filter((e) => !e.user.bot)
+        .filter((e) => !e.voice.selfDeaf).size == 0
     ) {
       await this.client.audio.audioTimer.createTimer(oldState.guild.id);
     }

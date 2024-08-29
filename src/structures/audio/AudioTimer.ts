@@ -14,7 +14,7 @@ class AudioTimer {
   }
 
   public createTimer(guildId: string) {
-    this.client.log.debug('[AudioTimer] Creating timer for guild ', guildId);
+    this.client.log.debug("[AudioTimer] Creating timer for guild ", guildId);
     const timer = setTimeout(async () => {
       const player = this.client.audio.players.get(guildId);
       if (!player || !player.connection.channelId) {
@@ -43,7 +43,9 @@ class AudioTimer {
         return;
       }
       if (
-        channel.members.filter((e) => !e.user.bot).filter((e) => !e.voice.selfDeaf).size <= 0
+        channel.members
+          .filter((e) => !e.user.bot)
+          .filter((e) => !e.voice.selfDeaf).size <= 0
       ) {
         this.deleteTimer(guildId);
         this.client.audio.dispatchers
@@ -62,7 +64,7 @@ class AudioTimer {
   }
 
   public deleteTimer(guildId: string) {
-    this.client.log.debug('[AudioTimer] Deleting timer for guild ', guildId);
+    this.client.log.debug("[AudioTimer] Deleting timer for guild ", guildId);
     const timer = this.timers.get(guildId);
     if (timer) {
       clearTimeout(timer);
