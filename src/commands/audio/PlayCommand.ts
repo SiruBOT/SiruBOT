@@ -120,7 +120,7 @@ export default class PlayCommand extends BaseCommand {
           textChannelId: interaction.channelId,
         });
       } catch (error) {
-        await interaction.editReply(format(interaction.locale, "FAILED_JOIN"));
+        await interaction.reply(format(interaction.locale, "FAILED_JOIN"));
       }
     }
     await interaction.reply(format(interaction.locale, "PLAY_SEARCHING"));
