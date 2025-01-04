@@ -29,6 +29,14 @@ export default class MaintenanceCommand extends BaseCommand {
               .setName("정보")
               .setDescription("노드 정보를 확인합니다."),
           );
+      })
+      .addSubcommandGroup((group) => {
+        return group
+          .setName("설정")
+          .setDescription("설정 관리 명령어")
+          .addSubcommand((subcommand) =>
+            subcommand.setName("리로드").setDescription("설정을 리로드합니다."),
+          );
       });
     super({
       slashCommand,
@@ -53,6 +61,13 @@ export default class MaintenanceCommand extends BaseCommand {
           case "정보":
             return this.onNodeInfo({ interaction, userPermissions });
         }
+      case "설정":
+        switch (interaction.options.getSubcommand(true)) {
+          case "리로드":
+            return this.onReload({ interaction, userPermissions });
+        }
+      default:
+        break;
     }
   }
 
@@ -189,5 +204,24 @@ export default class MaintenanceCommand extends BaseCommand {
       }),
     );
     await interaction.reply({ embeds: [nodeInfoEmbed] });
+  }
+
+  private async onReload({ interaction }: KafuuCommandContext): Promise<void> {
+    if (!this.client.cluster) {
+      await interaction.reply("클러스터링 기능이 꺼져있습니다.");
+      return;
+    }
+
+    await interaction.deferReply();
+    this.client.cluster.broadcastEval("this.reloadConfig()");
+
+    await promisify(setTimeout)(3000);
+
+    const nodeInfoEmbed: ExtendedEmbed = EmbedFactory.createEmbed();
+    nodeInfoEmbed.setTitle("🔄  설정 리로드 완료");
+    nodeInfoEmbed.setDescription("설정이 리로드되었습니다.");
+    nodeInfoEmbed.setTimestamp(new Date());
+
+    await interaction.editReply({ embeds: [nodeInfoEmbed] });
   }
 }

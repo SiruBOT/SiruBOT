@@ -10,7 +10,6 @@ import { Routes, APIApplication } from "discord-api-types/v9";
 import { REST as DiscordREST } from "@discordjs/rest";
 
 import { ArgumentParser } from "argparse";
-import { stat, readFile } from "fs/promises";
 
 import { Logger } from "tslog";
 import FastGlob from "fast-glob";
@@ -27,7 +26,7 @@ import type {
   KafuuBootStrapperArgs,
   DiscordGatewayResponse,
 } from "@/types/bootstrapper";
-import type { KafuuSettings } from "@/types/settings";
+import { safeReadFile, type KafuuSettings } from "@/types/settings";
 
 import { version, name, dependencies } from "../package.json";
 import { Cluster, ClusterManager } from "discord-hybrid-sharding";
@@ -96,27 +95,6 @@ const log: Logger = createLogger({
 
 /* ---------------- BOOT CALL ---------------- */
 boot();
-
-// fs.exists is deprecated
-async function exists(path: string): Promise<boolean> {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await stat(path);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
-// read file when file exists & file extension == .yaml
-async function safeReadFile(path: string): Promise<string> {
-  const fileExists = await exists(path);
-  if (!fileExists) throw new Error(`File ${path} does not exist`);
-  if (typeof path == "string" && !path.endsWith(".yaml"))
-    throw new Error(`File ${path} is not a YAML file`);
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  return readFile(path, "utf-8");
-}
 
 /* Async function for boot */
 async function boot() {
@@ -458,9 +436,9 @@ async function boot() {
           return status;
         });
 
-        await fastify.listen({ port: args.port ?? 3000 });
+        await fastify.listen({ port: args.port ?? 3000, host: "0.0.0.0" });
         log.info(
-          "Experimental API server started on port " + args.port ?? 3000,
+          "Experimental API server started on port " + (args.port ?? 3000),
         );
       }
     } catch (err) {

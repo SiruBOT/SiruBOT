@@ -2,14 +2,14 @@
 
 name: Run eslint
 
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest 
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
 
     steps:
     -

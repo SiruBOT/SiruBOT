@@ -10,9 +10,10 @@ import { BaseEvent, DatabaseHelper } from "./";
 import type { KafuuBootStrapperArgs } from "@/types/bootstrapper";
 import { MESSAGE_CACHE_SWEEPER_INTERVAL } from "@/constants/time";
 import { ClientStats } from "@/types/stats";
-import { KafuuSettings } from "@/types/settings";
+import { KafuuSettings, safeReadFile } from "@/types/settings";
 import { generateGlobPattern } from "@/utils/formatter";
 import { join as joinPath } from "path";
+import { parse } from "yaml";
 
 class KafuuClient extends Discord.Client {
   public settings: KafuuSettings;
@@ -186,6 +187,14 @@ class KafuuClient extends Discord.Client {
         wsLatency: this.ws.ping,
       },
     };
+  }
+
+  private async reloadConfig() {
+    const configPath = joinPath(process.cwd(), this.bootStrapperArgs.config);
+    const yamlContent = await safeReadFile(configPath);
+    const config = parse(yamlContent);
+
+    this.settings = config as KafuuSettings;
   }
 }
 

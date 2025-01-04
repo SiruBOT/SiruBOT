@@ -1,4 +1,5 @@
 import type { NodeOption } from "shoukaku";
+import { stat, readFile } from "fs/promises";
 
 // Define the interface for KafuuSettings
 export interface KafuuSettings {
@@ -42,4 +43,24 @@ export interface KafuuSettings {
       password: string; // MongoDB password string
     };
   };
+}
+
+// fs.exists is deprecated
+async function exists(path: string): Promise<boolean> {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await stat(path);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function safeReadFile(path: string): Promise<string> {
+  const fileExists = await exists(path);
+  if (!fileExists) throw new Error(`File ${path} does not exist`);
+  if (typeof path == "string" && !path.endsWith(".yaml"))
+    throw new Error(`File ${path} is not a YAML file`);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  return readFile(path, "utf-8");
 }

@@ -30,11 +30,7 @@ export function createLogger({
   );
 
   const writeTransport = (logObj: ILogObject) => {
-    if (shardInfo) {
-      stream.write(JSON.stringify({ shardInfo, logObj }) + "\n");
-    } else {
-      stream.write(JSON.stringify(logObj) + "\n");
-    }
+    stream.write(JSON.stringify(logObj) + "\n");
   };
 
   const logger = new Logger({
