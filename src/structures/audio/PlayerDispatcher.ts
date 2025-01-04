@@ -117,7 +117,10 @@ export class PlayerDispatcher {
   @BreakOnDestroyed()
   private async onException(exception: TrackExceptionEvent) {
     const name = this.player.node.name;
-    this.log.error(`Error while playback node ${name}@${this.guildId}`, exception);
+    this.log.error(
+      `Error while playback node ${name}@${this.guildId}`,
+      exception,
+    );
     await this.handleError(exception);
   }
 
@@ -206,7 +209,9 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  private async playNextTrack(exception?: TrackExceptionEvent): Promise<KafuuAudioTrack | void> {
+  private async playNextTrack(
+    exception?: TrackExceptionEvent,
+  ): Promise<KafuuAudioTrack | void> {
     this.log.debug(`Playing next track`);
     const guildConfig: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
