@@ -2,14 +2,14 @@
 
 name: Typescript build
 
-on: [push, pull_request] # push, pull request 가 발생했을때 작동합니다.
+on: [pull_request] # push, pull request 가 발생했을때 작동합니다.
 jobs:
   build:
     runs-on: ubuntu-latest # Ubuntu 최신버전에서 실행합니다
 
     strategy:
       matrix:
-        node-version: [18.x] # Node.JS 18.x 버전에서 빌드합니다
+        node-version: [22.x]
 
     steps:
     - 
