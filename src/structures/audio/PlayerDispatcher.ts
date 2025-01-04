@@ -116,8 +116,9 @@ export class PlayerDispatcher {
 
   @BreakOnDestroyed()
   private async onException(exception: TrackExceptionEvent) {
-    this.log.error(`Error while playback`, exception);
-    await this.handleError();
+    const name = this.player.node.name;
+    this.log.error(`Error while playback node ${name}@${this.guildId}`, exception);
+    await this.handleError(exception);
   }
 
   @BreakOnDestroyed()
@@ -205,7 +206,7 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  private async playNextTrack(): Promise<KafuuAudioTrack | void> {
+  private async playNextTrack(exception?: TrackExceptionEvent): Promise<KafuuAudioTrack | void> {
     this.log.debug(`Playing next track`);
     const guildConfig: TypeORMGuild =
       await this.client.databaseHelper.upsertAndFindGuild(this.guildId);
@@ -220,6 +221,13 @@ export class PlayerDispatcher {
       this.log.debug(
         `Nothing to playing next, but related playing is enabled. trying handle related videos...`,
       );
+      if (exception) {
+        this.log.warn(
+          `TrackExceptionEvent is exists, stop player and clean PlayerDispatcher`,
+        );
+        await this.stopPlayer();
+        return;
+      }
       await this.playRelated();
       return;
     } else {
@@ -425,8 +433,8 @@ export class PlayerDispatcher {
   }
 
   @BreakOnDestroyed()
-  private async handleError(): Promise<void> {
-    await this.playNextTrack();
+  private async handleError(exception?: TrackExceptionEvent): Promise<void> {
+    await this.playNextTrack(exception);
     await this.audioMessage.sendErrorMessage();
   }
 

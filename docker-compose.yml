@@ -31,13 +31,15 @@ services:
   sirubot:
     container_name: sirubot_discord
     build: .
+    ports:
+      - 3000:3000
     environment:
       - NODE_ENV=development
-    command: node ./build -d -s -c settings.yaml
+    command: node ./build -api -d -s -c settings.yaml
     volumes:
       - type: bind
         source: settings.yaml
-        target: /opt/sirubot/settings.yaml
+        target: /app/settings.yaml
 
 # Volumes
 volumes:
