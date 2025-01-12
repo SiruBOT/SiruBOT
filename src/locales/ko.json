@@ -89,6 +89,7 @@
 	"SHUFFLE_SHUFFLED_TRACKS": "> 🔀  노래 **{0}** 개의 순서를 무작위로 섞었어요.",
 
 	"SOURCE": "아티스트: {0}",
+	"NODE": "📡 재생 서버: {0}",
 	"TRACK_EMBED_RELATED": "⭐  추천 곡 자동 재생 중",
 
 	"INTERACTION_ONLY_SAME_EXECUTOR": "> ❔  이 상호작용은 명령어를 실행한 사용자만 사용 가능해요.",

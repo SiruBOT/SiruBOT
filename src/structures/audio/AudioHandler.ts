@@ -142,6 +142,7 @@ export class AudioHandler extends Shoukaku {
     return await EmbedFactory.buildNowplayingEmbed(
       this.client,
       getReusableFormatFunction(localeName ?? Locale.Korean),
+      guildId,
       nowPlaying,
       position,
       queue.length,

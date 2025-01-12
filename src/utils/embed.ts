@@ -123,6 +123,7 @@ export class EmbedFactory {
   public static async buildNowplayingEmbed(
     client: KafuuClient,
     format: ReusableFormatFunc,
+    guildId: string,
     nowplaying: GuildAudioData["nowPlaying"],
     position: number | null,
     remainTracks?: number,
@@ -137,24 +138,26 @@ export class EmbedFactory {
       const readableTrackLength: string = nowplaying.info.isStream
         ? `[${format("LIVESTREAM")}]`
         : humanizeSeconds(trackLength, true);
+      
+      const formattedTrack = `**${formatTrack(nowplaying, {
+        streamString: format("LIVESTREAM"),
+        showLength: false,
+      })}**`;
+      const urlLinkTitle: string = nowplaying.info.uri
+          ? `[${formattedTrack}](${nowplaying.info.uri})`
+          : formattedTrack;
       const trackEmbed: ExtendedEmbed = await this.getTrackEmbed(
         client,
         format,
         nowplaying,
       );
-      const formattedTrack = `**${formatTrack(nowplaying, {
-        streamString: format("LIVESTREAM"),
-        showLength: false,
-      })}**`;
+      
+      const node = client.audio.players.get(guildId)?.node.name;
+
       const progressBar: string = emojiProgressBar(
         currentPosition / trackLength,
       );
-      const urlLinkTitle: string = nowplaying.info.uri
-        ? `[${formattedTrack}](${nowplaying.info.uri})`
-        : formattedTrack;
-      trackEmbed.setDescription(
-        `${urlLinkTitle}\n${readablePosition}  ${progressBar}  ${readableTrackLength}`,
-      );
+
       const footerItems: string[] = [];
       if (nowplaying.info.author) {
         footerItems.push(format("SOURCE", nowplaying.info.author));
@@ -171,7 +174,21 @@ export class EmbedFactory {
           ),
         );
       }
-      trackEmbed.setFooter({ text: footerItems.join(" | ") });
+
+      trackEmbed.setDescription(
+        `${urlLinkTitle}\n [${readablePosition}/${readableTrackLength}] ${progressBar}\n-# ${footerItems.join(
+          " | ",
+        )}`,
+      );
+
+      trackEmbed.setFooter(
+        node
+          ? {
+              text: format("NODE", node),
+            }
+          : undefined,
+      );
+
       return trackEmbed;
     }
   }
