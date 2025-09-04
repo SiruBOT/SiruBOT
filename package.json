@@ -1,13 +1,54 @@
 {
   "name": "sirubot",
   "version": "5.0.0",
-  "description": "Discord musicbot with lavalink v4",
-  "main": "./dist/index.js",
-  "repository": "https://github.com/SiruBOT/SiruBOT",
-  "author": "Sannoob3144 <cotwo0139@gmail.com>",
+  "main": "dist/index.js",
   "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "@sapphire/decorators": "^6.2.0",
+    "@sapphire/discord-utilities": "^3.5.0",
+    "@sapphire/discord.js-utilities": "^7.3.3",
+    "@sapphire/fetch": "^3.0.5",
+    "@sapphire/framework": "^5.3.6",
+    "@sapphire/plugin-api": "^8.3.1",
+    "@sapphire/plugin-editable-commands": "^4.0.4",
+    "@sapphire/plugin-logger": "^4.1.0",
+    "@sapphire/plugin-subcommands": "^7.0.1",
+    "@sapphire/time-utilities": "^1.7.14",
+    "@sapphire/type": "^2.6.0",
+    "@sapphire/utilities": "^3.18.2",
+    "@skyra/env-utilities": "^2.0.1",
+    "chokidar": "^4.0.3",
+    "discord.js": "^14.22.1",
+    "esbuild": "^0.25.9",
+    "lavalink-client": "^2.6.1",
+    "prisma": "^6.15.0",
+    "undici": "^7.15.0"
+  },
   "devDependencies": {
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.2"
-  }
+    "@sapphire/cli": "^1.9.3",
+    "@sapphire/prettier-config": "^2.0.0",
+    "@sapphire/ts-config": "^5.0.1",
+    "@swc/cli": "0.7.8",
+    "@swc/core": "1.13.5",
+    "@types/node": "^22.18.1",
+    "@types/ws": "^8.18.1",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.6.2",
+    "tsc-watch": "6.3.1",
+    "typescript": "^5.9.2"
+  },
+  "scripts": {
+    "sapphire": "sapphire",
+    "generate": "sapphire generate",
+    "build": "swc src -d dist --strip-leading-paths",
+    "watch": "swc src -d dist -w --strip-leading-paths",
+    "start": "node dist/index.js",
+    "dev": "run-s build start",
+    "watch:start": "tsc-watch --onSuccess \"node ./dist/index.js\"",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "prettier": "@sapphire/prettier-config",
+  "packageManager": "yarn@4.6.0"
 }
