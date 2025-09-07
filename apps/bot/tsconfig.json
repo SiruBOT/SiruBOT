@@ -2,6 +2,8 @@
 	"extends": ["@sapphire/ts-config", "@sapphire/ts-config/extra-strict", "@sapphire/ts-config/decorators"],
 	"compilerOptions": {
 		"noEmit": true,
-		"incremental": false
-	}
+		"incremental": false,
+		"typeRoots": ["./src/types", "node_modules/@types"]
+	},
+	"include": ["src/**/*", "src/types/**/*"]
 }

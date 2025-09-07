@@ -1,0 +1,21 @@
+{
+  "name": "@sirubot/bot",
+  "private": true,
+  "version": "5.0.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "lint": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@sirubot/prisma": "*",
+    "@sirubot/utils": "*"
+  },
+  "prettier": "@sapphire/prettier-config",
+  "packageManager": "yarn@4.6.0"
+}

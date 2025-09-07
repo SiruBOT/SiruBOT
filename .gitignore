@@ -33,5 +33,11 @@ package-lock.json
 .env.test.local
 .env.production.local
 
+# turbo generated files
+.turbo/
+
+# build generated files
+dist/
+
 # prisma generated files
-src/lib/prisma/client/
+packages/prisma/src/client/
