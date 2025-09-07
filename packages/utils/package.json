@@ -1,0 +1,19 @@
+{
+    "name": "@sirubot/utils",
+    "version": "0.1.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "lint": "prettier --write \"src/**/*.ts\"",
+        "typecheck": "tsc --noEmit",
+        "build": "tsup",
+        "watch": "tsup --watch"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.0.0"
+    },
+    "devDependencies": {
+        "prisma": "^5.0.0"
+    },
+    "packageManager": "yarn@4.6.0"
+}
