@@ -1,7 +1,7 @@
-import { isDev } from '@sirubot/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Listener } from '@sapphire/framework';
 import type { StoreRegistryValue } from '@sapphire/pieces';
+import { isDev } from '@sirubot/utils';
 import { blue, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
 
 @ApplyOptions<Listener.Options>({ once: true })
