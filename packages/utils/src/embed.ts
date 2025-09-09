@@ -1,7 +1,14 @@
-import { EmbedBuilder, EmbedFooterOptions } from "discord.js";
+import {
+  ContainerBuilder,
+  EmbedBuilder,
+  SeparatorBuilder,
+  ThumbnailBuilder,
+  SeparatorSpacingSize,
+  EmbedFooterOptions,
+} from "discord.js";
 import { isDev } from "./index";
 import { versionInfo } from "./version";
-import { WARN_COLOR } from "./constants";
+import { DEFAULT_COLOR, WARN_COLOR } from "./constants";
 
 export class ExtendedEmbedBuilder extends EmbedBuilder {
   public override setFooter(options: EmbedFooterOptions | null) {
@@ -16,4 +23,24 @@ export function buildErrorEmbed(error: string) {
   return new ExtendedEmbedBuilder()
     .setColor(WARN_COLOR)
     .setDescription(`**${error}**`);
+}
+
+export function addSeparator(container: ContainerBuilder): void {
+  container.addSeparatorComponents(
+    new SeparatorBuilder()
+      .setDivider(true)
+      .setSpacing(SeparatorSpacingSize.Small),
+  );
+}
+
+export function createContainer(): ContainerBuilder {
+  const container = new ContainerBuilder();
+  container.setAccentColor(DEFAULT_COLOR);
+  return container;
+}
+
+export function createThumbnail(url: string): ThumbnailBuilder {
+  const thumbnail = new ThumbnailBuilder();
+  thumbnail.setURL(url);
+  return thumbnail;
 }
