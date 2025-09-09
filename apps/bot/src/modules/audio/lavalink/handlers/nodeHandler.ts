@@ -1,5 +1,5 @@
+import { InvalidLavalinkRestRequest, LavalinkNode, LavalinkPlayer, NodeManager } from 'lavalink-client';
 import { BaseLavalinkHandler } from './base';
-import { LavalinkNode, NodeManager } from 'lavalink-client';
 
 export class NodeHandler extends BaseLavalinkHandler {
 	private nodeManager: NodeManager | null;
@@ -32,14 +32,22 @@ export class NodeHandler extends BaseLavalinkHandler {
 		node.updateSession(true, 300_000);
 	}
 
-	//@ts-ignore
-	private handleNodeResumed(node: LavalinkNode, payload: any, players: any) {
+	private handleNodeResumed(
+		node: LavalinkNode,
+		payload: {
+			resumed: true;
+			sessionId: string;
+			op: 'ready';
+		},
+		players: LavalinkPlayer[] | InvalidLavalinkRestRequest
+	) {
 		this.logger.info(`Node resumed: ${node.options.id}`);
+		console.log(payload);
+		console.log(players);
 	}
 
-	//@ts-ignore
 	private handleNodeDisconnect(node: LavalinkNode, reason: { code?: number | undefined; reason?: string | undefined }) {
-		this.logger.info(`Node disconnected: ${node.options.id}`);
+		this.logger.info(`Node disconnected: ${node.options.id} | ${reason.reason}`);
 	}
 
 	private handleNodeReconnecting(node: LavalinkNode) {

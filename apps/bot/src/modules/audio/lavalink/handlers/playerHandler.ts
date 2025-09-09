@@ -15,6 +15,7 @@ export class PlayerHandler extends BaseLavalinkHandler {
 		lavalinkManager.on('playerDestroy', this.handlePlayerDestroy.bind(this));
 		lavalinkManager.on('playerDisconnect', this.handlePlayerDisconnect.bind(this));
 		lavalinkManager.on('playerMove', this.handlePlayerMove.bind(this));
+    lavalinkManager.on('playerUpdate', this.handlePlayerUpdate.bind(this));
 	}
 
 	//@ts-ignore
@@ -33,6 +34,12 @@ export class PlayerHandler extends BaseLavalinkHandler {
 	private handlePlayerMove(player: Player, oldChannelId: string, newChannelId: string) {
 		this.logger.info(`Player moved: ${player.guildId}`);
 	}
+
+  //@ts-ignore
+  private handlePlayerUpdate(oldPlayerJson: PlayerJson, newPlayer: Player) {
+    this.logger.info(`Player updated: ${newPlayer.guildId}`);
+    this.container.redisStoreManager.getPlayerSaver().set(newPlayer)
+  }
 
 	public cleanup() {
 		this.lavalinkManager?.off('playerCreate', this.handlePlayerCreate.bind(this));
