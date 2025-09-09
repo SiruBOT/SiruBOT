@@ -10,32 +10,32 @@ export class VoiceConnectedPrecondition extends AllFlowsPrecondition {
 
 	public override chatInputRun(interaction: CommandInteraction) {
 		if (!interaction.inCachedGuild()) return this.error({ message: this.#message });
-		
+
 		if (!this.checkVoiceConnected(interaction.member.voice.channelId)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 
 	public override contextMenuRun(interaction: ContextMenuCommandInteraction) {
 		if (!interaction.inCachedGuild()) return this.error({ message: this.#message });
-		
+
 		if (!this.checkVoiceConnected(interaction.member.voice.channelId)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 
 	public override messageRun(message: Message) {
 		if (!message.inGuild()) return this.error({ message: this.#message });
-		
+
 		const channelId = message.member?.voice.channelId ?? null;
 		if (!this.checkVoiceConnected(channelId)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 }

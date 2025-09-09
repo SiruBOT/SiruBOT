@@ -1,5 +1,5 @@
 import { AllFlowsPrecondition } from '@sapphire/framework';
-import { CommandInteraction, ContextMenuCommandInteraction, PermissionsBitField, GuildMember, Guild } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandInteraction, Guild, GuildMember, PermissionsBitField } from 'discord.js';
 import { Message } from 'discord.js';
 
 export class ClientVoiceSpeakable extends AllFlowsPrecondition {
@@ -15,31 +15,31 @@ export class ClientVoiceSpeakable extends AllFlowsPrecondition {
 
 	public override chatInputRun(interaction: CommandInteraction) {
 		if (!interaction.inCachedGuild()) return this.error({ message: this.#message });
-		
+
 		if (!this.checkSpeakPermissions(interaction.member, interaction.guild)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 
 	public override contextMenuRun(interaction: ContextMenuCommandInteraction) {
 		if (!interaction.inCachedGuild()) return this.error({ message: this.#message });
-		
+
 		if (!this.checkSpeakPermissions(interaction.member, interaction.guild)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 
 	public override messageRun(message: Message) {
 		if (!message.inGuild()) return this.error({ message: this.#message });
-		
+
 		if (!this.checkSpeakPermissions(message.member, message.guild)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 }

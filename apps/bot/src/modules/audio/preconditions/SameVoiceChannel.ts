@@ -13,40 +13,40 @@ export class SameVoiceChannelPrecondition extends AllFlowsPrecondition {
 
 	public override chatInputRun(interaction: CommandInteraction) {
 		if (!interaction.inCachedGuild()) return this.error({ message: this.#message });
-		
+
 		const userChannelId = interaction.member.voice.channelId;
 		const botChannelId = interaction.guild?.members.me?.voice.channelId ?? null;
-		
+
 		if (!this.checkSameVoiceChannel(userChannelId, botChannelId)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 
 	public override contextMenuRun(interaction: ContextMenuCommandInteraction) {
 		if (!interaction.inCachedGuild()) return this.error({ message: this.#message });
-		
+
 		const userChannelId = interaction.member.voice.channelId;
 		const botChannelId = interaction.guild?.members.me?.voice.channelId ?? null;
-		
+
 		if (!this.checkSameVoiceChannel(userChannelId, botChannelId)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 
 	public override messageRun(message: Message) {
 		if (!message.inGuild()) return this.error({ message: this.#message });
-		
+
 		const userChannelId = message.member?.voice.channelId ?? null;
 		const botChannelId = message.guild?.members.me?.voice.channelId ?? null;
-		
+
 		if (!this.checkSameVoiceChannel(userChannelId, botChannelId)) {
 			return this.error({ message: this.#message });
 		}
-		
+
 		return this.ok();
 	}
 }
