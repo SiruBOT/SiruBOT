@@ -19,6 +19,10 @@ export class RedisPlayerSaver {
 		return JSON.parse(playerData);
 	}
 
+	public async delete(guildId: string): Promise<void> {
+		await this.redis.del(this.getKey(guildId));
+	}
+
 	private stringify(player: Player): string {
 		const { queue, ...playerData } = player.toJSON();
 
