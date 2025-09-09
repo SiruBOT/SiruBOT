@@ -1,6 +1,6 @@
-import { DEFAULT_COLOR } from '@sirubot/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
+import { DEFAULT_COLOR } from '@sirubot/utils';
 import { ApplicationIntegrationType, ChatInputCommandInteraction } from 'discord.js';
 
 @ApplyOptions<Command.Options>({

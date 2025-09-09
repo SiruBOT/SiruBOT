@@ -1,7 +1,7 @@
-import { buildErrorEmbed } from '@sirubot/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { ChatInputCommandDeniedPayload, Events } from '@sapphire/framework';
 import { Listener, UserError } from '@sapphire/framework';
+import { buildErrorEmbed } from '@sirubot/utils';
 import { MessageFlags } from 'discord.js';
 
 @ApplyOptions<Listener.Options>({ event: Events.ChatInputCommandDenied })
