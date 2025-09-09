@@ -16,6 +16,11 @@
     "@sirubot/prisma": "*",
     "@sirubot/utils": "*"
   },
-  "prettier": "@sapphire/prettier-config",
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "@sapphire/cli": "^1.9.3",
+    "@sapphire/ts-config": "^5.0.1",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "prettier": "^3.6.2"
+  }
 }
