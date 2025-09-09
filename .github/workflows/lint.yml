@@ -22,9 +22,16 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+    -
+      name: Enable Corepack
+      run: corepack enable
+    -
+      name: Set Yarn version
+      run: corepack prepare yarn@4.9.4 --activate
     -
       name: Install dependencies
-      run: yarn install --production=false
+      run: yarn install --immutable
     -
       name: Run lint
       run: yarn run lint
