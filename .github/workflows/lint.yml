@@ -18,6 +18,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
+
+      - name: Enable Corepack and set Yarn version
+        run: |
+          corepack enable
+          corepack prepare yarn@4.6.0 --activate
  
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
