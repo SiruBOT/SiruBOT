@@ -44,6 +44,5 @@
         "lint": "turbo lint",
         "test": "turbo test",
         "generate": "turbo generate"
-    },
-    "packageManager": "yarn@4.6.0"
+    }
 }
